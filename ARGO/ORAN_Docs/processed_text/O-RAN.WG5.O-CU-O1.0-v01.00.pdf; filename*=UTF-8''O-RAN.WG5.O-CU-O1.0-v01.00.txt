@@ -1,0 +1,2698 @@
+O-RAN-WG5.O-CU-O1.0-v01.00
+Technical Specification
+O-RAN Alliance Working Group 5
+O1 Interface specification for O-CU-UP and O-CU-CP
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the
+previous requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN
+Adopter License Agreement to access and use Final Specifications shall no longer apply or be
+required for these Final Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is
+prohibited, save that you may print or download extracts of the material on this site for your
+personal use, or copy the material on this site for the purpose of sending to individual third parties
+for their information provided that you acknowledge O-RAN ALLIANCE as the source of the
+material and that you inform the third party that these conditions apply to them and that they must
+comply with them.
+1
+O-RAN-WG5.O-CU-O1.0-v01.00
+Technical Specification
+O-RAN Alliance Working Group 5 O1 Interface specification for O-CU-UP and O-CU-CP
+
+Copyright © 2021 by O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving,
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN
+Adopter License Agreement contained in Annex ZZZ of this specification. All other rights reserved.
+
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189.
+2021 O-RAN ALLIANCE e.V. All Rights Reserved           1
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        2
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Revision History 1
+Date Revision Author Description
+2021.07.19 01.00 O-RAN-WG5 First published version based on contributions and review by
+O-RAN members
+ 2
+3
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        3
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Contents 1
+Revision History ................................................................................................................................................. 2 2
+Contents .............................................................................................................................................................. 3 3
+List of Figures..................................................................................................................................................... 6 4
+List of Tables ...................................................................................................................................................... 6 5
+Chapter 1 Introductory Material ......................................................................................................................... 7 6
+1.1 Scope 7 7
+1.2 References .................................................................................................................................................................... 7 8
+1.3 Definitions and Abbreviations ...................................................................................................................................... 8 9
+1.3.1 Definitions ................................................................................................................................................................. 8 10
+1.3.2 Abbreviations ............................................................................................................................................................. 8 11
+1.4 Conventions .................................................................................................................................................................. 8 12
+1.5 Topics for Future Specification Versions ..................................................................................................................... 9 13
+Chapter 2 High Level Description ...................................................................................................................... 9 14
+2.1 Top level functional description and terminology, ....................................................................................................... 9 15
+2.1.1 Architecture for O-RAN WG5 functional split .......................................................................................................... 9 16
+2.1.2 O1 interface for O-CU architecture model ................................................................................................................ 9 17
+2.1.3 Transport Network ..................................................................................................................................................... 9 18
+2.2 Interfaces ...................................................................................................................................................................... 9 19
+Chapter 3 PNF Startup and Registration Management..................................................................................... 10 20
+3.1 PNF Plug-n-Play ......................................................................................................................................................... 10 21
+3.2 PNF Registration ........................................................................................................................................................ 10 22
+Chapter 4 Heartbeat Management Services ...................................................................................................... 10 23
+4.1 Heartbeat Notification................................................................................................................................................. 10 24
+4.2 Heartbeat Control ........................................................................................................................................................ 10 25
+Chapter 5 PNF Software Management Services .............................................................................................. 11 26
+3.1 Software Package Naming and Content ..................................................................................................................... 11 27
+3.2 Software Inventory ..................................................................................................................................................... 11 28
+3.3 Software Download .................................................................................................................................................... 11 29
+3.4 Software Activation Pre-Check .................................................................................................................................. 11 30
+3.5 Software Activate ....................................................................................................................................................... 11 31
+Chapter 6 Performance Management ............................................................................................................... 11 32
+6.1 Performance Data File Reporting ............................................................................................................................... 11 33
+6.2 Performance Data Streaming ...................................................................................................................................... 11 34
+6.3 Measurement Job Control ........................................................................................................................................... 12 35
+Chapter 7 Fault Management ........................................................................................................................... 12 36
+7.1 Fault Notification ........................................................................................................................................................ 12 37
+7.2 Fault Supervision Control ........................................................................................................................................... 12 38
+Chapter 8 File Management ............................................................................................................................. 12 39
+8.1 File Structure .............................................................................................................................................................. 13 40
+8.2 Notification notifyFileReady ...................................................................................................................................... 13 41
+8.3 File Management Operation: listAvailableFiles ......................................................................................................... 14 42
+8.4 File Management Operation: transferFile ................................................................................................................... 15 43
+8.5 File Management Operation: downloadFile ............................................................................................................... 15 44
+Chapter 9 Provisioning Management ............................................................................................................... 15 45
+9.1 Configuration for O-CU.............................................................................................................................................. 16 46
+9.4 Information model for O-CU-CP ................................................................................................................................ 17 47
+Annex A: Counter definition ............................................................................................................................ 20 48
+A.1 NR PDCP performance counters (Type A): ............................................................................................................... 20 49
+A.1.1 Distribution of UE per UL received data volume ................................................................................................... 20 50
+A.1.2 Distribution of DL UE throughput in O-CU ........................................................................................................... 20 51
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        4
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.1.3 Total discarded UL PDCP SDU volume ................................................................................................................. 20 1
+A.1.4 UL PDCP SDU volume discarded due to bearer release ........................................................................................ 20 2
+A.1.5 Total discarded DL PDCP SDU volume discarded ................................................................................................ 20 3
+A.1.6 DL PDCP SDU volume discarded due to bearer release ........................................................................................ 20 4
+A.1.7 DL PDCP SDU volume discarded due to out of memory ....................................................................................... 20 5
+A.1.8 PDCP transmission stop .......................................................................................................................................... 20 6
+A.2 NR PDCP performance counters (Type B): ............................................................................................................... 20 7
+A.2.1 UL PDCP SDU Data Volume ................................................................................................................................. 20 8
+A.2.2 UL PDCP SDU Data Volume on X2 Interface ....................................................................................................... 20 9
+A.2.3 UL PDCP SDU Data Volume on Xn Interface ....................................................................................................... 21 10
+A.2.4 DL PDCP SDU Data Volume ................................................................................................................................. 21 11
+A.2.5 DL PDCP SDU Data Volume on X2 Interface ....................................................................................................... 21 12
+A.2.6 DL PDCP SDU Data Volume on Xn Interface ....................................................................................................... 21 13
+A.3 NR S1-U Interface Performance Counters ................................................................................................................. 21 14
+A.3.1 UL PDCP SDU volume transmitted via S1-U UL GTP-U tunnel .......................................................................... 21 15
+A.3.2 DL PDCP SDU volume received via S1-U DL GTP-U tunnel ............................................................................... 21 16
+A.4 NR NG-U Interface Performance Counters ............................................................................................................... 21 17
+A.4.1 UL PDCP SDU volume transmitted via NG-U UL GTP-U tunnel ......................................................................... 21 18
+A.4.2 DL PDCP SDU volume received via NG-U DL GTP-U tunnel ............................................................................. 21 19
+A.5 NR X2-U Interface performance counters (O-CU) .................................................................................................... 21 20
+A.5.1 UL PDCP SDU volume received via X2-U UL GTP-U tunnel (X2-U UL data forwarding) ................................. 21 21
+A.5.2 DL PDCP SDU volume received via X2-U DL GTP-U tunnel (X2-U DL data forwarding) ................................. 21 22
+A.6 NR Xn-U Interface performance counters (O-CU) .................................................................................................... 22 23
+A.6.1 UL PDCP SDU volume received via Xn-U UL GTP-U tunnel (Xn-U UL data forwarding) ................................. 22 24
+A.6.2 DL PDCP SDU volume received via Xn-U DL GTP-U tunnel (Xn-U DL data forwarding) ................................. 22 25
+A.7 NR X2-C Interface performance counters (O-CU-CP) .............................................................................................. 22 26
+A.7.1 void 22  27
+A.7.2 Transmitted X2-C messages ................................................................................................................................... 22 28
+A.7.3 Received X2-C messages ........................................................................................................................................ 22 29
+A.8 NR Xn-C Interface performance counters (O-CU-CP) .............................................................................................. 23 30
+A.8.1 void 23  31
+A.8.2 Transmitted Xn-C messages ................................................................................................................................... 23 32
+A.8.3 Received Xn-C messages ........................................................................................................................................ 23 33
+A.9 NR F1-C Interface performance counters (O-CU-CP) .............................................................................................. 24 34
+A.9.1 void 24  35
+A.9.2 Transmitted F1-C messages .................................................................................................................................... 24 36
+A.9.3 Received F1-C messages ........................................................................................................................................ 24 37
+A.10 Number of UEs for EN-DC ..................................................................................................................................... 24 38
+A.10.1 Max SN terminated split bearer UEs .................................................................................................................... 24 39
+A.10.2 Max SN terminated MCG bearer UEs .................................................................................................................. 25 40
+A.10.3 Average SN terminated split bearer UEs .............................................................................................................. 25 41
+A.10.4 Average SN terminated MCG bearer UEs ............................................................................................................ 26 42
+A.10.5 Total DL CA UEs PSCellVoid ............................................................................................................................. 26 43
+A.10.6 void 26  44
+A.10.7 Total DL CA UEs SCellVoid................................................................................................................................ 26 45
+A.10.8 void 26  46
+A.10.9 Max DL CA UEs PSCell ...................................................................................................................................... 26 47
+A.10.10 void 27 48
+A.10.11 Max DL CA UEs SCell ....................................................................................................................................... 27 49
+A.10.12 void 28 50
+A.11 Number of UEs for SA ............................................................................................................................................ 28 51
+A.11.1 Total RRC Connected UEs ................................................................................................................................... 28 52
+A.11.2 Total UEs Per QoS ................................................................................................................................................ 28 53
+A.11.3 Total SCell Configuration UEs ............................................................................................................................. 28 54
+A.11.4 Total Measurement Gap UEs ................................................................................................................................ 28 55
+A.11.5 Max RRC Connected UEs .................................................................................................................................... 29 56
+A.11.6 Max UEs Per QoS ................................................................................................................................................. 29 57
+A.11.7 Max SCell Configuration UEs .............................................................................................................................. 29 58
+A.11.8 Max Measurement Gap UEs ................................................................................................................................. 30 59
+A.12 Monitoring of procedure for EN-DC ....................................................................................................................... 30 60
+A.12.1 Number of SgNB Addition procedure attempted for each Cell ............................................................................ 30 61
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        5
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.12.2 Number of SgNB Addition procedure successfully for each Cell ........................................................................ 30 1
+A.12.3 Number of SgNB Addition procedure attempted for each neighbour eNB .......................................................... 31 2
+A.12.4 Number of SgNB Addition procedure successfully for each neighbour eNB ....................................................... 31 3
+A.12.5 Number of SgNB modification procedure attempted for each neighbor eNB ...................................................... 32 4
+A.12.6 Number of SgNB modification procedure successfully for each neighbor eNB .................................................. 32 5
+A.13 Monitoring of RRC Connection for EN-DC ............................................................................................................ 33 6
+A.13.1 Number of Measurement Gap Coordination for per FR2 gap via SRB3 attempted .............................................. 33 7
+A.13.2 Number of Measurement Gap Coordination for per FR2 gap via SRB3 successfully ........................................ 34 8
+A.13.3 Number of Inter gNB-DU PSCell Change via SRB3 attempted ........................................................................ 34 9
+A.13.4 Number of Inter gNB-DU PSCell Change via SRB3 successfully ..................................................................... 34 10
+A.13.5 Number of Intra gNB-DU PSCell Change via SRB3 attempted ........................................................................... 35 11
+A.13.6 Number of Intra gNB-DU PSCell Change via SRB3 successfully ....................................................................... 35 12
+A.14 Monitoring of RRC Connection for SA ................................................................................................................... 36 13
+A.14.1 Number of initial RRC Connection requests ........................................................................................................ 36 14
+A.14.2 Number of RRC connection completions for initial RRC Connection requests ................................................... 36 15
+A.14.3 Number of retransmission RRC Connections requests ......................................................................................... 37 16
+A.14.4 Number of RRC Connections completions for retransmission RRC Connections requests ................................. 37 17
+A.14.5 Number of incomplete RRC Connection by failed resource allocations .............................................................. 37 18
+A.14.6 Number of incomplete RRC Connection by O-CU internal error ......................................................................... 38 19
+A.14.7 Number of initial RRC Connection requests each Establishment Cause .............................................................. 38 20
+A.14.8 Number of RRC connection completions for initial RRC Connection requests each Establishment Cause ...... 39 21
+A.14.9 Number of retransmission RRC Connections requests each Establishment Cause ............................................... 40 22
+A.14.10 Number of RRC Connections completions for retransmission RRC Connections requests each 23
+Establishment Cause .................................................................................................................................. 40 24
+A.14.11 Number of incomplete RRC Connection by failed resource allocations each Establishment Cause .............. 41 25
+A.14.12 Number of incomplete RRC Connection by O-CU internal error each Establishment Cause ........................ 42 26
+A.15 Monitoring of Establishment calls for SA ............................................................................................................... 43 27
+A.15.1 Number of attempted establishment calls for mo-Data ......................................................................................... 43 28
+A.15.2 Number of successful establishment calls for mo-Data ........................................................................................ 43 29
+A.15.3 Number of incomplete establishment calls for mo-Data by protocol error ........................................................ 43 30
+A.15.4 Number of incomplete establishment calls for mo-Data by O-CU internal error .............................................. 44 31
+A.15.5 Number of incomplete establishment calls for mo-Data by O-DU error detection ........................................... 44 32
+A.15.6 Number of attempted establishment calls for mt-Access ...................................................................................... 44 33
+A.15.7 Number of successful establishment calls for mt-Access ..................................................................................... 45 34
+A.15.8 Number of incomplete establishment calls for mt-Access by protocol error ..................................................... 45 35
+A.15.9 Number of incomplete establishment calls for mt-Access by O-CU internal error ........................................... 46 36
+A.15.10 Number of incomplete establishment calls for mt-Access by O-DU error detection ....................................... 46 37
+A.15.11 Number of attempted establishment calls for mo-Signalling .............................................................................. 46 38
+A.15.12 Number of successful establishment calls for mo-Signalling ............................................................................. 47 39
+A.15.13 Number of incomplete establishment calls for mo-Signalling by protocol error ................................................ 47 40
+A.15.14 Number of incomplete establishment calls for mo-Signalling by O-CU internal error ...................................... 48 41
+A.15.15 Number of incomplete establishment calls for mo-Signalling by O-DU error detection .................................... 48 42
+A.15.16 Number of attempted establishment calls for mo-SMS ...................................................................................... 48 43
+A.15.17 Number of successful establishment calls for mo-SMS ...................................................................................... 49 44
+A.15.18 Number of incomplete establishment calls for mo-SMS by protocol error ........................................................ 49 45
+A.15.19 Number of incomplete establishment calls for mo-SMS by O-CU internal error ............................................... 50 46
+A.15.20 Number of incomplete establishment calls for mo-SMS by O-DU error detection ............................................ 50 47
+A.16 Monitoring of PDU session connection for SA ....................................................................................................... 51 48
+A.16.1 Accepted PDU Session Resource Configuration .................................................................................................. 51 49
+A.16.2 Completed PDU Session Resource Configuration ................................................................................................ 51 50
+A.16.3 Interrupted PDU Session Resource configuration by Protocol Error .................................................................... 51 51
+A.16.4 Interrupted PDU Session Resource configuration by O-DU Error Detection ....................................................... 51 52
+A.16.5 Interrupted PDU Session Resource configuration by O-CU internal error ........................................................... 51 53
+A.17 Monitoring of mobility for SA ................................................................................................................................. 51 54
+A.17.1 Accepted Handover ............................................................................................................................................. 51 55
+A.17.2 Completed Handover ............................................................................................................................................ 52 56
+A.18 Monitoring of RRC re-establishment for SA ........................................................................................................... 52 57
+A.18.1 Number of initial RRC re-establishment requests when UE context can be retrieved .......................................... 52 58
+A.18.2 Number of RRC re-establishment request completions for initial RRC re-establishment requests when UE 59
+context can be retrieved .............................................................................................................................. 52 60
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        6
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.18.3 Number of retransmission RRC re-establishment requests when UE context can be retrieved ............................ 53 1
+A.18.4 Number of RRC re-establishment request completions for retransmission RRC re-establishment request 2
+when UE context can be retrieved .............................................................................................................. 53 3
+A.18.5 Number of initial RRC re-establishment requests when UE context cannot be retrieved ..................................... 54 4
+A.18.6 Number of RRC re-establishment request completions for initial RRC re-establishment requests when UE 5
+context cannot be retrieved ........................................................................................................................ 54 6
+A.18.7 Number of retransmission RRC re-establishment requests when UE context cannot be retrieved ....................... 55 7
+A.18.8 Number of RRC re-establishment request completions for retransmission RRC re-establishment requests 8
+when UE context cannot be retrieved ......................................................................................................... 55 9
+A.19 Monitoring of connection status for SA ................................................................................................................... 56 10
+A.19.1 Normally Released Calls ....................................................................................................................................... 56 11
+A.19.2 Abnormally Released Calls ................................................................................................................................... 56 12
+A.19.3 Another Cell HO UEs ........................................................................................................................................... 56 13
+Annex ZZZ O-RAN Adopter License Agreement ........................................................................................... 57 14
+Section 1: DEFINITIONS ................................................................................................................................................ 57 15
+Section 2: COPYRIGHT LICENSE ................................................................................................................................. 57 16
+Section 3: FRAND LICENSE .......................................................................................................................................... 58 17
+Section 4: TERM AND TERMINATION ........................................................................................................................ 58 18
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 58 19
+Section 6: INDEMNIFICATION ..................................................................................................................................... 59 20
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 59 21
+Section 8: ASSIGNMENT ............................................................................................................................................... 59 22
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 59 23
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 59 24
+Section 11: GENERAL ..................................................................................................................................................... 59 25
+ 26
+List of Figures 27
+Figure 1. Heartbeat Notification ....................................................................................................................................... 10 28
+Figure 2. File Ready Notification ..................................................................................................................................... 14 29
+Figure 3. List Available Files ........................................................................................................................................... 15 30
+ 31
+List of Tables 32
+No table of figures entries found. 33
+34
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        7
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Chapter 1 Introductory Material 1
+1.1 Scope 2
+This Technical Specification has been produced by the O-RAN.org. 3
+The contents of the present document are subject to continuing work within O-RAN WG5 and may change following 4
+formal O-RAN approval. Should the O-RAN.org modify the contents of the present document, it will be re-released by 5
+O-RAN Alliance with an identifying change of release date and an increase in version number as follows: 6
+Release x.y.z 7
+where: 8
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9
+etc. (the initial approved document will have x=01). 10
+y the second digit is incremented when editorial only changes have been incorporated in the document. 11
+z the third digit included only in working versions of the document indicating incremental changes during the 12
+editing process. 13
+The present document specifies the O1 Interface specification for O-CU used over the interface linking the O-CU (O-14
+RAN Central  Unit) with Service Management and Orchestration (SMO).  15
+1.2 References 16
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 17
+document. 18
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 19
+non-specific. 20
+- For a specific reference, subsequent revisions do not apply. 21
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 22
+a GSM document), a non-specific reference implicitly refers to the latest version of that document. 23
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”, Release 17, v17.0.0, 2020-07 24
+[2] ORAN-WG5.C.1-v01.00 “Control Plane Specification”, O-RAN  Alliance, Working Group 5  25
+[3] ORAN-WG5.U.0-v01.00 “User Plane Specification”, O-RAN  Alliance, Working Group 5 26
+[4] RFC 6241, “Network Configuration Protocol (NETCONF)”, IETF, June 2011 27
+[5] RFC 7950, “The YANG 1.1 Data Modeling Language”, IETF, August 2016 28
+[6] RFC 7895, “YANG Model Library”, IETF, June 2016 29
+[7] O-RAN-WG1.OAM-Architecture-v03.00, O-RAN Alliance, Working Group 1 30
+[8] O-RAN.WG1.O1-Interface.0-v04.00, “O-RAN Operations and Maintenance Interface Specification”, O-RAN 31
+Alliance, Working Group 1 32
+[9] 3GPP 28.532, “Management and orchestration; Generic management services”, Release 16, v16.7.1, 2021-04 33
+[10] 3GPP 28.545, “Management and orchestration; Fault Supervision (FS)”, Release 16, v16.1.0, 2020-09 34
+[11] 3GPP 28.541, “Management and orchestration; 5G Network Resource Model (NRM); Stage 2 and stage 3”, 35
+Release 17, v17.2.1, 2021-04  36
+[12] 3GPP 32.342, “File Transfer (FT); Integration Reference Point (IRP); Information Service (IS)”, Release 16, 37
+v16.0.0, 2020-07 38
+[13] 3GPP 32.302, “Configuration Management (CM); Notification Integration Reference Point (IRP) ; Information 39
+Service (IS)”, Release 16, v16.0.0, 2020-07 40
+[14] 3GPP 28.622, “Telecommunication management; Generic Network Resource Model (NRM) Integration 41
+Reference Point (IRP); Information Service (IS)”, Release 16, v16.7.1, 2021-04 42
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        8
+ORAN-WG5.O-CU-O1.0-v01.00
+
+[15] 3GPP 28.623, “Telecommunication management; Generic Network Resource Model (NRM) Integration 1
+Reference Point (IRP); Solution Set (SS) definitions”, Release 16, v16.7.0, 2021-03 2
+ 3
+1.3 Definitions and Abbreviations 4
+1.3.1 Definitions 5
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the O1 interface 6
+specification [8].   7
+ 8
+1.3.2 Abbreviations 9
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An 10
+abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 11
+3GPP TR 21.905 [1] . 12
+O-CU-CP O-RAN Central Unit Control Plane 13
+O-CU-UP O-RAN Central Unit User Plane 14
+NETCONF Network Configuration Protocol 15
+NMS Network Management System 16
+O-CU O-RAN Central Unit 17
+O-DU O-RAN Distributed Unit 18
+O-RU O-RAN Radio Unit 19
+OAM Operations And Maintenance 20
+SMO Service Management and Orchestration 21
+PNF Physical Network Function 22
+QoS Quality of Service 23
+RPC Remote Procedure Call 24
+sFTP Secure File Transfer Protocol or SSH File Transfer Protocol 25
+SSH Secure Shell 26
+VES Virtual-function Event Streaming 27
+VLAN Virtual LAN 28
+YANG Yet Another Next Generation 29
+ 30
+1.4 Conventions 31
+This specification includes cross references to a set of associated YANG models. Text may reference particular YANG 32
+leafs, notifications and remote procedure calls (RPCs). In order to assist in readability, all cross references to YANG 33
+defined elements will keep the identical case format as defined in the corresponding YANG model, with the font-weight 34
+set to bold. This convention applies only to text and not to YANG elements embedded into figures.  35
+If there is any conflict between the YANG models and the accompanying text description in this specification, the 36
+definition of the YANG models shall take precedence. 37
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        9
+ORAN-WG5.O-CU-O1.0-v01.00
+
+1.5 Topics for Future Specification Versions 1
+ 2
+ 3
+The revision statement in the YANG models will be used to describe future revisions to the models that are backwards 4
+compatible. Backwards incompatible changes will be addressed by incrementing the number used as part of the model 5
+name and namespace, effectively creating a new YANG model. The format of the namespace used in all O-RAN YANG 6
+models is “urn:o-ran:”<model-name>“:”<model-number>, where the initial <model-number> used in a newly defined 7
+YANG model is “1.0”. Where this document makes reference to models, irrespective of their backward compatibity, a 8
+generic <model-number> of “x.y” is used to enable reference to all versions of the namespace for a particular <model-9
+name>. 10
+ 11
+The revision statement in all YANG models includes a reference statement used to cross-reference to the first version of 12
+this document where the corresponding description was introduced. For example, the reference in all revision statements 13
+for the initial O-RAN models should include cross-reference to “O-RAN.WG5.O-CU-O1.0-v01.00”.  14
+ 15
+The revision statement of the YANG models also includes a description which is used to track the versioning of the 16
+YANG model. All revision statement descriptions will begin with “version ”<a>“.”<b>“.”<c>, where <a>, <b> and <c> 17
+are used to reflect the version of the YANG model, where 18
+ 19
+<a> corresponds to the first digit of the O-RAN WG5 management plane specification version where the 20
+corresponding description was first introduced, corresponding to <x> in sub-section 1.1 21
+<b>  is incremented when errors in the YANG model have been corrected 22
+<c> is incremented only in working versions of the the YANG model indicating incremental changes during the 23
+editing process 24
+ 25
+ 26
+Chapter 2 High Level Description 27
+2.1 Top level functional description and terminology,  28
+2.1.1 Architecture for O-RAN WG5 functional split 29
+This O1 interface facilitates the initialization, configuration and management of the O-CU-CP and O-CU-UP. Please refer 30
+to O-RAN OAM Architecture [7] for more details on the architecture. 31
+2.1.2 O1 interface for O-CU architecture model 32
+O1 interface for O-CU-CP and O-CU-UP is used for supporting the management features including “start up” installation, 33
+software management, configuration management, performance management, fault management and file management 34
+towards the O-CU.  35
+2.1.3 Transport Network 36
+Based on the transport topology, various modes of network connectivity are possible between O-CU-CP, O-CU-UP and 37
+SMO, as defined in the O-RAN OAM Architecture document [7]  .  38
+  39
+2.2 Interfaces 40
+The interface between the management system and the O-CU is as defined in the O1 specification [8]. 41
+ 42
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        10
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Chapter 3 PNF Startup and Registration Management 1
+ 2
+ O-CU (including O-CU-CP and O-CU-UP) may deployed as PNF as described in O1 Interface Specification [8], 3
+Chapter 2.7 PNF Startup and Registration Management Services. 4
+3.1 PNF Plug-n-Play 5
+PNF Plug-n-Play for O-CU is aligned with O1 Interface Specification [8], Chapter 2.7.1 PNF Plug-n-Play. 6
+3.2 PNF Registration 7
+PNF Registrationfor O-CU is aligned with O1 Interface Specification [8], Chapter 2.7.2 PNF Registration. 8
+ 9
+Chapter 4 Heartbeat Management Services 10
+ 11
+4.1 Heartbeat Notification 12
+Heartbeat Notification for both O-CU-CP and O-CU-UP are aligned with O1 Interface Specification [8], chapter 2.6.1 13
+Heartbeat Notification.  14
+ 15
+ 16
+Figure 1. Heartbeat Notification 17
+ 18
+4.2 Heartbeat Control 19
+Heartbeat Control for both O-CU-CP and O-CU-UP are aligned with O1 Interface Specification [8], chapter 2.6.2 20
+Heartbeat Control.  21
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        11
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+ 2
+ 3
+Chapter 5 PNF Software Management Services 4
+ 5
+3.1 Software Package Naming and Content 6
+Software Package Naming and Content for O-CU is aligned with O1 Interface Specification [8], Chapter 2.8.1 Software 7
+Package Naming and Content. 8
+3.2 Software Inventory 9
+Software Inventory for O-CU is aligned with O1 Interface Specification [8], Chapter 2.8.2 Software Inventory. 10
+3.3 Software Download 11
+Software Download for O-CU is aligned with O1 Interface Specification [8], Chapter 2.8.3 Software Download. 12
+3.4 Software Activation Pre-Check 13
+Software Activation Pre-Check for O-CU is aligned with O1 Interface Specification [8], Chapter 2.8.4 Software 14
+Activation Pre-Check. 15
+3.5 Software Activate 16
+Software Activate for O-CU is aligned with O1 Interface Specification [8], Chapter 2.8.5 Software Activate. 17
+ 18
+Chapter 6 Performance Management 19
+6.1 Performance Data File Reporting 20
+Performance Data File Reporting for O-CU is aligned with O1 Interface Specification [8], Chapter 2.3.1 Performance 21
+Data File Reporting. 22
+6.2 Performance Data Streaming 23
+Performance Data Streaming for O-CU is aligned with O1 Interface Specification [8] , Chapter 2.3.2 Performance Data 24
+Streaming. 25
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        12
+ORAN-WG5.O-CU-O1.0-v01.00
+
+6.3 Measurement Job Control 1
+Measurement Job Control for O-CU is aligned with O1 Interface Specification [8] , Chapter 2.3.3 Measurement Job 2
+Control. 3
+ 4
+ 5
+Chapter 7 Fault Management 6
+Fault supervision management services allow a Fault Supervision MnS Provider to report errors and events to a Fault 7
+Supervision MnS Consumer, and allow a Fault Supervision MnS Consumer to perform fault supervision operations on 8
+the Fault Supervision MnS Provider, such as get alarm list. 9
+O-CU-UP and O-CU-CP Fault Supervision Management services are based on the Fault Supervision Management 10
+Services of O1 Interface Specification [8]  that contains Fault Supervision MnS as specified in 3GPP TS 28.545 [10], 11
+Fault notifications as specified in 3GPP TS 28.532 [9], AlarmList IOC and AlarmRecord data type as specified in 3GPP 12
+TS 28.622 [14], and solution sets for YAML and YANG as specified in 3GPP TS 28.623 [15]. 13
+7.1 Fault Notification 14
+O-CU-UP and O-CU-CP Fault notification events are aligned with O1 Interface Specification [8], Chapter 2.2.1 Fault 15
+Notification. 16
+7.2 Fault Supervision Control 17
+O-CU-UP and O-CU-CP Fault supervision control is aligned with O1 Interface Specification [8], Chapter 2.2.2 Fault 18
+Supervision Control. 19
+ 20
+Chapter 8 File Management 21
+This chapter illustrate File Management between the O-CU-CP and SMO and between the O-CU-UP and SMO. The 22
+File Management Service is applied to manage file transfer for different types of data file such as Bulk CM file, Call 23
+and UE trace file, Performance Measurement result file, etc. The following file management use cases are supported for 24
+the O-CU-CP and O-CU-UP: 25
+ List available files 26
+ Transfer  file 27
+ Download file 28
+ File ready notification 29
+The detailed description of the use cases including file management operations and procedures as well as sequence 30
+diagram can be found in the O-RAN O1 interface specification [8], chapter 2.5. 31
+This chapter shall describe the handling of files that are stored in the O-CU-CP which are generated by the O-CU-CP 32
+itself and O-CU-UP which are generated by the O-CU-UP itself.   33
+The data files that are stored in the O-CU shall follow Chapter 8.1 of this specification. 34
+ 35
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        13
+ORAN-WG5.O-CU-O1.0-v01.00
+
+8.1 File Structure 1
+The file system structure for the O-CU-CP and O-CU-UP is defined as for file management procedures defined in the rest 2
+of this chapter. If the O-CU-CP and O-CU-UP’s physical file structure differs from the logical file structure defined below, 3
+the O-CU-CP and O-CU-UP shall perform the mapping related files into defined structure. 4
+The O-CU-CP and O-CU-UP shall support the standized folders for files generated by the O-CU-CP and O-CU-UP itself. 5
+The following standardized folders are defined: 6
+O-CU-CP 7
+› O-RAN/O-CU-CP/PM/   for performance data files 8
+› O-RAN/O-CU-CP/CM/ for configuration files (except inventory) 9
+› O-RAN/O-CU-CP/NL/     for notification log file 10
+› O-RAN/O-CU-CP/CT/     for call trace files 11
+› O-RAN/O-CU-CP/OT/     for other files 12
+O-CU-UP 13
+› O-RAN/O-CU-UP/PM/   for performance data files 14
+› O-RAN/O-CU-UP/CM/ for configuration files (except inventory) 15
+› O-RAN/O-CU-UP/NL/     for notification log file 16
+› O-RAN/O-CU-UP/CT/     for call trace files 17
+› O-RAN/O-CU-UP/OT/     for other files 18
+ 19
+The O-CU-CP and O-CU-UP may additionally support vendor defined folders which are out of scope of this specification. 20
+ 21
+8.2 Notification notifyFileReady 22
+The file ready notification is applied to when the management data files have been prepared ready in O-CU-CP and O-23
+CU-UP. The O-CU-CP and O-CU-UP will send notification using notifyFileReady VES event to subscribed SMO in 24
+order to notify the availability of the file(s) as defined in O1 Interface Specification [8].  25
+The following input parameters are provided by the file ready notification (see also 3GPP TS 32.342 [12]): 26
+ 27
+objectClass Notification header – see 3GPP TS 32.302[xx].
+It shall carry the FTIRP class name.
+objectInstance Notification header - see 3GPP TS 32.302[xx].
+It shall carry the DN of the FTIRP.
+notificationId Notification header - see 3GPP TS 32.302[xx].
+eventTime Notification header - see 3GPP TS 32.302[xx].
+systemDN Notification header - see 3GPP TS 32.302[xx].
+notificationType Notification header – see 3GPP TS 32.302[xx].
+fileInfoList It specifies the information of the available file.
+additionalText It carries vendor-specific semantics not defined
+in the present document.
+Table x: Parameters list for Notification notifyFileReady 28
+ 29
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        14
+ORAN-WG5.O-CU-O1.0-v01.00
+
+When a file is available, the O-CU-CP and O-CU-UP sends a FileReady notification to the SMO using HTTP/TLS as 1
+defined in O1 Interface Specification [8]. The FileReady notification for O-CU-CP and O-CU-UP is performed 2
+independently. 3
+@startuml 4
+Title File Ready Notification  5
+participant "SMO/OAM\n(File Management Service Consumer)” as L 6
+participant "O-CU-CP\n(File Management Service Provider)" as M 7
+participant "O-CU-UP\n(File Management Service Provider)" as N 8
+ 9
+note over ME : New file is available 10
+L <- M: HTTP/TLS<notifyFileReady> 11
+note over N: New file is available 12
+L <- N: HTTP/TLS<notifyFileReady> 13
+@enduml 14
+ 15
+ 16
+ 17
+ 18
+Figure 2. File Ready Notification 19
+ 20
+8.3 File Management Operation: listAvailableFiles 21
+This listAvailableFiles operation for the SMO is applied to obtain the available file list with files location and type from 22
+the O-CU-CP and O-CU-UP by reading the AvailableFileList IOC as specified in 3GPP TS 32.342 [12]. The 23
+listAvailableFiles operation for O-CU-CP and O-CU-UP is performed independently. 24
+The following rpc is used for lisAvailableFiles operation. 25
+-rpc: list-available-files 26
+-  input 27
+- name of AvailableFileList IOC on O-CU-CP and O-CU-UP  28
+- Filter: the content which is intereting from SMO  (* is allowed as wild-card) 29
+-  output 30
+-  data: whether O-CU-CP and O-CU-UP accepted with the contents of the AvailableFileList.IOC or 31
+-  reject-reason: the human readable reason why O-CU rejects the request (only applicable if status is rejected) 32
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        15
+ORAN-WG5.O-CU-O1.0-v01.00
+
+@startuml 1
+Title List Available Files  2
+ 3
+participant "SMO/OAM\n(File Management Service Consumer)” as L 4
+participant "O-CU-CP\n(File Management Service Provider)" as M 5
+participant "O-CU-UP\n(File Management Service Provider)" as N 6
+Autonumber 7
+L -> M : NETCONF<rpc><get><filter> 8
+L <- M: NETCONF<rpc-reply><data> 9
+Autonumber 10
+L -> N: NETCONF<rpc><get><filter> 11
+L <- N: NETCONF<rpc-reply><data> 12
+@enduml 13
+ 14
+ 15
+ 16
+ 17
+Figure 3. List Available Files 18
+ 19
+8.4 File Management Operation: transferFile 20
+The Transfer File Service provides the capability for the SMO to transfer files from or to the O-CU-CP and O-CU-UP.  21
+SMO/OAM may perform this action as a result of a FileReady notification from the O-CU-CP and O-CU-UP informing 22
+SMO that a file is now available to transfer, In any case, the file transfer is performed using a secure file transfer 23
+protocol (SFTP or FTPeS) from or to the location provided by O-CU-CP and O-CU-UP. The SMO triggers file transfer 24
+operation to O-CU-CP and O-CU-UP. Detailed procedure can be found in Chapter 2.5.3 of O1 Interface Specification 25
+[8]. The transferFile operation for O-CU-CP and O-CU-UP is performed independently. 26
+8.5 File Management Operation: downloadFile 27
+The Download File Service provides the capability for the SMO to request the O-CU-CP and O-CU-UP to download 28
+the file(s) when the SMO has a file that needs to be downloaded. In any case, the file download is performed using a 29
+secure file transfer protocol (SFTP or FTPeS) from the location provided by the SMO. The O-CU-CP and O-CU-UP 30
+replies to the SMO with the result of the download procedure. Detailed procedure can be found in Chapter 2.5.4 of O1 31
+Interface Specification [8]. The downloadFile operation for O-CU-CP and O-CU-UP  is performed independently. 32
+Chapter 9 Provisioning Management 33
+ 34
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        16
+ORAN-WG5.O-CU-O1.0-v01.00
+
+This chapter describes the Provisioning Management for O-CU specific aspects. 1
+ 2
+ 3
+9.1 Configuration for O-CU  4
+ 5
+SMO configures the O-CU-CP and O-CU-UP  6
+Data Model configurations: 7
+1. SA5 data model  8
+The following 3GPP SA5 YANG modules are imported in the O-CU YANG modules published along with this 9
+specification. See TS 28.541 [x] 10
+- _3gpp-common-top.yang 11
+- _3gpp-common-yang-types.yang 12
+- _3gpp-common-managed-element.yang  13
+- _3gpp-nr-nrm-gnbcucpfunction.yang  14
+- _3gpp-nr-nrm-nrcellcu.yang  15
+- _3gpp-nr-nrm-nrfreqrelation.yang 16
+- _3gpp-nr-nrm-gnbcuupfunction.yang 17
+- _3gpp-nr-nrm-ep.yang  18
+ 19
+2. O-RAN augmentation of SA5 data models 20
+O-CU-CP 21
+- o-ran-cu-security-handling.yang 22
+ 23
+O-CU-UP 24
+--- 25
+ 26
+The O-CU YANG modules listed above, are published along with this specification document, and augment SA5 data 27
+models.  28
+SupportQualifier(SQ) property for each attribute in the O-CU YANG modules, specifies whether it is mandatory for 29
+vendor to support the attribute in the implementation and in the data model. Meaning of this property, follows the 30
+definition in 3GPP TS 32.156, section 6. Values can be M, O, CM, CO.  31
+If SQ=O, for an attribute, and if vendor does not support it, then this lack of support must be indicated, as specified in 32
+3GPP TS 32.106 section 6.2.26. 33
+If SQ is not specified, then a default value of 'O' is to be assumed. 34
+ 35
+9.2 Cell Activation 36
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        17
+ORAN-WG5.O-CU-O1.0-v01.00
+
+O-RU O-DU O-CU SMO[a]Service Configurations[1] Cell Configuration[2] Carrier Configuration[3] <sync-status>LOCKED</sync-status>[4] <sync-state>LOCKED</sync-state>par[5] <operastionalState>ENABLED</operationalState>[6] <sync-state>LOCKED</sync-state>F1 Startup step[7] F1 Setup Request[8] F1 setup Response[9] gNB-CU configuration update[10] gNB-CU configuration update ACKMeNBX2 setup[B] X2 setup Procedures[11] ACTIVE
+ 1  2
+ 3
+ 4
+9.3 Notification aspect 5
+9.3.1 Subscribing for O-CU notification from SMO  6
+The O-CU would represent the parameters in its YANG model. 7
+The SMO is responsible of subscribing to the parameters of interest from  the O-CU data model using subscription 8
+mechanism described in O1 Interface specification  Chapter 2.1.10 Subscription Control.  9
+ 10
+9.4 Information model for O-CU-CP  11
+9.4.1 Imported and associated information 12
+ 13
+Label reference Local label
+3GPP TS 28.620 [9], IOC, ManagedElement_ ManagedElement_
+ 14
+9.4.2 Class diagram  15
+ 16
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        18
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+Figure x: NRM for <<IOC>>GNBCUCPFunction and <<IOC>>SecurityHandling  2
+ 3
+ 4
+9.4.3 Class definition 5
+ 6
+9.4.3.1 SecurityHandling <<InformationObjectClass>> 7
+This IOC represents the CU-CP security related handling function.  8
+ 9
+Attribute name
+Support
+Qualifier isReadable isWritable isInvariant isNotifyable
+cipheringAlgoPrio O
+
+T T F T
+integrityProtectAlgoPrio O T T F T
+ 10
+9.4.4 ENUMERATIONs 11
+ 12
+9.4.4.1 CipheringAlgorithmID << enumeration>> 13
+ 14
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        19
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+ 2
+9.4.4.2 IntegrityAlgorithmID << enumeration>> 3
+ 4
+ 5
+9.4.5 Attribute definitions 6
+ 7
+9.4.5.1 Attribute properties 8
+ 9
+  10
+Attribute Name Documentation and Allowed Values Properties
+cipheringAlgoPrio The attribute provides allowed ciphering algorithms
+with priority order.
+
+Minimum length of 1, maximum length of 4.
+Algorithm in index zero has highest priority. Each
+algorithm written only once in array.
+AllowedValues:
+NEA0, NEA1, NEA2, NEA3
+
+Default value:
+NEA1,NEA2,NEA0
+Type: CipheringAlgorithmID
+multiplicity: 4
+isOrdered:  True
+isUnique:  True
+defaultValue: NEA1,NEA2,NEA0
+isNullable: False
+
+integrityProtectAlgoPrio The attribute provides allowed integrity algorithms
+with priority order.
+
+Minimum length of 1, maximum length of 3.
+Algorithm in index zero has highest priority. Each
+algorithm written only once in array.
+
+AllowedValues:
+NIA1, NIA2, NIA3
+
+DefaultValue:
+NIA2,NIA1
+Type:  IntegrityAlgorithmID
+multiplicity: 3
+isOrdered:  True
+isUnique:  True
+defaultValue:  NIA2,NIA1
+isNullable: False
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        20
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Annex A: Counter definition 1
+A.1 NR PDCP performance counters (Type A): 2
+A.1.1 Distribution of UE per UL received data volume 3
+A.1.1.1 Performance Counter Table 4
+A.1.2 Distribution of DL UE throughput in O-CU 5
+A.1.2.1 Performance Counter Table 6
+A.1.3 Total discarded UL PDCP SDU volume 7
+A.1.3.1 Performance Counter Table 8
+A.1.4 UL PDCP SDU volume discarded due to bearer release 9
+A.1.4.1 Performance Counter Table 10
+A.1.5 Total discarded DL PDCP SDU volume discarded 11
+A.1.5.1 Performance Counter Table 12
+A.1.6 DL PDCP SDU volume discarded due to bearer release 13
+A.1.6.1 Performance Counter Table 14
+A.1.7 DL PDCP SDU volume discarded due to out of memory 15
+A.1.7.1 Performance Counter Table 16
+A.1.8 PDCP transmission stop 17
+A.1.8.1 Performance Counter Table 18
+A.2 NR PDCP performance counters (Type B): 19
+A.2.1 UL PDCP SDU Data Volume 20
+A.2.1.1 Performance Counter Table 21
+A.2.2 UL PDCP SDU Data Volume on X2 Interface 22
+A.2.2.1 Performance Counter Table 23
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        21
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.2.3 UL PDCP SDU Data Volume on Xn Interface 1
+A.2.3.1 Performance Counter Table 2
+A.2.4 DL PDCP SDU Data Volume 3
+A.2.4.1 Performance Counter Table 4
+A.2.5 DL PDCP SDU Data Volume on X2 Interface 5
+A.2.5.1 Performance Counter Table 6
+A.2.6 DL PDCP SDU Data Volume on Xn Interface 7
+A.2.6.1 Performance Counter Table 8
+A.3 NR S1-U Interface Performance Counters 9
+A.3.1 UL PDCP SDU volume transmitted via S1-U UL GTP-U tunnel 10
+A.3.1.1 Performance Counter Table 11
+A.3.2 DL PDCP SDU volume received via S1-U DL GTP-U tunnel 12
+A.3.2.1 Performance Counter Table 13
+A.4 NR NG-U Interface Performance Counters 14
+A.4.1 UL PDCP SDU volume transmitted via NG-U UL GTP-U tunnel 15
+A.4.1.1 Performance Counter Table 16
+A.4.2 DL PDCP SDU volume received via NG-U DL GTP-U tunnel 17
+A.4.2.1 Performance Counter Table 18
+A.5 NR X2-U Interface performance counters (O-CU) 19
+A.5.1 UL PDCP SDU volume received via X2-U UL GTP-U tunnel (X2-U UL 20
+data forwarding) 21
+A.5.1.1 Performance Counter Table 22
+A.5.2 DL PDCP SDU volume received via X2-U DL GTP-U tunnel (X2-U DL 23
+data forwarding) 24
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        22
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.5.2.1 Performance Counter Table 1
+A.6 NR Xn-U Interface performance counters (O-CU) 2
+A.6.1 UL PDCP SDU volume received via Xn-U UL GTP-U tunnel (Xn-U UL 3
+data forwarding) 4
+A.6.1.1 Performance Counter Table 5
+A.6.2 DL PDCP SDU volume received via Xn-U DL GTP-U tunnel (Xn-U DL 6
+data forwarding) 7
+A.6.2.1 Performance Counter Table 8
+A.7 NR X2-C Interface performance counters (O-CU-CP) 9
+A.7.1 void 10
+A.7.2 Transmitted X2-C messages 11
+A.7.2.1 Performance Counter Table 12
+Measurement Name OR.X2.TxX2CMesg
+Description This counter provides the number of the transmitted X2-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever X2 C-plane
+message is transmitted when the signal type of the X2 C-plane message
+is group of Signaltype.
+Measurement Result Integer (32)
+Measurement Type OR.X2.TxX2CMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.7.3 Received X2-C messages 13
+A.7.3.1 Performance Counter Table 14
+Measurement Name OR.X2.RxX2CMesg
+Description This counter provides the number of the received X2-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever X2 C-plane
+message is received when the signal type of the X2 C-plane message is
+group of Signaltype.
+Measurement Result Integer (32)
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        23
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Measurement Type OR.X2.RxX2CMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.8 NR Xn-C Interface performance counters (O-CU-CP) 1
+A.8.1 void 2
+A.8.2 Transmitted Xn-C messages 3
+A.8.2.1 Performance Counter Table 4
+Measurement Name OR.Xn.TxXnCMesg
+Description This counter provides the number of the transmitted Xn-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever Xn C-plane
+message is transmitted when the signal type of Xn C-plane message is
+group of Signaltype.
+Measurement Result Integer (32)
+Measurement Type OR.Xn.TxXnCMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.8.3 Received Xn-C messages 5
+A.8.3.1 Performance Counter Table 6
+Measurement Name OR.Xn.RxXnCMesg
+Description This counter provides the number of the received Xn-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever Xn C-plane
+message is received when the signal type of the Xn C-plane message is
+group of Signaltype.
+Measurement Result Integer (32)
+Measurement Type OR.Xn.RxXnCMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        24
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.9 NR F1-C Interface performance counters (O-CU-CP) 1
+A.9.1 void 2
+A.9.2 Transmitted F1-C messages 3
+A.9.2.1 Performance Counter Table 4
+Measurement Name OR.F1.TxF1CMesg
+Description This counter provides the number of the transmitted F1-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever F1 C-plane
+message is transmitted when the signal type of the F1 C-plane message is
+group of Signaltype.
+Measurement Result Integer (32)
+Measurement Type OR.F1.TxF1CMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.9.3 Received F1-C messages 5
+A.9.3.1 Performance Counter Table 6
+Measurement Name OR.F1.RxF1CMesg
+Description This counter provides the number of the received F1-C messages per
+signal type that is non UE-associated or UE-associated signaling [TS
+38.401].
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever F1 C-plane
+message is received when the signal type of the F1 C-plane message is
+group of Signaltype.
+Measurement Result Integer (32)
+Measurement Type OR.F1.RxF1CMesg.Signaltype where Signaltype is signal type:
+0: non UE-associated
+1: UE associated
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.10 Number of UEs for EN-DC 7
+A.10.1 Max SN terminated split bearer UEs 8
+A.10.1.1 Performance Counter Table 9
+Measurement Name OR.UEENDC.MaxSnSplitBearer
+Description This counter provides the maximum number of UEs that are configured
+SN terminated split bearer.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        25
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with sampling period by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the UE that are configured as SN terminated split
+bearer.
+x is acquired as an instantaneous value at every sampling period.
+Note that sampling period is vendor implementation specific e.g., 100ms.
+Measurement Result Integer number (U32)
+Measurement Type OR.UEENDC.MaxSnSplitBearer
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.10.2 Max SN terminated MCG bearer UEs 2
+A.10.2.1 Performance Counter Table 3
+Measurement Name OR.UEENDC.MaxSnMcgBearer
+Description This counter provides the maximum number of UEs that are configured
+SN terminated MCG bearer.
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with sampling period by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the UEs  that are configured as SN terminated MCG
+bearer.
+x is acquired as an instantaneous value at every sampling period.
+Note that sampling period is vendor implementation specific e.g., 100ms.
+Measurement Result Integer number (U32)
+Measurement Type OR.UEENDC.MaxSnMcgBearer
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.10.3 Average SN terminated split bearer UEs 5
+A.10.3.1 Performance Counter Table 6
+Measurement Name OR.UEENDC.AvgSnSplitBearer
+Description This counter provides the average number of UEs that are configured SN
+terminated split bearer that are already setup.
+Collection Method SI
+Condition Measurement subcounter is x/y.
+
+x is incremented by the number of UEs that are configured SN
+terminated split bearer. This counter obtains the number of the UEs
+every sampling period.
+y is calculated as: measurement period divided by sampling period.
+Note that sampling period is vendor implementation specific e.g., 100ms.
+Measurement Result Integer number (U32)
+Measurement Type OR.UEENDC.AvgSnSplitBearer
+Measurement Object Class NRCellCU
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        26
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.10.4 Average SN terminated MCG bearer UEs 2
+A.10.4.1 Performance Counter Table 3
+Measurement Name OR.UEENDC.AvgSnMcgBearer
+Description This counter provides the average number of UEs that are configured SN
+terminated MCG bearer that are already setup.
+Collection Method SI
+Condition Measurement subcounter is x/y.
+
+x is incremented by the number of UEs that are configured SN
+terminated MCG bearer. This counter obtains the number of the UEs
+every sampling period.
+y is calculated as: measurement period divided by sampling period.
+Note that sampling period is vendor implementation specific e.g., 100ms.
+Measurement Result Integer number (U32)
+Measurement Type OR.UEENDC.AvgSnMcgBearer
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.10.5 Total DL CA UEs PSCellVoid 5
+A.10.5.1 Performance Counter Table 6
+A.10.6 void 7
+ 8
+A.10.7 Total DL CA UEs SCellVoid 9
+A.10.7.1 Performance Counter Table 10
+A.10.8 void 11
+ 12
+A.10.9 Max DL CA UEs PSCell 13
+A.10.9.1 Performance Counter Table 14
+Measurement Name OR.UEENDC.MaxDlCaUePscell
+Description This counter provides the maximum number of UEs that are set of DL
+CA as PSCell in units of NR Cell.
+Collection Method SI
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        27
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with sampling period by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the UEs using this cell as PSCell per the number of
+CC configured for DL CA in unit of NR Cell group as
+subcounter.Ccnum.
+The number is acquired as an instantaneous value at every sampling
+period.
+Note that sampling period is vendor implementation specific e.g., 100ms
+or 10s.
+Measurement Result Users (integer)
+Measurement Type OR.UEENDC.MaxDlCaUePscell.Ccnum where Ccnum is the number of
+CC:
+0: #0CC (number of SCell excluding PSCell in the cell group)
+1: #1CC (number of SCell excluding PSCell in the cell group)
+…
+7: #7CC (number of SCell excluding PSCell in the cell group)
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.10.10 void 1
+ 2
+A.10.11 Max DL CA UEs SCell 3
+A.10.11.1 Performance Counter Table 4
+Measurement Name OR.UEENDC.MaxDlCaUeScell
+Description This counter provides the maximum number of UEs that are set of DL
+CA as SCell in units of NR Cell.
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with sampling period by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the UEs using this cell as SCell per the number of CC
+configured for DL CA in unit of NR Cell group as subcounter.Ccnum.
+The number is acquired as an instantaneous value at every sampling
+period.
+Note that sampling period is vendor implementation specific e.g., 100ms
+or 10s.
+Measurement Result Users (integer)
+Measurement Type OR.UEENDC.MaxDlCaUeScell.Ccnum where Ccnum is the number of
+CC:
+0: #1CC (number of SCell excluding PSCell in the cell group)
+1: #2CC (number of SCell excluding PSCell in the cell group)
+…
+7: #6CC (number of SCell excluding PSCell in the cell group)
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        28
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.10.12 void 1
+ 2
+A.11 Number of UEs for SA 3
+A.11.1 Total RRC Connected UEs 4
+A.11.1.1 Performance Counter Table 5
+Measurement Name OR.UESA.TotalRrcConnectedUes
+Description This counter provides the total number of the RRC connected UEs as
+PCell. This counter includes only RRC active state.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is the total number of x by the measurement
+period.
+x is the number of the RRC connected UEs by every 10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.TotalRrcConnectedUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.11.2 Total UEs Per QoS 6
+A.11.2.1 Performance Counter Table 7
+A.11.3 Total SCell Configuration UEs 8
+A.11.3.1 Performance Counter Table 9
+Measurement Name OR.UESA.TotalScellConfigUes
+Description This counter provides the total number of the SCell configuration UEs.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is the total number of x by the measurement
+period.
+x is the number of the SCell configuration UEs by every 10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.TotalScellConfigUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.11.4 Total Measurement Gap UEs 10
+A.11.4.1 Performance Counter Table 11
+Measurement Name OR.UESA.TotalMeasGapUes
+Description This counter provides the total number of UEs which is configured with
+measurement gap.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is the total number of x by the measurement
+period.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        29
+ORAN-WG5.O-CU-O1.0-v01.00
+
+x is the number of UEs which is configured measurement gap by every
+10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.TotalMeasGapUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.11.5 Max RRC Connected UEs 1
+A.11.5.1 Performance Counter Table 2
+Measurement Name OR.UESA.MaxRrcConnectedUes
+Description This counter provides the maximum number of the RRC connected UEs
+as PCell. This counter includes only RRC active state.
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with period of 10s by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the RRC connected UEs as PCell.
+The number is acquired as an instance value at every 10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.MaxRrcConnectedUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.11.6 Max UEs Per QoS 3
+A.11.6.1 Performance Counter Table 4
+A.11.7 Max SCell Configuration UEs 5
+A.11.7.1 Performance Counter Table 6
+Measurement Name OR.UESA.MaxScellConfigUes
+Description This counter provides the maximum number of the SCell configuration
+UEs.
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with period of 10s by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the SCell configuration UEs.
+The number is acquired as an instance value at every 10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.MaxScellConfigUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        30
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.11.8 Max Measurement Gap UEs 1
+A.11.8.1 Performance Counter Table 2
+Measurement Name OR.UESA.MaxMeasGapUes
+Description This counter provides the maximum number of UEs which is configured
+with measurement gap.
+Collection Method SI
+Condition Measurement subcounter is the maximum number of x. It is assigned
+with period of 10s by the volume x, if x is bigger than previously
+counted volume.
+x is the number of the UEs which is configured with measurement gap.
+The number is acquired as an instance value at every 10s.
+Measurement Result Integer number (U32)
+Measurement Type OR.UESA.MaxMeasGapUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.12 Monitoring of procedure for EN-DC 3
+A.12.1 Number of SgNB Addition procedure attempted for each Cell 4
+A.12.1.1 Performance Counter Table 5
+Measurement Name OR.ENDCPROCEDURE.SgnbAddAttemptCell
+Description This counter provides the number of the transmitted X2-AP:SGNB
+ADDITION REQUEST ACKNOWLEDGE messages.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever X2-AP:SGNB
+ADDITION REQUEST ACKNOWLEDGE message is transmitted as
+PSCell.
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbAddAttemptCell
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 6
+A.12.2 Number of SgNB Addition procedure successfully for each Cell 7
+A.12.2.1 Performance Counter Table  8
+Measurement Name OR.ENDCPROCEDURE.SgnbAddSuccessCell
+Description This counter provides the number of the completed SgNB addition
+Procedure.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever SgNB addition
+procedure is completed as PSCell.(i.e. X2-AP:SGNB
+RECONFIGURATION COMPLETE message (SgNB addition
+complete) is received and RACH processing with UE is completed.)
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbAddSuccessCell
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        31
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.12.3 Number of SgNB Addition procedure attempted for each neighbour 2
+eNB 3
+A.12.3.1 Performance Counter Table 4
+Measurement Name OR.ENDCPROCEDURE.SgnbAddAttemptNeiEnb
+Description This counter provides the number of the transmitted X2-AP:SGNB
+ADDITION REQUEST ACKNOWLEDGE messages.
+This counter is split into subcounters per neighbor eNB.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever X2-AP:SGNB
+ADDITION REQUEST ACKNOWLEDGE message is transmitted when
+the eNB configured by the message is group of subcounter.neighboreNB.
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbAddAttemptNeiEnb.neighboreNB  where
+neighboreNB is neighbor eNB index:
+0: #0
+1: #1
+…
+63: #63
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.12.4 Number of SgNB Addition procedure successfully for each neighbour 6
+eNB 7
+A.12.4.1 Performance Counter Table  8
+Measurement Name OR.ENDCPROCEDURE.SgnbAddSuccessNeiEnb
+Description This counter provides the number of the completed SgNB addition
+Procedure.
+This counter is split into subcounters per neighbor eNB.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever SgNB addition
+procedure is completed (i.e. X2-AP:SGNB RECONFIGURATION
+COMPLETE message (SgNB addition complete) is received and RACH
+processing with UE is completed) when the eNB configured by the
+message is group of subcounter.neighboreNB.
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbAddSuccessNeiEnb.neighboreNB  where
+neighboreNB is neighbor eNB index:
+0: #0
+1: #1
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        32
+ORAN-WG5.O-CU-O1.0-v01.00
+
+…
+63: #63
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.12.5 Number of SgNB modification procedure attempted for each neighbor 2
+eNB 3
+A.12.5.1 Performance Counter Table 4
+Measurement Name OR.ENDCPROCEDURE.SgnbModAttemptNeiEnb
+Description This counter provides the number of the received X2-AP:SGNB
+MODIFICATION REQUEST messages or transmitted X2-AP:SGNB
+MODIFICATION REQUIRED messages.
+This counter is split into subcounters per neighbor eNB.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever X2-AP:SGNB
+MODIFICATION REQUEST message is received or X2-AP:SGNB
+MODIFICATION REQUIRED message is transmitted , when the eNB
+configured by the message is group of subcounter.neighboreNB.
+Double counting is not performed if the procedure is changed to the MN
+initiated SN Modification procedure after transmitted X2-AP:SGNB
+MODIFICATION REQUIRED message (e.g. Measurement gap
+Coordination(SN initiated)).
+This subcounter will not be incremented if received X2-AP:SGNB
+MODIFICATION REQUEST message which True is set for SCG
+Configuration Query IE.
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbModAttemptNeiEnb.neighboreNB where
+neighboreNB is neighbor eNB index:
+0: #0
+1: #1
+…
+63: #63
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.12.6 Number of SgNB modification procedure successfully for each 6
+neighbor eNB 7
+A.12.6.1 Performance Counter Table 8
+Measurement Name OR.ENDCPROCEDURE.SgnbModSuccessNeiEnb
+Description This counter provides the number of the completed SgNB modification
+Procedure.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        33
+ORAN-WG5.O-CU-O1.0-v01.00
+
+This counter is split into subcounters per neighbor eNB.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever SgNB
+Modification procedure is completed ( i.e.X2-AP:SGNB
+RECONFIGURATION COMPLETE message(SgNB modification
+complete) is received or X2-AP:SGNB MODIFICATION CONFIRM is
+received and RACH processing with UE is completed) when the eNB
+configured by the message is group of subcounter.neighboreNB.
+Measurement Result Integer number (U32)
+Measurement Type OR.ENDCPROCEDURE.SgnbModSuccessNeiEnb.neighboreNB where
+neighboreNB is neighbor eNB index:
+0: #0
+1: #1
+…
+63: #63
+Measurement Object Class GNBCUCPFunction
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.13 Monitoring of RRC Connection for EN-DC 2
+A.13.1 Number of Measurement Gap Coordination for per FR2 gap via SRB3 3
+attempted 4
+A.13.1.1 Performance Counter Table 5
+Measurement Name OR.RRCCONENDC.ReconfSrb3AttemptGap
+Description This counter provides the number of the transmitted RRC:RRC
+Reconfiguration messages via SRB3 when the following procedure.
+- Measurement Gap Coordination for per FR2 gap (without MN
+involvement) Procedure (SN initiated).
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration message is transmitted via SRB3 when the
+following procedure.
+- Measurement Gap Coordination for per FR2 gap (without MN
+involvement) Procedure (SN initiated).
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONENDC.ReconfSrb3AttemptGap
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 6
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        34
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.13.2 Number of Measurement Gap Coordination for per FR2 gap via SRB3 1
+successfully  2
+A.13.2.1 Performance Counter Table 3
+Measurement Name OR.RRCCONENDC.ReconfSrb3SuccessGap
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via SRB3 when the following
+procedure.
+- Measurement Gap Coordination for per FR2 gap (without MN
+involvement) Procedure (SN initiated).
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration Complete message is received via SRB3
+when the following procedure.
+- Measurement Gap Coordination for per FR2 gap (without MN
+involvement) Procedure (SN initiated).
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONENDC.ReconfSrb3SuccessGap
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.13.3 Number of Inter gNB-DU PSCell Change via SRB3 attempted 5
+A.13.3.1 Performance Counter Table 6
+Measurement Name OR.RRCCONENDC.ReconfSrb3AttemptInterDuPscellch
+Description This counter provides the number of the transmitted RRC:RRC
+Reconfiguration messages via SRB3 when the following procedure.
+- Inter gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration message is transmitted via SRB3 when the
+following procedure.
+- Inter gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Measurement Result Integer number (U3 Inter gNB-DU PSCell Change 2)
+Measurement Type OR.RRCCONENDC.ReconfSrb3AttemptInterDuPscellch
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 7
+A.13.4 Number of Inter gNB-DU PSCell Change via SRB3 successfully  8
+A.13.4.1 Performance Counter Table 9
+Measurement Name OR.RRCCONENDC.ReconfSrb3SuccessInterDuPscellch
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        35
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via SRB3 when the following
+procedure.
+- Inter gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration Complete message is received via SRB3
+when the following procedure.
+- Inter gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONENDC.ReconfSrb3SuccessInterDuPscellch
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.13.5 Number of Intra gNB-DU PSCell Change via SRB3 attempted 2
+A.13.5.1 Performance Counter Table 3
+Measurement Name OR.RRCCONENDC.ReconfSrb3AttemptIntraDuPscellch
+Description This counter provides the number of the transmitted RRC:RRC
+Reconfiguration messages via SRB3 when the following procedure.
+- Intra gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration message is transmitted via SRB3 when the
+following procedure.
+- Intra gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONENDC.ReconfSrb3AttemptIntraDuPscellch
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.13.6 Number of Intra gNB-DU PSCell Change via SRB3 successfully  5
+A.13.6.1 Performance Counter Table 6
+Measurement Name OR.RRCCONENDC.ReconfSrb3SuccessIntraDuPscellch
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via SRB3 when the following
+procedure.
+- Intra gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever
+RRC:RRCReconfiguration Complete message is received via SRB3
+when the following procedure.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        36
+ORAN-WG5.O-CU-O1.0-v01.00
+
+- Intra gNB-DU PSCell Change using SRB3 for RRC
+Reconfiguration.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONENDC.ReconfSrb3SuccessIntraDuPscellch
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+ 2
+A.14 Monitoring of RRC Connection for SA 3
+A.14.1 Number of initial RRC Connection requests 4
+A.14.1.1 Performance Counter Table 5
+Measurement Name OR.RRCCONSA.IniConReq
+Description This counter provides the number of the received RRC:RRC Setup
+Request messages via F1-C which is in the first time for each ue-
+Identity.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Request message is received via F1-C,if RRC:RRC Setup Request
+message of the same ue-Identity is not received for a certain period
+of time from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IniConReq
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 6
+A.14.2 Number of RRC connection completions for initial RRC Connection 7
+requests 8
+A.14.2.1 Performance Counter Table 9
+Measurement Name OR.RRCCONSA.IniConComp
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C which corresponds to the initial RRC:RRC
+Setup Request except fall-back procedure.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message which corresponds to the initial RRC:RRC Setup
+Request except fall-back procedure is received via F1-C.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IniConComp
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        37
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.14.3 Number of retransmission RRC Connections requests 2
+A.14.3.1 Performance Counter Table 3
+Measurement Name OR.RRCCONSA.RetConReq
+Description This counter provides the number of the received RRC:RRC Setup
+Request messages via F1-C which is retransmission for each ue-Identity.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Request message is received via F1-C,if RRC:RRC Setup Request
+message of the same ue-Identity is received for a certain period of
+time from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.RetConReq
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.14.4 Number of RRC Connections completions for retransmission RRC 5
+Connections requests 6
+A.14.4.1 Performance Counter Table 7
+Measurement Name OR.RRCCONSA.RetConComp
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C which corresponds to the retransmission
+RRC:RRC Setup Request except fall-back procedure.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message which corresponds to the retransmission RRC:RRC
+Setup Request except fall-back procedure is received via F1-C.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.RetransConComp
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 8
+A.14.5 Number of incomplete RRC Connection by failed resource allocations 9
+A.14.5.1 Performance Counter Table 10
+Measurement Name OR.RRCCONSA.IncompConResourAllo
+Description This counter provides the number of the RRC Connection configuration
+interrupted by failed resource allocations.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC Connection
+configuration is interrupted by failed resource allocations.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        38
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IncompConResourAllo
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.14.6 Number of incomplete RRC Connection by O-CU internal error 2
+A.14.6.1 Performance Counter Table  3
+Measurement Name OR.RRCCONSA.IncompConOcuInterErr
+Description This counter provides the number of the RRC Connection configuration
+interrupted by O-CU internal error (e.g. L3 message sending NG).
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC Connection
+configuration is interrupted by O-CU internal error.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IncompConOcuInterErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.14.7 Number of initial RRC Connection requests each Establishment 5
+Cause 6
+A.14.7.1 Performance Counter Table 7
+Measurement Name OR.RRCCONSA.IniConReqEstaCause
+Description This counter provides the number of the received RRC:RRC Setup
+Request messages via F1-C which is in the first time for each ue-
+Identity.
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever RRC:RRC Setup
+Request message is received via F1-C,if RRC:RRC Setup Request
+message of the same ue-Identity is not received for a certain period
+of time from the reception timing when the cell configured by the
+message is group of subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IniConCompEstaCause.EstablishmentCause where
+EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+4: EstablishmentCause = mo-Data
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        39
+ORAN-WG5.O-CU-O1.0-v01.00
+
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.14.8 Number of RRC connection completions for initial RRC Connection 2
+requests each Establishment Cause 3
+A.14.8.1 Performance Counter Table 4
+Measurement Name OR.RRCCONSA.IniConCompEstaCause
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C which corresponds to the initial RRC:RRC
+Setup Request except fall-back procedure.
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever RRC:RRC Setup
+Complete message which corresponds to the initial RRC:RRC Setup
+Request except fall-back procedure is received via F1-C when the cell
+configured by the message is group of subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IniConCompEstaCause.EstablishmentCause where
+EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+4: EstablishmentCause = mo-Data
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        40
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+A.14.9 Number of retransmission RRC Connections requests each 2
+Establishment Cause 3
+A.14.9.1 Performance Counter Table 4
+Measurement Name OR.RRCCONSA.RetConReqEstaCause
+Description This counter provides the number of the received RRC:RRC Setup
+Request messages via F1-C which is retransmission for each ue-Identity.
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever RRC:RRC Setup
+Request message is received via F1-C,if RRC:RRC Setup Request
+message of the same ue-Identity is received for a certain period of
+time from the reception timing when the cell configured by the
+message is group of subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IniConCompEstaCause.EstablishmentCause where
+EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+4: EstablishmentCause = mo-Data
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.14.10 Number of RRC Connections completions for retransmission RRC 6
+Connections requests each Establishment Cause 7
+A.14.10.1 Performance Counter Table 8
+Measurement Name OR.RRCCONSA.RetConCompEstaCause
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C which corresponds to the retransmission
+RRC:RRC Setup Request except fall-back procedure.
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        41
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Condition Measurement subcounter is incremented by 1 whenever RRC:RRC Setup
+Complete message which corresponds to the retransmission RRC:RRC
+Setup Request except fall-back procedure is received via F1-C when the
+cell configured by the message is group of
+subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.RetransConCompEstaCause.EstablishmentCause
+where EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+4: EstablishmentCause = mo-Data
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.14.11 Number of incomplete RRC Connection by failed resource allocations 2
+each Establishment Cause 3
+A.14.11.1 Performance Counter Table 4
+Measurement Name OR.RRCCONSA.IncompConResourAlloEstaCause
+Description This counter provides the number of the RRC Connection configuration
+interrupted by failed resource allocations.
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever RRC
+Connection configuration is interrupted by failed resource allocations
+when the cell configured by the message is group of
+subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.RetransConResourAlloEstaCause.EstablishmentCause
+where EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        42
+ORAN-WG5.O-CU-O1.0-v01.00
+
+4: EstablishmentCause = mo-Data
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.14.12 Number of incomplete RRC Connection by O-CU internal error each 1
+Establishment Cause 2
+A.14.12.1 Performance Counter Table 3
+Measurement Name OR.RRCCONSA.IncompConOcuInterErrEstaCause
+Description This counter provides the number of the RRC Connection configuration
+interrupted by O-CU internal error (e.g. L3 message sending NG).
+This counter is split into subcounters per EstablishmentCause.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever RRC
+Connection configuration is interrupted by O-CU internal error when the
+cell configured by the message is group of
+subcounter.EstablishmentCause.
+Measurement Result Integer number (U32)
+Measurement Type OR.RRCCONSA.IncompConOcuInterErrEstaCause.EstablishmentCause
+where EstablishmentCause is EstablishmentCause:
+0: EstablishmentCause = emergency
+1: EstablishmentCause = highPriorityAccess
+2: EstablishmentCause = mt-Access
+3: EstablishmentCause = mo-Signalling
+4: EstablishmentCause = mo-Data
+5: EstablishmentCause = mo-VoiceCall
+6: EstablishmentCause = mo-VideoCall
+7: EstablishmentCause = mo-SMS
+8: EstablishmentCause = mps-PriorityAccess
+9: EstablishmentCause = mcs-PriorityAccess
+
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        43
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.15 Monitoring of Establishment calls for SA 1
+A.15.1 Number of attempted establishment calls for mo-Data  2
+A.15.1.1 Performance Counter Table 3
+Measurement Name OR.ESTACALL.AttemptModata
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C after received RRC:RRC Setup Request
+(Establishment Cause:mo-Data).
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message is received via F1-C after received RRC:RRC Setup
+Request (Establishment Cause: mo-Data).
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.AttemptModata
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.2 Number of successful establishment calls for mo-Data  5
+A.15.2.1 Performance Counter Table 6
+Measurement Name OR.ESTACALL.SuccessModata
+Description This counter provides the number of the transmitted NG-AP:Initial
+Context Setup Response messages after received RRC: RRC Setup
+Request (Establishment Cause: mo-Data).
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever NG-AP:Initial
+Context Setup Response message is transmitted after received RRC:
+RRC Setup Request (Establishment Cause: mo-Data).
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.SuccessModata
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 7
+A.15.3 Number of incomplete establishment calls for mo-Data by protocol 8
+error 9
+A.15.3.1 Performance Counter Table  10
+Measurement Name OR.ESTACALL.IncompModataProtocolErr
+Description This counter provides the number of the Call establishment for mo-Data
+interrupted by protocol error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever Call establishment
+for mo-Data is interrupted by protocol error.
+Measurement Result Integer number (U32)
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        44
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Measurement Type OR.ESTACALL.IncompModataProtocolErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.15.4 Number of incomplete establishment calls for mo-Data by O-CU 2
+internal error 3
+A.15.4.1 Performance Counter Table 4
+Measurement Name OR.ESTACALL.IncompModataOcuInterErr
+Description This counter provides the number of the call establishment for mo-Data
+interrupted by O-CU internal error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-Data is interrupted by O-CU internal error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompModataOcuInterErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.15.5 Number of incomplete establishment calls for mo-Data by O-DU error 6
+detection 7
+A.15.5.1 Performance Counter Table 8
+Measurement Name OR.ESTACALL.IncompModataOduErrDetect
+Description This counter provides the number of the call establishment for mo-Data
+interrupted by O-DU Error Detection.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-Data is interrupted by O-DU Error Detection.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompModataOduErrDetect
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 9
+A.15.6 Number of attempted establishment calls for mt-Access 10
+A.15.6.1 Performance Counter Table 11
+Measurement Name OR.ESTACALL.AttemptMtaccess
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C after received RRC: RRC Setup Request
+(Establishment Cause: mt-Access).
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        45
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message is received via F1-C after received RRC:RRC Setup
+Request (Establishment Cause: mt-Access).
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.AttemptMtaccess
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.15.7 Number of successful establishment calls for mt-Access 2
+A.15.7.1 Performance Counter Table 3
+Measurement Name OR.ESTACALL.SuccessMtaccess
+Description This counter provides the number of the following message after
+received RRC:RRC Setup Request(Establishment Cause:mt-Access):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever the following event
+occurs after received RRC:RRC Setup Request(Establishment Cause:mt-
+Access):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.SuccessMtaccess
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.8 Number of incomplete establishment calls for mt-Access by protocol 5
+error 6
+A.15.8.1 Performance Counter Table 7
+Measurement Name OR.ESTACALL.IncompMtaccessProtocolErr
+Description This counter provides the number of the call establishment for mt-Access
+interrupted by protocol error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mt-Access is interrupted by protocol error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMtaccessProtocolErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        46
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+A.15.9 Number of incomplete establishment calls for mt-Access by O-CU 2
+internal error 3
+A.15.9.1 Performance Counter Table 4
+Measurement Name OR.ESTACALL.IncompMtaccessOcuInterErr
+Description This counter provides the number of the call establishment for mt-Access
+interrupted by O-CU internal error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call
+establishment for mt-Access is interrupted by O-CU internal error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMtaccessOcuInterErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.15.10 Number of incomplete establishment calls for mt-Access by O-DU 6
+error detection 7
+A.15.10.1 Performance Counter Table 8
+Measurement Name OR.ESTACALL.IncompMtaccessOduErrDetect
+Description This counter provides the number of the call establishment for mt-Access
+is interrupted by O-DU Error Detection.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mt-Access is interrupted by DU Error Detection.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMtaccessOduErrDetect
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 9
+A.15.11 Number of attempted establishment calls for mo-Signalling 10
+A.15.11.1 Performance Counter Table 11
+Measurement Name OR.ESTACALL.AcceptMosignal
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C after received RRC: RRC Setup Request
+(Establishment Cause:mo-Signalling).
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message is received via F1-C after received RRC:RRC Setup
+Request (Establishment Cause:mo-Signalling).
+Measurement Result Integer number (U32)
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        47
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Measurement Type OR.ESTACALL.AcceptMosignal
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.15.12 Number of successful establishment calls for mo-Signalling 2
+A.15.12.1 Performance Counter Table 3
+Measurement Name OR.ESTACALL.SuccessMosignal
+Description This counter provides the number of the following message after
+received RRC:RRC Setup Request (Establishment Cause: mo-
+Signalling):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever the following event
+occurs after received RRC:RRC Setup Request(Establishment Cause:
+mo-Signalling):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.SuccessMosignal
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.13 Number of incomplete establishment calls for mo-Signalling by 5
+protocol error 6
+A.15.13.1 Performance Counter Table 7
+Measurement Name OR.ESTACALL.IncompMosignalProtocolErr
+Description This counter provides the number of the call establishment for mo-
+Signalling interrupted by protocol error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-Signalling is interrupted by protocol error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMosignalProtocolErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 8
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        48
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.15.14 Number of incomplete establishment calls for mo-Signalling by O-CU 1
+internal error 2
+A.15.14.1 Performance Counter Table 3
+Measurement Name OR.ESTACALL.IncompMosignalOcuInterErr
+Description This counter provides the number of the call establishment for mo-
+Signalling interrupted by O-CU internal error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever mo-signalling
+configuration is interrupted by O-CU internal error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMosignalOcuInterErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.15 Number of incomplete establishment calls for mo-Signalling by O-DU 5
+error detection 6
+A.15.15.1 Performance Counter Table 7
+Measurement Name OR.ESTACALL.IncompMosignalDuErrDetect
+Description This counter provides the number of the call establishment for mo-
+Signalling interrupted by O-DU error detection.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-Signalling is interrupted by O-DU error detection.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMosignalDuErrDetect
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 8
+A.15.16 Number of attempted establishment calls for mo-SMS 9
+A.15.16.1 Performance Counter Table 10
+Measurement Name OR.ESTACALL.AttemptMossms
+Description This counter provides the number of the received RRC:RRC Setup
+Complete messages via F1-C after received RRC: RRC Setup Request
+(Establishment Cause: mo-SMS).
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message is received via F1-C after received RRC:RRC Setup
+Request (Establishment Cause: mo-SMS).
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.AttemptMossms
+Measurement Object Class NRCellCU
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        49
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.15.17 Number of successful establishment calls for mo-SMS 2
+A.15.17.1 Performance Counter Table 3
+Measurement Name OR.ESTACALL.SuccessMossms
+Description This counter provides the number of the following message after
+received RRC:RRC Setup Request (Establishment Cause: mo-SMS):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever the following event
+occurs after received RRC:RRC Setup Request(Establishment Cause:
+mo-SMS):
+- NG-AP:Initial Context Setup Response is transmitted.
+- NG-AP:UE Context Release Command (for detach) is received
+before NG-AP:Initial Context Setup Response is transmitted.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.SuccessMossms
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.18 Number of incomplete establishment calls for mo-SMS by protocol 5
+error 6
+A.15.18.1 Performance Counter Table 7
+Measurement Name OR.ESTACALL.IncompMossmsProtocolErr
+Description This counter provides the number of the call establishment for mo-SMS
+interrupted by protocol error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-SMS is interrupted by protocol error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMossmsProtocolErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 8
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        50
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.15.19 Number of incomplete establishment calls for mo-SMS by O-CU 1
+internal error  2
+A.15.19.1 Performance Counter Table  3
+Measurement Name OR.ESTACALL.IncompMossmsOcuInterErr
+Description This counter provides the number of the call establishment for mo-SMS
+interrupted by O-CU internal error.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-SMS is interrupted by O-CU internal error.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMossmsOcuInterErr
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 4
+A.15.20 Number of incomplete establishment calls for mo-SMS by O-DU error 5
+detection 6
+A.15.20.1 Performance Counter Table 7
+Measurement Name OR.ESTACALL.IncompMossmsOduErrDetect
+Description This counter provides the number of the call establishment for mo-SMS
+interrupted by O-DU error detection.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever call establishment
+for mo-SMS is interrupted by O-DU error detection.
+Measurement Result Integer number (U32)
+Measurement Type OR.ESTACALL.IncompMossmsOduErrDetect
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        51
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.16 Monitoring of PDU session connection for SA 1
+A.16.1 Accepted PDU Session Resource Configuration 2
+A.16.1.1 Performance Counter Table  3
+A.16.2 Completed PDU Session Resource Configuration 4
+A.16.2.1 Performance Counter Table 5
+A.16.3 Interrupted PDU Session Resource configuration by Protocol Error 6
+A.16.3.1 Performance Counter Table 7
+A.16.4 Interrupted PDU Session Resource configuration by O-DU Error 8
+Detection 9
+A.16.4.1 Performance Counter Table 10
+A.16.5 Interrupted PDU Session Resource configuration by O-CU internal 11
+error 12
+A.16.5.1 Performance Counter Table 13
+A.17 Monitoring of mobility for SA 14
+A.17.1 Accepted Handover 15
+A.17.1.1 Performance Counter Table 16
+Measurement Name OR.MOBILITY.AcceptHo
+Description This counter provides the number of the accepted handover.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by 1 whenever source gNB
+decides to perform HO procedure by the received (transmitted) following
+messages:
+- Intra-Cell HO: transmitted “RRC:RRC Reconfiguration”
+- HO procedure other than those above: received
+“RRC:Measurement report”
+Measurement Result Integer number (U32)
+Measurement Type OR.MOBILITY.AcceptHo
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        52
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.17.2 Completed Handover 1
+A.17.2.1 Performance Counter Table 2
+Measurement Name OR.MOBILITY.CompHo
+Description OR.MOBILITY.CompHo
+Collection Method This counter provides the number of the completed handover.
+Condition CC (Cumulative Counter)
+Measurement Result Measurement subcounter is incremented by 1 whenever source gNB
+detects successful handover procedure triggered by source gNB by the
+received following messages:
+- Intra-gNB HO: received “RRC:RRC Reconfiguration Complete”
+- HO procedure other than those above: received  “XnAP:UE
+CONTEXT RELEASE” from the target gNB at Xn HO or
+“NGAP:UE CONTEXT RELEASE COMMAND” from AMF at
+NG HO
+Measurement Type Integer number (U32)
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.18 Monitoring of RRC re-establishment for SA 3
+A.18.1 Number of initial RRC re-establishment requests when UE context can 4
+be retrieved 5
+A.18.1.1 Performance Counter Table 6
+Measurement Name OR.REEST.IniReqUecontext
+Description This counter provides the number of the received RRC:RRC
+Reestablishment Request messages via F1-C which is in the first time for
+each ReestabUE-Identity when UE context can be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reestablishment Request message is received via F1-C when UE context
+can be retrieved, if RRC:RRC Reestablishment Request of the same
+ReestabUE-Identity is not received for a certain period of time
+from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.IniReqUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 7
+A.18.2 Number of RRC re-establishment request completions for initial RRC 8
+re-establishment requests when UE context can be retrieved 9
+A.18.2.1 Performance Counter Table 10
+Measurement Name OR.REEST.IniReqCompUecontext
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        53
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via F1-C which corresponds to the
+initial RRC:RRC Reestablishment Request when UE context can be
+retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reconfiguration Complete message which corresponds to the initial
+RRC:RRC Reestablishment Request is received via F1-C when UE
+context can be retrieved.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.IniReqCompUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.18.3 Number of retransmission RRC re-establishment requests when UE 2
+context can be retrieved 3
+A.18.3.1 Performance Counter Table 4
+Measurement Name OR.REEST.RetaransReqUecontext
+Description This counter provides the number of the received RRC:RRC
+Reestablishment Request messages via F1-C which is the retransmission
+for each ReestabUE-Identity when UE context can be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reestablishment Request message is received via F1-C when UE context
+can be retrieved, if RRC:RRC Reestablishment Request message of the
+same ReestabUE-Identity is received for a certain period of time
+from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.RetaransReqUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.18.4 Number of RRC re-establishment request completions for 6
+retransmission RRC re-establishment request when UE context can be 7
+retrieved 8
+A.18.4.1 Performance Counter Table 9
+Measurement Name OR.REEST.RetaransReqCompUecontext
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via F1-C which corresponds to the
+retransmission RRC:RRC Reestablishment Request when UE context
+can be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reconfiguration Complete message which corresponds to the
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        54
+ORAN-WG5.O-CU-O1.0-v01.00
+
+retransmission RRC:RRC Reestablishment Request is received via F1-C
+when UE context can be retrieved.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.RetaransReqCompUecontext
+Measurement Object Class NRCellCUs
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 1
+A.18.5 Number of initial RRC re-establishment requests when UE context 2
+cannot be retrieved 3
+A.18.5.1 Performance Counter Table 4
+Measurement Name OR.REEST.IniReqNotUecontext
+Description This counter provides the number of the received RRC:RRC
+Reestablishment Request messages via F1-C which is in the first time for
+each ReestabUE-Identity when UE context cannot be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reestablishment Request message is received via F1-C when UE context
+cannot be retrieved, if RRC:RRC Reestablishment Request of the same
+ReestabUE-Identity is not received for a certain period of time
+from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.IniReqNotUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.18.6 Number of RRC re-establishment request completions for initial RRC 6
+re-establishment requests when UE context cannot be retrieved 7
+A.18.6.1 Performance Counter Table 8
+Measurement Name OR.REEST.IniReqCompNotUecontext
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via F1-C which corresponds to the
+initial RRC:RRC Reestablishment Request when UE context cannot be
+retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC Setup
+Complete message which corresponds to the initial RRC:RRC
+Reestablishment Request is received via F1-C when UE context cannot
+be retrieved.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.IniReqCompNotUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        55
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+A.18.7 Number of retransmission RRC re-establishment requests when UE 2
+context cannot be retrieved 3
+A.18.7.1 Performance Counter Table 4
+Measurement Name OR.REEST.RetReqNotUecontext
+Description This counter provides the number of the received RRC:RRC
+Reestablishment Request messages via F1-C which is the retransmission
+for each ReestabUE-Identity when UE context cannot be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reestablishment Request message is received via F1-C when UE context
+cannot be retrieved, if RRC:RRC Reestablishment Request message of
+the same ReestabUE-Identity is received for a certain period of
+time from the reception timing.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.RetransReqNotUecontext
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 5
+A.18.8 Number of RRC re-establishment request completions for 6
+retransmission RRC re-establishment requests when UE context cannot be 7
+retrieved 8
+A.18.8.1 Performance Counter Table 9
+Measurement Name OR.REEST.RetReqCompNotUecontext
+Description This counter provides the number of the received RRC:RRC
+Reconfiguration Complete messages via F1-C which corresponds to the
+retransmission RRC:RRC Reestablishment Request when UE context
+cannot be retrieved.
+Collection Method CC (Cumulative Counter)
+Condition Measurement counter is incremented by 1 whenever RRC:RRC
+Reconfiguration Complete message which corresponds to the
+retransmission RRC:RRC Reestablishment Request is received via F1-C
+when UE context cannot be retrieved.
+Measurement Result Integer number (U32)
+Measurement Type OR.REEST.RetransReqCompNotUecontext
+Measurement Object Class NRCellCUs
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        56
+ORAN-WG5.O-CU-O1.0-v01.00
+
+A.19 Monitoring of connection status for SA 1
+A.19.1 Normally Released Calls 2
+A.19.1.1 Performance Counter Table 3
+Measurement Name OR.CONNECTSTATUS,NormalRelCalls
+Description This counter provides the number of the normally released calls.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by the number of the normally
+released calls.Normal released calls is follows:
+ received NG-AP: UE Context Release Command (Cause: Normal
+release or Deregister)
+ the expiry of a UE inactivity timer, the gNB suspend the RRC
+connection
+Measurement Result Integer number (U32)
+Measurement Type OR.CONNECTSTATUS,NormalRelCalls
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+A.19.2 Abnormally Released Calls 4
+A.19.2.1 Performance Counter Table 5
+Measurement Name OR.CONNECTSTATUS.AbnormallRelCalls
+Description This counter provides the number of the abnormally released calls.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by the number of the
+abnormally released calls.
+Measurement Result Integer number (U32)
+Measurement Type OR.CONNECTSTATUS.AbnormallRelCalls
+Measurement Object Class NRCellCU NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 6
+A.19.3 Another Cell HO UEs 7
+A.19.3.1 Performance Counter Table 8
+Measurement Name OR.CONNECTSTATUS.AnotherCellHoUes
+Description This counter provides the number of the UEs which has transferred to
+another cell.
+Collection Method CC (Cumulative Counter)
+Condition Measurement subcounter is incremented by the number of the UEs
+which has transferred to another cell.
+Measurement Result Integer number (U32)
+Measurement Type OR.CONNECTSTATUS.AnotherCellHoUes
+Measurement Object Class NRCellCU
+Switching Technology Packet Switched
+Generation 5GS
+Purpose Network Operator’s Traffic Engineering Community
+ 9
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        57
+ORAN-WG5.O-CU-O1.0-v01.00
+
+ 1
+Annex ZZZ O-RAN Adopter License Agreement 2
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER 3
+AGREES TO THE TERMS OF THIS AGREEMENT. 4
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the 5
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 6
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7
+Section 1: DEFINITIONS 8
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 9
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 10
+fifty (50%) percent or more of the voting stock or equity in an entity. 11
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 12
+software or combinations thereof) that fully conforms to a Final Specification. 13
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 14
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 15
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 16
+not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN 17
+Specification. The term “O-RAN Specifications” includes Minor Updates. 18
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 19
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 20
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 21
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 22
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 23
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 24
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 25
+generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent 26
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 27
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 28
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 29
+claims shall be considered Necessary Claims. 30
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 31
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 32
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 33
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 34
+Section 2: COPYRIGHT LICENSE 35
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 36
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 37
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 38
+furtherance of implementations of an ORAN Specification. 39
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40
+agreement with O-RAN Alliance. 41
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        58
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Section 3: FRAND LICENSE 1
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 2
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 3
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 4
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 5
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 6
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 7
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 8
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 9
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 10
+customers of such licensed Compliant Implementations. 11
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 13
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 14
+its Affiliates for its license of Necessary Claims to its licensees. 15
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 16
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 17
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 18
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 19
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 20
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 21
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 22
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 23
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 24
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 25
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 26
+licensed Compliant Implementations. 27
+Section 4: TERM AND TERMINATION 28
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 30
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 31
+(30) days after being given notice specifying the breach. 32
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 33
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 34
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 35
+version that was current as of the date of termination. 36
+Section 5: CONFIDENTIALITY 37
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN 38
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 39
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 41
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 42
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 43
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 44
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 45
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 46
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 47
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN 48
+Alliance’s prior written approval. 49
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        59
+ORAN-WG5.O-CU-O1.0-v01.00
+
+Section 6: INDEMNIFICATION 1
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 2
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 3
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 4
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 5
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 6
+products that comply with O-RAN Specifications. 7
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 8
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 9
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 10
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 11
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 12
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 13
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES.  14
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS 15
+WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE 16
+AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY 17
+WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, 18
+NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY 19
+WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 20
+Section 8: ASSIGNMENT 21
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 22
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 23
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 24
+Alliance may freely assign this Agreement. 25
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 26
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 27
+Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, 28
+including as licensees under Section 3. 29
+Section 10: BINDING ON AFFILIATES 30
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 31
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 32
+and are also entitled to the benefits of the rights of Adopter hereunder. 33
+Section 11: GENERAL 34
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  35
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 36
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 37
+to the subject matter of this Agreement.  38
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 39
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 40
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 41
+prohibits any communication that would violate the antitrust laws. 42
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        60
+ORAN-WG5.O-CU-O1.0-v01.00
+
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 1
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 2
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, 3
+Contributors or Academic Contributors. 4
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 5
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 6
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 7
+full force and effect. 8
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 9
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 10
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 11
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 12
+force and effect. 13
+ 14
+ 15
+ 16
+ 17
+ 18

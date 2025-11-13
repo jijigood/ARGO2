@@ -1,0 +1,153 @@
+# 多GPU配置文件
+# 针对 8x RTX 3060 (12GB each) 优化
+
+# ========================================
+# GPU配置
+# ========================================
+gpu:
+  # 可用的GPU数量
+  n_gpus: 8
+  
+  # 每个GPU的显存限制 (GB)
+  max_memory_per_gpu: 10
+  
+  # 默认使用的GPU IDs (null表示使用全部)
+  default_gpu_ids: null  # [0, 1, 2, 3, 4, 5, 6, 7]
+  
+  # GPU并行模式
+  # - "auto": 根据模型大小自动选择
+  # - "single": 单GPU (适合小模型)
+  # - "data_parallel": 数据并行 (推荐批量评估)
+  # - "accelerate": Accelerate自动分配 (推荐大模型)
+  # - "model_parallel": 手动模型并行 (高级)
+  default_mode: "auto"
+
+# ========================================
+# 模型配置
+# ========================================
+models:
+  # 小模型 (单GPU即可)
+  small:
+    models:
+      - "Qwen/Qwen2.5-1.5B-Instruct"  # ~3GB
+      - "Qwen/Qwen2.5-3B-Instruct"    # ~6GB
+    recommended_mode: "single"
+    n_gpus_needed: 1
+  
+  # 中等模型 (数据并行)
+  medium:
+    models:
+      - "Qwen/Qwen2.5-7B-Instruct"    # ~14GB (需要量化或模型并行)
+    recommended_mode: "data_parallel"
+    n_gpus_needed: 2
+  
+  # 大模型 (模型并行)
+  large:
+    models:
+      - "Qwen/Qwen2.5-14B-Instruct"   # ~28GB
+      - "Qwen/Qwen2.5-32B-Instruct"   # ~64GB
+    recommended_mode: "accelerate"
+    n_gpus_needed: "3-6"
+
+# ========================================
+# 实验配置
+# ========================================
+experiments:
+  # 快速测试
+  quick_test:
+    model: "Qwen/Qwen2.5-7B-Instruct"
+    n_questions: 10
+    difficulty: "easy"
+    gpu_mode: "single"
+    gpu_ids: [0]
+  
+  # 中等规模评估
+  medium_eval:
+    model: "Qwen/Qwen2.5-7B-Instruct"
+    n_questions: 100
+    difficulty: "medium"
+    gpu_mode: "data_parallel"
+    gpu_ids: [0, 1, 2, 3]
+  
+  # 大规模评估
+  large_eval:
+    model: "Qwen/Qwen2.5-7B-Instruct"
+    n_questions: 1000
+    difficulty: "mixed"
+    gpu_mode: "data_parallel"
+    gpu_ids: null  # 使用全部8个GPU
+  
+  # 大模型评估
+  large_model_eval:
+    model: "Qwen/Qwen2.5-14B-Instruct"
+    n_questions: 100
+    difficulty: "medium"
+    gpu_mode: "accelerate"
+    gpu_ids: null
+
+# ========================================
+# MDP配置 (符合ARGO V3.0规范)
+# ========================================
+mdp:
+  # 状态空间
+  U_max: 1.0
+  
+  # 状态转移参数
+  delta_r: 0.25      # Retrieve时U的增量 (调整: 0.15→0.25 使MDP执行Retrieve)
+  delta_p: 0.08      # Reason时U的增量
+  
+  # 检索成功率 (Phase2实现)
+  p_s: 0.8           # 检索成功概率 (符合规范)
+  
+  # 成本参数 (修正为符合规范)
+  c_r: 0.05          # Retrieve成本 (原0.1，现修正为0.05)
+  c_p: 0.02          # Reason成本 (原0.05，现修正为0.02)
+  
+  # MDP求解参数
+  mu: 0.6            # 质量函数参数
+  gamma: 0.98        # 折扣因子 (符合规范)
+  grid_size: 101     # U的离散化粒度
+  
+  # 质量函数类型 (Phase2.3扩展)
+  # - "linear": σ(x) = x
+  # - "sqrt": σ(x) = √x  (Phase2.3新增)
+  # - "saturating": σ(x) = 1 - e^(-αx)  (Phase2.3新增，α由quality_k控制)
+  # - "sigmoid": σ(x) = 1 / (1 + e^{-k(x-0.5)})
+  quality_function: "linear"
+  quality_k: 5.0     # sigmoid的陡峭度参数k，或saturating的α参数
+  
+  # Reward Shaping (Phase2.2实现)
+  reward_shaping:
+    enabled: false   # Phase2.2: 设为true启用reward shaping
+    k: 1.0           # Φ(U) = kU 中的k参数
+
+# ========================================
+# 推理配置
+# ========================================
+inference:
+  # 批量大小 (数据并行时使用)
+  batch_size: 4
+  
+  # 生成参数
+  generation:
+    max_new_tokens: 10
+    temperature: 0.1
+    do_sample: false
+  
+  # 精度
+  dtype: "float16"  # "float16" or "bfloat16"
+  
+  # 量化 (可选)
+  quantization:
+    enabled: false
+    bits: 8  # 4 or 8
+    type: "nf4"  # "nf4" or "int8"
+
+# ========================================
+# 输出配置
+# ========================================
+output:
+  results_dir: "results/multi_gpu"
+  comparison_dir: "results/multi_gpu_comparison"
+  save_full_results: true
+  verbose: true

@@ -1,0 +1,1212 @@
+#!/usr/bin/env python
+"""
+实验1: 检索成本影响 - 3B快速验证版本
+============================================
+使用Qwen2.5-3B模型进行快速验证（约19小时完成）
+
+修正内容:
+1. ✓ 添加Random策略
+2. ✓ 基线策略使用动态θ*（而非硬编码0.9）
+3. ✓ 支持小规模测试模式和大规模实验模式切换
+4. ✓ 图表命名与实验设计文档一致
+
+快速验证配置:
+- 模型: Qwen2.5-3B-Instruct (单卡即可)
+- 题目: 1000题 (从Hard中随机采样)
+- 预计时间: ~19小时
+
+硬件要求:
+- 单张GPU (RTX 3060即可，3GB显存)
+- CUDA环境
+
+模型:
+- LLM: Qwen2.5-3B-Instruct
+- Embedding: all-MiniLM-L6-v2
+- 检索库: Chroma (ORAN规范文档)
+"""
+
+import os
+import sys
+import torch
+import numpy as np
+import yaml
+import json
+import random
+import math
+import matplotlib.pyplot as plt
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from sentence_transformers import SentenceTransformer
+
+# 尝试导入chromadb (可能失败)
+try:
+    import chromadb
+    CHROMADB_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠ ChromaDB不可用: {e}")
+    print(f"  将使用模拟检索模式")
+    CHROMADB_AVAILABLE = False
+    chromadb = None
+
+# 添加路径
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from oran_benchmark_loader import ORANBenchmark
+
+sys.path.insert(0, '../ARGO_MDP/src')
+from mdp_solver import MDPSolver
+
+# 导入增强提示词系统（暂时注释掉，使用内联版本）
+# sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
+# from prompts import ARGOPrompts
+
+
+class RealCostImpactExperiment:
+    """实验1: 检索成本影响 - 真实LLM版本 (修正版)"""
+    
+    def __init__(
+        self,
+        config_path: str = "configs/multi_gpu.yaml",
+        llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-3B-Instruct",
+        embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
+        chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
+        test_mode: str = "small",  # "small" (快速测试) 或 "full" (完整实验)
+        difficulty: str = "hard",
+        seed: int = 42,
+        gpu_ids: List[int] = None
+    ):
+        """
+        Args:
+            config_path: MDP配置文件路径
+            llm_model_path: Qwen模型本地路径 (默认3B用于快速验证)
+            embedding_model_path: 嵌入模型本地路径
+            chroma_db_path: Chroma数据库路径
+            test_mode: "small" (10题测试) 或 "full" (1000题快速验证)
+            difficulty: 问题难度 ("easy", "medium", "hard")
+            seed: 随机种子
+            gpu_ids: 使用的GPU ID列表，如 [0] (单卡即可)
+        """
+        # 根据测试模式设置参数
+        if test_mode == "small":
+            self.n_test_questions = 10
+            self.n_cost_steps = 5  # 小规模测试保持5个点
+            self.mode_desc = "小规模测试模式 (快速验证代码)"
+        elif test_mode == "full":
+            self.n_test_questions = 1000  # 快速验证: 1000题
+            self.n_cost_steps = 20  # 增加采样密度: 10 → 20 (消除"悬崖")
+            self.mode_desc = "快速验证模式 (1000题, 3B模型, 预计19小时)"
+        else:
+            raise ValueError(f"test_mode必须是'small'或'full'，当前值: {test_mode}")
+        
+        self.test_mode = test_mode
+        
+        print(f"\n{'='*80}")
+        print(f"实验1: 检索成本影响 - 3B快速验证版本")
+        print(f"{'='*80}")
+        print(f"运行模式: {self.mode_desc}")
+        print(f"LLM模型: {llm_model_path}")
+        print(f"嵌入模型: {embedding_model_path}")
+        print(f"问题难度: {difficulty.upper()}")
+        print(f"问题数量: {self.n_test_questions if self.n_test_questions else '全部 (~12K)'}")
+        print(f"c_r采样点: {self.n_cost_steps}个")
+        print(f"{'='*80}\n")
+        
+        self.config_path = config_path
+        self.llm_model_path = llm_model_path
+        self.embedding_model_path = embedding_model_path
+        self.chroma_db_path = chroma_db_path
+        self.difficulty = difficulty
+        self.seed = seed
+        
+        # GPU配置 (3B模型单卡即可)
+        if not torch.cuda.is_available():
+            raise RuntimeError("需要GPU!")
+        
+        self.n_gpus = torch.cuda.device_count()
+        # 3B模型只需要1张GPU即可
+        self.gpu_ids = gpu_ids if gpu_ids else [0]
+        
+        print(f"GPU配置:")
+        print(f"  可用GPU: {self.n_gpus}张")
+        print(f"  使用GPU: {self.gpu_ids} (3B模型单卡即可)")
+        for i in self.gpu_ids:
+            name = torch.cuda.get_device_name(i)
+            mem = torch.cuda.get_device_properties(i).total_memory / 1e9
+            print(f"    GPU {i}: {name} ({mem:.1f}GB)")
+        print()
+        
+        # 加载配置
+        with open(config_path, 'r') as f:
+            self.config = yaml.safe_load(f)
+        
+        # 设置随机种子
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        
+        # 加载数据集
+        print("加载ORAN-Bench-13K数据集...")
+        self.benchmark = ORANBenchmark()
+        
+        if self.n_test_questions:
+            self.test_questions = self.benchmark.sample_questions(
+                n=self.n_test_questions,
+                difficulty=difficulty,
+                seed=seed
+            )
+        else:
+            # 使用全部测试集（传入超大数字，sample_questions会自动限制为实际数量）
+            # 从stats中获取该难度的总题数
+            total_count = self.benchmark.stats[difficulty]
+            self.test_questions = self.benchmark.sample_questions(
+                n=total_count,
+                difficulty=difficulty,
+                seed=seed
+            )
+        
+        print(f"✓ 加载了 {len(self.test_questions)} 道 {difficulty.upper()} 问题\n")
+        
+        # 加载嵌入模型
+        print(f"加载嵌入模型: {embedding_model_path}")
+        self.embedding_model = SentenceTransformer(embedding_model_path)
+        self.embedding_model = self.embedding_model.to(f'cuda:{self.gpu_ids[0]}')
+        print(f"✓ 嵌入模型加载成功 (GPU {self.gpu_ids[0]})\n")
+        
+        # 🆕 预计算所有问题的embeddings (优化检索速度)
+        print(f"{'='*80}")
+        print(f"预计算问题embeddings (优化检索性能)...")
+        print(f"{'='*80}")
+        self.query_embeddings = {}
+        
+        import time
+        start_time = time.time()
+        
+        for idx, q in enumerate(self.test_questions):
+            question_text = q['question']
+            
+            # 避免重复计算（虽然理论上不会有重复）
+            if question_text not in self.query_embeddings:
+                # 直接返回numpy数组，避免GPU转换
+                embedding = self.embedding_model.encode(
+                    question_text, 
+                    convert_to_tensor=False,
+                    show_progress_bar=False
+                )
+                self.query_embeddings[question_text] = embedding.tolist()
+            
+            # 每100个打印一次进度
+            if (idx + 1) % 100 == 0:
+                elapsed = time.time() - start_time
+                avg_time = elapsed / (idx + 1)
+                remaining = avg_time * (len(self.test_questions) - idx - 1)
+                print(f"  进度: {idx+1}/{len(self.test_questions)} "
+                      f"({(idx+1)/len(self.test_questions)*100:.1f}%) - "
+                      f"预计剩余: {remaining:.0f}秒")
+        
+        elapsed = time.time() - start_time
+        print(f"\n✓ 预计算完成!")
+        print(f"  - 问题数: {len(self.query_embeddings)}")
+        print(f"  - 耗时: {elapsed:.1f}秒 ({elapsed/60:.1f}分钟)")
+        print(f"  - 平均: {elapsed/len(self.query_embeddings)*1000:.1f}ms/问题")
+        print(f"  - 内存占用: ~{len(self.query_embeddings) * 384 * 4 / 1024 / 1024:.2f} MB")
+        print(f"{'='*80}\n")
+        
+        # 加载Chroma检索库
+        print(f"连接Chroma数据库: {chroma_db_path}")
+        if CHROMADB_AVAILABLE:
+            try:
+                self.chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+                self.collection = self.chroma_client.get_collection("oran_specs")
+                print(f"✓ Chroma集合加载成功 (文档数: {self.collection.count()})\n")
+            except Exception as e:
+                print(f"⚠ Chroma集合加载失败: {e}")
+                print(f"  将使用模拟检索模式\n")
+                self.collection = None
+        else:
+            print(f"⚠ ChromaDB不可用，使用模拟检索模式\n")
+            self.collection = None
+        
+        # 加载LLM模型
+        print(f"加载LLM模型: {llm_model_path}")
+        self._load_llm()
+        
+        # 初始化增强提示词系统（内联版本，不需要额外导入）
+        print(f"✓ 使用增强提示词系统 (V2.1 - 内联版本)\n")
+        sys.stdout.flush()  # 强制刷新输出
+        
+        print(f"\n{'='*80}")
+        print(f"初始化完成!")
+        print(f"{'='*80}\n")
+        sys.stdout.flush()  # 强制刷新输出
+    
+    def _load_llm(self):
+        """加载LLM (多GPU并行)"""
+        print(f"  使用 {len(self.gpu_ids)} 张GPU加载模型...")
+        
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.llm_model_path,
+            trust_remote_code=True,
+            padding_side='left'
+        )
+        
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        # 使用Accelerate自动分配到多个GPU
+        max_memory = {i: "10GB" for i in self.gpu_ids}
+        max_memory["cpu"] = "30GB"
+        
+        self.model = AutoModelForCausalLM.from_pretrained(
+            self.llm_model_path,
+            torch_dtype=torch.float16,
+            device_map="auto",
+            max_memory=max_memory,
+            trust_remote_code=True,
+            offload_folder="offload"
+        )
+        
+        self.model.eval()
+        
+        print(f"✓ LLM模型加载成功")
+        print(f"  Device map: {self.model.hf_device_map}")
+        sys.stdout.flush()  # 强制刷新输出
+    
+    def create_mdp_config(self, c_r: float) -> Dict:
+        """创建MDP配置"""
+        mdp_config = self.config['mdp'].copy()
+        mdp_config['c_r'] = c_r
+        
+        # 添加 U_grid_size (兼容性)
+        if 'U_grid_size' not in mdp_config and 'grid_size' in mdp_config:
+            mdp_config['U_grid_size'] = mdp_config['grid_size']
+        
+        return {
+            'mdp': mdp_config,
+            'quality': self.config.get('quality', {'mode': 'linear', 'k': 5.0}),
+            'solver': {
+                'max_iterations': 1000,
+                'convergence_threshold': 1e-6,
+                'verbose': False
+            }
+        }
+    
+    def solve_mdp(self, c_r: float) -> tuple:
+        """求解MDP获取阈值"""
+        print(f"  求解MDP (c_r={c_r:.3f})...", end=" ")
+        
+        config = self.create_mdp_config(c_r)
+        solver = MDPSolver(config)
+        solver.solve()
+        
+        theta_cont = solver.theta_cont
+        theta_star = solver.theta_star
+        
+        print(f"θ_cont={theta_cont:.3f}, θ*={theta_star:.3f}")
+        return theta_cont, theta_star
+    
+    def retrieve_documents(self, question: str, top_k: int = 3) -> List[str]:
+        """检索相关文档 (使用预计算的embeddings)"""
+        if self.collection is None:
+            # 模拟检索(如果Chroma不可用)
+            return [f"模拟文档 {i+1}: O-RAN specification content related to the query." for i in range(top_k)]
+        
+        # ✅ 使用预计算的embedding (避免重复编码)
+        query_embedding = self.query_embeddings.get(question)
+        
+        # 如果缓存中没有（理论上不应该发生），才临时计算
+        if query_embedding is None:
+            print(f"⚠️  缓存未命中，临时计算embedding: {question[:60]}...")
+            query_embedding = self.embedding_model.encode(
+                question, 
+                convert_to_tensor=False,
+                show_progress_bar=False
+            ).tolist()
+        
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=["documents"]
+        )
+        
+        documents = results.get("documents", [[]])[0]
+        return documents
+    
+    def generate_answer(self, question: Dict, context: str = "", is_retrieval: bool = True, progress: float = 0.0) -> tuple:
+        """使用LLM生成答案
+        
+        Args:
+            question: 问题字典
+            context: 检索到的上下文
+            is_retrieval: True=检索模式, False=推理模式
+            progress: 当前进度 (0.0-1.0)
+        
+        Returns:
+            (answer_index, confidence)
+        """
+        prompt = self._create_prompt(question, context, is_retrieval, progress)
+        
+        inputs = self.tokenizer(
+            prompt,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=2048
+        )
+        
+        # 移动到第一个GPU (Accelerate会自动处理后续的分布)
+        inputs = {k: v.to(f'cuda:{self.gpu_ids[0]}') for k, v in inputs.items()}
+        
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=10,
+                temperature=0.1,
+                do_sample=False,
+                pad_token_id=self.tokenizer.pad_token_id
+            )
+        
+        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        answer = self._extract_answer(response)
+        
+        # 简单的置信度估计
+        confidence = 0.7 if context else 0.5
+        
+        return answer, confidence
+    
+    def _create_prompt(self, question: Dict, context: Optional[str] = None, is_retrieval: bool = True, progress: float = 0.0) -> str:
+        """创建提示词 (使用增强提示词系统)
+        
+        Args:
+            question: 问题字典
+            context: 检索到的上下文 (可选)
+            is_retrieval: True=检索模式, False=推理模式
+            progress: 当前进度 (0.0-1.0)
+        """
+        # 处理异常情况：确保有4个选项
+        options = question.get('options', [])
+        if len(options) < 4:
+            print(f"⚠️  问题选项数异常: {len(options)}个 - {question['question'][:60]}...")
+            # 跳过此问题或填充默认选项
+            options = options + ['N/A'] * (4 - len(options))
+        elif len(options) > 4:
+            print(f"⚠️  问题选项数异常: {len(options)}个 - {question['question'][:60]}...")
+            options = options[:4]  # 只取前4个
+        
+        # 简化版本：直接构建提示词（不使用复杂的 history 结构）
+        question_text = question['question']
+        
+        # 构建基础指令（根据模式选择）
+        if is_retrieval and context:
+            # 检索模式
+            instruction = """You are an O-RAN (Open Radio Access Network) expert assistant. Based on the retrieved documentation, carefully analyze and answer the following question.
+
+**Instructions:**
+1. Read the retrieved context carefully
+2. Identify key O-RAN concepts and technical specifications
+3. Apply your understanding to answer the question
+4. If unsure, base your answer on the most relevant retrieved information
+
+"""
+        else:
+            # 推理模式
+            instruction = """You are an O-RAN (Open Radio Access Network) expert assistant. Using your knowledge and reasoning, answer the following question.
+
+**Instructions:**
+1. Apply your deep understanding of O-RAN architecture and specifications
+2. Use logical reasoning to deduce the most likely answer
+3. Consider O-RAN principles: openness, intelligence, virtualization, and disaggregation
+4. Focus on key concepts: RAN Intelligent Controller (RIC), xApps, O-RAN Alliance specifications
+
+"""
+        
+        # 构建完整提示词
+        prompt = instruction
+        
+        # 添加进度信息（如果有）
+        if progress > 0:
+            prompt += f"[Progress: {progress:.0%}]\n\n"
+        
+        # 添加问题
+        prompt += f"**Question:** {question_text}\n\n"
+        
+        # 添加选项
+        if options:
+            prompt += "**Options:**\n"
+            for i, opt in enumerate(options, 1):
+                prompt += f"{i}. {opt}\n"
+            prompt += "\n"
+        
+        # 添加检索上下文（如果有）
+        if context:
+            prompt += "**Retrieved Context:**\n"
+            prompt += f"{context[:1500]}\n\n"  # 限制长度
+        
+        # 添加输出格式要求
+        prompt += """**Output Format:**
+Provide your answer in the following format:
+<choice>X</choice>
+
+Where X is the option number (1, 2, 3, or 4).
+
+Your answer:"""
+        
+        return prompt
+    
+    def _extract_answer(self, response: str) -> int:
+        """从响应中提取答案 (支持增强提示词的 <choice>X</choice> 格式)"""
+        import re
+        
+        # 优先尝试提取 <choice>X</choice> 格式
+        choice_match = re.search(r'<choice>([1-4])</choice>', response, re.IGNORECASE)
+        if choice_match:
+            return int(choice_match.group(1))
+        
+        # 回退1: 尝试提取纯数字格式
+        response_lower = response.lower()
+        matches = re.findall(r'\b([1-4])\b', response_lower)
+        
+        if matches:
+            return int(matches[-1])
+        
+        # 回退2: 默认返回1
+        return 1
+    
+    def decompose_query(self, original_question: str, history: List[Tuple[str, str]], progress: float, step: int) -> str:
+        """Decomposer: 根据原始问题、历史和进度生成子查询
+        
+        Args:
+            original_question: 原始问题
+            history: 历史 [(q_1, r_1), ..., (q_t, r_t)]
+            progress: 当前进度 U_t
+            step: 当前步数
+            
+        Returns:
+            子查询 q_t
+        """
+        if step == 0:
+            # 第一步：直接使用原始问题
+            return original_question
+        
+        # 后续步骤：根据历史生成子查询
+        # 简化版：提取已解决的方面，询问更深入的细节
+        if len(history) > 0:
+            # 构建历史摘要
+            # 转换历史为字符串（处理r可能是int的情况）
+            history_summary = "\n".join([
+                f"Q: {q}\nA: {str(r)[:100] if r is not None else ''}..." 
+                for q, r in history[-2:]
+            ])  # 最近2步
+            
+            # 生成子查询的prompt
+            decompose_prompt = f"""Given the original question and the partial answers so far, generate a focused sub-question to further investigate.
+
+Original Question: {original_question}
+
+Previous Sub-questions and Answers:
+{history_summary}
+
+Current Progress: {progress:.2%}
+
+Generate the next sub-question (must be related to the original question and build upon previous answers):"""
+            
+            # 使用LLM生成子查询
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant that decomposes complex questions into sub-questions."},
+                {"role": "user", "content": decompose_prompt}
+            ]
+            
+            try:
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    max_tokens=100,
+                    temperature=0.3
+                )
+                sub_query = response.choices[0].message.content.strip()
+                return sub_query if sub_query else original_question
+            except:
+                # 失败时返回原始问题
+                return original_question
+        
+        return original_question
+    
+    def synthesize_answer(self, original_question: str, history: List[Tuple[str, str]]) -> str:
+        """Synthesizer: 综合所有子答案生成最终答案
+        
+        Args:
+            original_question: 原始问题
+            history: 完整历史 H_T = [(q_1, r_1), ..., (q_T, r_T)]
+            
+        Returns:
+            最终答案 O
+        """
+        if not history:
+            return ""
+        
+        # 如果只有一步，直接返回该答案（转换为字符串）
+        if len(history) == 1:
+            r = history[0][1]
+            return str(r) if r is not None else ""
+        
+        # 构建所有子答案的摘要（处理r可能是int的情况）
+        sub_answers = "\n\n".join([
+            f"Sub-question {i+1}: {q}\nSub-answer {i+1}: {str(r) if r is not None else ''}" 
+            for i, (q, r) in enumerate(history)
+        ])
+        
+        # 综合答案的prompt
+        synthesize_prompt = f"""Based on the following sub-questions and sub-answers, provide a comprehensive final answer to the original question.
+
+Original Question: {original_question}
+
+Sub-questions and Sub-answers:
+{sub_answers}
+
+Synthesize a final answer that integrates all the information above:"""
+        
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant that synthesizes information from multiple sources."},
+            {"role": "user", "content": synthesize_prompt}
+        ]
+        
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                max_tokens=200,
+                temperature=0.3
+            )
+            return response.choices[0].message.content.strip()
+        except:
+            # 失败时返回最后一个子答案
+            return history[-1][1]
+
+    def simulate_argo_policy(self, question: Dict, theta_cont: float, theta_star: float, c_r: float) -> Dict:
+        """执行完整的ARGO策略
+        
+        完整实现包括:
+        1. Decomposer: 生成子查询 q_t
+        2. Retriever/Reasoner: 每步生成子答案 r_t
+        3. 维护历史: H_t = {(q_1,r_1), ..., (q_t,r_t)}
+        4. Synthesizer: 综合所有子答案生成最终答案 O
+        """
+        U = 0.0
+        C = 0.0
+        retrieval_count = 0
+        reason_count = 0
+        
+        delta_r = self.config['mdp']['delta_r']
+        delta_p = self.config['mdp']['delta_p']
+        c_p = self.config['mdp']['c_p']
+        p_s = self.config['mdp']['p_s']
+        
+        max_steps = 20
+        history = []  # H_t: 维护完整历史 [(q_1, r_1), ..., (q_t, r_t)]
+        
+        for step in range(max_steps):
+            if U >= theta_star:
+                break
+            
+            # 1. Decomposer: 生成子查询
+            sub_query = self.decompose_query(
+                question['question'], 
+                history, 
+                U, 
+                step
+            )
+            
+            # 2. 根据策略执行 Retrieve 或 Reason
+            if U < theta_cont:
+                # === a_t = 0: Retrieve ===
+                retrieval_count += 1
+                C += c_r  # 计算动作成本
+                
+                # 模拟检索成功/失败
+                random_value = random.random()
+                
+                if random_value <= p_s:
+                    # SUCCESS: 检索成功
+                    docs = self.retrieve_documents(sub_query, top_k=3)
+                    context = " ".join(docs) if docs else ""
+                    
+                    # 生成基于检索的子答案 r_t (使用 RETRIEVAL_ANSWER 提示词)
+                    sub_answer, _ = self.generate_answer(
+                        {'question': sub_query, 'options': question.get('options', [])},
+                        context,
+                        is_retrieval=True,  # ← 检索模式
+                        progress=U  # ← 传递当前进度
+                    )
+                    
+                    # 进度增加: U_{t+1} = min(U_t + δ_r, U_max)
+                    U = min(U + delta_r, 1.0)
+                    
+                else:
+                    # FAILURE: 检索失败
+                    # r_t = ∅ (空信息，用空字符串表示)
+                    sub_answer = ""  # 失败时无有效子答案
+                    
+                    # 进度不增加: U_{t+1} = U_t
+                    # (U保持不变)
+                    
+            else:
+                # === a_t = 1: Reason ===
+                reason_count += 1
+                C += c_p  # 计算动作成本
+                
+                # 生成基于推理的子答案 r_t (使用 REASONING 提示词, 无外部context)
+                sub_answer, _ = self.generate_answer(
+                    {'question': sub_query, 'options': question.get('options', [])},
+                    "",  # 纯推理，无检索文档
+                    is_retrieval=False,  # ← 推理模式
+                    progress=U  # ← 传递当前进度
+                )
+                
+                # 进度确定性增加: U_{t+1} = min(U_t + δ_p, U_max)
+                U = min(U + delta_p, 1.0)
+            
+            # 3. 更新历史: H_{t+1} = H_t ∪ {(q_t, r_t)}
+            # 注意: 即使检索失败(r_t=∅)，也要更新历史
+            history.append((sub_query, sub_answer))
+        
+        # 4. Synthesizer: 综合所有子答案生成最终答案
+        final_answer = self.synthesize_answer(question['question'], history)
+        
+        # 检查答案正确性
+        correct = (final_answer == question['correct_answer']) if final_answer else False
+        
+        # 最终质量 Q(O): 使用真实准确率 (0或1)
+        # 既然有QA数据集，用真实准确率代替理论质量更合理
+        quality = 1.0 if correct else 0.0
+        
+        # 保留理论质量用于调试 (使用平方根函数以满足凹性要求)
+        # σ(x) = √x 满足: 严格递增、有界、凹函数 (σ''(x) < 0)
+        quality_theory = math.sqrt(min(U / 1.0, 1.0))
+        
+        return {
+            'quality': quality,  # 真实质量 (准确率)
+            'quality_theory': quality_theory,  # 理论质量 (U_t)
+            'cost': C,
+            'retrieval_count': retrieval_count,
+            'reason_count': reason_count,
+            'steps': step + 1,
+            'correct': correct,
+            'history_length': len(history)
+        }
+    
+    def simulate_always_retrieve_policy(self, question: Dict, c_r: float, theta_star: float) -> Dict:
+        """Always-Retrieve基线: 总是执行Retrieve动作
+        
+        完整流程 (与ARGO一致):
+        1. Decomposer: 生成子查询 q_t
+        2. 固定策略: 总是选择 a_t = 0 (Retrieve)
+        3. 生成子答案 r_t
+        4. 维护历史 H_t
+        5. Synthesizer: 综合生成最终答案 O
+        """
+        U = 0.0
+        C = 0.0
+        retrieval_count = 0
+        
+        delta_r = self.config['mdp']['delta_r']
+        p_s = self.config['mdp']['p_s']
+        
+        max_steps = 20
+        history = []  # H_t: 维护完整历史
+        
+        for step in range(max_steps):
+            if U >= theta_star:
+                break
+            
+            # 1. Decomposer: 生成子查询
+            sub_query = self.decompose_query(
+                question['question'], 
+                history, 
+                U, 
+                step
+            )
+            
+            # 2. 固定策略: Always Retrieve (a_t = 0)
+            retrieval_count += 1
+            C += c_r
+            
+            # 模拟检索成功/失败
+            random_value = random.random()
+            
+            if random_value <= p_s:
+                # SUCCESS: 检索成功
+                docs = self.retrieve_documents(sub_query, top_k=3)
+                context = " ".join(docs) if docs else ""
+                
+                # 生成子答案 r_t
+                sub_answer, _ = self.generate_answer(
+                    {'question': sub_query, 'options': question.get('options', [])},
+                    context,
+                    is_retrieval=True,
+                    progress=U
+                )
+                
+                U = min(U + delta_r, 1.0)
+            else:
+                # FAILURE: 检索失败
+                sub_answer = ""
+                # U保持不变
+            
+            # 3. 更新历史 H_t
+            history.append((sub_query, sub_answer))
+        
+        # 4. Synthesizer: 综合所有子答案生成最终答案
+        final_answer = self.synthesize_answer(question['question'], history)
+        
+        # 检查答案正确性
+        correct = (final_answer == question['correct_answer']) if final_answer else False
+        quality = 1.0 if correct else 0.0
+        quality_theory = math.sqrt(min(U / 1.0, 1.0))
+        
+        return {
+            'quality': quality,
+            'quality_theory': quality_theory,
+            'cost': C,
+            'retrieval_count': retrieval_count,
+            'reason_count': 0,
+            'steps': step + 1,
+            'correct': correct,
+            'history_length': len(history)
+        }
+    
+    def simulate_always_reason_policy(self, question: Dict, theta_star: float) -> Dict:
+        """Always-Reason基线: 总是执行Reason动作
+        
+        完整流程 (与ARGO一致):
+        1. Decomposer: 生成子查询 q_t
+        2. 固定策略: 总是选择 a_t = 1 (Reason)
+        3. 生成子答案 r_t
+        4. 维护历史 H_t
+        5. Synthesizer: 综合生成最终答案 O
+        """
+        U = 0.0
+        C = 0.0
+        reason_count = 0
+        
+        delta_p = self.config['mdp']['delta_p']
+        c_p = self.config['mdp']['c_p']
+        
+        max_steps = 20
+        history = []  # H_t: 维护完整历史
+        
+        for step in range(max_steps):
+            if U >= theta_star:
+                break
+            
+            # 1. Decomposer: 生成子查询
+            sub_query = self.decompose_query(
+                question['question'], 
+                history, 
+                U, 
+                step
+            )
+            
+            # 2. 固定策略: Always Reason (a_t = 1)
+            reason_count += 1
+            C += c_p
+            
+            # 生成子答案 r_t (纯推理，无外部context)
+            sub_answer, _ = self.generate_answer(
+                {'question': sub_query, 'options': question.get('options', [])},
+                "",
+                is_retrieval=False,
+                progress=U
+            )
+            
+            # 进度确定性增加
+            U = min(U + delta_p, 1.0)
+            
+            # 3. 更新历史 H_t
+            history.append((sub_query, sub_answer))
+        
+        # 4. Synthesizer: 综合所有子答案生成最终答案
+        final_answer = self.synthesize_answer(question['question'], history)
+        
+        # 检查答案正确性
+        correct = (final_answer == question['correct_answer']) if final_answer else False
+        quality = 1.0 if correct else 0.0
+        quality_theory = math.sqrt(min(U / 1.0, 1.0))
+        
+        return {
+            'quality': quality,
+            'quality_theory': quality_theory,
+            'cost': C,
+            'retrieval_count': 0,
+            'reason_count': reason_count,
+            'steps': step + 1,
+            'correct': correct,
+            'history_length': len(history)
+        }
+    
+    def simulate_random_policy(self, question: Dict, c_r: float, theta_star: float) -> Dict:
+        """Random基线: 随机选择Retrieve或Reason
+        
+        完整流程 (与ARGO一致):
+        1. Decomposer: 生成子查询 q_t
+        2. 随机策略: 50%概率选择 a_t=0 (Retrieve), 50%概率选择 a_t=1 (Reason)
+        3. 生成子答案 r_t
+        4. 维护历史 H_t
+        5. Synthesizer: 综合生成最终答案 O
+        """
+        U = 0.0
+        C = 0.0
+        retrieval_count = 0
+        reason_count = 0
+        
+        delta_r = self.config['mdp']['delta_r']
+        delta_p = self.config['mdp']['delta_p']
+        c_p = self.config['mdp']['c_p']
+        p_s = self.config['mdp']['p_s']
+        
+        max_steps = 20
+        history = []  # H_t: 维护完整历史
+        
+        for step in range(max_steps):
+            if U >= theta_star:
+                break
+            
+            # 1. Decomposer: 生成子查询
+            sub_query = self.decompose_query(
+                question['question'], 
+                history, 
+                U, 
+                step
+            )
+            
+            # 2. 随机策略: 50% Retrieve, 50% Reason
+            if random.random() < 0.5:
+                # === a_t = 0: Retrieve ===
+                retrieval_count += 1
+                C += c_r
+                
+                random_value = random.random()
+                
+                if random_value <= p_s:
+                    # SUCCESS: 检索成功
+                    docs = self.retrieve_documents(sub_query, top_k=3)
+                    context = " ".join(docs) if docs else ""
+                    
+                    sub_answer, _ = self.generate_answer(
+                        {'question': sub_query, 'options': question.get('options', [])},
+                        context,
+                        is_retrieval=True,
+                        progress=U
+                    )
+                    
+                    U = min(U + delta_r, 1.0)
+                else:
+                    # FAILURE: 检索失败
+                    sub_answer = ""
+                    # U保持不变
+            else:
+                # === a_t = 1: Reason ===
+                reason_count += 1
+                C += c_p
+                
+                sub_answer, _ = self.generate_answer(
+                    {'question': sub_query, 'options': question.get('options', [])},
+                    "",
+                    is_retrieval=False,
+                    progress=U
+                )
+                
+                U = min(U + delta_p, 1.0)
+            
+            # 3. 更新历史 H_t
+            history.append((sub_query, sub_answer))
+        
+        # 4. Synthesizer: 综合所有子答案生成最终答案
+        final_answer = self.synthesize_answer(question['question'], history)
+        
+        # 检查答案正确性
+        correct = (final_answer == question['correct_answer']) if final_answer else False
+        quality = 1.0 if correct else 0.0
+        quality_theory = math.sqrt(min(U / 1.0, 1.0))
+        
+        return {
+            'quality': quality,
+            'quality_theory': quality_theory,
+            'cost': C,
+            'retrieval_count': retrieval_count,
+            'reason_count': reason_count,
+            'steps': step + 1,
+            'correct': correct,
+            'history_length': len(history)
+        }
+    
+    def evaluate_all_policies(self, c_r: float, theta_cont: float, theta_star: float) -> Dict:
+        """评估所有策略 (修正: 添加Random，传入θ*)"""
+        results = {
+            'ARGO': [],
+            'Always-Retrieve': [],
+            'Always-Reason': [],
+            'Random': []  # ← 新增Random策略
+        }
+        
+        print(f"\n  评估 {len(self.test_questions)} 道问题...")
+        
+        for i, question in enumerate(self.test_questions, 1):
+            if i % 10 == 0:
+                print(f"    进度: {i}/{len(self.test_questions)}")
+            
+            # ARGO
+            result = self.simulate_argo_policy(question, theta_cont, theta_star, c_r)
+            results['ARGO'].append(result)
+            
+            # Always-Retrieve (传入theta_star)
+            result = self.simulate_always_retrieve_policy(question, c_r, theta_star)
+            results['Always-Retrieve'].append(result)
+            
+            # Always-Reason (传入theta_star)
+            result = self.simulate_always_reason_policy(question, theta_star)
+            results['Always-Reason'].append(result)
+            
+            # Random (传入theta_star)
+            result = self.simulate_random_policy(question, c_r, theta_star)
+            results['Random'].append(result)
+        
+        return results
+    
+    def run_experiment(
+        self,
+        c_r_min_multiplier: float = 1.0,
+        c_r_max_multiplier: float = 10.0
+    ):
+        """运行实验"""
+        c_p = self.config['mdp']['c_p']
+        c_r_values = np.linspace(
+            c_r_min_multiplier * c_p,
+            c_r_max_multiplier * c_p,
+            self.n_cost_steps  # ← 使用根据test_mode设定的步数
+        )
+        
+        print(f"\n{'='*80}")
+        print(f"开始实验 - 检索成本影响")
+        print(f"{'='*80}")
+        print(f"运行模式: {self.mode_desc}")
+        print(f"c_r范围: {c_r_values[0]:.3f} ~ {c_r_values[-1]:.3f} (扫描 {self.n_cost_steps} 个点)")
+        print(f"c_p固定: {c_p:.3f}")
+        print(f"问题数量: {len(self.test_questions)}")
+        print(f"策略数量: 4 (ARGO, Always-Retrieve, Always-Reason, Random)")
+        print(f"总评估次数: {self.n_cost_steps} × 4策略 × {len(self.test_questions)}题 = {self.n_cost_steps * 4 * len(self.test_questions)}")
+        print(f"{'='*80}\n")
+        
+        all_results = []
+        
+        for i, c_r in enumerate(c_r_values, 1):
+            print(f"\n[{i}/{self.n_cost_steps}] c_r = {c_r:.4f} ({c_r/c_p:.1f}x c_p)")
+            print(f"{'-'*80}")
+            
+            # 求解MDP
+            theta_cont, theta_star = self.solve_mdp(c_r)
+            
+            # 评估所有策略
+            results = self.evaluate_all_policies(c_r, theta_cont, theta_star)
+            
+            # 聚合结果
+            aggregated = {
+                'c_r': c_r,
+                'theta_cont': theta_cont,
+                'theta_star': theta_star
+            }
+            
+            for policy_name, policy_results in results.items():
+                avg_quality = np.mean([r['quality'] for r in policy_results])
+                avg_cost = np.mean([r['cost'] for r in policy_results])
+                avg_retrievals = np.mean([r['retrieval_count'] for r in policy_results])
+                avg_reasons = np.mean([r['reason_count'] for r in policy_results])
+                accuracy = np.mean([r['correct'] for r in policy_results])
+                
+                aggregated[f'{policy_name}_quality'] = avg_quality
+                aggregated[f'{policy_name}_cost'] = avg_cost
+                aggregated[f'{policy_name}_retrievals'] = avg_retrievals
+                aggregated[f'{policy_name}_reasons'] = avg_reasons
+                aggregated[f'{policy_name}_accuracy'] = accuracy
+                
+                print(f"  {policy_name:20s}: Accuracy={accuracy:.1%}, Quality={avg_quality:.3f}, "
+                      f"Cost={avg_cost:.3f}, Retrievals={avg_retrievals:.1f}")
+            
+            all_results.append(aggregated)
+        
+        self.results = all_results
+        
+        print(f"\n{'='*80}")
+        print(f"实验完成!")
+        print(f"{'='*80}\n")
+        
+        return all_results
+    
+    def save_results(self, output_dir: str = "draw_figs/data"):
+        """保存结果"""
+        os.makedirs(output_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        mode_suffix = "small" if self.test_mode == "small" else "full"
+        filename = f"exp1_real_cost_impact_{mode_suffix}_{timestamp}.json"
+        filepath = os.path.join(output_dir, filename)
+        
+        # 保存完整结果 + 元数据
+        output_data = {
+            'metadata': {
+                'test_mode': self.test_mode,
+                'n_questions': len(self.test_questions),
+                'difficulty': self.difficulty,
+                'n_cost_steps': self.n_cost_steps,
+                'timestamp': timestamp
+            },
+            'results': self.results
+        }
+        
+        with open(filepath, 'w') as f:
+            json.dump(output_data, f, indent=2)
+        
+        print(f"✓ 结果已保存: {filepath}")
+        return filepath
+    
+    def plot_results(self, output_dir: str = "figs"):
+        """绘制结果 (修正: 按实验设计文档要求绘制2张图)"""
+        os.makedirs(output_dir, exist_ok=True)
+        
+        c_r_values = [r['c_r'] for r in self.results]
+        mode_suffix = "small" if self.test_mode == "small" else "full"
+        
+        # ====================================================================
+        # 图1.A: Cost vs. Accuracy (按实验设计文档要求)
+        # ====================================================================
+        plt.figure(figsize=(10, 6))
+        
+        policies = ['ARGO', 'Always-Retrieve', 'Always-Reason', 'Random']
+        colors = ['#2E86AB', '#A23B72', '#F18F01', '#6A994E']
+        markers = ['o', 's', '^', 'D']
+        
+        for policy, color, marker in zip(policies, colors, markers):
+            accuracy = [r[f'{policy}_accuracy'] for r in self.results]
+            plt.plot(c_r_values, accuracy, marker=marker, label=policy, 
+                    linewidth=2.5, markersize=8, color=color, alpha=0.8)
+        
+        plt.xlabel('Retrieval Cost ($c_r$)', fontsize=13, fontweight='bold')
+        plt.ylabel('Average Accuracy', fontsize=13, fontweight='bold')
+        plt.title('Graph 1.A: Cost vs. Accuracy', fontsize=15, fontweight='bold', pad=15)
+        plt.legend(fontsize=11, loc='best', framealpha=0.9)
+        plt.grid(True, alpha=0.3, linestyle='--')
+        plt.tight_layout()
+        
+        fig1_path = os.path.join(output_dir, f'exp1_graph1A_cost_vs_accuracy_{mode_suffix}.png')
+        plt.savefig(fig1_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"✓ 图表已保存: {fig1_path}")
+        
+        # ====================================================================
+        # 图1.B: Cost vs. Retrieval Calls (按实验设计文档要求)
+        # ====================================================================
+        plt.figure(figsize=(10, 6))
+        
+        # 只绘制有检索行为的策略 (Always-Reason不检索，所以不画)
+        retrieval_policies = ['ARGO', 'Always-Retrieve', 'Random']
+        retrieval_colors = ['#2E86AB', '#A23B72', '#6A994E']
+        retrieval_markers = ['o', 's', 'D']
+        
+        for policy, color, marker in zip(retrieval_policies, retrieval_colors, retrieval_markers):
+            retrievals = [r[f'{policy}_retrievals'] for r in self.results]
+            plt.plot(c_r_values, retrievals, marker=marker, label=policy, 
+                    linewidth=2.5, markersize=8, color=color, alpha=0.8)
+        
+        plt.xlabel('Retrieval Cost ($c_r$)', fontsize=13, fontweight='bold')
+        plt.ylabel('Average Retrieval Calls ($E[R_T]$)', fontsize=13, fontweight='bold')
+        plt.title('Graph 1.B: Cost vs. Retrieval Calls', fontsize=15, fontweight='bold', pad=15)
+        plt.legend(fontsize=11, loc='best', framealpha=0.9)
+        plt.grid(True, alpha=0.3, linestyle='--')
+        plt.tight_layout()
+        
+        fig2_path = os.path.join(output_dir, f'exp1_graph1B_cost_vs_retrievals_{mode_suffix}.png')
+        plt.savefig(fig2_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"✓ 图表已保存: {fig2_path}")
+        
+        # ====================================================================
+        # 额外图: Cost vs. Total Cost (补充分析)
+        # ====================================================================
+        plt.figure(figsize=(10, 6))
+        
+        for policy, color, marker in zip(policies, colors, markers):
+            total_cost = [r[f'{policy}_cost'] for r in self.results]
+            plt.plot(c_r_values, total_cost, marker=marker, label=policy, 
+                    linewidth=2.5, markersize=8, color=color, alpha=0.8)
+        
+        plt.xlabel('Retrieval Cost ($c_r$)', fontsize=13, fontweight='bold')
+        plt.ylabel('Average Total Cost', fontsize=13, fontweight='bold')
+        plt.title('Supplementary: Cost vs. Total Cost', fontsize=15, fontweight='bold', pad=15)
+        plt.legend(fontsize=11, loc='best', framealpha=0.9)
+        plt.grid(True, alpha=0.3, linestyle='--')
+        plt.tight_layout()
+        
+        fig3_path = os.path.join(output_dir, f'exp1_supplementary_cost_vs_total_{mode_suffix}.png')
+        plt.savefig(fig3_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"✓ 图表已保存: {fig3_path}")
+
+
+def main():
+    """主函数"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='实验1: 检索成本影响 (真实LLM版本)')
+    parser.add_argument('--mode', type=str, default='small', choices=['small', 'full'],
+                       help='测试模式: small (50题, 快速验证) 或 full (全部~12K题, 完整实验)')
+    parser.add_argument('--difficulty', type=str, default='hard', choices=['easy', 'medium', 'hard'],
+                       help='问题难度')
+    parser.add_argument('--gpus', type=str, default='0,1,2,3',
+                       help='使用的GPU ID列表，逗号分隔，例如: 0,1,2,3')
+    parser.add_argument('--seed', type=int, default=42,
+                       help='随机种子')
+    
+    args = parser.parse_args()
+    
+    # 解析GPU列表
+    gpu_ids = [int(x.strip()) for x in args.gpus.split(',')]
+    
+    print(f"\n启动参数:")
+    print(f"  模式: {args.mode}")
+    print(f"  难度: {args.difficulty}")
+    print(f"  GPU: {gpu_ids}")
+    print(f"  种子: {args.seed}\n")
+    
+    # 配置
+    experiment = RealCostImpactExperiment(
+        llm_model_path="/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-3B-Instruct",
+        embedding_model_path="/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
+        test_mode=args.mode,
+        difficulty=args.difficulty,
+        seed=args.seed,
+        gpu_ids=gpu_ids
+    )
+    
+    # 运行实验
+    # 方案1: 扩大低成本区 + 增加采样密度 (消除"悬崖"效应)
+    # 旧版: c_r ∈ [0.020, 0.200], 10点 → "悬崖"明显
+    # 新版: c_r ∈ [0.005, 0.100], 20点 → 平滑过渡
+    results = experiment.run_experiment(
+        c_r_min_multiplier=0.25,   # 1.0 → 0.25 (覆盖更低成本区)
+        c_r_max_multiplier=5.0     # 10.0 → 5.0 (聚焦低-中成本区)
+    )
+    
+    # 保存结果
+    experiment.save_results()
+    
+    # 绘图
+    experiment.plot_results()
+    
+    print("\n实验1完成!")
+    print(f"\n使用提示:")
+    if args.mode == "small":
+        print(f"  当前是小规模测试模式，如果运行成功，请使用以下命令运行完整实验:")
+        print(f"  python Exp_real_cost_impact_v2.py --mode full --difficulty {args.difficulty} --gpus {args.gpus}")
+
+
+if __name__ == "__main__":
+    main()

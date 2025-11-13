@@ -1,0 +1,3673 @@
+O-RAN.WG10.OAM-Architecture-v05.00
+
+O-RAN.WG10.OAM-Architecture-v05.00
+
+		O-RAN.WG10.OAM-Architecture-v05.00
+
+Technical Specification
+
+O-RAN Operations and Maintenance Architecture
+
+	This is a re-published version of the attached final specification.
+
+	For this re-published version, the prior versions of the IPR Policy will apply, except that the previous requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License Agreement to access and use Final Specifications shall no longer apply or be required for these Final Specifications after 1st July 2022.
+
+	The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material on this site for your personal use, or copy the material on this site for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+	 	O-RAN.WG10.OAM-Architecture-v05.00
+
+Technical Specification
+
+O-RAN Operations and Maintenance Architecture
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.
+
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in Annex ZZZ of this specification. All other rights reserved.
+
+O-RAN ALLIANCE e.V.
+
+Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238
+
+VAT ID DE321720189
+
+Contents
+
+Introductory Material	4
+
+1.1	Scope	4
+
+1.2	References	4
+
+1.3	Definitions and Abbreviations	5
+
+1.3.1	Definitions	5
+
+1.3.2	Abbreviations	6
+
+	Chapter 2.	O-RAN Overview	7
+
+2.1	Scope and Objectives	7
+
+2.2	End to End OAM Use Cases	7
+
+2.2.1	O-RAN Service Provisioning	7
+
+2.2.2	O-RAN Measurement Data Collection	12
+
+2.2.3	O-RAN Configuration Provisioning	19
+
+	Chapter 3.	OAM Architecture	23
+
+3.1	Architectural Principles	23
+
+3.2	Architecture Requirements	23
+
+3.2.1	Functional Requirements	23
+
+3.2.2	Non-Functional Requirements	24
+
+3.2.3	Security Requirements	24
+
+3.3	Reference Architecture	24
+
+3.3.1	Architectural Building Blocks	24
+
+3.3.2	Basic OAM Architecture	27
+
+3.3.3	OAM Models and Deployment Options	27
+
+3.3.4	Managed Elements Deployed behind a NAT	28
+
+	Chapter 4.	Application Lifecycle Management (LCM)	30
+
+4.1	Scope	30
+
+4.1.1	Information Model	31
+
+4.1.2	App Development Lifecycles	32
+
+4.1.3	App Onboarding Lifecycles	34
+
+4.1.4	App Operation Lifecycles	36
+
+4.2	Common Application Lifecycle Conclusions	36
+
+4.2.1	Information Consumers	36
+
+4.2.2	Solution SW Package Lifecycle	37
+
+4.2.3	Onboarded SW Package Lifecycles	37
+
+4.2.4	Onboarded App Descriptor Certification Lifecycle	38
+
+4.2.5	App Descriptor Training Lifecycle	38
+
+4.2.6	Deploy Instance Lifecycle	38
+
+Appendix A: Cardinality	40
+
+Appendix B: Sequence Diagram Template	41
+
+Appendix C: [Informational] Common App Lifecyle Flows	49
+
+Annex A: SMO and Non-RT RIC mapping with 3GPP management system	59
+
+Annex ZZZ : O-RAN Adopter License Agreement	61
+
+Section 1: DEFINITIONS	61
+
+Section 2: COPYRIGHT LICENSE	61
+
+Section 3: FRAND LICENSE	61
+
+Section 4: TERM AND TERMINATION	62
+
+Section 5: CONFIDENTIALITY	62
+
+Section 6: INDEMNIFICATION	62
+
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY	63
+
+Section 8: ASSIGNMENT	63
+
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS	63
+
+Section 10: BINDING ON AFFILIATES	63
+
+Section 11: GENERAL	63
+
+ Introductory Material
+
+Scope
+
+This Technical Specification has been produced by the O-RAN.org.
+
+The contents of the present document are subject to continuing work within O-RAN WG1 and may change following formal o-RAN approval. Should the o-RAN.org modify the contents of the present document, it will be re-released by o-RAN Alliance with an identifying change of release date and an increase in version number as follows:
+
+Release x.y.z
+
+where:
+
+x	the first digit is incremented for all changes of substance, i.e., technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+
+The present document studies O-RAN OAM architecture and interface functions. The OAM architecture supports a variety of management network deployment models, including the model of management entities (NMS/EMS/MANO) connecting directly to NEs, and the indirect connection (e.g., M-Plane involved) model. A separate OAM interface document provides details of the functions and protocols conveyed over the interface, that include management functions, procedures, operations and corresponding solutions.
+
+References
+
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+
+-	References are either specific (identified by date of publication, edition number, version number, etc.) or nonspecific.
+
+-	For a specific reference, subsequent revisions do not apply.
+
+-	For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 16.
+
+	3GPP TR 21.905: “Vocabulary for 3GPP Specifications”
+
+	3GPP TS 38.401: "NG-RAN; Architecture description".
+
+	3GPP TS 28.622: "Telecommunication management; Generic Network Resource Model (NRM) Integration Reference Point (IRP); Information Service (IS)".
+
+	3GPP TS 32.101: “Telecommunication management; Principles and high level requirements”.
+
+	3GPP TS 28.532: Management and orchestration; Generic management services
+
+	3GPP TS 28.533: Management and orchestration; Architecture framework
+
+	3GPP TS 28.550: Management and orchestration; Performance assurance
+
+	3GPP TS 28.552: Management and orchestration; 5G performance measurements
+
+	ETSI GS NFV-IFA 005 V3.3.1 (2019-08), Network Functions Virtualisation (NFV) Release 3;Management and Orchestration;Or-Vi reference point - Interface and Information Model Specification
+
+	ETSI GS NFV-IFA 027 V2.4.1 (2018-05), Network Functions Virtualisation (NFV) Release 2;Management and Orchestration; Performance Measurements Specification
+
+	O-RAN White Paper: “O-RAN: Towards an Open and Smart RAN”, October 2018
+
+	O-RAN-WG4.MP.0-v05.00: O-RAN Alliance Working Group 4 Management Plane Specification
+
+	O-RAN.WG1.O1-Interface-v05.00: “O-RAN Operations and Maintenance Interface Specification”.
+
+	ORAN.WG2.Use Case Requirements v03.00: “O-RAN Working Group 2 (Non-RT RIC & A1 interface)”.
+
+	O-RAN.WG6.CAD-v02.02, “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”
+
+	O-RAN.WG6.ORC-v02.01, “Orchestration Use Cases for O-RAN Virtualized RAN”
+
+	O-RAN.WG1-O-RAN Architecture Description - v04.00: “O-RAN Architecture Description”.
+
+	ORAN.WG3.E2GAP.0-v0.1: “O-RAN Working Group 3; Near-Real-time RAN Intelligent Controller Architecture & E2 General Aspects and Principles”.
+
+	O-RAN.WG3.RICARCH-v02.00: “O-RAN Working Group 3;Near-Real-time RAN Intelligent Controller; Near-RT RIC Architecture”
+
+	3GPP TR 28.809 v0.2.0, Study on enhancement of management data analytics
+
+	O-RAN-WG6.O2-GA&P-v01.01: “O2 General Aspects and Principles”
+
+	https://yaml.org/spec/1.2/spec.html, "YAML Ain’t Markup Language (YAML™) Version 1.2", October 2009
+
+	O-RAN.WG1.Information Model and Data Models-v01.00: “O-RAN Information Model and Data Models Specification”
+
+	O-RAN.SFG-O-RAN-Security-Requirements-Specification-v01.00: “O-RAN Security Requirements v1.0”
+
+RFC 6241, “Network Configuration Protocol (NETCONF)”, IETF, June 2011
+
+O-RAN.WG5.MP.0-v02.00, ”O1 Interface specification for O-DU”
+
+Definitions and Abbreviations
+
+Definitions
+
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 [1].
+
+Also, any terms and definitions that are also given in the O-RAN Architecture [17] are intended to be aligned.  Text in the O-RAN Architecture [17] takes precedence in case of any difference.
+
+infrastructure resources: Infrastructure resources as used here refer to a set of resources provided to a VNF [9] by its supporting O-Cloud.
+
+Service Planning: The activity of a Service Operator around certifying a solution configuration for deployment into their network.
+
+Service Provider: A network provider who is planning to deploy applications into their network.
+
+Solution Provider: An application developer who delivers applications to Service Providers.
+
+"SP" Exchange: Not a formal interface in terms of between systems. However, the structure and content of the exchange is defined such that a Solution Provider can deliver applications to a Service Provider for deployment.
+
+Definitions for the following terms used in the document can be found in the O-RAN Architecture [17]:
+
+near-RT RIC
+
+non-RT RIC
+
+NMS
+
+O-Cloud
+
+O-CU
+
+O-CU-CP
+
+O-CU-UP
+
+O-DU
+
+O-RU
+
+O1
+
+O2
+
+SMO
+
+rApp
+
+xApp
+
+Abbreviations
+
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+
+FCAPS	Fault, Configuration, Accounting, Performance, Security
+
+FOCOM	Federated O-Cloud Orchestration and Management
+
+MA	Managed Application
+
+ME	Managed Element
+
+MF	Managed Function
+
+MMP	Meet-Me-Point
+
+NAT	Network Address Translation
+
+Near-RT RIC      O-RAN near real time RAN Intelligent Controller
+
+NFO	Network Function Orchestration
+
+NFV 	Network Function Virtualization
+
+NFVI	Network Function Virtualization Infrastructure
+
+NM 	Network Manager
+
+Non-RT RIC	O-RAN non-real time RAN Intelligent Controller
+
+O-CU-CP	O-RAN Central Unit – Control Plane.
+
+O-CU-UP	O-RAN Central Unit – User Plane
+
+O-DU	O-RAN Distributed Unit
+
+O-RU	O-RAN Radio Unit
+
+PCP	Port Control Protocol
+
+PK	Primary Key
+
+PNF 	Physical Network Function
+
+RAN	Radio Access Network
+
+SDLC	Software Development LifeCycle
+
+SMO	Service Management and Orchestration
+
+VNF 	Virtualized Network Function
+
+VPN	Virtual Private Network
+
+UPNP	Universal Plug-N-Play
+
+ O-RAN Overview
+
+Scope and Objectives
+
+O-RAN activities are guided by the following objectives [11]:
+
+•	Leading the industry towards open, interoperable interfaces, RAN virtualization, and big data and AI enabled RAN intelligence.
+
+•	Maximizing the use of common-off-the-shelf hardware and merchant silicon and minimizing proprietary hardware
+
+•	Specifying APIs and interfaces, driving standards to adopt them as appropriate, and exploring open source where appropriate
+
+The O-RAN OAM Architecture identifies management services, managed functions and managed elements supported in O-RAN, including the interworking between service management and orchestration and other O-RAN components such as infrastructure management.  Requirements are derived from end-to-end OAM use cases, initially using the initial provisioning of O-RAN service across VNFs and PNFs as the primary use case.  The architecture identifies the interfaces between O-RAN Service Management and Orchestration and Managed Elements for different models and example deployment options.  It provides a description of the LifeCycle Management for applications delivered from a Solution Provider to a Service Provider/Network Operator.
+
+Future versions of the architecture will address additional areas of O-RAN OAM functionality.
+
+End to End OAM Use Cases
+
+This section contains end to end OAM use cases that O-RAN is expected to support.  Requirements will be derived from the use cases.
+
+The initial use cases defined include O-RAN Service Provisioning and Data Collection.  Additional Use Cases will be added as prioritized by the O-RAN community in future versions of this document
+
+O-RAN Service Provisioning
+
+Basic Objective
+
+In the O-RAN architecture, the radio side includes Near-RT RIC, O-CU-CP, O-CU-UP, O-DU, and O-RU Managed Functions, and the management side is comprised of the Service Management and Orchestration Framework (including the Non-RT RIC). In the NFV environment, O-RAN network elements can also be implemented in a virtualized form, and thus include an Infrastructure layer (e.g., COTS/White Box/Peripheral hardware and virtualization layer) based on an O-Cloud.
+
+The current use case focuses on network/element deployment rather than physical construction. According to the radio coverage requirement, operators could deploy the O-RAN network/element on dedicated physical resources and/or virtualized resources in a specific area.
+
+This use case assumes that the network elements are deployed based on an example Network Design using VNFs for centralized functions and PNFs for functions closer to the customer, so that the sequence calls for deployment of VNFs for the Near-RT RIC, O-CU-CP and O-CU-UP first followed by PNFs for the O-DU and O-RU. Note: RF functions must always be realized as PNFs but the O-DU can be realized as a PNF or VNF; this document uses PNF as an example to illustrate the associated OAM flows.
+
+It is also assumed that secure network connectivity is already available between RAN components.
+
+Entities/Resources involved
+
+To support the O-RAN network provisioning, the Service Management and Orchestration Framework needs to support the following capabilities:
+
+O-RAN network element deployed in selected area
+
+For non-virtualized parts, the Service Management and Orchestration Framework supports the deployment of physical network elements on the target dedicated physical resources which satisfy the coverage requirements, with management through the O1 interface.
+
+For virtualized network elements, the Service Management and Orchestration Framework has the capability to interact with the O-Cloud to perform network element life cycle management, e.g. instantiate the virtualized network element on the target infrastructure through the O2 interface (e.g., indicate the selected geo-location for each VNF to be instantiated, where close to the PNFs).
+
+The Service Management and Orchestration Framework has the capability to consume the provisioning management service through the O1 interface to manage the configuration of the network element, details are defined in O-RAN.WG1.OAM Interface Specification [13].
+
+O-RAN network provisioning
+
+Based on the deployed network elements, the Service Management and Orchestration Framework configures the IP addressing, etc. in the PNFs and VNFs to support connectivity between them (this operation could also be performed during the instantiation steps).
+
+Operators can operate and maintain the network dynamically through the O1 and/or O2 interface by means of:
+
+Reconfiguration of the network elements
+
+System update (usually refers to software management, without adding network elements) and system upgrade (the network elements could be added/removed/modified)
+
+According to above, the Service Management and Orchestration Framework together with the O-Cloud implements the O-RAN network element deployment and provisioning, creating an O-RAN network to provide service to consumers.
+
+Solutions
+
+Table 2.2.1-1 shows the O-RAN service provisioning procedures.
+
+Table 2.2.1-1: O-RAN service provisioning
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+O-RAN service provisioning
+
+Actors and Roles
+
+Service Management and Orchestration Framework: NFO, OAM Functions, Non-RT RIC
+
+O-Cloud: DMS
+
+PNF
+
+VNF
+
+Assumptions
+
+Pre-conditions
+
+The Service Management and Orchestration Framework and O-Cloud are connected and interact normally
+
+O-Cloud supports platform and resource management normally
+
+The PNF was constructed/installed but not activated
+
+The VNF Software Package has been uploaded to the O-Cloud
+
+Secure network connectivity is already available between RAN components
+
+- Note: security related procedure is FFS
+
+Begins when
+
+The network operator/manager decides to deploy an O-RAN network in specific geo-location
+
+Step 1 (M)
+
+The service designer deploys Service Model and Artifacts to SMO
+
+Step 2 (M)
+
+SMO on boarding the VNF Descriptors for the service to the O-Cloud
+
+Step 3 (M)
+
+The radio planner orders RAN Service Deployment
+
+Step 4 (M)
+
+The SMO initiates the O-RAN Service instantiation
+
+Step 5 (M)
+
+The SMO interacts with O-Cloud to instantiate Near-RT RIC based on Near-RT RIC VNFD
+
+Step 6 (M)
+
+The O-Cloud creates VNF of Near-RT RIC
+
+Step 7 (M)
+
+The O-Cloud notifies the SMO the Near-RT RIC has been instantiated and SMO updates its inventory
+
+Step 8 (M)
+
+The SMO configures the Near-RT RIC
+
+Step 9 (M)
+
+the O-Cloud creates VNF of O-CU-CP
+
+Step 10 (M)
+
+The O-Cloud notifies the SMO the O-CU-CP has been instantiated and SMO updates its inventory
+
+Step 11 (M)
+
+The SMO prepares configuration, e.g. Near-RT RIC related
+
+Step 12 (M)
+
+The SMO configures the O-CU-CP
+
+Step 13 (M)
+
+The SMO interacts with O-Cloud to instantiate O-CU-UP, for multiple O-CU-UP VNF, the step 13 to 17 is circulated
+
+Step 14 (M)
+
+the O-Cloud creates VNF of O-CU-UP
+
+Step 15 (M)
+
+The O-Cloud notifies the SMO the O-CU-UP has been instantiated and SMO updates its inventory
+
+Step 16 (M)
+
+The SMO prepares configuration, e.g., Near-RT RIC, O-CU-CP related
+
+Step 17 (M)
+
+The SMO configures the O-CU-UP
+
+Step 18 (O)
+
+The SMO deploys xApp to Near-RT RIC
+
+Step 19 (O)
+
+After the above steps the Near-RT RIC could interact with O-CU-CP via E2 interface
+
+Step 20 (O)
+
+After the above steps the Near-RT RIC could interact with O-CU-UP via E2 interface
+
+Step 21 (M)
+
+SMO adds O-DU into inventory, e.g., with an O-DU.ID for each O-DU. For multiple O-DU this step is circulated
+
+Step 22 (M)
+
+SMO add O-RU into inventory in the O-DU record, e.g., with an O-RU.ID for each O-RU. For multiple O-DU this step is circulated
+
+Step 23 (M)
+
+The field technician powers on the O-DU
+
+Step 24 (M)
+
+The O-DU sends Registration to the SMO
+
+Note: controller address determined as per O-RAN-WG1.O1 Interface Specification
+
+Step 25 (M)
+
+The SMO registers the O-DU as on-line
+
+Step 26 (M)
+
+The SMO prepares O-DU configuration, e.g., related information from Near-RT RIC and O-CU-CP, O-CU-UP
+
+Step 27 (M)
+
+The SMO configures the O-DU
+
+Note: includes NETCONF configuration as per O-RAN WG4.MP.0-v01.00 [12]
+
+Step 28 (O)
+
+The SMO could deploy xApp to O-DU
+
+Step 29 (O)
+
+After the above steps the Near-RT RIC could interact with O-DU via E2 interface
+
+Step 30 (M)
+
+The field technician powers on the O-RU
+
+Step 31 (M)
+
+The O-RU registers to the O-DU
+
+Note: detailed procedures as per O-RAN WG4.MP.0-v01.00 – additional actions for hybrid case not shown
+
+Step 32 (M)
+
+The O-DU sends Config Change Notification to the SMO indicating O-RU on-line
+
+Step 33 (M)
+
+The SMO registers the O-RU as on-line
+
+Step 34 (M)
+
+The SMO configures the O-RU via O-DU
+
+Step 35 (M)
+
+The O-DU gets O-RU configuration information from the SMO
+
+Step 36 (M)
+
+The O-DU configures the O-RU
+
+Step 37 (M)
+
+O-RU sends Registration to the SMO
+
+Note: procedure not currently supported in WG4.MP.0-v01.00 but details assumed as per O-RAN-WG1.O1 Interface Specification
+
+Step 38 (M)
+
+The SMO registers the O-RU as on-line
+
+Step 39 (M)
+
+The SMO prepares O-RU configuration, e.g., include co-related O-DU, etc.
+
+Step 40 (M)
+
+The SMO configures the O-RU
+
+Ends when
+
+  All O-RAN network functions needed for service have been registered and configured; SMO holds current inventory of all O-RAN network functions
+
+Exceptions
+
+Not applicable
+
+Post Conditions
+
+The O-RAN network has been established and can provide service to customers
+
+Traceability
+
+REQ-M&O-FUN1, REQ-M&O-FUN2, REQ-M&O-FUN3, REQ-M&O-FUN4, REQ-M&O-FUN5, REQ-M&O-FUN6, REQ-M&O-FUN9, REQ-M&O-FUN10
+
+Figure 2.2.1-1: O-RAN Service Provisioning
+
+O-RAN Measurement Data Collection
+
+Basic Objective
+
+In this use case, the Non-RT RIC as the intelligent management center located in Service Management and Orchestration Framework determines that measurement data is needed and interacts with the SMO OAM Functions to collect measurement data from network for AI/ML training/inference/analyzing, and then generate optimization operations in order to improve the end-to-end user service experience and the network performance.
+
+According to the Service Management and Orchestration Framework, to fulfill the Non-RT RIC requested data collection, the following capability should be supported by the SMO (framework):
+
+The SMO should support the MnS component Type A (defined in [6])generation and the corresponding operation performing (defined in [5] and [7]), according to the measurement data collection request from the Non-RT RIC
+
+The SMO (framework) should support the MnS component type C (defined in [6]) consumption such as the measurement data requested by the Non-RT RIC
+
+The current use case focuses on the Non-RT RIC requested measurement data collection and consumption, the SMO should generate the PM Job and perform the PM Job control operations accordingly, and the SMO (framework) should support the measurement data consumption by the Non-RT RIC.
+
+Notes:
+
+In the O-RAN SMO framework, in order to avoid the PM Job confliction, it is suggested that the SMO take the responsibility for generating the PM Job and performing the PM Job control related operations. The resolution of conflict resolving by the SMO is FFS.
+
+In this use case, the network elements decide if the PM Job is acceptable or not, in other words, it is ultimately the network element (MnS producer) who decides whether the measurement data collection task can be established or not.
+
+Specifications for collecting infrastructure measurements do not yet exist. The Measurement Data Collection procedures will be updated to comply with [15] once WG6 has published the specification.
+
+The measurement data producer in the use case so far doesn’t refer to Network Slicing, but this will be added in the use case once the O-RAN network slice has been defined.
+
+Entities/Resources involved
+
+Roles in the PM Job Control related operations:
+
+The Non-RT RIC: PM Job initiator
+
+The SMO (framework): measurement service component type A consumer
+
+To fulfill the Non-RT RIC requested measurement data collection by the SMO on the O1/O2 interface, the information related to the collection task should comply with section2.3 defined in [13].
+
+The measurement data collection information provided by the Non-RT RIC should be converted into a PM Job, and any management operations to the data collection task requested by the Non-RT RIC should be converted into the O1/O2 interface supported PM Job control related management service operations by the SMO.
+
+Roles in the NotifyFileReady subscribing:
+
+SMO: management service component type A consumer (the referenceConsumer, defined in [5])
+
+O-RAN MOs: Notification producer
+
+Roles in the measurement data consumption:
+
+SMO: management service component type C consumer
+
+O-RAN MOs: streaming data producer
+
+File Server: storage the measurement data file
+
+Solutions
+
+Measurement Data Collection Creation
+
+Table 2.2.2-1 shows the procedure of the Non-RT RIC requested measurement data collection task fulfilled by the SMO on the O1/O2 interface.
+
+Table 2.2.2-1: Measurement Data Collection Creation
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+O-RAN Measurement Data Collection
+
+Actors and Roles
+
+Service Management and Orchestration Framework
+
+Non-RT RIC
+
+O-Cloud
+
+O-RAN components/logical nodes, e.g., O-CU, O-DU, O-RU, Near-RT RIC.
+
+Assumptions
+
+None
+
+Pre-conditions
+
+The SMO and the Non-RT RIC are connected and interact normally
+
+O-RAN components are in normal running status
+
+Secure network connectivity is already available between RAN components
+
+- Note: security related procedure is FFS
+
+Begins when
+
+The Non-RT RIC determines that it needs measurement data from the O-RAN MOs and corresponding infrastructure resources, e.g., O-CU-CP instance and corresponding infrastructure resources
+
+Step 1 (M)
+
+The Non-RT RIC provides the information of the measurement data to the SMO
+
+Step 2 (M)
+
+The SMO generates a PM Job as the Non-RT RIC required
+
+Step 3.1 (M)
+
+SMO performs PM Job control management to the O-CU-CP via the O1 interface, e.g., Operation createMeasurementJob defined in [7]
+
+Step 3.2 (M)
+
+The SMO performs PM Job control management to the O-Cloud over the O2 interface for the O-CU-CP infrastructure resource instance, e.g., Create PM Job operation defined in clause 7.7.2, [9]
+
+Step 4.1 (M)
+
+The measured O-CU-CP responds to the SMO with the PM Job creation result. The PM Job ID should be contained.
+
+Step 4.2 (M)
+
+The O-Cloud responds to the SMO with the PM Job creation result with the PM Job ID.
+
+Step 5.1 (M)
+
+The SMO subscribes to PM Notifications to the O-CU-CP instance via the O1 interface. The ConsumerReference defined in 7.1.1.3 [5] could be the SMO address
+
+Step 5.2 (M)
+
+The SMO subscribes to O-CU-CP related infrastructure resource instance PM data to the O-Cloud over the O2 interface
+
+Step 6.1 (M)
+
+The O-CU-CP instance provides the result of this operation to the SMO
+
+Step 6.2 (M)
+
+The O-Cloud provides the SMO with the result of the subscription to the O-CU-CP infrastructure resource instance
+
+Step 7 (M)
+
+The SMO provides the result of the measurement data collection establishment to the Non-RT RIC
+
+Ends when
+
+Non-RT RIC has measurement data
+
+Exceptions
+
+FFS
+
+Post Conditions
+
+The Non-RT RIC initiated measurement data collection has been fulfilled by the SMO; the measured O-RAN MOs generate measured data as the PM Job required. The subscription to the File Ready notification has been created successfully
+
+Traceability
+
+REQ-M&O-FUN7
+
+Figure 2.2.2-1: Measurement Data Collection Creation
+
+Measurement Data File Consumption
+
+With the performance data file reporting method:
+
+The measurement data file could be stored in a file server, and the path should be contained in the NotifyFileReady
+
+Once the measurement data file has been prepared, the O-CU-CP instance shall report the notification NotifyFileReady to the SMO
+
+Table 2.2.2-2 shows the measurement data file consumption
+
+Table 2.2.2-2: Measurement Data File Ready Report
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+O-RAN Measurement Data Collection
+
+Actors and Roles
+
+Service Management and Orchestration Framework
+
+Non-RT RIC
+
+O-Cloud
+
+O-RAN components/logical nodes, e.g., O-CU, O-DU, O-RU, Near-RT RIC.
+
+Assumptions
+
+None
+
+Pre-conditions
+
+The SMO and the Non-RT RIC are connected and interact normally
+
+O-RAN components are in normal running status
+
+Secure network connectivity is already available between RAN components
+
+- Note: security related procedure is FFS
+
+Begins when
+
+The SMO shall perform the Operation Subscribe to provide the consumer information to the measurement data producer. The producer shall report the NotifyFileReady once the measurement data file has been prepared
+
+Step 1.1 (M)
+
+The O-CU-CP sends the notification NotifyFileReady to the SMO, and it is consumed by the SMO
+
+Step 1.2 (M)
+
+The O-Cloud reports the infrastructure resource measured data file to the SMO
+
+Step 2 (M)
+
+The SMO retrieves the data file from the FileServer, and the collected data is eventually consumed by the Non-RT RIC
+
+Ends when
+
+SMO has collected data
+
+Exceptions
+
+FFS
+
+Post Conditions
+
+The SMO received the notification of NotifyFileReady successfully, the data file eventually consumed by the Non-RT RIC
+
+Traceability
+
+REQ-M&O-FUN7
+
+Figure 2.2.2-2: Measurement Data File Consumption
+
+Measurement Streaming Data Consumption
+
+With the streaming reporting method:
+
+The consumer related information was taken to the producer in the operation of performance data collection creation.
+
+The performance data streaming service producer shall establish streaming connection(s) to the consumer, in this use case, the O-CU-CP instance act as the performance data streaming service producer and the SMO as the consumer.
+
+The O-CU-CP instance shall send measured data on the established connection(s).
+
+The table 2.2.2-3 shows the streaming connection(s) establishment and streaming data consumption.
+
+Table 2.2.2-3: Measurement Streaming Data Consumption
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+O-RAN Measurement Data Collection
+
+Actors and Roles
+
+Service Management and Orchestration Framework
+
+Non-RT RIC
+
+O-Cloud
+
+O-RAN components/logical nodes, e.g., O-CU, O-DU, O-RU, Near-RT RIC.
+
+Assumptions
+
+None
+
+Pre-conditions
+
+The SMO and the Non-RT RIC are connected and interact normally
+
+O-RAN components are in normal running status
+
+Secure network connectivity is already available between RAN components
+
+- Note: security related procedure is FFS
+
+Begins when
+
+The O-CU-CP instance starts streaming connection(s) establishment to the SMO, and reports the measured data as the PM Job required
+
+Step 1 (M)
+
+The O-CU-CP instance interworks with the SMO to establish streaming connection(s). the connection(s) should not be released until the PM Job is stopped
+
+Step 2.1 (M)
+
+The O-CU-CP instance reports the measured data to the SMO as the PM Job required via the streaming connection(s)
+
+Step 2.2 (O)
+
+The O-Cloud reports the infrastructure resource measured data to the SMO
+
+Ends when
+
+SMO receives measured data
+
+Exceptions
+
+FFS
+
+Post Conditions
+
+The streaming connection(s) has been established between the O-CU-CP instance and the SMO successfully.
+
+The SMO consumed the measured data successfully
+
+Traceability
+
+REQ-M&O-FUN7
+
+Figure 2.2.2-3: Measurement Streaming Data Consumption
+
+O-RAN Configuration Provisioning
+
+Basic Objective
+
+The Provisioning Management Service provides the ability for the SMO to configure an O-RAN Managed Element (ME) and to receive Configuration Management (CM) notifications from an O-RAN ME.  The Configuration ME Use Case in this section shows how O-RAN uses NETCONF as specified in the O1 Interface Specification [13] to configure O-RAN Managed Elements.
+
+Entities/Resources involved
+
+Roles in the Provisioning Use Case:
+
+SMO is the Provisioning MnS Consumer
+
+ME is the Provisioning MnS Provider
+
+Configure ME Use Case
+
+The Configure ME Use Case illustrates the sequence of NETCONF commands and Provisioning MnS Procedures, as specified in the O1 Interface Specification [13], to configure a Managed Element.
+
+Before issuing any NETCONF commands, the NETCONF session must be established.  Before changing the configuration of a ME, the appropriate target data store should be locked to prevent other NETCONF clients, non-NETCONF clients, and human users from interfering with the configuration changes.  Note that locking the data store is optional and is at the discretion of the SMO/operator.
+
+Configuration changes are made using the Create Managed Object Instance Procedure, Delete Managed Object Instance Procedure or Modify Managed Object Instance Attributes procedure as specified in O-RAN O1 Interface Specification [13].  If desired, SMO may first read the current ME configuration using the Read Managed Object Instance Attributes Procedure as specified in O-RAN O1 Interface Specification [13], before modifying the configuration, in order to ensure that the SMO is synchronized with the current ME configuration. Note that reading the current configuration is optional and is at the discretion of the SMO/operator.  If the changes are made in a candidate data store, SMO must commit the changes to the running data store to make them effective.
+
+If the SMO wishes to receive CM notifications, SMO must subscribe to CM notifications using the Subscription Control procedure, as specified in O-RAN O1 Interface Specification [13].
+
+Multiple provisioning procedures can be executed in sequence, one at a time, under the same lock session.  When the SMO has finished sending all the commands that modify the configuration of the data store, the SMO should unlock the target data store so that other clients can make changes.  Note that unlocking the data store is optional and is at the discretion of the SMO/operator.
+
+Finally, if the SMO has no more provisioning procedures to perform at this time, SMO can terminate the NETCONF session.  Note that terminating the NETCONF session is optional and is at the discretion of the SMO/operator.
+
+Table 2.2.3-1 shows the End to End Use Case for the SMO to configure a ME.
+
+Table 2.2.3-1: Configure ME
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Configure ME
+
+Actors and Roles
+
+Service Management and Orchestration Framework
+
+O-RAN Managed Element
+
+Assumptions
+
+None
+
+Pre-conditions
+
+Operator has prepared the ME configuration and provided it to the SMO.
+
+SMO is in an operational state
+
+ME is in an operational state
+
+SMO is managing the ME
+
+(Optional) SMO has subscribed to CM Notifications, if desired
+
+Begins when
+
+SMO decides to configure the ME.
+
+Step 1 (O)
+
+If there is no NETCONF session established, SMO uses the NETCONF Session Establishment procedure to establish a NETCONF session on a ME.
+
+O-RAN O1 Interface Specification [13], clause 2.1.11
+
+Step 2 (O)
+
+(Optional) If the target DS is not locked, SMO uses the NETCONF Lock Data Store procedure to lock a target data store (DS) on a ME.  Note that locking the data store is optional and is at the discretion of the SMO/operator.
+
+O-RAN O1 Interface Specification [13], clause 2.1.13
+
+Step 3 (O)
+
+(Optional) If desired, SMO reads the current ME configuration using the Read Managed Object Instance Attributes Procedure to ensure that the SMO is synchronized with the current ME configuration before modifying it.  Note that reading the current configuration is optional and is at the discretion of the SMO/operator.
+
+O-RAN O1 Interface Specification [13], clause 2.1.5
+
+Step 4 (M)
+
+SMO configures the ME data store. Configuration changes are made using the Create Managed Object Instance Procedure, Delete Managed Object Instance Procedure or Modify Managed Object Instance Attributes Procedure.  Multiple provisioning procedures can be sent in sequence, one at a time, under the same lock session.
+
+O-RAN O1 Interface Specification [13], clauses 2.1.2, 2.1.3, 2.1.4
+
+Step 5 (O)
+
+If configuration changes were made in the candidate data store, SMO uses the NETCONF Commit procedure to commit the changes to the running data store and make them effective.
+
+O-RAN O1 Interface Specification [13], clause 2.1.15
+
+Step 6 (O)
+
+If SMO has subscribed to CM Notifications, ME sends the appropriate CM notification, using the Notify Managed Object Instance Creation Procedure, Notify Managed Object Instance Deletion Procedure, Notify Managed Object Instance Attribute Value Changes Procedure, or Notify Managed Object Instance Changes Procedure.
+
+O-RAN O1 Interface Specification [13], clauses 2.1.6, 2.1.7, 2.1.8, 2.1.9, 2.1.10
+
+Step 7 (O)
+
+(Optional) If SMO has successfully completed configuration changes, and if the data store is locked, SMO uses the NETCONF Unlock Data Store procedure to unlock a target data store (DS) on a ME. Note that unlocking the data store is optional and is at the discretion of the SMO/operator.
+
+O-RAN O1 Interface Specification [13], clause 2.1.14
+
+Step 8 (O)
+
+If SMO is finished sending NETCONF commands, SMO uses the NETCONF Session Termination procedure to terminate a NETCONF session on a ME.  Note that terminating the NETCONF session is optional and is at the discretion of the SMO/operator.
+
+O-RAN O1 Interface Specification [13], clause 2.1.12
+
+Ends when
+
+Step 4 or later optional steps complete
+
+Exceptions
+
+See RFC 6241 [25]
+
+Post Conditions
+
+ME configuration has been updated in the running DS.
+
+Traceability
+
+[13] REQ-GNC-FUN-1, REQ-GNC-FUN-2, REQ-GNC-FUN-3, REQ-GNC-FUN-4, REQ-GNC-FUN-5, REQ-GNC-FUN-6, REQ-GNC-FUN-7, REQ-GNC-FUN-8, REQ-GNC-FUN-9
+
+O-RAN O1 Interface Specification [13], clause 2.1.1
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+box “Service Management & \nOrchestration Framework” #gold
+
+   Participant “OAM Functions” as SMO
+
+end box
+
+box "O-RAN Managed Element"#lightpink
+
+   Participant “ME” as ME
+
+end box
+
+Opt If NETCONF session is not established
+
+   note over SMO, ME #lightblue
+
+       <<O1>> NETCONF Session Establishment
+
+   endnote
+
+End
+
+Opt
+
+   note over SMO, ME #lightblue
+
+       <<O1>> NETCONF Lock Data Store
+
+   endnote
+
+End
+
+== SMO configures the ME ==
+
+Opt If SMO desires
+
+   note over SMO, ME #lightblue
+
+       <<O1>> Read MOI Attributes
+
+   Endnote
+
+End
+
+Loop until all commands are sent
+
+   note over SMO, ME #lightblue
+
+         <<O1>> Delete MOI and/or Create MOI and/or Modify MOI Attributes
+
+   Endnote
+
+Opt If target DB is candidate
+
+   note over SMO, ME #lightblue
+
+       <<O1>> NETCONF Commit
+
+   Endnote
+
+End Opt
+
+Opt If SMO has subscribed to CM notifications
+
+   note over SMO, ME #lightblue
+
+        <<O1>> HTTPS CM notification
+
+   Endnote
+
+End Opt
+
+End Loop
+
+== Configuration changes complete ==
+
+Opt
+
+   note over SMO, ME #lightblue
+
+       <<O1>> NETCONF Unlock Data Store
+
+   endnote
+
+End
+
+Opt If SMO has no more NETCONF operations to perform
+
+   note over SMO, ME #lightblue
+
+       <<O1>> NETCONF Session Termination
+
+   endnote
+
+End
+
+@enduml
+
+Figure 2.2.3-1: Configure ME
+
+OAM Architecture
+
+Architectural Principles
+
+The following section provides architecture principals guiding the support of OAM in the O-RAN architecture. Common OAM functions should be supported through a common set of OAM interface protocols across the different components of the O-RAN architecture
+
+Management Services should, to the degree possible, align with existing standards specifications:
+
+3GPP 5G Specifications for management interfaces
+
+ETSI NFV Specifications for life cycle management
+
+O-RAN WG4.MP.0-v07.00 (Future enhancements to align to 3GPP can be considered.)
+
+O-RAN OAM specifications should refer to the 3GPP and ETSI specs and not replicate them here.  O-RAN OAM specifications must identify needed extensions to support O-RAN and exceptions which cannot be supported.  It is the goal of O-RAN to drive any needed extensions into standards to maintain alignment between O-RAN and existing standards.
+
+Architecture Requirements
+
+Defines the Architecture requirements applicable to the O-RAN reference architecture.  Architecture requirements are derived from Use Cases to be supported and define the functional needs the architecture aims to satisfy.
+
+The initial set of requirements in this document are derived from the O-RAN Service Provisioning Use Case.  More requirements may be added in future versions of the OAM Architecture.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-M&O-FUN1]
+
+O-RAN OAM Architecture must support the interaction between the Service Management and Orchestration Framework and the O-Cloud through O2 interface to perform virtualized resource orchestration.
+
+Use Case
+
+[REQ-M&O-FUN2]
+
+O-RAN OAM Architecture must support the capability for the Service Management and Orchestration Framework to consume the provisioning management service exposed by each O-RAN managed element, whether implemented as PNF or VNF, through the O1 interface.
+
+O-RAN-WG1.OAM Interface Specification [13]
+
+[REQ-M&O-FUN3]
+
+O-RAN OAM Architecture must support creation, modification and termination of VNFs in an O-RAN network by the Service Management and Orchestration Framework
+
+Use Case
+
+[REQ-M&O-FUN4]
+
+O-RAN OAM Architecture must support registration and inventory of newly activated VNFs and PNFs by the Service Management and Orchestration Framework
+
+Use Case
+
+[REQ-M&O-FUN5]
+
+O-RAN OAM Architecture must support collection of status change and other indications from VNFs and PNFs by the Service Management and Orchestration Framework
+
+Use Case
+
+[REQ-M&O-FUN6]
+
+O-RAN OAM Architecture must support configuration of VNFs and PNFs by the Service Management and Orchestration Framework, including, for example, addressing information needed to allow them to connect to each other
+
+Use Case
+
+[REQ-M&O-FUN7]
+
+O-RAN OAM Architecture must support management of PM jobs, PM data collection/storage/query/statistical reports from O-RAN Components
+
+Use Case
+
+[REQ-M&O-FUN8]
+
+O-RAN OAM Architecture must support operation logging and operation authority of Managed Elements
+
+Use Case to be added
+
+[REQ-M&O-FUN9]
+
+O-RAN OAM Architecture must support management of Managed Functions contained within a Managed Element
+
+ETSI 3GPP TS 28.622
+
+[REQ-M&O-FUN10]
+
+O-RAN OAM Architecture must support hierarchical and hybrid management of O-RAN O-DU and O-RU components as defined in O-RAN-WG4.MP.0-v01.00
+
+Use Case & O-RAN MP Spec [12]
+
+[REQ-M&O-FUN11]
+
+O-RAN OAM Architecture and interfaces must support network slicing, where an instance of O-RAN managed function may be associated with one or more slices.
+
+Use Case to be added
+
+[REQ-M&O-FUN12]
+
+O-RAN OAM Architecture must support O1 interface for all Managed Elements (with the exception of the RU) even if the Managed Element is deployed behind a NAT
+
+O-RAN-WG1.OAM Interface Specification [13]
+
+Non-Functional Requirements
+
+[REQ-M&O-NFUN1]
+
+O-RAN OAM Architecture must support the introduction of new and more cost-effective technologies into the RAN through open, standard interfaces
+
+O-RAN white paper [11]
+
+[REQ-M&O-NFUN2]
+
+O-RAN OAM Architecture must support virtualization of RAN components, allowing operators use of common, off-the-shelf hardware implementations
+
+O-RAN white paper [11]
+
+[REQ-M&O-NFUN3]
+
+O-RAN OAM Architecture must support use of Analytics and Artificial Intelligence/Machine Learning to improve network efficiency and performance and reduce operations costs
+
+O-RAN white paper [11]
+
+Security Requirements
+
+[REQ-M&O-NFUN4]
+
+O-RAN OAM Architecture must support security of interactions between the components of an O-RAN network
+
+See note
+
+Note: more detailed requirements for security will be  addressed in [24].
+
+Reference Architecture
+
+The reference architecture defines a set of basic architectural building blocks – management services, managed functions and managed elements – for the O-RAN management domain.
+
+Architectural Building Blocks
+
+Management Services
+
+O-RAN Management Services offer capabilities to manage and orchestrate managed elements.   Managed elements expose their management services to managers.  Managers consume the management services.
+
+Examples of Management Services supported by O-RAN include:
+
+Provisioning
+
+Fault Supervision
+
+Performance Assurance
+
+Trace Management
+
+File Management
+
+Software Management
+
+Communication Surveillance
+
+Startup and Registration of a Physical Network Function (PNF)
+
+Instantiation and Termination of a Virtualized Network Function (VNF)
+
+Scaling Management Services for VNF
+
+'The definition of supported management services and their APIs will be covered in the OAM O1 Interface specification [13].
+
+Managed Elements
+
+The definition of a Managed Element (ME) is given in 3GPP TS 28.622 [3] section 4.3.3.  The ME is an IOC that supports communication over management interface(s) to the manager for purposes of control and monitoring.
+
+Examples of O-RAN Managed Elements include:
+
+O-RAN Managed Functions deployed individually as MEs (e.g., Near-RT RIC ME, CU-CP ME, CU-UP ME, O-DU ME, O-RU ME).
+
+Central Unit (CU) composed of CU-CP and CU-UP
+
+ME composed of Near-RT RIC, CU-CP, CU-UP, DU and RU
+
+A variety of deployment examples and their OAM interfaces are given in a later section. Choice of deployment options will be based on operator requirements.
+
+A key motivation for the Managed Element concept is that an ME is a tightly integrated and tested group of MFs that are deployed together.  This has implications on how software updates are managed, because all software updates need to retain the property that all MFs in the ME have been tested together.  Depending on the deployment scenario and other considerations, the MFs may be grouped in different ways.  An interface is required to each ME, which can manage the communications to each MF that is contained within it.  Following sections present many examples of how the O1 interface can connect to either an ME that contains an individual MF, or to an integrated ME that contains multiple MFs.
+
+Managed Functions
+
+The definition of a Managed Function (MF) is given in 3GPP TS 28.622 [3] section 4.3.4.  An MF instance is managed using the management interface(s) exposed by its containing ME instance.
+
+O-RAN managed functions include:
+
+Near-Real-Time Radio Intelligent Controller (Near-RT RIC)
+
+O-RAN Central Unit – Control Plane (O-CU-CP)
+
+O-RAN Central Unit – User Plane (O-CU-UP)
+
+O-RAN Distributed Unit (O-DU)
+
+O-RAN Radio Unit (O-RU)
+
+Managed Applications
+
+ManagedApplication: This Information Object Class (IOC) represents a software application that may be independently tested and separately deployed from its containing ManagedFunction instance. The containing ManagedFunction instance mediates the management service for the Managed Application. A ManagedFunction instance may have zero or more Managed Application instances.
+
+The xApp is defined in [19].  Management of the xApp shall comply with the following principles:
+
+	The O1 interface terminates on the Near-RT RIC platform ME, the Near-RT RIC platform delegates the management of xApps
+
+	xApp could be provided by the third party, it is decoupled from the O-RAN nodes, O-RAN node supports one or more xApp running on it
+
+	In order to model a variety of different types of xApps, it is necessary to extend common features of a parent Class, and the specific xApp IOC could inherit from its parent Class.
+
+According to above principles, the modeling to the xApp could be described as the following:
+
+	xApp IOC represents the management aspects of the xApp
+
+	xApp IOC inherits from ManagedApplication and could extend specific attributes.
+
+The details of the MA will be defined in the O-RAN Information Model document [23].
+
+Service Management and Orchestration Framework
+
+Service Management and Orchestration Framework is responsible for the management and orchestration of the managed elements under its span of control.  The framework can for example be a third-party Network Management System (NMS) or orchestration platform.
+
+Service Management and Orchestration Framework must provide an integration fabric and data services for the managed functions.  The integration fabric enables interoperation and communication between managed functions within the O-RAN domain.  Data services provide efficient data collection, storage and movement capabilities for the managed functions.  In order to implement multiple OAM architecture options together with RAN service modeling, the modeling of different OAM deployment options and OAM services (integration fabric etc.) must be supported by SMO
+
+Non-Real Time Radio Intelligent Controller
+
+The non-RT RIC is a part of the Service Management & Orchestration Framework and communicates to the near-RT RIC using the A1 interface. [11]
+
+Non-RT control functionality (> 1s) and near-Real Time (near-RT) control functions (< 1s) are decoupled in the RIC. Non-RT functions include service and policy management, RAN analytics and model-training for some of the near-RT RIC functionality, and non-RT RIC optimization.
+
+Control Loop Support
+
+O-RAN defines 3 control loops with different latency bands [11]. It is not expected that these loops are hierarchical but instead run in parallel. This does not mean that an ME with an inner loop will not generate its own event as result of an inner loop failure, but it will not simply propagate the lower level event received by the inner loop. The three loops are roughly defined as:
+
+Loop 1: In the DU for per TTI/msec resource scheduling (<10 millisecond)
+
+Loop 2: In the Near-RT RIC and CU for resource optimization (10 milliseconds to 1 second)
+
+Loop 3: In the Service Management and Orchestration Framework for ML Training, Trending, Orchestration (> 1 second)
+
+Basic OAM Architecture
+
+Figure 3.3.21 O-RAN Logical Architecture
+
+Figure 3.3.2-1 shows the overall O-RAN Logical Architecture.  In the original white paper [11], the interface between the Manager and the O-RAN components for control purposes was identified as A1.  The O-RAN OAM Architecture adds another interface for OAM functions, labeled O1 (OAM). O1 is the interface between the O-RAN Managed Element and the management entity.  Note: the figure uses 5G terminology, however the same principles will apply for LTE/4G.  Mapping to LTE/4G may be added in future.  O-RAN OAM also adds the O2 interface for management of the O-Cloud, which has different requirements from the O1 interface and as defined in [21].
+
+The O1 OAM Interface includes implementation of Fault, Configuration, Accounting, Performance, Security (FCAPS) functions, File management and Software management functions to ME (s) virtualized and physical alike. For details of the management services supported by O1, see [13].
+
+The O2 OAM Interface enables the management of O-Cloud infrastructures and the deployment life cycle management of O-RAN cloudified NFs that run on an O-Cloud.  For details of the functions supported by O2, see [21].
+
+As shown in the figure, there is a logical OAM interface to individual O-RAN Managed Functions, however in practice the grouping of Managed Functions into Managed Elements will determine where actual O1 interfaces are terminated.  More detail is explained in subsequent sections.  The O1 interface could be the terminated directly on the Service Management & Orchestration Framework or in a hierarchical model could be terminated on a Managed Element which manages other O-RAN Managed Functions.
+
+The sections below identify possible management topologies, for example, the basic “flat” model of OAM relationships as well as the hierarchical model of O-DU to O-RU relationship and the hybrid model of O-DU to O-RU relationship defined in the O-RAN Front Haul M-Plane specification, as well as example deployment options.
+
+OAM Models and Deployment Options
+
+This section describes some of the possible O-RU management models, providing a high level description of the model and its current supported status in the O-RAN architecture.  It also explains that O-RAN supports multiple deployment options for O-RAN managed Functions and Elements as defined in section 3.3.1.2 of this document and references examples of those deployments. Adoption of a single O-RU management model or managed deployment option is not required in the O-RAN OAM Architecture. Multiple combinations of deployments may be supported in a network.
+
+Flat Management Architecture Model
+
+In the flat model, all entities/nodes are managed directly by the SMO.  This model is not currently supported for the O-RU and is for future study.
+
+Hierarchical Management Architecture Model
+
+In the hierarchical model, all entities/nodes except for O-RUs are managed directly by the SMO, but the O-RU is managed directly by the O-DU (and indirectly by the SMO).  The WG4 Fronthaul M-Plane Specification [12] documents the details of the use of the hierarchical model for the O-RAN O-RU.  The WG5 O1 Interface specification for O-DU [26] provides an initial view of the hierarchical management of the O-RU through the O-DU.
+
+Hybrid Management Architecture Model
+
+In the hybrid model, all entities/nodes except for O-RUs are managed directly by the SMO.  The O-RU is partially managed by the SMO (for FCAPS support) and partially managed by the O-DU. Details of the hybrid model for the O-RU including privilege division between SMO and O-DU can be found in the WG4 Fronthaul M-Plane Specification [12].
+
+Example Managed Deployment Options
+
+O-RAN also supports multiple deployment options for O-RAN Managed Functions and Managed Elements. The O-RAN Architecture document [17] has an informative Annex A which provides several examples of O-RAN deployments.  O-RAN supports individual MFs, as defined in section 3.3.1.2 of this document, deployed as MEs.    O-RAN also supports combinations of MFs deployed as MEs.  The choice of deployment option is at the discretion of the service provider.  Since many combinations are allowed, O-RAN Architecture Annex A presents examples of the possible deployments.
+
+Managed Elements Deployed behind a NAT
+
+Service Providers prefer to not deploy Managed Elements (ME) behind a NAT, but there are cases where this cannot be avoided, for example:
+
+exhaustion of public IPv4 addresses
+
+managed elements deployed in large complexes not owned by the Service Provider (Apartments, Sports Venues etc.)
+
+managed elements connected via third-party networks using a NAT
+
+When a Service Provider deploys managed elements behind a NAT it is critical that they are able to retain full management control of these elements.
+
+Figure 3.3.4.1 O-RAN MEs behind a NAT
+
+Four methods of providing the O-RAN Manager with the ability to address a ME behind a NAT and identify data received from a ME behind a NAT are recommended in priority order:
+
+ME uses IPv6 as Backhaul transport where possible eliminating the need for a NAT - exhaustion of public IPv4 addresses
+
+ME establishes persistent VPN tunnel (e.g., IPSec) toward a VPN concentrator (gateway) located outside of network with the NAT.  The ME is then accessible through the established tunnel.
+
+ME uses a standard protocol (UPNP or PCP) to establish a port-forwarding rule at the firewall and automatically assign itself a port.
+
+Service Provider manually configures the firewall to assign a port to each ME that resides within the protected network.
+
+Application Lifecycle Management (LCM)
+
+This chapter describes Lifecycle Management of applications that are developed by a Solution Provider and delivered to a Service Provider or Network Operator for deployment in O-RAN.  The chapter’s current focus is on LCM of rApps and xApps, as defined in [17].
+
+Lifecycle Management follows the basic models of a Software Development Lifecycle by defining the transitional information from one state to another. There are several Software Development Life Cycle (SDLC) definitions. For the purposes of discussion this document generally follows a 7-state model as shown in Figure 41. Some states might also include activities that align with other states. However, this level of detail is not depicted here in order to introduce those details later in the document.
+
+A Service Provider or Network Operator has needs which are fulfilled by a Solution Provider. Once the Solution Provider delivers the application it is validated in a test environment prior to giving to operations to deploy.  Usage of the deployed application may result in changes to configuration by the Service Provider or may be feedback to Solution Providers to evolve the capabilities of the network and/or its management.
+
+Figure 4-1: Generalized LifecycleAlthough applications may come in many forms the delivery from the Solution Provider to the Service Provider needs to be done in a standardized manner. The seven steps defined in the SDLC are high level. Each may break down into a set of finer grain steps.
+
+Scope
+
+The end-to-end lifecycle involves two entities, the Solution Provider and the Service Provider. The Solution Provider provides applications for the Service Provider to use in their network. The working flow could be summarized as three phases: Development, Onboarding and Operations, as shown in Figure 4.12.
+
+Figure 4.1-2 Application Lifecycle Phases
+
+These applications need to be onboarded in a common manner, regardless of how they are deployed. This document focuses on the data that must be included in the App Package as it is exchanged between the Solution Provider and the Service Provider. This exchange is referred to as the "SP" exchange. This is not a formal interface between systems and therefore is not denoted as other O-RAN interfaces are. Care is given as not to put implementation or tooling mandates on either the Solution Provider in their development of the application, or the Service Provider in the aspect of training or deploying the application. Aspects of the lifecycle across both parties are introduced. However, not all aspects are discussed. Instead the focus is on those activities that affect the data contained in the SP Exchange.  Later in this document the term "Service Planning" is used to represent activities internal to the Service Provider. This is not the same as the "SP Exchange" used to describe the data passed from the Solution Provider to the Service Provider. The method of the SP Exchange is not defined in this document. It is sometimes referred to as the "Marketplace". The marketplace can be implemented by either the solution provider, the service provider, and an external entity to both. The Marketplace simply represents an exchange between entities which could be done by electronic means or physical media.
+
+The App Development will provide application solutions w/wo AI/ML models, while “App Onboard” and “App Operate” will be responsible for application onboarding and operations. Considering the data privacy and security requirements, the application development could be completed in the environment provided by the Service Provider.
+
+Applications utilize AI/ML models or not. Therefore, although the Model Information may be optional in the package, we will focus on the data exchange requirements for applications with AI/ML models as the superset.
+
+Information Model
+
+The following UML diagram illustrates the high-level composition of the Application Package (AppPackage). An Application Package is the basic unit exchanged between the Solution Provider and Service Provider. The attributes of the entities in the diagram are representative. The detailed contents are FFS and will be refined in a separate document.  This high-level model may be further updated as the detailed model is completed.
+
+@startuml
+
+hide members
+
+Class AppPackage #Cyan
+
+Class AppDescriptor #Gold
+
+Class DeploymentDescriptor #LightSkyBlue
+
+Class MLModelDescriptor #Pink
+
+AppPackage --> DeploymentDescriptor : Has
+
+AppPackage --> "May Have" MLModelDescriptor
+
+AppPackage --> AppDescriptor: Has
+
+Class ComponentDescriptor #Gold
+
+Class AlarmDictionary #Gold
+
+Class ConfigurationModel #Gold
+
+Class AccountingDictionary #Gold
+
+Class PerformanceDictionary #Gold
+
+Class SecurityDescriptor #Gold
+
+AppDescriptor -l-> ComponentDescriptor : Has
+
+AppDescriptor --> AlarmDictionary : Has
+
+AppDescriptor --> ConfigurationModel : Has
+
+AppDescriptor --> AccountingDictionary : Has
+
+AppDescriptor --> PerformanceDictionary : Has
+
+AppDescriptor --> SecurityDescriptor : Has
+
+Class CloudDescriptor #LightSkyBlue
+
+DeploymentDescriptor --> CloudDescriptor : Has
+
+Class CloudNativeDescriptorFile #Lime
+
+CloudDescriptor --> ComponentDescriptor : May Have
+
+CloudDescriptor -r-> CloudNativeDescriptorFile : Has
+
+ComponentDescriptor -u-> MLModelDescriptor : May Have
+
+Class DockerImage #Lime
+
+Class RTEDescriptor #GreenYellow
+
+ComponentDescriptor --> "Has" DockerImage
+
+ComponentDescriptor --> "May Have" RTEDescriptor
+
+@enduml
+
+@startuml
+
+hide members
+
+Class AppPackage #Cyan
+
+Class AppDescriptor #Gold
+
+Class DeploymentDescriptor #LightSkyBlue
+
+Class MLModelDescriptor #Pink
+
+AppPackage --> DeploymentDescriptor : Has
+
+AppPackage --> "May Have" MLModelDescriptor
+
+AppPackage --> AppDescriptor: Has
+
+Class ComponentDescriptor #Gold
+
+Class AlarmDictionary #Gold
+
+Class ConfigurationModel #Gold
+
+Class AccountingDictionary #Gold
+
+Class PerformanceDictionary #Gold
+
+Class SecurityDescriptor #Gold
+
+AppDescriptor -l-> ComponentDescriptor : Has
+
+AppDescriptor --> AlarmDictionary : Has
+
+AppDescriptor --> ConfigurationModel : Has
+
+AppDescriptor --> AccountingDictionary : Has
+
+AppDescriptor --> PerformanceDictionary : Has
+
+AppDescriptor --> SecurityDescriptor : Has
+
+Class CloudDescriptor #LightSkyBlue
+
+DeploymentDescriptor --> CloudDescriptor : Has
+
+Class CloudNativeDescriptorFile #Lime
+
+CloudDescriptor --> ComponentDescriptor : May Have
+
+CloudDescriptor -r-> CloudNativeDescriptorFile : Has
+
+ComponentDescriptor -u-> MLModelDescriptor : May Have
+
+Class DockerImage #Lime
+
+Class RTEDescriptor #GreenYellow
+
+ComponentDescriptor --> "Has" DockerImage
+
+ComponentDescriptor --> "May Have" RTEDescriptor
+
+@enduml
+
+@startuml
+
+hide members
+
+Class DeploymentDescriptor #LightSkyBlue
+
+Class AppPackage #Cyan
+
+Class MLModelDescriptor #Pink
+
+Class AppDescriptor #Gold
+
+AppPackage --> DeploymentDescriptor : Has
+
+AppPackage --> MLModelDescriptor : May Have
+
+AppPackage --> AppDescriptor: Has
+
+Class ComponentDescriptor #Gold
+
+Class AlarmDictionary #Gold
+
+Class ConfigurationModel #Gold
+
+Class AccountingDictionary #Gold
+
+Class PerformanceDictionary #Gold
+
+Class SecurityDescriptor #Gold
+
+AppDescriptor -l-> ComponentDescriptor : Has
+
+AppDescriptor --> AlarmDictionary : Has
+
+AppDescriptor --> ConfigurationModel : Has
+
+AppDescriptor --> AccountingDictionary : Has
+
+AppDescriptor --> PerformanceDictionary : Has
+
+AppDescriptor --> SecurityDescriptor : Has
+
+Class CloudDescriptor #LightSkyBlue
+
+DeploymentDescriptor --> CloudDescriptor : Has
+
+Class CloudNativeDescriptorFile #Lime
+
+CloudDescriptor --> ComponentDescriptor : May Have
+
+CloudDescriptor --> CloudNativeDescriptorFile : Has
+
+Class DockerImage #Lime
+
+Class RTEDescriptor #GreenYellow
+
+ComponentDescriptor --> DockerImage : Has
+
+ComponentDescriptor --> RTEDescriptor : May Have
+
+@enduml
+
+Figure 4.13 Application Package High Level Model
+
+The following modifiers can be pre-pended to Information Model Elements to indicate context:
+
+"Solution"	The version of the element as defined by the Solution Provider
+
+"Onboarded"	The initial version of the catalogued elements created during onboarding.
+
+"Catalogue"	Subsequent versions of the catalogued package or its elements which may have been adjusted by the Service Provider.
+
+The AppPackage contains the DeploymentDescriptor and the AppDescriptor. An optional MLModelDescriptor is supplied for an application employing ML technology.
+
+The DeploymentDescriptor describes the deployment options for the application that have been validated by the Solution Provider.  It includes one or more CloudDescriptors describing the requirements for O-Cloud deployment of the application.  The DeploymentDescriptor and CloudDescriptor are consumed by the SMO/NFO.
+
+The AppDescriptor describes the application contained in the AppPackage.  It contains one or more ComponentDescriptors describing the components to be deployed as part of the application as well as elements used for FCAPS functions for the AppPackage such as an AlarmDictionary, ConfigurationModel, SecurityDescriptor, etc.  The AppDescriptor and its components are consumed by the SMO/FOCOM.  Note: Security requirements in general for O-RAN are discussed in more detail in [24].
+
+ML Models may be pre-trained by the Solution Provider and therefore provide initial Training History. The Service Provider may also train the model or retrain the model with a more specialized data set, this is called specialization. The Training History provides the mechanism to record all training and subsequent specializations applied to that training through the Training History.
+
+An example of specialization is a ML Model created to predict the flow of traffic volumes. This algorithm can be generally trained to follow road patterns for devices with a velocity greater than 20 miles per hour. This training could be done by the Solution Provider on a generalized or open data set and recorded in the MLModelDescriptor. After onboarding the Service Provider may provide specialized training for dense urban traffic patterns which don't always follow the roads due to periodic traffic congestion This would be an additional Training History record added by the Service Provider and referenced as specialization in the Catalogue Training History. Further refinement could also be applied for specific cities such as New York, Los Angeles, or San Francisco which would now add 3 specializations Catalogue Training History records relating to the dense urban Catalogue Training History which is a specialization if the Onboarded Training History.
+
+Once a Catalogue DeploymentDescriptor is validated as safe for use in operations it is published to a runtime environment as a Published DeploymentDescriptor. Runtime instance data can be applied to the Published DeploymentDescriptor. Applications deployed as part of this activity are called App Instances. An App Instance running in the Non-RT RIC Runtime can be referred to as an rAPP instance.  An App Instance running in the near-RT RIC Runtime can be referred to as an xAPP instance. An App Instance running in a training environment is referred to as a Training App instance.
+
+Diagramming Legend
+
+The legend depicted in Figure 4.15 is used across all lifecycle diagrams in this section and is shown once so it is not required on every diagram. Bolded text on a diagram is an item identified as requiring further discussion later in the document. Text in Italics are items identified for completeness but not requiring further discussion. Meet-Me-Points (MMPs) are places where a major aspect of the lifecycle interchanges. Data may be exchanged through these MMPs but the exact mechanism of the exchange is outside the scope of this document. Destination or Decision points are color coded according to their user community. Destination or Decision points are not a contributing factor to the data demands of the "SP" Exchange and are therefore not named. Instead the actions or conditions that are used as a transition between points are named as the items of interest.
+
+Figure 4.14: Life Cycle Diagram Legend
+
+App Development Lifecycles
+
+In the App Development Lifecycle only two aspects are defined, the Solution AppPackage Lifecycle and the Solution App Lifecycle.
+
+Solution App Lifecycle
+
+The Development Lifecycle steps related to the Solution App are shown below in Figure 4.16.
+
+Figure 4.15: Solution App Development Lifecycle
+
+Customer feedback can consist of use case requirements, feature requests, defect notifications, or a variety of other comments. These feed the development cycle to develop new application or enhance existing ones. Requirements are usually identified and sent to developers to implement. The outcome of the build process is the container images built using SDKs for their intended deployments. If the application is AI/ML enabled, then the training action is done. The training might happen with synthetic data or with data provided by Service Providers. Information on the training performed will be included in the Solution Training History. The completed Solution App is stored in a development repository.
+
+Solution AppPackage Lifecycle
+
+The Development Lifecycle steps related the Solution AppPackage are shown below in Figure 4.17.
+
+Figure 4.16: Solution AppPackage App Development Lifecycle
+
+The Solution AppPackage is used to convey the Solution App through the onboarding process to the Service Provider. It begins by pulling the App out of its repository and placing it in the package as mandated by the exchange requirements. Next security is applied such that the Service Provider can ensure that an Onboarded AppPackage did in fact come from the expected Solution Provider. The secure package, Solution AppPackage, is then delivered to the Service Provider for onboarding.
+
+App Onboarding Lifecycles
+
+The App Onboarding phase deals with establishing configuration, policies, measurements, and required analytics.
+
+The App Onboarding Phase is involved with both AppPackages and Apps, each with its own steps and associated actions.  These will be treated separately.
+
+Onboarded AppPackage Lifecycles
+
+The Service Design steps associated with an Onboarded AppPackage are shown below:
+
+Figure 4.17: Onboarded AppPackage Service Provider Configuration Lifecycle
+
+An AppPackage is onboarded from the exchange, and its content verified.  If valid, its contents (the App) are unpacked and the Onboarded AppPackage and associated Onboarded App are catalogued.  If invalid, the Service Provider can provide AppPackage-level feedback to the Solution Provider via the Marketplace.
+
+Onboarded App Lifecycles
+
+The App Onboarding Phase for Onboarded Apps is split between normal processing for all applications, named "Configuration", and the lifecycle for "Training" Apps with included AI/ML Models. Workflow can interchange between these cycles iteratively.  We will treat each of these separately below.
+
+Note: The Run Time Library shown in the sections below models a location where apps/Artifacts can be identified as ready for future deployment. It is not intended to imply any particular method of implementation of the SMO.  Additional modeling of SMO is subject to further study.
+
+Onboarded App Certification Lifecycle
+
+The Service Operator Certification steps associated with an Onboarded App are shown below:
+
+Figure 4.18 Onboarded App Service Provider Certification Lifecycle
+
+Onboarded Apps are made visible in the SMO environment when published into the catalogue. Each recommended configuration of the App is certified prior to publication to a runtime library. If Certification fails, then Service Planning will determine the next course of action.
+
+Service Planning aggregates “fix” requests from Configuration which can be passed back to the Solution Provider (at the AppPackage level) as feedback across the SP interface of the Marketplace Exchange.   This exchange also aggregates “change” requests from Configuration or Operations and determines if the request is for additional development (a “feature” request) or additional training (a “training” request).  The former would be aggregated and passed back to the Solution Provider via the SP interface as described above for “fix” requests.  For the latter, the Service Design: Training lifecycle would ensue.
+
+If the Onboarded App requires AI/ML training, then a request through Service Planning is used to train the model. When the "Specialized App " is returned, like non-ML Onboarded Apps it is catalogued and scheduled for certification. Once certified the App is distributed as a Published App to a Run Time Library. From there operations can deploy as either a management (rAPP) or network application instance (xAPP).
+
+App Training Lifecycle
+
+The Service Operator Training Lifecycle associated with a Training App is shown below:
+
+Figure 4.19: Training App  Service Provider Training Lifecycle
+
+When a training request is received then resources within the training environment are scheduled for the application. Data is collected and groomed for training after which a training iteration is executed. At the end of the training cycle a test set is applied to the model and accuracy is calculated. If the test fails or other metadata indicates more training iterations are required, then the cycle repeats. Once the model is adequately trained it is promoted and sent back to service planning for continuation in another lifecycle.
+
+Inside the "Training Lifecycle" the process MAY require multiple iterations of training before being returned to the Service Planning MMP.
+
+The iteration count SHALL be included in the specialization metadata info.
+
+App Operation Lifecycles
+
+There can be many runtime environments in the service providers’ network. Some can be production while others might be for non-production execution, such as offline training and lab certification. For this document we will focus on the runtime aspects of rAPPs, which execute within the Non-RT RIC as part of the SMO, and the xAPPs which execute in the near-RT RIC as part of the RAN. Although they have the same lifecycle steps the data demands due to their operational environment are different and therefore need to be independently addressed.
+
+App Instance Lifecycles
+
+Figure 4.110: Service Provider Runtime Lifecycles
+
+After the App Instance is created through a deploy operation it is monitored. As monitoring reports the health and workload of the application it is scaled up and down based on demand. Based on monitoring result, a series of operation and management functions are triggered, such as alert management, event management, incident management and further analysis. The analysis results can be guidance for further actions such as termination, healing and scaling. Finally, when its job is completed, the instance is terminated. While in operation the service provider may discover defects, performance issues, or identify new features that would be beneficial. Such issue or change request will be communicated to the Service planning where the Application could be retrained or updated. The information can also be sent via the Service Planning to the Solution Provider as feedback.
+
+Operations determine when an application is deployed, or undeployed. Since applications are atomic, the update process is an orchestrated process of deploy and terminate. It is possible for two versions to be active at the same time, but care must be given not to provide overlapping scopes to the application instances, otherwise they may give differing directives to the network in a random order. This could cause a destabilization of the network.
+
+Common Application Lifecycle Conclusions
+
+The initial conclusion of Common Application Lifecycle procedures is that there is a formalized exchange between the Solution Provider and the Service Provider, the "SP Exchange". The SP Exchange consists of data describing the package and its security. The package also contains information regarding Deployment Configurations, Application Types, Deployable Components, and potentially ML Models. Further details regarding the composition of these areas will be defined through analysis of the Actions identified in section 4.1 as an action requiring further analysis (Bolded). O-RAN use cases for App Operation Lifecycle actions beyond “Deploy” have not been specified. Therefore, the analysis of the App Operation Lifecycles has been limited to the “Deploy” action.
+
+The analysis consists of identifying the actors within the LCM which need information. Each Information Object is then analyzed for the Actions identified above and what is needed by each actor is identified. The actor information requirements will then be coalesced into artifacts such that each artifact will only be consumed by one actor. This maintains a separation of concern regarding artifact composition for different consumers.
+
+Information Consumers
+
+The following actors are used in the analysis as consumers of information. The CNAD is unique in that it is also the producer of all the artifacts used to convey the information. However, since this is a basic premise it is not used in the analysis to describe its role in artifact generation.
+
+Actor
+
+Role
+
+Description
+
+CNAD
+
+Cloud Native Application Developer
+
+Vendor who wants to develop a CNA to be deployed into an O-RAN network utilizing CMT provided by a CP which in onboarded and deployed by the SMO.
+
+CMT
+
+Container Management Technology
+
+Technology such as HELM and/or Kubernetes used to manage network functions components using cloud native de facto standards. This is different from the CP as the same CMT might be provided by different CPs.
+
+CP
+
+Cloud Provider
+
+Cloud provider which provides cloud services including CMT. The exact mechanism or service points to provide the CMT maybe cloud specific. This is different than the CMT as a CP can provide multiple CMT.
+
+SMO
+
+Service Management & Orchestration
+
+This is the main orchestrator for a Telecom Service Provider to onboard and provide lifecycle management of vendor products.
+
+RTE
+
+Near-RT/Non-RT RIC
+
+The near-RT RIC and Non-RT RIC provide the ability to be extended by 3rd party xAPPs and rAPPs, respectively. To integrate these apps into its framework a descriptor is supplied to its Run Time Environment (RTE).
+
+Solution SW Package Lifecycle
+
+The Solution SW package lifecycle deals with the Solution Provider creating a secure package that can be delivered to a Service Operator for onboarding. This largely deals with the addition of all the artifacts of the software into a library and then adding security around the files and the package. Annex section C.1 describes the processing of the artifacts into the package.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-ALM-FUN2-1]
+
+The Application Package shall be composed of at least all the mandatory items defined in the Application Package Descriptor and its subtending elements.
+
+Use Case
+
+[REQ-ALM-FUN2-2]
+
+The Application Package shall support security requirements as specified in [24].
+
+Use Case
+
+Onboarded SW Package Lifecycles
+
+The Onboarded SW Package Lifecycles deal with the importing of an Application Package by first verifying its authenticity and then verifying is consistency. Assuming the package passes those tests the contained artifacts are extracted from the package and added to the SMO catalogue. Annex section C.2 describes the process of cataloguing the artifacts of the package.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-ALM-FUN3-1]
+
+The SMO shall have the capability to verify that Application Package satisfies security requirements as specified in [24].
+
+Use Case
+
+[REQ-ALM-FUN3-2]
+
+The SMO shall verify that the values contained in the Application Package descriptors are valid prior to cataloging.
+
+Use Case
+
+[REQ-ALM-FUN3-3]
+
+The SMO shall catalogue the verified artifacts identified in the Application Package.
+
+Use Case
+
+Onboarded App Descriptor Certification Lifecycle
+
+The Onboarded App Descriptor Certification Lifecycle entails certifying deployment options prior to utilization in a specific runtime environment. The SMO will initiate the fine tuning of such an App for this deployment option. This process may be iterative and the SMO will identify each refinement of the APP and certify the refinements results in App being suitable for inclusion in the run time library for deployment. Annex section C.3 describes the process of certify a deployment option of the package.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-ALM-FUN4-1]
+
+The SMO should validate and certify each deployment option defined in the application package prior to deployment.
+
+Use Case
+
+[REQ-ALM-FUN4-2]
+
+SMO shall be able to identify a deployment option that requires AI/ML training and initiate the training request.
+
+Use Case
+
+[REQ-ALM-FUN4-3]
+
+SMO shall be able to identify and onboard a new version of an App for a specific deployment delivered from AI/ML Training.
+
+Use Case
+
+App Descriptor Training Lifecycle
+
+The App Descriptor Training Lifecycle deals with the training of an AI/ML Model that was included as part of a deployment option in an application package. The model is trained, and the resultant deployment is returned as a new version of the application. Annex section C.4 describes the process of training an application deployment option which contains one or more ML Models.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-ALM-FUN5-1]
+
+The Training Provider shall have the ability to receive training requests. (Note 1)
+
+Use Case
+
+[REQ-ALM-FUN5-2]
+
+Training Platform acquires the data from the network which satisfy the Data Requirements specified in the MLModelDescriptor. (Note 1)
+
+Use Case
+
+[REQ-ALM-FUN5-3]
+
+The Training Provider shall be able to validate that the model has been trained sufficiently, such as passing accuracy thresholds for use in a production setting. (Note 1)
+
+Use Case
+
+[REQ-ALM-FUN5-4]
+
+The Training Provider shall deliver an updated version of the App for the specified deployment option in the format that the SMO can onboard.
+
+Use Case
+
+Note 1: This requirement is overarching and generalized in nature. Specific requirements for rAPPs or xAPPs as specified by other Work Groups shall supersede this requirement when in conflict.
+
+Deploy Instance Lifecycle
+
+Deployment of an Application differs only slightly depending on if it is a CNF, xAPP, or rAPP. Basically, the process of registering with a Run Time Environment is not required when the application is a CNF. The xAPP and rAPP differ in the registration process and the mechanisms to connect the Application with other Applications of the same type is dependent on the framework used.
+
+The use case for CNF deployment is in clause 3.2.1 of the WG6 Orchestration Use Cases and Requirements for O-RAN Virtualized RAN [16]. The use case for xAPP deployment is in clause 3.3.2 of the same document. An example use case for deployment of an rAPP is in Annex C.5 of this document.
+
+Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+[REQ-ALM-FUN6-1]
+
+The SMO shall be able to deploy a CNF using a set of CloudNativeDescriptorFiles and a set of OverrideVariables as defined in the CloudDescriptor.
+
+Use Case
+
+[REQ-ALM-FUN6-2]
+
+The SMO shall be able to deploy an xAPP using a set of CloudNativeDescriptorFiles and a set of OverrideVariables as defined in the CloudDescriptor.
+
+Use Case
+
+[REQ-ALM-FUN6-3]
+
+The SMO should be able to deploy an rAPP using a set of CloudNativeDescriptorFiles and a set of OverrideVariables as defined in the CloudDescriptor.
+
+Use Case
+
+Appendix A: Cardinality
+
+This informative Appendix provides background information regarding the cardinality of different O-RAN architecture elements.  It is not intended as a requirement on cardinality.
+
+The RAN network has an expected hierarchical fan out. Therefore, the O-RAN sizing would be:
+
+Non-RT RIC (1..j)
+
+Near-RT RIC (1..k)
+
+CU-CP (1..m)
+
+CU-UP (1..n)
+
+O-DU (1..p)
+
+O-RU (1..q)
+
+Where: 1<=j; j<=k; k<=m; m<=n; m<=p; p<=q
+
+Due to resiliency and scaling aspects of cloud implementations an O-DU will logically be connected to one CU-CP. The CU-CP may in fact be a pool of CU-CP instances to handle loads.
+
+CU-UP MEs will be pooled and aligned with the services they are configured to serve. The CU-CP will assign the CU-UP that an O-DU needs to connect to for a given UE session.
+
+An O-DU may serve many O-RU MEs depending on its designed capacity to manage the loop 1 processing.
+
+One Near-RT RIC will be connected to multiple CU-CP, CU-UP, and O-DU MEs. For resiliency the MEs may be connected to more than one Near-RT RIC, however, it shall not require duplication of data to be sent to each RIC instance.
+
+A Near-RT RIC will be connected to one non-RT RIC.
+
+Appendix B: Sequence Diagram Template
+
+This section provides a common template for the description of end-to-end use cases.
+
+B.1 Installing the PlantUML plugin for windows
+
+Follow the installation instructions found at: https://github.com/plantuml/word-template
+
+The plantuml.jar file can be downloaded from: http://sourceforge.net/projects/plantuml/files/plantuml.jar/download
+
+The word “*.dotm” file to use would be in the “Template_Word_16” (https://github.com/plantuml/word-template/tree/master/Template_Word_2016) link.
+
+Once you have the plugin installed you can select “Show PlantUML” which will unhide the text used to generate the diagrams.
+
+B.2 Plant UML Colors
+
+The following Palette are the named colors recognized by PlantUML. Colors can also be defined by RGB Hexcode (RRGGBB).
+
+@startuml
+
+colors
+
+@enduml
+
+B.3 Depicting human actors as participants
+
+The participant type Actor should be used. For Clarity these should be the first group and therefore always on the left side of the diagram. The color “#lightblue” has been identified as the background for this group of use case participants.
+
+@startuml
+
+Box “Personnel” #lightblue
+
+   Actor FT as “Field Technician”
+
+   Actor RP as “Radio Planner”
+
+End box
+
+@enduml
+
+At times it may be desirable to identify external data sources. These would be presented using the same color as personnel but be titled as Non-RAN Data. The Source of the data would be identified as an “Entity”. The list of these could be immense but small within the context of a use case. Therefore, a few examples are shown below, and is not intended to be an exhaustive list.
+
+@startuml
+
+Box “Non-RAN Data” #lightblue
+
+   Entity weather as “Weather Data”
+
+   Entity fire as “Fire Data”
+
+   Entity earth as “Earthquake Data”
+
+   Entity subs as “Subscriber Data”
+
+End box
+
+@enduml
+
+B.4 Depicting Service Management and Orchestration Participants
+
+Service Management and Orchestration participants can vary by type. The following UML shows the standard types for defined participants. Participants  can be deleted when not pertinent to the use case but additional participants should be avoided unless they are defined in the O-RAN Architecture Description [17] or other O-RAN specifications.  For consistency SMO should be the second group unless the personnel group is not required which would make this the first group. The color “#gold” has been identified as the background for this group of use case participants.
+
+The O-RAN Architecture [17]  identifies three types of functions in SMO: FCAPS for O-RAN Network Functions(named here as “OAM Functions”), Non-RT RIC, and O-Cloud Management, Orchestration and Workflow Management.   The O2 General Aspects and Principles [21] further distinguishes between management of the distribution of O-Cloud software and orchestration for O-Cloud life cycle processes, called “Federated O-Cloud Operations and Management”, or “FOCOM”, and coordination between SMO and the O-Cloud for managing deployment life cycle events and operational processes, called “Network Function Orchestration”, or “NFO”. These are shown as participants in the UML as below.
+
+@startuml
+
+Box “Service Orchestration and Management Framework” #gold
+
+   participant NFO
+
+   participant SMO as “OAM Functions”
+
+   Collections RPGF as “non-RT RIC”
+
+   Participant FOCOM
+
+end box
+
+@enduml
+
+B.5 Depicting Cloud Platform Participants
+
+As described in the O-Ran Architecture Description [17] the Cloud platform has two roles. These are depicted by the end points in the O-Cloud Management and Control Planes. The Infrastructure Management Services (IMS) provides management of the O-Cloud as a platform. The Deployment Management Services (DMS) provides management of Deployments using the O-Cloud resources. Like in the SMO the internal software modules and components to the O-Cloud can vary from implementation to implementation. Therefore it is not advised to add additional entities unless it is unavoidable for the use case. The color “#lightseagreen” has been identified as the background for this group of use case participants.
+
+@startuml
+
+Box “O-Cloud Platform” #lightseagreen
+
+   participant IMS
+
+   participant DMS
+
+End box
+
+@enduml
+
+B.6 O-RAN Managed Elements as participants
+
+The O-RAN architecture defines 5 Managed Functions (MF) which can be deployed independently or aggregated in different ways into a Managed Element (ME). The O-CU is a predefined aggregation of the O-CU-CP and O-CU-UP.
+
+@startuml
+
+Box “O-RAN” #lightpink
+
+   Participant RIC as “near-RT RIC”
+
+   Participant OCUCP as “O-CU-CP”
+
+   Participant OCUUP as “O-CU-UP”
+
+   Participant OCU as “O-CU”
+
+   Participant ODU as “O-DU”
+
+   Participant ORU as “O-RU”
+
+end box
+
+@enduml
+
+B.7 3GPP RAN elements as participants
+
+On occasion some use cases may need to show interaction between O-RAN and 3GPP elements. 3GPP defines both LTE and 5G elements. The gNodeB is also defined with a split defining the Centralized Unit (CU) and the Distributed Unit (DU). These participants are in the 3GPPP RAN box with a background of “#Tan”.
+
+@startuml
+
+Box “3GPP RAN” #Tan
+
+   Participant eNB
+
+   Participant gNB
+
+   Participant CU
+
+   Participant DU
+
+Endbox
+
+@enduml
+
+B.8 Messaging
+
+Autonumber should be used so that individual messages in a diagram can be easily referenced in conversation. Synchronous calls have an implicit return or the return can be implicitly depicted, often after a long block so as to provide clarity of where processing continues. Some use cases can be used with a start message and end with either a message or response. This is helpful when a common block can be used multiple times.
+
+@startuml
+
+Autonumber
+
+Participant One
+
+Participant Two
+
+[-> One : Use Case incoming message
+
+One -> Two: Synchronous Call
+
+Two ->> One : Asynchronous message
+
+One -> One : Call to Self
+
+Two ->] : Use Case outgoing message
+
+Two --> One : Explicit Synchronous Return
+
+ [<-- One : Use Case Return Message
+
+@enduml
+
+B.9 Adding Comments
+
+Comments can be added to the diagram. This is sometimes better than trying to describe the comment in text or for the picture to be able to standalone.
+
+@startuml
+
+Autonumber
+
+Participant One
+
+Participant Two
+
+Note over One
+
+Notes can be used and placed over a lifeline
+
+To describe something happening along that line
+
+End note
+
+[-> One : Use Case incoming message
+
+Rnote over One, Two
+
+Notes can be a simple rectangle instead of the standard
+
+Note above and can be spanning multiple life lines to
+
+Describe the interaction about to occur
+
+endrnote
+
+One -> Two: Synchronous Call
+
+Hnote right One
+
+The can be hexagonal and to the Right
+
+Endhnote
+
+Hnote over One
+
+Over
+
+endhnote
+
+Hnote left One
+
+Or Left of a lifeline
+
+endhnote
+
+Two -> Two :
+
+Note Right : Messages on notes can\nbe used to describe\ninternal processing\nwithout adding to\nparticpant spacing.
+
+Two ->> One : Asynchronous message
+
+Note Left: Message Notes can be\nright or left of the\nmessage but must be\nimmediately after the\nmessage they are noting.
+
+Note over One #fuchsia
+
+Note backgrounds can be **changed** as //well// as the __text__
+
+End note
+
+One -> One : Call to Self
+
+Two ->] : Use Case outgoing message
+
+Two --> One : Explicit Synchronous Return
+
+ [<-- One : Use Case Return Message
+
+@enduml
+
+B.10 Participant Creation/Deletion
+
+Sometimes clarity is depicted by showing when a participant is created or first comes into being and likewise when it is destroyed. This is very helpful in understanding timing and existence of a participant. This happens with modifiers to the message.
+
+@startuml
+
+Autonumber
+
+Participant One
+
+Participant Two
+
+[-> One : Use Case incoming message
+
+One -> Two **: Synchronous Call
+
+Two ->> One : Asynchronous message
+
+Two ->] : Use Case outgoing message
+
+Two -> Two !! : Terminate
+
+One -> One : Call to Self
+
+ [<-- One : Use Case Return Message
+
+@enduml
+
+B.11 Dividers
+
+In some cases, it is helpful to provide divisions of separate activities of the use case. This can be to define pre-requisite activity such as configuration or subscriptions to an event. It can also be used to depict stages of a lifecycle.
+
+@startuml
+
+Autonumber
+
+Box “Personnel” #lightblue
+
+  Actor FT as “Field Technician”
+
+  Actor RP as “Radio Planner”
+
+  Actor SD as “Service Designer”
+
+End box
+
+Box “Orchestration and Management Platform” #gold
+
+  participant SMO as “OAM Functions”
+
+end box
+
+Box “O-Cloud Platform” #lightseagreen
+
+   participant OCM as “IMS”
+
+End box
+
+Box “O-RAN” #NavajoWhite
+
+   Participant OCU as “O-CU”
+
+end box
+
+Box “3GPP RAN” #Tan
+
+   Participant DU
+
+Endbox
+
+== Service Design ==
+
+SD -> SMO : Onboard Service Descriptor
+
+SMO -> OCM : Onboard VNF Descriptor
+
+== Service Deploy ==
+
+RP -> SMO : Deploy Service
+
+== VNF Instantiate ==
+
+SMO -> OCM : Instantiate
+
+OCM -> OCU ** : Create VNF
+
+OCM --> SMO : VNF Created
+
+SMO -> OCU : Configure
+
+== PNF Discovery ==
+
+FT -> DU **: Poweron
+
+DU -> SMO : PNF Register
+
+SMO -> SMO : PNF On Network
+
+SMO -> DU : Configure
+
+== Operate ==
+
+DU <-> OCU : Traffic
+
+@enduml
+
+B.12 Grouping and References
+
+Grouping can be used for many different aspects. In UML there are many types of groups. PlantUML support the basic three. Any of the group types can be nested. “Alt” for conditional processing which can show different path processing rather than just a sunny day scenario. It can also be used to show any logical, as the condition is stated in the swim lane, processing. Sometimes the message and the grouping boundary are close and need some separation. Use the “|||” to create that space.
+
+The “loop” group is used to show iterations or conditional loops. The loop condition is stated on the lines and contain the statements within the loop.
+
+The last kind of group is the fragment. This is a logic group of a sequence of events that go together. The tag line at the top describes the group.
+
+Although references look like groups they cannot be nested. Use the single line version for references to use cases in the current document. The Multi-Line version should be used for reference to use cases in an external document.
+
+@startuml
+
+Box “Orchestration and Management Platform” #gold
+
+   participant SMO as “Orchestration”
+
+end box
+
+Box “O-RAN” #NavajoWhite
+
+   Participant ODU as “O-DU”
+
+   Participant ORU as “O-RU”
+
+end box
+
+Group Configure O-RU associated with O-DU
+
+Alt if flat management model then
+
+  Loop for each O-RU managed by the current O-DU
+
+   SMO -> ORU : Config (Full_Config)
+
+   ref over ORU : Edit-Config <color red>(Internal Document Reference)</color>
+
+   Hnote over ORU
+
+      Ready
+
+   Endhnote
+
+  End
+
+|||
+
+Else else if hierarchical model then
+
+   SMO -> ODU : Config_RU (Global_Config)
+
+  Loop for each O-RU managed by this O-DU instance
+
+   ODU -> ODU : Full_Config = Config_Merge (Global_Config, Local_Config)
+
+   ODU -> ORU : Config (Full_Config)
+
+   ref over ORU
+
+     Edit-Config <color red>(External Document Reference)</color>
+
+     WG4 M-Plane Specification [12]
+
+   End ref
+
+   Hnote over ORU
+
+      Ready
+
+   endhnote
+
+  end
+
+|||
+
+Else else must be hybrid model then
+
+   Rnote over SMO, ORU
+
+      Order of Global and Local Configuration can vary
+
+   Endrnote
+
+  Loop for each O-RU managed by the current O-DU
+
+   SMO -> ORU : Config (Global_Config)
+
+  end
+
+  Loop for each O-RU managed by this O-DU instance
+
+   ODU -> ORU : Config (Local_Config)
+
+  end
+
+   Alt If both Local_Config and Local_Config Received then
+
+   ref over ORU
+
+     Edit-Config
+
+     WG4 M-Plane Specification [12]
+
+   End ref
+
+   Hnote over ORU
+
+      Ready
+
+   endhnote
+
+|||
+
+   End
+
+End
+
+end
+
+@enduml
+
+Appendix C: [Informational] Common App Lifecyle Flows
+
+This section provides examples of information flow during various lifecycle activities which are not depicted in other O-RAN Specifications.
+
+C.1 Solution SW Package Lifecycle.
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Build a package that a CNAD can deliver to an Operator which can be onboarded onto the SMO.
+
+Actors and Roles
+
+Cloud Native Application Developer
+
+Application Package.
+
+Assumptions
+
+The application has been successfully verified by the developer
+
+The order in which the artifacts are added are arbitrary and can be done in any order. The order presented is just one of many possible orders.
+
+Pre-conditions
+
+Developer Repository is available and contains the unpackaged artifacts.
+
+Begins when
+
+CNAD wants to create an Application Package for delivery to the operator.
+
+Step 1 (M)
+
+Add the CMDictionary files to the package.
+
+Step 2 (O)
+
+Add the certificates which are to be delivered with the package to the package.
+
+Step 3 (M)
+
+Add the AppDescriptor to the Package
+
+Step 4 (M)
+
+Add the DockerImages to the Package
+
+Step 5 (O)
+
+Add the RTEDescriptor if an rAPP or xAPP to the Package
+
+Step 6 (M)
+
+Add the Component Descriptor to the Package
+
+Step 7 (O)
+
+Add the ML Model Descriptor to the Package
+
+Step 8 (O)
+
+Add any Training History for the MLModel to the Package
+
+Step 9 (O)
+
+Add the Cloud Native Descriptor to the Package
+
+Step 10 (O)
+
+Add the Deployment Descriptor to the Package
+
+Step 11 (M)
+
+Compute the Checksum for all files in the Package and add to Package
+
+Step 12 (M)
+
+Digitally Sign the Package
+
+Ends when
+
+The Application Package is Created.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+Application is described in a secure Application Package.
+
+Traceability
+
+[REQ-ALM-FUN01]; [REQ-ALM-FUN02]; [REQ-ALM-FUN03]
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autonumber
+
+Box “Personnel” #lightblue
+
+   Actor “Cloud\nNetwork\nApplication\nDeveloper\n(CNAD)” as CNAD
+
+End box
+
+Database “Application\nPackage” as PKG
+
+== PACK ==
+
+Loop foreach <color Blue>ConfigurationManagementDescriptionFile</color>
+
+   CNAD -> PKG : Add File to **<color Blue>Package</color>**
+
+   Note right CNAD : Update **<color Blue>AppDescriptor.ConfigurationDictionary</color>** with filename and filetype
+
+End loop
+
+Loop foreach **<color Blue>Certificate</color>**
+
+   CNAD -> PKG : Add File to **<color Blue>Package</color>**
+
+   Note right CNAD : Update **<color Blue>AppDescriptor.SecurityDescriptor.Certificate</color>** with filename
+
+End loop
+
+CNAD -> PKG : Add **<color Blue>App Descriptor</color>**
+
+Loop foreach Component of the App
+
+   CNAD -> PKG : Add **<color Blue>DockerImage</color>**
+
+   Note right CNAD : Update Component Descriptor with CloudNativeFileNames
+
+   Alt if rAPP or xAPP Component then
+
+      CNAD -> PKG : Add **<color Blue>RTE Descriptor</color>**
+
+   end
+
+   Note right CNAD : Update **<color Blue>ComponentDescriptor</color>** with **<color Blue>RTEDescriptorFileName</color>**
+
+   CNAD -> PKG : Add **<color Blue>Component Descriptor
+
+end
+
+ALT if ML Enabled
+
+   CNAD -> PKG : **<color Blue>ML Model Descriptor(s)</color>**
+
+   Alt If Training has been performed then
+
+      CNAD-> PKG : Add **<color Blue>ML Training History</color>**
+
+   end
+
+End
+
+Loop For each Deployment Option
+
+   Loop For each Deployment Module
+
+     CNAD -> PKG : add **<color Blue>CloudNative Descriptor</color>**
+
+   End
+
+   Note right CNAD : Update **<color Blue>Deployment Descriptor</color>** with **<color Blue>CloudNativeFileNames</color>**
+
+   CNAD -> PKG : Add **<color Blue>Deployment Descriptor</color>**
+
+end
+
+== SECURE ==
+
+CNAD -> PKG : Add Checksum for artifacts
+
+CNAD -> PKG : Sign Overall Package
+
+@enduml
+
+C.2 Onboarded SW Package Lifecycle.
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Verify and Unpack a package that a CNAD delivered to an Operator which is placed in the SMO catalogue.
+
+Actors and Roles
+
+Cloud Native Application Developer
+
+Service Designer.
+
+SMO Import Function.
+
+SMO Catalogue.
+
+Assumptions
+
+The Application Package has been successfully received from the CNAD.
+
+The order in which the artifacts are extracted is arbitrary and can be done in any order. The order presented is just one of many possible orders.
+
+Pre-conditions
+
+Catalogue is available.
+
+Begins when
+
+Service Designer wants onboard and catalog a package received from the CNAD.
+
+Step 1-2 (M)
+
+Get the package to Import and begin Import
+
+Step 3-5 (M)
+
+Verify the Signature of the Package
+
+Step 6-8 (M)
+
+Verify the checksum of all artifacts in the package.
+
+Step 9 (O)
+
+Add the package to the catalogue.
+
+Step 10 (M)
+
+Extract the overall Application Package Descriptor
+
+Step 11-12 (M)
+
+Extract and Catalogue all ConfigurationManagementDescriptionFile
+
+Step 13-14 (M)
+
+Extract and Catalogue all Certificates
+
+Step 15-16 (M)
+
+Extract and Catalogue all DockerImages
+
+Step 17-18 (M)
+
+Extract and Catalogue all RTE Descriptor Files
+
+Step 19 (M)
+
+Catalogue the Application Descriptor
+
+Step 20-21 (M)
+
+Extract and Catalogue all ML Model Descriptors
+
+Step 22 (M)
+
+Extract each DeploymentDescriptor
+
+Step 23-24
+
+Extract and Catalogue each CloudNativeDescriptorFile
+
+Step 25 (M)
+
+Catalogue each Deployment Descriptor
+
+Step 26 (M)
+
+Return success of the Package Import request.
+
+Ends when
+
+The information elements of the Application Package have been successfully added to the catalogue.
+
+Exceptions
+
+Package fails signature verification. Feedback is sent to CNAD. Use Case Terminates.
+
+File fails Checksum validation. Feedback is sent to CNAD. Use Case Terminates.
+
+Post Conditions
+
+Application is described the SMO catalogue.
+
+Traceability
+
+[REQ-ALM-FUN04]; [REQ-ALM-FUN05]; [REQ-ALM-FUN06]
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autonumber
+
+Database “Application\nPackage” as PKG
+
+Box “Personnel” #lightblue
+
+   Actor “Cloud\nNative\nApplication\nDeveloper\n(CNAD)” as CNAD
+
+   Actor “Service\nDesigner\n(SMO)” as SDO
+
+End box
+
+box “Service Management & \nOrchestration Framework” #gold
+
+   Participant “Import\nFunction” as SD
+
+   Database “Catalog” as CTLG
+
+end box
+
+== VERIFY ==
+
+SDO -> PKG : Fetch
+
+SDO -> SD : Onboard (**<color Blue>ApplicationPackage</color>**)
+
+SD -> PKG : Authenticate Signature
+
+Alt If Authentication Fails
+
+   SD --> SDO : Terminate Processing and Indicate Authentication Failure
+
+   SDO -> CNAD : Send Feedback (fix request)
+
+end
+
+SD -> PKG : verify checksums
+
+Alt If Verification Fails
+
+   SD --> SDO : Terminate Processing and Indicate File Corruption
+
+   SDO -> CNAD : Send Feedback (fix request)
+
+End
+
+SD -> CTLG : Add Package to Catalogue
+
+== UNPACK ==
+
+Group App Descriptor Processing
+
+     SD -> PKG : Get **<color Blue>App Descriptor</color>**
+
+  Loop foreach **<color Blue>ConfigurationManagementDescriptionFile</color>** in **<color Blue>App Desciptor</color>**
+
+    SD -> PKG : Extract File
+
+    SD -> CTLG : Add File
+
+    Note Right SD : Update for local file names
+
+  End loop
+
+  Loop foreach **<color Blue>Certificate</color>** in **<color Blue>App Desciptor</color>**
+
+    SD -> PKG : Extract File
+
+    SD -> CTLG : Add File
+
+    Note Right SD : Update for local file names
+
+  End loop
+
+  Loop foreach **<color Blue>DockerImage</color>** in **<color Blue>App Desciptor</color>**
+
+    SD -> PKG : Extract File
+
+    SD -> CTLG : Add File
+
+    Note Right SD : Update for local file names
+
+  End loop
+
+  Loop foreach **<color Blue>RTE Descriptor</color>** in **<color Blue>App Desciptor</color>**
+
+    SD -> PKG : Extract File
+
+    SD -> CTLG : Add File
+
+    Note Right SD : Update for local file names
+
+  End loop
+
+  SD -> CTLG : Catalogue **<color Blue>App Descriptor</color>**
+
+End
+
+Group ML Mode Descriptor Processing
+
+   Loop Foreach **<color Blue>ML Model</color>** in **<color Blue>Application Package</color>**
+
+      SD -> PKG : **<color Blue>Get ML Model</color>**
+
+      SD -> CTLG : Catalogue **<color Blue>ML Model</color>**
+
+   End Loop
+
+End
+
+Group Deployment Descriptor Processing
+
+   SD -> PKG : Get **<color Blue>DeploymentDescriptor</color>**
+
+   Loop Foreach **<color Blue>CloudNativeDescriptorFile in **<color Blue>Application Package</color>**
+
+      SD -> PKG : Extract File
+
+      SD -> CTLG : Add File
+
+      Note Right SD : Update for local file names
+
+   End Loop
+
+   SD -> CTLG : Catalogue **<color Blue>Deployment Descriptor</color>**
+
+End
+
+SD --> SDO : Success: Package Catalogued.
+
+@enduml
+
+C.3 Onboarded App Descriptor Certification Lifecycle
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Certify a deployment option for publication to a runtime library.
+
+Actors and Roles
+
+Cloud Native Application Developer
+
+Application Tester.
+
+Service Planning.
+
+SMO Catalogue.
+
+SMO Runtime Library
+
+Assumptions
+
+The deployment option has been onboarded. Some instruction for populating the runtime variables and application configuration has been provided. Currently this is outside the of the application package and will be verified with the TIFG.
+
+Pre-conditions
+
+Catalogue is available.
+
+Certification Environment is available.
+
+Runtime Library is available.
+
+Begins when
+
+Service Designer wants to certify a deployment option.
+
+Step 1-3 (M)
+
+Perform Certification Testing
+
+Step 3 (O)
+
+Modify Configuration Parameters and re-iterate testing until complete.
+
+Step 4-6 (M)
+
+Testing Complete. Extract Catalogue components for this option and publish to runtime library.
+
+Step 7-8 (O)
+
+Exception Case 1: Certification failed due to feature defect. Notify CNAD of failed deployment certification.
+
+Step 9-13 (M)
+
+Exception Case 2: Certification failed due to lack of training. Send to training and ingest trained model as new application version.
+
+Step 14 (M)
+
+Exception Case 3: Unspecified Other Failure.
+
+Ends when
+
+The deployment option is certified and published into a runtime library.
+
+Exceptions
+
+Deployment Option fails certification. Feedback is sent to CNAD. Use Case Terminates.
+
+Deployment Option requires additional training. Use case resumes at Step 1 with the new version to be certified.
+
+Other failure cases: Use Case Terminates and failure cause is corrected before restarting the Use Case at step 1.
+
+Post Conditions
+
+Deployment Option is published in a Runtime Library. Note: The SMO can have several Runtime Libraries for different environments.
+
+Traceability
+
+[REQ-ALM-FUN07]; [REQ-ALM-FUN08]; [REQ-ALM-FUN09] ; [REQ-ALM-FUN10] ; [REQ-ALM-FUN11]
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autonumber
+
+Box “Personnel” #lightblue
+
+   Actor “Cloud\nNetwork\nApplication\nDeveloper\n(CNAD)” as CNAD
+
+   Actor “Application\nTester\n(SMO)” as SDO
+
+End box
+
+box “Service Management & \nOrchestration Framework” #gold
+
+   Participant “Certification\nFunction” as SD
+
+   Participant “Service\nPlanning” as SVP
+
+   Database “Catalogue” as CTLG
+
+   Database “Run Time Library” as RTL
+
+end box
+
+== CERTIFY ==
+
+SDO -> SD : Begin Testing
+
+Loop While Certification In Progress
+
+   SD -> SD :
+
+   Note Right : Perform Certification Testing
+
+== CATALOG CHANGES ==
+
+   Alt If Certification Fails due to Configuration then
+
+      SD -> CTLG : Update Configuration Data for next Validation Iteration
+
+Note right SDO #Yellow
+
+<color red> The Initial recommended Configuration From the Package is not defined in the information model </color>
+
+End note
+
+   End if
+
+End loop
+
+== PUBLISH ==
+
+Alt If Certification Succeeds then
+
+   SD -> CTLG : Fetch App Catalog Data
+
+   SD -> RTL : Publish App Catalog Data to Run Time Library
+
+   SD -> SDO : Certifaction Complete
+
+Else Certification Failed Due to Defect then
+
+   SD --> SDO : Certifaction Failed (defect)
+
+   SDO -> CNAD : Feedback (fix requests)
+
+Else Certification Failed Due to Training then
+
+   SD -> SVP : Send to AI/ML Training
+
+   SD --> SDO : Certifaction Failed (training)
+
+…
+
+   SVP -> SD : AI/ML Training Completed
+
+   SD -> CTLG : Establish New App Version to be Certified
+
+   SD -> CTLG : Update Training Record
+
+Else Other Failure Detected
+
+   SD --> SDO : Certifaction Failed (failure)
+
+end
+
+@enduml
+
+C.4 App descriptor Training Lifecycle.
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Train one or more ML models which are part of a deployment option for an application.
+
+Actors and Roles
+
+Service Planning.
+
+Training Provider
+
+Assumptions
+
+The deployment option has been onboarded and an initial configuration for deployment has been identified.
+
+Pre-conditions
+
+Training Provider is available.
+
+Data required for training is available.
+
+Begins when
+
+Service Planning requests a deployment option with at least one AI/ML Model to be trained.
+
+Step 1 (M)
+
+Service Planning initiates a training request
+
+Step 2 (O)
+
+Training Platform acquires the data from the network which satisfy the Data Requirements specified in the MLModelDescriptor.
+
+Step 3 (M)
+
+The Training Platform executes the training iteration.
+
+Step 4 (M)
+
+The Training Platform will update the training history record for the deployment option
+
+Step 5 (M)
+
+The Training platform will validate the ML Model scores to determine if it now ready to be certified.
+
+Step 6 (M)
+
+The Training platform returns the newly trained version of the ML Model to Service Planning.
+
+Ends when
+
+The ML Models of the deployment option successfully pass its qualification scores required for accuracy in a runtime environment.
+
+Exceptions
+
+None Identified.
+
+Post Conditions
+
+Deployment Option is returned to Service Planning as a new version of the application.
+
+Traceability
+
+[REQ-ALM-FUN12]; [REQ-ALM-FUN13]; [REQ-ALM-FUN14] ; [REQ-ALM-FUN15]
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autonumber
+
+box “Service Management & \nOrchestration Framework” #gold
+
+   Participant “Service\nPlanning” as SVP
+
+end box
+
+box “Training Provider” #mediumOrchid
+
+   Participant “Training Platform” as TP
+
+end box
+
+SVP -> TP : TrainingRequest (ML Models)
+
+Note over SVP,TP
+
+More than one model may need to be trained together
+
+End note
+
+Loop while Training
+
+== GROOM TRAINING DATA ==
+
+TP -> TP :
+
+Note Right : Groom Training Data
+
+Note right TP
+
+Using the **<color Blue>ML Model Descriptor training data requirements</color>** and **<color Blue>
+
+Security requirements</color>** establish the collection of data to create
+
+The training, testing, and validation data sets.
+
+End note
+
+== TRAIN APPLICATION ==
+
+TP -> TP :
+
+Note Right : perform Training iteration
+
+== VALIDATE MODEL ==
+
+TP  -> TP : Update **<color Blue>Training History</color>**
+
+TP -> TP : Compare Metrics to Thresholds
+
+Note right TP
+
+Using the **<color Blue>ML Model Descriptor performance requirements</color>** and
+
+the **<color Blue>validation requirements</color>** determine if the model is sufficiently
+
+trained for operations.
+
+End note
+
+End loop
+
+TP --> SVP : Training Complete
+
+@enduml
+
+C.5 Deploy rAPP Instance Lifecycle.
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+rApp deployment is instantiated on Non-RT RIC, resulting in enhanced capabilities.   Configuration and communication between rApp and SMO is mediated by the Non-RT RIC via the R1 interface.
+
+Actors and Roles
+
+Operations Personnel
+
+SMO (Run Time Library, Network Function Orchestrator, OAM Functions, Non-RT RIC, rAPP)
+
+O-Cloud (Deployment Management Services)
+
+O-RAN (Any NF)
+
+Assumptions
+
+The O-Cloud and resultant O2 interface are used to exemplify a cloud. Implementations may vary based on SMO architecture and deployment model.
+
+The “Deployment Option” to the SMO for the new rApp(s) may include information for the SMO to use for homing purposes, such as desired rApp or rApp type(s) associated with O-Cloud or Non-RT RIC Instance
+
+Pre-conditions
+
+SMO is available
+
+The O-Cloud instance has been installed successfully as per “O-Cloud Deployment Processing” use case.
+
+Non-RT RIC NF has been deployed successfully on the O-Cloud instance as part of the SMO.
+
+rAPP package has been onboarded onto the SMO. The Onboarded package has at least one deployment option that has been certified and published in the Run-Time Library per the Application Lifecycle. The NF package contains a descriptor that provides the deployment and resource requirements for the rAPP
+
+Begins when
+
+New rApp is to be instantiated as a SMO deployment on a Non-RT RIC hosted on an O-Cloud
+
+Step 1-2 (M)
+
+Ops Personnel query the Run Time Library to find certified deployment options for the rAPP. This includes the Schema Variables for descriptor overrides. Based on the schema the operator provides values for the override variables.
+
+Step 3 (M)
+
+Ops Personnel makes request to SMO to deploy new rApp(s) on the Non-RT RIC.
+
+Step 4 (M)
+
+For the selected option get the cloud descriptors for the selected option.
+
+Step 5 (O)
+
+The SMO decomposes the service request and identifies all rAPPs to be deployed and the order in which they should be deployed.
+
+Steps 6-16
+
+These steps are repeated for each rAPP to be deployed as part of the deployment Option.
+
+Step 6 (M)
+
+The SMO determines which O-Cloud and Non-RT RIC Instance to deploy the rAPP to. This can be done using Policies which match operator input or other more complex homing policies, or can be explicitly identified by the Ops Personnel.
+
+Step 7 (M)
+
+For each deployment of the rAPP in the deployment option, the following steps 7 - 11 take place:
+
+The deployment requires a CloudNativeDescriptor which is retrieved from the Run Time Library for the current Cloud Descriptor being deployed.
+
+Step 8 (M)
+
+SMO directs the O-Cloud DMS using O2 to create the Deployment
+
+Step 9 (M)
+
+DMS allocates the resources according to the NF Deployment request. During the NF Deployment instantiation, day-0 configuration can take place.
+
+Step 10 (M)
+
+DMS returns notification to SMO over O2 indicating that the  deployment has been created and the Deployment ID
+
+Step 11 (M)
+
+SMO updates its rApp inventory with the received Deployment ID
+
+Step 12 (M)
+
+rAPP registers with the Non-RT RIC via the R1 interface
+
+Step 13 (O)
+
+Optional implementation of the Non-RT RIC to detect when rAPP is requesting data that is anchored in the SMO and initiate a request for that data.
+
+Step 14 (O)
+
+Optional implementation of the Network Function Manager to evaluate current data jobs and determine if data is already available or a job needs to be created or updated.
+
+Step 15 (O)
+
+Optional implementation of the Network Function Manager to create or update jobs dynamically.
+
+Step 16 (M)
+
+If a job is to be updated or created then the O1 interface is used.
+
+Step 17 (M)
+
+The SMO informs the Ops Personnel of the overall success or failure of the request.
+
+Ends when
+
+rApp(s) have been instantiated as SMO deployment(s) on the O-Cloud and configured by the SMO via the Non-RT RIC
+
+Exceptions
+
+rAPP Deploy fails – DMS notifies SMO and SMO informs Ops Personnel
+
+Post Conditions
+
+rAPP is instantiated and incorporated under Non-RT RIC management.
+
+Traceability
+
+TBD
+
+@startuml
+
+skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam sequenceArrowColor green
+
+autonumber
+
+Box “Personnel” #lightblue
+
+   Actor “Operations\nPersonnel” as OPS
+
+End box
+
+box “Service Management & \nOrchestration Framework” #gold
+
+   Database “Run Time Library” as RTL
+
+   Participant “Network\nFunction\nOrchestrator” as NFO
+
+   Participant “Network\nFunction\nManager” as NFM
+
+   Participant “Non-RT\nRIC” as NrtRIC
+
+   Participant “rAPP” as rAPP
+
+end box
+
+Box “O-Cloud Platform” #lightseagreen
+
+   participant DMS
+
+End box
+
+Box “O-RAN” #lightpink
+
+   Participant “RAN NF” as CNF
+
+end box
+
+OPS –> RTL : Get **<color Blue> Deployment Options</color>**
+
+OPS –> OPS :
+
+Note right
+
+Determine Runtime Variables for each **<color Blue>CloudDescriptor.
+
+This includes the initial rAPP config. Post deployment
+
+the xAPP is configured through the Non-RT RIC via R1.
+
+End note
+
+OPS -> NFO : Deployment Request (selectedOption)
+
+NFO –> RTL : Get **<color Blue>CloudDescriptor</color>** for Selected Option
+
+NFO -> NFO : Decompose and determine sequence
+
+Note over NFO, rAPP
+
+   The SMO determines the correct sequence for deploying the rAPPs
+
+End note
+
+Loop for each rAPP to be deployed
+
+   NFO-> NFO : Determine homing
+
+   Note over NFO, rAPP
+
+      The SMO determines on which Non-RT RIC/O-Cloud to deploy this/these xAPP(s).
+
+      This can be explicitly identified by the Operations Personnel or via homing policies
+
+   End note
+
+   Group rAPP Deploy
+
+      Loop Foreach **<color Blue>CloudDescriptor</color>**
+
+         NFO –> RTL : Get **<color Blue>CloudNativeDescriptor</color>** for **<color Blue>CloudDescriptor</color>**
+
+         NFO -> DMS : <<O2>> Create Workload (CloudDescriptor, RuntimeVariables)
+
+         DMS -> rAPP ** : create
+
+         DMS --> NFO : notify deployment instantiation is completed (DeploymentID)
+
+         NFO -> NFO :
+
+         Note right
+
+            Once complete, SMO updates
+
+            its rAPP inventory record with
+
+            the Deployment ID from the O-Cloud
+
+         End note
+
+      End loop
+
+      rAPP -> NrtRIC : <<R1>> Register (**<color Blue>RTE Descriptor</color>**)
+
+      opt if rAPP is requesting O1 or SMO data then
+
+         NrtRIC -> NFM : Request SMO data
+
+         NFM -> NFM : Evaluate Request
+
+         opt if new NmS data is required then
+
+            NFM -> NFM : translate requirements to PM request (new/update)
+
+            NFM -> CNF : <<O1>> PM Job Changes
+
+         End if
+
+      end
+
+   End
+
+End loop
+
+NFO --> OPS : rAPP Deployment status (Success)
+
+@enduml
+
+Annex A: SMO and Non-RT RIC mapping with 3GPP management system
+
+This section shows the SMO, Non-RT RIC and the related management interface/service mapping with 3GPP management system.
+
+In [9], 3GPP defines the network management and orchestration architecture for 3GPP networks including network slicing. The management data analytic function (MDAF) is identified as the key function to enable the intelligent management of the network, which provides management data analytics service (MDAS) to both the management functions and the network element. Meanwhile, intent driven management service (IDMS) is under discussion in 3GPP SA5, where the management system could generate intent as the target of the network optimization and automation. The management system should have the capability to consume the service (IDMS) provided by the network. Currently, the two studies are mainly to enable the network management automaton and intelligence. In this sense, it is quite aligned with the motivation of introducing Non-RT RIC in O-RAN.
+
+To better understand the O-RAN OAM architecture, the management services defined in O-RAN, and the relationship with 3GPP and the potential gaps between 3GPP and O-RAN.  Fig. A-1 below tries to do some mapping between the SMO, Non-RT RIC and 3GPP management system and interfaces with the following preliminary analysis.
+
+A1 interface is closely related to the current SA5 3GPP IDMS and MDAS study.
+
+A1-P, as declarative policy is closely related to Intent-NOP discussed in IDMS. Performance target is expected to be provided by management system via the IDMS. But only system level targets are being discussed in the IDMS study. A1-P is finer granularity to enable the UE level, group UE level and even application level automation and optimization.
+
+	A1-EI/ML is closely related to the 3GPP MDAS study. MDAS provider is expected to provide data analytics reports and recommendations to the consumers, e.g., CN or RAN leveraging the data analytics and machine learning technologies. AI-EI/ML studied in O-RAN is to enable the enrichment information communication and ML model management towards the RAN. The enrichment information may come from the data analytics based on the historical RAN data collected over O1 interface or from RAN external data sources. In this sense, A1-EI/ML has a larger scope than the MDAS in 3GPP.
+
+O1 interface reflects the 3GPP traditional FCAPS management services.
+
+O2 interface perform the O-Cloud management, the mapping with 3GPP is FFS.
+
+Non-RT RIC could be seen as a MDAF instance, which provides management data analytic service to both internal functions reside in the SMO and external consumers such as near-RT RIC.
+
+The management service, Non-RT RIC and A1 work in O-RAN will continue evolve and the MDAS/IDMS related SI/WI are under study and still in early stage in 3GPP. The gap analysis and mapping relationship will be continuously updated based on the latest progress.
+
+Figure A- 1: SMO and Non-RT RIC mapping with the 3GPP management system
+
+Note:
+
+The figure shows the entire services provided by the SMO Framework, the O-Cloud management and Integration fabric and data service defined by O-RAN so far there is no corresponding services defined in 3GPP.
+
+The Security management service and Accounting management defined in 3GPP so far they are not used in OAM Functions.
+
+The A1 Policy management, A1 EI management, A1 ML management are being studied in O-RAN and being implemented in O-RAN software community.
+
+The A1 Policy management maps to 3GPP IDMS.
+
+A1 EI management and A1 ML management is correlated to the MDAS, when the EI is retrieved from the Data Analytic and AI/ML Model Training, the concrete mapping relationship with 3GPP is FFS.
+
+The Data Analytics and AI/ML Model Training studied in O-RAN maps to 3GPP RAN domain MDAS producer.
+
+Annex ZZZ : O-RAN Adopter License Agreement
+
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT.
+
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”).
+
+This is a license agreement for entities who wish to adopt any O-RAN Specification.
+
+Section 1: DEFINITIONS
+
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity.
+
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, software or combinations thereof) that fully conforms to a Final Specification.
+
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications.
+
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN Specification. The term “O-RAN Specifications” includes Minor Updates.
+
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary Claims.
+
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.
+
+Section 2: COPYRIGHT LICENSE
+
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in furtherance of implementations of an O-RAN
+
+Specification.
+
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written agreement with O-RAN Alliance.
+
+Section 3: FRAND LICENSE
+
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant Implementations.
+
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees.
+
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Implementations.
+
+Section 4: TERM AND TERMINATION
+
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.
+
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) days after being given notice specifying the breach.
+
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the version that was current as of the date of termination.
+
+Section 5: CONFIDENTIALITY
+
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval.
+
+Section 6: INDEMNIFICATION
+
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications.
+
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY
+
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS.
+
+Section 8: ASSIGNMENT
+
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN Alliance may freely assign this Agreement.
+
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS
+
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, including as licensees under Section 3.
+
+Section 10: BINDING ON AFFILIATES
+
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder.
+
+Section 11: GENERAL
+
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.
+
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating to the subject matter of this Agreement.
+
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any communication that would violate the antitrust laws.
+
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.
+
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full force and effect.
+
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full force and effect.
+
+Copyright © 2021 by the O-RAN ALLIANCE e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ	6

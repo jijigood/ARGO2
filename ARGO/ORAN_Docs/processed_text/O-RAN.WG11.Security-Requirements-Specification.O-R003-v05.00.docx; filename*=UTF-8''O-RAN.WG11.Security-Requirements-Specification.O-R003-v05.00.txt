@@ -1,0 +1,2968 @@
+O-RAN.WG11.SecReqSpecs.0-R003-v05.00
+
+	  O-RAN.WG11.SecReqSpecs.0-R003-v05.00
+
+                                 O-RAN.WG11.SRS-v04.00
+
+Specifications.0-v04.00
+
+Technical Specification
+
+O-RAN Working Group 11 (Security Working Group)
+
+Security Requirements Specifications
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+Contents	2
+
+Foreword	4
+
+Modal verbs terminology	4
+
+1	Scope	5
+
+2	References	5
+
+2.1	Normative references	5
+
+2.2	Informative references	7
+
+3	Definition of terms, symbols and abbreviations	7
+
+3.1	Terms	7
+
+3.2	Abbreviations	8
+
+4	Objectives and scope	10
+
+4.1	Objectives	10
+
+4.2	Perimeter	10
+
+5	Security Requirements	11
+
+5.1	Network Functions and Applications maintained by O-RAN	11
+
+5.1.1	Service Management and Orchestration (SMO)	11
+
+5.1.2	Non-RT RIC and rApps	12
+
+5.1.3	Near-RT RIC and xApps	12
+
+5.1.4	O-CU-CP/UP	14
+
+5.1.5	O-DU	14
+
+5.1.6	O-RU	15
+
+5.1.7	O-eNB	15
+
+5.1.8	O-Cloud	15
+
+5.2	Interfaces maintained by O-RAN:	19
+
+5.2.1	A1 Interface	19
+
+5.2.2	O1 Interface	20
+
+5.2.3	O2 Interface	22
+
+5.2.4	E2 Interface	22
+
+5.2.5	Open Fronthaul Interface	22
+
+5.2.6	R1 Interface	31
+
+5.3	Transversal requirements	31
+
+5.3.1	Software Bill of Materials	31
+
+5.3.2	Common Application Lifecycle Management	32
+
+5.3.3	Network Protocols and Services	32
+
+5.3.4	Robustness of Common Transport Protocols	32
+
+5.3.5	Robustness against Volumetric DDoS Attack	32
+
+5.3.6	Robustness of OS and Applications	33
+
+5.3.7	Password-Based Authentication	33
+
+6	SBOM Guidelines for O-RAN	33
+
+6.1	SBOM Overview	33
+
+6.2	Summary of U.S. DoC and NTIA Report	33
+
+6.3	SBOM Requirements for O-RAN	34
+
+Annex A (informative): Security Principles mapping to Security Requirements	36
+
+Annex B (informative): Security: List of 3GPP security requirements	37
+
+Annex C (informative): Guidance on Security Requirements	55
+
+Revision history	56
+
+History	56
+
+List of Tables
+
+	Table 1: Security Principles mapping to Security Requirements defined in [4].	36
+
+	Table 2: References for 3GPP Security requirements	37
+
+	Table 3: 3GPP Security requirements	37
+
+List of Figures
+
+	Figure 41 : Logical Architecture of O-RAN system [2]	10
+
+	Figure 51 : mTLS on A1 interface	19
+
+	Figure 52 : Normal Operation of 802.1X Port Based Authentication in the O-RAN Fronthaul architecture	30
+
+	Figure 53 : mTLS on R1 interface	31
+
+Foreword
+
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+
+Modal verbs terminology
+
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+
+Scope
+
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+
+version xx.yy.zz
+
+where:
+
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+
+The present document specifies the Security Requirements per O-RAN Interface and per O-RAN component.
+
+References
+
+Normative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+
+The following referenced documents are necessary for the application of the present document.
+
+	3GPP TR 21.905: “Vocabulary for 3GPP Specifications”.
+
+	O-RAN ALLIANCE, “O-RAN Architecture Description 8.0”, February 2022
+
+	O-RAN ALLIANCE, “O-RAN Security Protocols Specification 4.0”, July 2022
+
+	O-RAN ALLIANCE, “O-RAN Security Threat Modeling and Remediation Analysis 2.0”, July 2021
+
+	O-RAN ALLIANCE, “O-RAN A1 Transport Protocol v1.1”, March 2021
+
+	O-RAN ALLIANCE, “O-RAN 02 General Aspects and Principles Specification 1.0”, September 2020
+
+	O-RAN ALLIANCE, “O-RAN E2 General Aspects and Principles Specification v01.01”
+
+	O-RAN ALLIANCE, “Cloud Platform Reference Designs, 2.0”, November 2020
+
+	Network Configuration Protocol (NETCONF), RFC 6241. https://tools.ietf.org/html/rfc6241
+
+	Network Configuration Access Control Model, RFC 8341. https://tools.ietf.org/html/rfc8341
+
+	Lightweight Directory Access Protocol (LDAP): Authentication Methods and Security Mechanisms, RFC 4513. https://datatracker.ietf.org/doc/html/rfc4513
+
+	"IEEE Standard for Local and Metropolitan Area Networks--Port-Based Network Access Control," in IEEE Std 802.1X-2020 (Revision of IEEE Std 802.1X-2010 Incorporating IEEE Std 802.1Xbx-2014 and IEEE Std 802.1Xck-2018), vol., no., pp.1-289, 28 Feb. 2020, doi: 10.1109/IEEESTD.2020.9018454
+
+	O-RAN ALLIANCE, “O-RAN Control, User and Synchronization Plane Specification 7.0”, July2021
+
+	O-RAN ALLIANCE, “O-RAN Management Plane Specification 7.0”, July 2021
+
+	O-RAN Deployment Scenarios and Base Station Classes For White Box Hardware 2.0 - July 2020 (ORAN-WG7.DSC.0-v02.00)
+
+	O-RAN ALLIANCE, “O-RAN Operation and Maintenance Architecture v5.0”, July 2021
+
+	“The Minimum Elements for a Software Bill of Materials (SBOM), Pursuant to Executive Order 14028 on Improving the Nation’s Cybersecurity”, U.S. DoC and NTIA, July 2021.
+
+	SPDX, https://spdx.dev/
+
+	CycloneDX, https://cyclonedx.org/
+
+	Guidelines for the Creation of Interoperable Software Identification (SWID) Tags, NISTIR 8060, David Waltermire et al., U.S. NIST, 2016, http://dx.doi.org/10.6028/NIST.IR.8060
+
+	ISO/IEC 5962:2021 - Information technology — SPDX® Specification V2.2.1, August 2021.
+
+	IETF RFC 2865, Remote Authentication Dial In User Service (RADIUS)
+
+	IETF RFC 2866, RADIUS accounting
+
+	IETF RFC 2869, RADIUS Extensions
+
+	IETF 4072, Diameter Extensible Authentication Protocol (EAP) Application
+
+	O-RAN.WG9.XPSAAS-v02.00-final, Xhaul Packet Switched Architectures and Solutions
+
+	IEEE 1588-2019 IEEE Standard for a Precision Clock Synchronization Protocol for Networked Measurement and Control Systems
+
+	RFC 7384 Security Requirements of Time Protocols in Packet Switched Networks
+
+	3GPP TS 33.511 Security Assurance Specification (SCAS) for the next generation Node B (gNodeB) network product class
+
+	O-RAN ALLIANCE, “Synchronization Architecture and Solution Specification 2.0”, November 2021
+
+	O-RAN Fronthaul Control, User, and Synchronization Plane Specification v8.0
+
+	3GPP TS 38.323 NR; Packet Data Convergence Protocol (PDCP), Release 16, V16.6.0 (2021-12)
+
+	O-RAN ALLIANCE, “O-RAN.WG3.RICARCH-v02.01” (Near-RT RIC Architecture v2.1), November 2021
+
+	IETF RFC 6749, The OAuth 2.0 Authorization Framework
+
+	IETF RFC 7519, JSON Web Token (JWT)
+
+	IETF RFC 7515, JSON Web Signature (JWS)
+
+	O-RAN ALLIANCE, O-RAN.WG2.Non-RT-RIC-ARCH-TS-v02.00, Non-RT RIC Architecture, v02.00.
+
+	O-RAN ALLIANCE, O-RAN.WG2.A1GAP-v02.03, A1 interface General Aspects & Principles Specification (A1 GA&P), v02.03.
+
+	O-RAN ALLIANCE, O-RAN.WG2.R1GAP-v02.00, R1 General Aspects and Principles (R1GAP), v02.00.
+
+	O-RAN ALLIANCE, O-RAN.WG2.Use-Case-Requirements-v06.00, Non-RT RIC & A1 Interface: Use Cases and Requirements, v06.00.
+
+	ETSI GS NFV-SEC 021: VNF Package Security Specification
+
+	ETSI GS NFV-SOL 004: Protocols and Data Models; VNF Package specification
+
+	ETSI GS NFV-IFA 011: Management and Orchestration; VNF Descriptor and Packaging Specification
+
+	3GPP TR 33.848: Study on Security Impacts of Virtualisation
+
+	3GPP TR 33.818: Security Assurance Methodology (SECAM) and Security Assurance Specification (SCAS) for 3GPP virtualised network products
+
+	CIS Benchmarks for Docker v1.4.0, Section 4.10, https://www.cisecurity.org/benchmark/docker
+
+	ETSI GS NFV-SEC 021 “ NF Package Security Specification”, V2.6.1 (2019-06), Section 6.4, https://www.etsi.org/deliver/etsi_gs/NFV-SEC/001_099/021/02.06.01_60/gs_nfv-sec021v020601p.pdf
+
+	ETSI GS NFV-SOL 004 “ VNF Package and PNFD Archive specification “ V4.3.1 (2022-07), Section 5.5, https://www.etsi.org/deliver/etsi_gs/NFV-SOL/001_099/004/04.03.01_60/gs_NFV-SOL004v040301p.pdf
+
+	NIST SP 800-190 “APPLICATION CONTAINER SECURITY GUIDE” https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-190.pdf
+
+	ENISA “NFV SECURITY IN 5G Challenges and Best Practices” https://www.enisa.europa.eu/publications/nfv-security-in-5g-challenges-and-best-practices
+
+	ETSI GR NFV-SEC 018 “Report on NFV Remote Attestation Architecture” https://www.etsi.org/deliver/etsi_gr/NFV-SEC/001_099/018/01.01.01_60/gr_NFV-SEC018v010101p.pdf
+
+	IBM - Securing the container platform, Build a chain of trust https://www.ibm.com/downloads/cas/ZBPEBGLB
+
+	NIST SP 800-88 ” Guidelines for Media Sanitization” https://csrc.nist.gov/publications/detail/sp/800-88/rev-1/final
+
+	DoD 5220.22-M data sanitization method
+
+	Thales - Kubernetes Secrets Encryption - Integration Guide https://cpl.thalesgroup.com/resources/encryption/kubernetes-secrets-encryption-integration-guide
+
+	Encrypting Kubernetes secrets with Key Management Service plug-in https://www.ibm.com/docs/en/cloud-private/3.1.1?topic=cc-encrypting-kubernetes-secrets-key-management-service-plug-in
+
+	Kubernetes Documentation - Encrypting Secret Data at Rest https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+
+NIST IR 8320 HARDWARE-ENABLED SECURITY: ENABLING A LAYERED APPROACH TO PLATFORM SECURITY https://nvlpubs.nist.gov/nistpubs/ir/2022/NIST.IR.8320.pdf
+
+	Recent trends in applying TPM to cloud computing https://onlinelibrary.wiley.com/doi/full/10.1002/spy2.93
+
+	Federal Information Processing Standards Publication (FIPS PUB) 140-3, ‘Security Requirements for Cryptographic Modules’ https://csrc.nist.gov/publications/detail/fips/140/3/final https://csrc.nist.gov/CSRC/media/Projects/cryptographic-module-validation-program/documents/fips%20140-3/FIPS%20140-3%20IG.pdf
+
+	TPM 2.0 Library https://trustedcomputinggroup.org/resource/tpm-library-specification/
+
+	ETSI GR NFV-SEC 003 Network Functions Virtualisation (NFV); NFV Security; Security and Trust Guidance https://www.etsi.org/deliver/etsi_gr/NFV-SEC/001_099/003/01.02.01_60/gr_nfv-sec003v010201p.pdf
+
+ Informative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+
+The following referenced documents are not necessary for the application of the present document but they assist the user with regard to a particular subject area.
+
+Definition of terms, symbols and abbreviations
+
+Terms
+
+For the purposes of the present document, the following terms apply:
+
+A1: Interface between non-RT RIC and Near-RT RIC to enable policy-driven guidance of Near-RT RIC applications/functions, and support AI/ML workflow.
+
+A1 policy: Type of declarative policies expressed using formal statements that enable the non-RT RIC function in the SMO to guide the near-RT RIC function, and hence the RAN, towards better fulfilment of the RAN intent.
+
+A1 Enrichment information (EI): Information utilized by near-RT RIC that is collected or derived at SMO/non-RT RIC either from non-network data sources or from network functions themselves.
+
+E2:  Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, and one or more O-DUs.
+
+E2 Node: a logical node terminating E2 interface. In this version of the specification, O-RAN nodes terminating E2 interface are:
+
+-	for NR access: O-CU-CP, O-CU-UP, O-DU or any combination;
+
+-	for E-UTRA access: O-eNB.
+
+FCAPS: Fault, Configuration, Accounting, Performance, Security.
+
+Intents: A declarative policy to steer or guide the behavior of RAN functions, allowing the RAN function to calculate the optimal result to achieve stated objective.
+
+Near-RT RIC: O-RAN near-real-time RAN Intelligent Controller: a logical function that enables real-time control and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface.
+
+Non-RT RIC: O-RAN non-real-time RAN Intelligent Controller: a logical function that enables non-real-time control and optimization of RAN elements and resources, AI/ML workflow including model training and updates, and policy-based guidance of applications/features in Near-RT RIC.
+
+O-CU: O-RAN Central Unit: a logical node hosting O-CU-CP and O-CU-UP
+
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting the RRC and the control plane part of the PDCP protocol.
+
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of the PDCP protocol and the SDAP protocol.
+
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional split.
+
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH extraction).
+
+O1: Interface between management entities (NMS/EMS/MANO) and O-RAN managed elements, for operation and management, by which FCAPS management, Software management, File management shall be achieved.
+
+R1: Interface between rApps and Non-RT RIC Framework via which R1 Services can be produced and consumed.
+
+R1 Services: A collection of services including, but not limited to, service registration and discovery services, authentication and authorization services, AI/ML workflow services, and A1, O1 and O2 related services.
+
+RAN: Generally referred as Radio Access Network. In terms of this document, any component below Near-RT RIC per O-RAN architecture, including O-CU/O-DU/O-RU.
+
+rApps: Non-RT RIC application: an application designed to consume and/or produce R1 services. NOTE: rApps can  leverage the functionality provided by the SMO and Non-RT RIC Framework to deliver added value services related to intelligent RAN optimization and operation.
+
+Solution Provider: An application developer who delivers applications to Service Providers. [16]
+
+Service Provider: A network provider who is planning to deploy applications into their network. [16]
+
+	Abbreviations
+
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+
+eNB	e NodeB (applies to LTE)
+
+gNB	g NodeB (applies to NR)
+
+O-DU	O-RAN Distributed Unit
+
+O-RU	O-RAN Radio Unit
+
+AI/ML	Artificial Intelligence/Machine Learning
+
+eNB	eNodeB (applies to LTE)
+
+gNB	gNodeB (applies to NR)
+
+KPI	Key Performance Indicator
+
+RIC	O-RAN RAN Intelligent Controller
+
+SMO	Service Management and Orchestration
+
+RBAC	Role-based Access Control
+
+NF	Network Function
+
+PDCP	Packet Data Convergence Protocol
+
+VM 	Virtual machine
+
+VNF	Virtualised Network Function
+
+LLS	Lower Layer Split
+
+NETCONF	Network Configuration Protocol
+
+SSH	Secure Shell
+
+IPSEC	Internet Protocol Security
+
+TLS	Transport Layer Security
+
+DTLS	Datagram Transport LScayer Security
+
+PTP	Precision Timing Protocol
+
+FTP	File Transfer Protocol
+
+FTPS	File Transfer Protocol Secure
+
+FOSS		Free and Open Source Software
+
+OSC		O-RAN Software Community
+
+SBOM	Software Bill of Materials
+
+SDLC		Software Development Life Cycle
+
+SPDX		Software Package Data eXchange
+
+SWID		Software Identification
+
+BMCA	Best Master Clock Algorithm
+
+Objectives and scope
+
+Objectives
+
+This O-RAN Security Requirements specifications documents aims at specifying security requirements and security controls per O-RAN defined interface and O-RAN defined network function. It elaborates on O-RAN Threats and Remediation Analysis V2.0 [4] that identified assets to be protected, analysed the O-RAN components for vulnerabilities, examined potential threats associated with those vulnerabilities and provided security principles which stakeholders should address when building a secure end-to-end O-RAN system.
+
+Perimeter
+
+Figure 41 : Logical Architecture of O-RAN system [2]
+
+Figure 41illustrates the O-RAN components, interfaces and overall system.
+
+As specified in [2], the logical architecture of O-RAN includes the following components, interfaces and protocols:
+
+O-RAN components:
+
+Network functions and applications
+
+Service Management and Orchestration (SMO)
+
+Non-RT RIC and rApps
+
+Near-RT RIC and xApps
+
+O-CU-CP/UP
+
+O-DU
+
+O-RU
+
+O-eNB
+
+Cloud computing platform
+
+O-Cloud comprising a collection of physical infrastructure nodes that meet O-RAN requirements to host the relevant O-RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP, and O-DU), the supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and the appropriate management and orchestration functions.
+
+Maintained interfaces by O-RAN:
+
+A1 Interface between   Non-RT   RIC   and   Near-RT   RIC   to   enable   policy-driven   guidance   of   Near-RT RIC applications/functions, and support AI/ML workflow.
+
+O1 Interface connecting the SMO to the Near-RT RIC, one or more O-CU-CPs, one or more O-CU-UPs, and one or more O-DUs.
+
+O2 Interface between the SMO and the O-Cloud
+
+E2 Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, one or more O-DUs, and one or more O-eNBs.
+
+Open Fronthaul CUS-Plane Interface between O-RU and O-DU
+
+Open Fronthaul M-Plane Interface between O-RU and O-DU as well as between O-RU and SMO
+
+Maintained by 3GPP:
+
+E1
+
+F1-c
+
+F1-u
+
+NG-c
+
+NG-u
+
+X2-c
+
+X2-u
+
+Xn-c
+
+Xn-u
+
+Uu
+
+Security Requirements
+
+This chapter describes the O-RAN Security Requirements per O-RAN maintained interfaces and network functions. Security Requirements specified in this document are built upon Security Principles defined in [4] which intent to protect critical assets identified.
+
+Protection levels of critical assets as defined in [4] – Confidentiality, Integrity, Replay, Authentication, Authorisation – are now specified as normative security requirements.
+
+Network Functions and Applications maintained by O-RAN
+
+Service Management and Orchestration (SMO)
+
+Requirements
+
+The below mentioned requirements are referring to securing the event logs in SMO.
+
+REQ-SEC-SMO-Log-1: SMO shall support forwarding of event logs to a remote location.
+
+REQ-SEC-SMO-Log-2: SMO shall provide confidentiality protection for event logs over protected protocols to remote server.
+
+REQ-SEC-SMO-Log-3: SMO may support configuration settings that allow selection of remote servers to securely transfer the event logs.
+
+REQ-SEC-SMO-Log-4: SMO shall be capable of logging the event logs locally on itself.
+
+REQ-SEC-SMO-Log-5: SMO shall provide confidentiality protection for the locally stored event logs.
+
+REQ-SEC-SMO-Log-6: SMO shall provide integrity protection for the locally stored event logs.
+
+REQ-SEC-SMO-Log-7: SMO shall support access to event logs by authorized external services.
+
+REQ-SEC-SMO-Log-8: SMO shall be capable of reporting to authorized external services
+
+REQ-SEC-SMO-Log-9: SMO shall be able to record all the security related log events.
+
+REQ-SEC-SMO-Log-10: The security logs of SMO should be separate from other system logs.
+
+REQ-SEC-SMO-Log-11: The SMO shall not permit configuration change to logging level(s) of any component on the SMO system without proper authorization.Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Non-RT RIC and rApps
+
+Requirements
+
+REQ-SEC-NonRTRIC-1: The Non-RT RIC shall support authorization as a resource owner/server and client.
+
+REQ-SEC-NonRTRIC-2: The Non-RT RIC Framework, as a resource owner/server, shall provide authorization to requests from rApps as a client.
+
+REQ-SEC-NonRTRIC-3: rApps shall provide client authorization requests to the Non-RT RIC Framework.
+
+REQ-SEC-NonRTRIC-4: The Non-RT RIC shall be able to recover, without catastrophic failure, from a volumetric DDoS attack across the A1 interface, due to misbehavior or malicious intent.
+
+REQ-SEC-NonRTRIC-5: The Non-RT RIC Framework shall be able to recover, without catastrophic failure, from a volumetric DDoS attack across the R1 interface, due to misbehavior or malicious intent.
+
+REQ-SEC-NonRTRIC-6: rApps shall be able to recover, without catastrophic failure, from a volumetric DDoS attack across the R1 interface, due to misbehavior or malicious intent.
+
+Security Controls
+
+SEC-CTL- NonRTRIC-1: For A1-EI, Non-RT RIC shall support OAuth 2.0 resource owner/server, as specified in O-RAN Security Protocols Specifications [3], section 4.7, for service requests received from one or more Near-RT RICs.
+
+SEC-CTL- NonRTRIC-2: For A1-P, Non-RT RIC shall support OAuth 2.0 client, as specified in O-RAN Security Protocols Specifications [3], section 4.7.
+
+SEC-CTL- NonRTRIC-3: For R1, Non-RT RIC Framework shall support OAuth 2.0 resource owner/server functionality, as specified in O-RAN Security Protocols Specifications [3], section 4.7.
+
+SEC-CTL- NonRTRIC-4: For R1, rApps shall support OAuth 2.0 client functionality, as specified in O-RAN Security Protocols Specifications [3], section 4.7.
+
+Near-RT RIC and xApps
+
+Requirements
+
+REQ-SEC-XAPP-1: xApp images shall be authenticated during onboarding using a signature that is generated by the xApp Solution Provider and validated by the Service Provider.
+
+REQ-SEC-XAPP-2: xApp instances shall be validated during Registration to the Near-RT RIC platform using signatures from both the Service Provider and the xApp Solution Provider.
+
+REQ-SEC-NEAR-RT-1: Near-RT RIC shall authenticate xApp access to the Near-RT RIC database(s) during SDL registration.
+
+REQ-SEC-NEAR-RT-2: Near-RT RIC shall provide authorized access to Near-RT RIC database(s).
+
+REQ-SEC-NEAR-RT-3: The communication between xApps and Near-RT RIC platform APIs shall be mutually authenticated.
+
+REQ-SEC-NEAR-RT-4: Near-RT RIC architecture shall provide an authorization framework for the consumption of the services exposed in the platform APIs by the xApps, that takes operator policies into consideration. The framework should be used by the specified API procedures in [33].
+
+REQ-SEC-NEAR-RT-5: The Near-RT RIC shall support authorization as a resource owner/server (A1-P) and client (A1-EI).
+
+REQ-SEC-NEAR-RT-6: The Near-RT RIC shall be able to recover, without catastrophic failure, from a volumetric DDoS attack across the A1 interface, due to misbehavior or malicious intent.
+
+Security Controls
+
+API Security – Authentication
+
+REST APIs and gRPC APIs are being considered as valid network solutions for Near-RT RIC APIs. REST APIs use HTTP and support Transport Layer Security (TLS). REST APIs utilizes JavaScript Object Notation (JSON) as encoding protocol. gRPC APIs use HTTP/2 and support as well TLS. In contrast with REST APIs, gRPC use Protobuf as encoding protocol.
+
+Time critical E2 related APIs are currently specified to run over SCTP/Protobuf network protocol stack. The security network layer specified for E2 interface is IPsec (see SEC-CTL-E2).
+
+SEC-CTL-NEAR-RT-1: Transactional APIs (REST and gRPC) shall support mutual TLS (mTLS) authentication via X.509v3 certificates. Client authentication, as specified in rfc 5246 (TLS 1.2) and rfc8446 (TLS 1.3), shall be used. Both the client (e.g., xApp as API consumer) and the server (e.g., Near-RT RIC platform as API producer) require a certificate, and both sides authenticate each other using their public/private key pair.
+
+SEC-CTL-NEAR-RT-2: Time critical APIs (e.g., E2 related APIs), not supported by TLS protocol, shall support IPsec with IKEv2 certificated-based authentication according to O-RAN security protocol specification [3].
+
+API Security – Authorization
+
+Authorization is the function of specifying and enforcing access rights or privileges to certain resources or services. In the actual context of Near-RT RIC, the platform as API producer shall be responsible to specify those rights/privileges for the platform services as resources to the xApps as consumers. As a guideline, an xApp should only have the required set of permissions to perform the actions for which they are authorized, and no more.
+
+Authorization mechanisms shall be enforced by the Near-RT RIC platform in the following key API procedures [33]:
+
+Discovery of Near-RT RIC APIs: The Near-RT RIC platform shall provide means to restrict xApps from discovery of some published APIs based on configuration policies.
+
+E2 Subscription API procedure: The subscription management shall be based on operator’s policies. An xApp may be restricted to interface with only a subset of E2 Nodes by such policies. This procedure establishes a set of preconditions that assume authorization proccesses:
+
+xApp has been authorized to issue E2 Subscription API requests
+
+xApp has been authorized to request guidance from Conflict mitigation
+
+xApp Subscription Management has been configured to permit E2 Subscription API requests only from specific list of xApps.
+
+E2 Control API procedure: Only authorized xApps may initiate RIC control request messages issued by the Near-RT RIC over the E2 interface to the E2 Nodes, for a specific scope (e.g, E2 Node list, RAN function, etc.).
+
+E2 Guidance API procedure: The purpose of this procedure only authorized xApp to obtain guidance from the conflict mitigation platform function prior to initiating an action.
+
+SDL API procedures: The precondition to consume the services exposed by SDL API (e.g, client registration, fetch data, notification, store, etc.) is that xApps have been successfully registered and authorized.
+
+SEC-CTL-NEAR-RT-3: Transactional APIs (REST and gRPC)  in Near-RT RIC shall support OAuth 2.0 authorization framework as specified in in O-RAN Security Protocols Specifications [3], clause 4.7.
+
+The roles defined in OAuth 2.0 are assigned as follows:
+
+Resource owner / Resource server (producer): Near-RT RIC platform modules providing services via APIs
+
+Client (consumer): xApp
+
+Grants shall be of the type Client Credentials Grant, as described in clause 4.4. of RFC 6749. Client authentication as specified in rfc 5246 (TLS 1.2) and rfc8446 (TLS1.3) shall be used.
+
+SEC-CTL- NEAR-RT-4: For A1-P, Near-RT RIC shall support OAuth 2.0 resource owner/server, as specified in O-RAN Security Protocols Specifications [3], clause 4.7, for service requests received from a Non-RT RIC.
+
+SEC-CTL- NEAR-RT-5: For A1-EI, Near-RT RIC shall support OAuth 2.0 client, as specified in O-RAN Security Protocols Specifications [3], clause 4.7.
+
+API Security – Confidentiality and Integrity
+
+SEC-CTL- NEAR-RT-6: Transactional APIs (REST and gRPC) shall support TLS to provide message confidentiality and integrity.
+
+SEC-CTL- NEAR-RT-7: Time critical APIs (e.g., E2 related APIs), not supported by TLS protocol, shall support IPsec to provide message confidentiality and integrity.
+
+The Table 1 provides a summary of the security controls (SEC-CTL- NEAR-RT-1 to -7) and a mapping of those to the related interface/API transport protocols considered in Near-RT RIC platform..
+
+Table 51: Summary of the Security Controls for Near-RT RIC APIs
+
+API protocol
+
+Authentication method
+
+Authorization method
+
+Confidentiality method
+
+Integrity method
+
+gRPC
+
+mTLS
+
+OAuth2
+
+mTLS
+
+mTLS
+
+SCTP
+
+IKEv2
+
+-
+
+IPsec
+
+IPsec
+
+REST/HTTP
+
+mTLS
+
+OAuth2
+
+mTLS
+
+mTLS
+
+O-CU-CP/UP
+
+Requirements
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+O-DU
+
+Requirements
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+O-RU
+
+Requirements
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+O-eNB
+
+Requirements
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+O-Cloud
+
+Note: In the following requirements and controls, ‘App’ stands for xApp and rApp.
+
+Note: In the following requirements and controls, the actor ‘Service Provider’ is used to refer to the Telco Operator and/or the O-Cloud Provider since the App/VNF/CNF package verification could be performed by both or by one or the other, depending upon the O-Cloud deployment models. The Telco Operator may act as the O-Cloud Provider (e.g., in case of private cloud model) or they may be two different entities (e.g., in case of hybrid or public cloud models).
+
+Generic requirements
+
+ Generic requirements for Cloud Platform Management are specified in [8].
+
+User Management Requirements for Cloud Platform Management
+
+REQ-SEC-OCLOUD-1: User should be authenticated and authorized.
+
+REQ-SEC-OCLOUD-2: Means of isolation of control and resources among different users shall be implemented.
+
+Security Controls
+
+Editor’s notes: This section will be updated in subsequent versions of the security requirements specification
+
+Software Package Protection at the O-Cloud Network Functions and Applications Layer
+
+The identified requirements and controls in this section are enforcing the protection of O-Cloud App/VNF/CNF packages at the application layer, i.e., xApp, rApp, O-CU, O-DU, Near RT RIC.
+
+Requirements
+
+REQ-SEC-OCLOUD-IMG-1: The App/VNF/CNF package shall be certified by the App/VNF/CNF Provider using industry recognized software testing suites (e.g., vulnerability scanning, static and dynamic testing, penetration testing) to find any flaws and defects within the package and to eliminate them before its delivery to the Service Provider. Test results shall be shared with the Service Provider.
+
+REQ-SEC-OCLOUD-IMG-2: The App/VNF/CNF package shall be signed by the App/VNF/CNF Provider prior to its delivery to the Service Provider for ensuring its authenticity and integrity.
+
+REQ-SEC-OCLOUD-IMG-3: The App/VNF/CNF package shall include minimally the following artifacts according to [41], [42]: the App/VNF/CNF software image, the signing certificate, and signature(s) of App/VNF/CNF Provider.
+
+REQ-SEC-OCLOUD-IMG-4: If the App/VNF/CNF package refers to external artifacts [41], [42], those artifacts shall be signed by the App/VNF/CNF Provider.
+
+REQ-SEC-OCLOUD-IMG-5: The Service Provider shall verify the signatures on all external artifacts.
+
+REQ-SEC-OCLOUD-IMG-6: The App/VNF/CNF package shall be validated by NFO upon its reception using the signature generated and provided by the App/VNF/CNF Provider.
+
+REQ-SEC-OCLOUD-IMG-7: The App/VNF/CNF package shall be tested by the Service Provider for known security vulnerabilities (e.g., vulnerability scanning). All discovered vulnerabilities must be reported and remediated where possible.
+
+REQ-SEC-OCLOUD-IMG-8: The App/VNF/CNF package shall be cryptographically bound to one Telco Operator before its on-boarding to the O-Cloud images repository. This will prevent unauthorized package to be instantiated even if it has valid App/VNF/CNF certificate [41], [44], [45].
+
+REQ-SEC-OCLOUD-IMG-9: App/VNF/CNF packages shall be successfully authenticated and verified during instantiation to the O-Cloud Platform from the trust O-Cloud images repository using signatures from both App/VNF/CNF Provider and Service Provider.
+
+REQ-SEC-OCLOUD-IMG-10: Signatures reaching the end of their lifetime shall be renewed before the certificate times out (signatures provided by the App/VNF/CNF Provider might be ignored if the signature of the Service Provider is valid). App/VNF/CNF packages during instantiation that do not include valid certificates shall be removed from the O-Cloud images repository and from any type of O-Cloud Platform memory.
+
+REQ-SEC-OCLOUD-IMG-11: App/VNF/CNF packages stored within the O-Cloud images repository shall be protected in terms of integrity and confidentiality.
+
+REQ-SEC-OCLOUD-IMG-12: App/VNF/CNF packages stored within the O-Cloud images repository shall be accessible to only authorized actors (e.g., authorized users and authorized systems) and over networks that enforce authentication, integrity, and confidentiality.
+
+REQ-SEC-OCLOUD-IMG-13: O-Cloud images repository shall be clear of vulnerable App/VNF/CNF packages and of packages with expired or missing certificates.
+
+REQ-SEC-OCLOUD-IMG-14: Sensitive information (e.g L1 Apps/VNFs/CNFs, keys, PII, passwords or other critical configuration data) that is needed during the lifecycle of the App/VNFs/CNFs shall be protected in terms of confidentiality at rest and in transit [46], [47], [48].
+
+REQ-SEC-OCLOUD-IMG-15: NFO shall contain a pre-installed root certificate of trusted CA (trusted by the Telco Operator) before the on-boarding of the App/VNF/CNF package for verifying its authenticity and integrity. Root certificate shall be delivered via a trusted channel separately from an App/VNF/CNF package [42].
+
+REQ-SEC-OCLOUD-IMG-16: App/VNF/CNF Packages shall contain a Change Log. Change log captures the changes from one version to another including but not limited to features added/removed, issues fixed as well as known issues not resolved [43].
+
+REQ-SEC-OCLOUD-IMG-17: O-Cloud Platform shall monitor stored App/VNF/CNF Packages downloaded from the O-Cloud images repository within SMO to the O-Cloud platform to determine if any unauthorized modification, deletion, or insertion has occurred.
+
+REQ-SEC-OCLOUD-IMG-18: SMO and O-Cloud Platform shall support a strong protection of keys and algorithms for the code signing and encryption/decryption processes.
+
+Security Controls
+
+SEC-CTL-OCLOUD-IMG-1: App/VNF/CNF package shall be signed and verified for integrity and authenticity protection.
+
+To provide the authenticity and integrity protection for the App/VNF/CNF package, one of the two following options should be followed according to [41], [42]:
+
+Option 1: The App/VNF/CNF package contains a Digest (a.k.a. hash) for each of the artifacts of the App/VNF/CNF package. The table of hashes is signed with the App/VNF/CNF provider private key.
+
+Option 2: The complete App/VNF/CNF package is signed with the App/VNF/CNF provider private key.
+
+The signature verification process comprises the following steps:
+
+Responsible: App/VNF/CNF Provider, Service Provider
+
+A signed App/VNF/CNF package is delivered to the Service Provider containing the App/VNF/CNF package, the signing X.509v3 certificate, and the signature (signed hash value) of App/VNF/CNF Provider.
+
+The root CA certificate must be pre-installed within the NFO for the validation of the App/VNF/CNF Provider signing certificate.
+
+Upon reception of the signed App/VNF/CNF package from App/VNF/CNF Provider by the Service Provider:
+
+New hash(es) of the received App/VNF/CNF package are calculated and verified by the Service Provider against the hash(es) in the signature using the App/VNF/CNF Provider certificate retrieved from the received App/VNF/CNF package.
+
+Verification is successful if both hash values match.
+
+Service Provider signs the verified App/VNF/CNF package prior to its onboarding to the trust O-Cloud images repository
+
+Service Provider computes the hash value of the App/VNF/CNF package and the signature of the App/VNF/CNF Provider.
+
+The hash value is signed with the private key(s) of the Service Provider.
+
+A signed App/VNF/CNF package is onboarded to the O-Cloud images repository containing the App/VNF/CNF package, certificate(s) and signature(s) (signed hash value) of the App/VNF/CNF Provider and Service Provider.
+
+During instantiation to the O-Cloud Platform from the trust O-Cloud images repository, the App/VNF/CNF package is authenticated and verified using signatures from both App/VNF/CNF Provider and Service Provider.
+
+Algorithms, key sizes and standards to be used for signature generation/verification must follow the "O-RAN Security Protocol Specification" clause5.1.
+
+SEC-CTL-OCLOUD-IMG-2: Sensitive artifacts shall be encrypted for confidentiality protection
+
+The confidentiality protection of the sensitive artifacts is ensured by either asymmetric or symmetric Encryption/Decryption:
+
+Confidentiality protection of the sensitive artifacts during their delivery to the Service Provider
+
+Asymmetric based on public/private key pair
+
+App/VNF/CNF Provider encrypts the sensitive artifacts with the Service Provider public keys
+
+Service Provider decrypts the sensitive artifacts using the private key(s)
+
+Symmetric based on a shared key between App/VNF/CNF Provider and Service Provider that is used to encrypt or decrypt sensitive artifacts
+
+App/VNF/CNF Provider encrypts sensitive artifacts with the shared common key
+
+Service Provider decrypts sensitive artifacts with the same shared common key
+
+Confidentiality protection of the sensitive artifacts during onboarding and instantiation
+
+During onboarding to the trust O-Cloud images repository, NFO encrypts the App/VNF/CNF sensitive artifacts using the appropriate encryption key(s) provided by Service Provider.
+
+Prior to instantiation of the App/VNF/CNF package, the stored App/VNF/CNF sensitive artifacts shall be decrypted. After Service Provider App/VNF/CNF decryption, any signature is verified. The cryptographic key material used for decryption of the App/VNF/CNF Package is provided by the Service Provider.
+
+Algorithms, key sizes and standards to be used for Encryption/Decryption must follow the "O-RAN Security Protocol Specification" clause 5.1.
+
+SEC-CTL-OCLOUD-IMG-3: App/VNF/CNF packages should be compliant with ETSI NFV specifications, ETSI GS NFV-SOL004 [42], ETSI GS NFV-IFA 011 [43] and ETSI GS NFV-SEC 021 [41] for package formats and signing/verification procedures.
+
+SEC-CTL-OCLOUD-IMG-4: Encryption shall be used to secure  cryptographic keys used by the cryptographic operations (e.g., Signature generation/verification, Encryption/Decryption, Hashing) for  App/VNF/CNF image protection.
+
+See Annex C for the guidance to implement these controls.
+
+Software Package Protection at the O-Cloud Infrastructure Layer
+
+The identified requirements and controls in this section are enforcing the protection of O-Cloud software packages at the infrastructure level layer, e.g., AAL drivers, IMS, DMS, Host OS, Hypervisor/Container Engine.
+
+Requirements
+
+Security Controls
+
+O-Cloud Virtualization and Isolation
+
+Requirements
+
+REQ-SEC-OCLOUD-ISO-1: O-Cloud shall implement means of preventing privilege escalation by Apps/VNF/CNF.
+
+REQ-SEC-OCLOUD-ISO-2: The communication between the different Apps/VNF/CNF shall be mutually authenticated and authorized.
+
+REQ-SEC-OCLOUD-ISO-3: The O-Cloud consumer and provider shall together ensure that the Apps/VNF/CNF have only the minimum required capabilities and privileges as well as minimum required access to NFVI resources.
+
+REQ-SEC-O-CLOUD-ISO-4: The O-Cloud platform shall ensure that there is strict isolation between Apps/VNFs/CNFs in terms of data in transit, data in use and data at rest.
+
+Secure update
+
+The identified requirements and controls in this section are enforcing the secure update of O-Cloud software at the infrastructure level layer, e.g., AAL drivers, IMS, DMS, Host OS, Hypervisor/Container Engine.
+
+Requirements
+
+REQ-SEC-OCLOUD-SU-1 All software within the O-Cloud platform shall be kept up to date with the last security updates for adding additional security protections and correcting vulnerabilities [49].
+
+REQ-SEC-OCLOUD-SU-2 Before updating O-Cloud, all O-Cloud software images shall be signed by O-Cloud Software Providers prior to their delivery to O-Cloud Service Provider for ensuring their authenticity and integrity.REQ-SEC-OCLOUD-SU-3 Before updating O-Cloud, all O-Cloud software images shall be validated by SMO upon their reception using signatures generated and provided by O-Cloud Software Providers.
+
+REQ-SEC-OCLOUD-SU-4 The O-Cloud platform shall verify prior to the update process, the digital signature contained in the new O-Cloud software image.
+
+REQ-SEC-OCLOUD-SU-5 In case of an incomplete update, or incident during the installation process, the O-Cloud platform shall remain in its initial working state.
+
+REQ-SEC-OCLOUD-SU-6 The O-Cloud platform shall prevent the unauthorized rollback of its software to an earlier vulnerable version.
+
+REQ-SEC-OCLOUD-SU-7 The update of O-Cloud software should be completed with minimal disruption and downtime.
+
+Security Controls
+
+SEC-CTL-OCLOUD-SU-1 Algorithms, key sizes and standards to be used for signature generation/verification of the O-Cloud software images during the update process shall follow the "O-RAN Security Protocol Specification" clause 5 [3].
+
+Secure storage of cryptographic keys and sensitive data
+
+Requirements
+
+REQ-SEC-OCLOUD-SS-1 All cryptographic keys and sensitive data within the O-Cloud platform shall be protected in terms of integrity and confidentiality at rest and in transit.
+
+REQ-SEC-OCLOUD-SS-2 The O-Cloud platform shall delete cryptographic keys and sensitive data using a secure deletion method from both active and backup storage medias.
+
+REQ-SEC-OCLOUD-SS-3 The O-Cloud platform shall ensure that any data contained in a resource is not available when the resource is de-allocated from one VM/Container and reallocated to a different VM/Container. This requirement requires protection for any data contained in a resource that has been logically deleted or released but may still be present within the resource which in turn may be re-allocated to another VM/Container.
+
+Security Controls
+
+SEC-CTL-OCLOUD-SS-1 Encryption shall be used for all stored cryptographic keys and sensitive data (credentials, tokens, configuration data, etc.) with appropriate authentication and access control mechanisms.
+
+SEC-CTL-OCLOUD-SS-2 Secure deletion of data shall be used on addressable memory locations that are no longer in use due to reallocation, by overwriting with specific binary patterns, including zeroes, ones, and a random bit pattern [53].
+
+SEC-CTL-OCLOUD-SS-3 Medias containing sensitive information shall be sanitized using media-specific techniques.
+
+See Annex C for the guidance to implement these controls.
+
+Chain of Trust
+
+Requirements
+
+REQ-SEC-OCLOUD-COT-1 The O-Cloud platform shall support a root of trust that verifies the integrity of every relevant component in the O-Cloud platform [49], [50], [52].
+
+REQ-SEC-OCLOUD-COT-2 It shall be possible to attest an O-RAN App/VNF/CNF through the full attestation chain from the hardware layer through the virtualization layer to the O-RAN App/VNF/CNF layer [44], [51].
+
+Security Controls
+
+SEC-CTL-OCLOUD-COT-1 A true chain of trust shall start from the hardware firmware through the virtualization layer to O-RAN Apps/VNFs/CNFs to prevent tampering during the system boot and integrity check on the O-Cloud software layers [50], [52]. The chain of trust should be built from measurements stored in a hardware root of trust using the measure-and-verify security model, with each component measuring, verifying, and launching the next level [52]. Within the hardware root of trust are stored cryptographic keys and measurements (i.e., hash values) of the O-Cloud’s firmware, software, and configuration data.
+
+SEC-CTL-OCLOUD-COT-2 A remote attestation service (AS) should be supported for providing additional benefits beside verifying O-Cloud platform integrity by CoT. The remote AS should collect O-Cloud platform configurations and integrity measurements from data center servers at a O-Cloud service provider via a trust agent service running on the O-Cloud platform servers [58]. The O-Cloud service provider is responsible for defining allowlisted trust policies. These policies should include information and expected measurements for desired platform CoT technologies. The collected data is compared and verified against the policies, and a report is generated to record the relevant trust information in the AS database [58].The remote AS should be extended to include O-RAN Apps/VNFs/CNFs integrity.
+
+See Annex C for the guidance to implement these controls.
+
+Interfaces maintained by O-RAN:
+
+A1 Interface
+
+A1 Interface between Non-RT RIC and Near-RT RIC to enable policy-driven guidance of Near-RT RIC applications/functions, and support AI/ML workflow. See A1 specifications [38]
+
+Requirements
+
+REQ-SEC-A1-1: A1 interface shall support confidentiality, integrity, replay protection.
+
+REQ-SEC-A1-2: A1 interface shall support mutual authentication and authorization.
+
+Security Controls
+
+Figure 51 : mTLS on A1 interface
+
+SEC-CTL-A1: For the security protection at the transport layer on A1 interface, TLS shall be supported as specified in O-RAN Security Protocols Specifications [3] section 4.2.
+
+SEC-CTL-A1-2: For the mutual authentication of the Non-RT RIC and one or more Near-RT RICs, the A1 interface shall support mTLS as shown in Figure 51 and specified in O-RAN Security Protocols Specifications [3], section 4.2.
+
+SEC-CTL-A1-3: The A1 interface shall support authorization using OAuth 2.0, as specified in O-RAN Security Protocols Specifications [3], section 4.7.
+
+O1 Interface
+
+O1 Interface connecting the SMO to the Near-RT RIC, one or more O-CU-CPs, one or more O-CU-UPs, and one or more O-DUs.
+
+Requirements
+
+All O1 functions in an O-RAN deployment may be considered sensitive or vulnerable in some network environments. In order to support the zero trust principles guiding O-RAN security requirements, the O1 interface will enforce confidentiality, integrity, authenticity through an encrypted transport, and least privilege access control using the network configuration access control model.
+
+Write operations (e.g., edit-config) to these functions without proper protection can have a negative effect on network operations. Unrestricted read operations can reveal sensitive information to unauthorized users. For operators to manage O-RAN functions using NETCONF [9] effectively and securely, they need a standards-based mechanism for role-based access control that integrates with NETCONF. The network configuration access control model (NACM) [10] provides the means to restrict access for users to a preconfigured subset of all available NETCONF protocol operations and content.
+
+NACM further enables operators need to integrate both authentication and authorization with a centralized access management platform, protect the running configuration from unauthorized modification and deletion, support change management procedures for updating both network function configurations and changes to the NACM instance on a network function.
+
+This chapter specifies the requirements for O1 NACM support post function initialization and when the function is operating normally. NACM requirements related to network function initialization and when repairing broken access control configuration will be addressed in a future release of the document.
+
+Confidentiality, Integrity and Authenticity
+
+REQ-TLS-FUN-1:  Management Service providers and consumers that use TLS SHALL support TLS as specified in O-RAN Security Protocols Specification [3] section 4.2.
+
+Least Privilege Access Control
+
+REQ-NAC-FUN-1: Management Service providers and consumers that use NETCONF SHALL support the Network Configuration Access Control Model (NACM) as specified in RFC 8341 [10] to restrict NETCONF protocol access for users to a preconfigured subset of available NETCONF protocol operations and content.
+
+REQ-NAC-FUN-2: The NETCONF implementation for O1 SHALL set the default values of the NACM Global Enforcement Controls as follows.
+
+enable-nacm = true
+
+read-default = permit
+
+write-default = deny
+
+exec-default = deny
+
+enable-external-groups = true
+
+REQ-NAC-FUN-3: Management Service providers that support NETCONF SHALL support the following pre-defined groups in NACM to restrict NETCONF protocol access for users.
+
+O1_nacm_management: Allows changes to the /nacm objects which includes the NACM Global Enforcement Controls.
+
+O1_user_management: Allows assignment and deletion of users and assignment of users to roles on the O1 node.
+
+Mandatory if the network device supports a local user store.
+
+Not provided if the network device does not support a local user store and requires all user/role information to be provided by an external authentication/authorization service.
+
+O1_network_management: Allows read, write and execute operations on the <running> datastore and read, write, execute and commit operations on the <candidate> datastore if <candidate> is supported. All operations on the /nacm objects are prohibited.
+
+O1_ network_monitoring: Allows read operations on configuration data in the <running> datastore, except for the /nacm objects.
+
+O1_software_management: Allows installation of new software including new software versions.
+
+REQ-NAC-FUN-4: Users assigned to the O1_nacm_management group SHALL have read and write permission for the /nacm objects and attributes, which include the NACM Global Enforcement Controls.
+
+REQ-NAC-FUN-5: Users assigned to the O1_user_management group SHALL have read and write permissions for the locally defined user store objects and attributes.
+
+REQ-NAC-FUN-6: Users assigned to the O1_network_management group SHALL have read, write and execute permissions for the <running> datastore and read, write, execute and commit permissions on the <candidate> datastore if <candidate> datastore is supported. Users assigned to the O1_network_management group SHALL NOT have any permissions for the /nacm objects.
+
+REQ-NAC-FUN-7: Users assigned to the O1_network_monitoring group SHALL have read permissions for the <running> datastore. Users assigned to the O1_network_monitoring group SHALL NOT have read permissions for the /nacm objects.
+
+REQ-NAC-FUN-8: Users assigned to the O1_software_management group SHALL have permissions to install new software.
+
+REQ-NAC-FUN-9: NETCONF endpoints SHALL support external user to group mapping via at least one of the following protocols: LDAP with StartTLS [11], OAuth 2.0, RADIUS with EAP, and TACACS/TACACS+.
+
+REQ-NAC-FUN-10: Management Service providers MAY allow the definition of users in the <groups> NACM object.
+
+Security Controls
+
+As defined in the previous section, the O1 will use TLS 1.2 or higher to enforce confidentiality, integrity, and authenticity; and will use NACM [10] to enforce least privileged access.
+
+O2 Interface
+
+General Aspects and Principles of O2 Interface between the SMO and the O-Cloud are defined in [6].
+
+Requirements
+
+REQ-SEC-O2-1: O2 interface shall support confidentiality, integrity, replay protection and data origin authentication.
+
+Security Controls
+
+SEC-CTL-O2 : Management Service providers and consumers that use TLS shall support TLS as specified in O-RAN Security Protocols Specifications [3] section 4.2.
+
+E2 Interface
+
+General Aspects and Principles of E2 Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, one or more O-DUs, and one or more O-eNBs are defined in [7].
+
+Requirements
+
+REQ-SEC-E2-1: E2 interface shall support confidentiality, integrity, replay protection and data origin authentication.
+
+Security Controls
+
+SEC-CTL-E2: For the security protection at the IP layer on E2 interface, IPsec shall be supported as specified in O-RAN Security Protocols Specifications [3] section 4.4.
+
+Open Fronthaul Interface
+
+C-plane
+
+Introduction
+
+The O-DU sends UL C-plane messages and DL C-plane messages to O-RU to trigger transmission and reception of RF signals. The DL C-plane message describing multiple symbols must arrive at O-RU within a certain time window for the O-RU to successfully receive DL I/Q data in U-plane messages from O-DU. Likewise, the UL C-plane message describing multiple symbols must arrive within a certain time window for the O-RU to successfully receive RF signal and send UL I/Q data in U-plane messages to O-DU. Any delay of these messages would cause the O-RU to drop/discard U-plane traffic from O-DU and the UE [31].
+
+An adversary can inject its own DL C-plane or UL C-plane messages by spoofing the associated O-DU. As a result, it would block the O-RU from processing the corresponding U-Plane packets received from the O-DU and O-RU respectively, leading to temporary DoS and, limited cell performance on cells served by the O-RU [4]
+
+Requirements
+
+[REQ-SEC-OFCP-1] The C-Plane shall support authentication and authorization of O-DUs that exchange C-plane messages with O-RUs.
+
+Security Controls
+
+Authentication and Authorization of network elements supporting the C-Plane
+
+This clause addresses requirements REQ-SEC-OFCP-1 based on the use of IEEE 802.1X-2020 Port-based Network Access Control [12] for authentication and subsequent authorization of PTP nodes.
+
+Clause 5.2.5.5 of this document provides requirements and security controls for the authentication and authorization of an O-DU and other network elements supporting the C-Plane within Open Fronthaul point-to-point LAN segments.
+
+U-plane
+
+Requirements
+
+Open Fronthaul U-plane transports 5G System Control Plane and User Plane messages between O-CU-CP and UE, and O-CU-UP and UE.  The Packet Data Convergence Protocol (PDCP) [32] provides confidentiality and integrity protection of 5G System Control Plane and User Plane between O-CU-CP and UE, and O-CU-UP and UE.
+
+Security Controls
+
+S-plane
+
+Introduction
+
+The Precision Time Protocol (PTP) is a protocol used to synchronize clocks within a PTP network. Within a PTP domain [27], the grandmaster clock is the source of time to which all other PTP clocks in the domain are synchronized.
+
+The IEEE 1588 standard specifies the Best Master Clock Algorithm (BMCA) for electing the best clock from PTP Network and Local PTP Clock. The BMCA runs on PTP instances in the network continuously and is adjusting to changes in that network. PTP ANNOUNCE messages are used to build a timing distribution hierarchy with grandmaster at the top. There can be many grandmasters in PTP Network, but PTP Domain can have only one. The chosen grandmaster clock is responsible for providing timing to the PTP slave nodes.
+
+Following the selection of the new grandmaster, the grandmaster begins transmitting the current time within the SYNC message and FOLLOW_UP messages if applicable. This allows the other clocks to synchronize their time to the grandmaster.
+
+S-Plane attacks include an attacker masquerading as a grandmaster or manipulating PTP to degrade synchronization. Details are covered in Clause 5.4.1.2 of [4].
+
+The two most common deployment models for O-DU in O-RAN are:
+
+O-DU at the cell site deployment model: the O-DU is collocated with the O-RU with a direct connection between the two (LLS-C1) through a cell site gateway router.
+
+O-DU at the Data Centre deployment model: the O-DU is at a Data Centre. The O-RU’s at the cell site connect to the O-DU via a direct connection between O-RU and O-DU (LLS-C1) or intermediary Ethernet switches (LLS-C2 or LLS-C3).
+
+Requirements
+
+[REQ-SEC-OFSP-1] The S-Plane shall support authentication and authorization of PTP nodes that communicate with other PTP nodes within Configuration LLS-C1, Configuration LLS-C2, or Configuration LLS-C3.
+
+NOTE: This ensures least privilege access to the S-Plane where authenticated and authorized PTP nodes communicate over the Open Fronthaul network.
+
+NOTE: There is no specific requirement for authentication and authorization mechanism of S-plane PTP messages.
+
+[REQ-SEC-OFSP-2] The S-Plane should provide a means to prevent spoofing of master clocks.
+
+[REQ-SEC-OFSP-3] For the O-DU at the Data Centre deployment model the S-Plane should protect against MITM attacks that degrade the clock accuracy due to packet delay attacks or selective interception and removal attacks [28].
+
+Security Controls
+
+Synchronization Architecture Redundancy
+
+This clause addresses requirement REQ-SEC-OFSP-3 by providing an architectural recommendation to S-plane security based on redundancy in the Open Fronthaul Synchronization architecture.
+
+The following architectural recommendations for security controls build S-Plane redundancy into to the Open Fronthaul for increased robustness against security breaches.
+
+SEC-CTL-OFSP-1: The Open Fronthaul Synchronization architecture should support simultaneous Grandmasters.
+
+SEC-CTL-OFSP-2: The Open Fronthaul Synchronization architecture should support the assignment of GMs to physically separated PTP ports. Multiple masters could be connected to offer topology resilience.
+
+O-RAN Synchronization Architecture and Solution Specification [30] Clause 8.2.3 Timing/Synchronization Redundancy & Resiliency provides additional details on redundancy for the Open Fronthaul Synchronization architecture.
+
+Authentication and Authorization of PTP nodes
+
+This clause addresses requirements REQ-SEC-OFSP-1 and REQ-SEC-OFSP-2 based on the use of IEEE 802.1X-2020 Port-based Network Access Control [12] for authentication and subsequent authorization of PTP nodes.
+
+Clause 5.2.5.5 of this document provides requirements and security controls for the authentication and authorization of S-Plane PTP nodes within Open Fronthaul point-to-point LAN segments.
+
+M-plane
+
+Requirements
+
+Refer to [14]
+
+Security Controls
+
+Open Fronthaul Point-to-Point LAN Segment
+
+The Open Fronthaul Ethernet L1 physical interface comprises one or more coaxial cables, twisted pairs, or optical fibers. These are also known as point-to-point LAN segments [12]. Each end of the Open Fronthaul point-to-point LAN segment comprises a physical connection (colloquially known as an Ethernet Port) to physical O-RAN network elements, e.g., O-DU, O-RU, etc., as described in [13] and [14].
+
+An Open Fronthaul network element is an entity in a point-to-point LAN segment. Xhaul Transport Network Elements that share a point-to-point LAN segment with Open Fronthaul network elements are also Open Fronthaul network elements. Examples of O-RAN Alliance defined Open Fronthaul network elements include, but are not limited to, O-DU, O-RU, switches, FHM, FHGW, TNE and PRTC-T/GM [13][14][15][26].
+
+Requirements
+
+REQ-SEC-OFHPLS-1: The Open Fronthaul shall provide a means to authenticate and authorize point-to-point LAN segments between Open Fronthaul network elements.
+
+REQ-SEC-OFHPLS-2: The Open Fronthaul shall provide a means to detect and report when an authorized point-to-point LAN segment is made or broken.
+
+REQ-SEC-OFHPLS-3: The Open Fronthaul shall provide a means to block access to unused Ethernet ports in an Open Fronthaul network element.
+
+Open Fronthaul implementations may support IEEE 802.1X-2020 [12] to satisfy the requirements listed above. Implementations that support optional 802.1X shall provide the security controls as specified in sections 5.2.5.5.2 and 5.2.5.5.3.
+
+Solution #1: Authentication and Authorization based on 802.1x Port based Network Access Control
+
+IEEE 802.1X-2020 is optional to support.
+
+NOTE: Further security requirements for IEEE 802.1X-2020 will continue to be studied. It is intended to evolve IEEE 802.1X-2020 to a mandatory requirement for the Open Fronthaul interface after completion of the study.
+
+IEEE 802.1X-2020 Port-based Network Access Control [12] provides the means to control network access in point-to-point LAN segments within the Open Fronthaul network.
+
+Port-based network access control in the O-RAN Alliance Open Fronthaul comprises supplicant, authenticator, and authentication server entities described in IEEE 802.1X-2020 [12]  and as further described in this section. All other entities and functionality described in IEEE 802.1X are out of scope of this O-RAN Alliance specification and are determined by vendor implementation in agreement with operator-specific requirements.
+
+SEC-CTL-OFHPLS-1: Operator implementation of IEEE 802.1X-2020 [12] for Open Fronthaul port-based network access control is optional to use for each point-to-point LAN segment.
+
+Supplicants in the Open Fronthaul Network
+
+SEC-CTL-OFHPLS-2: Open Fronthaul network elements shall support IEEE 802.1X-2020 supplicant functionality [12] for each port connection in the Open Fronthaul network element.
+
+Authenticators in the Open Fronthaul Network
+
+In IEEE 802.1X-2020 a supplicant mutually authenticates with an authenticator.
+
+SEC-CTL-OFHPLS-3: Any Open Fronthaul network element may be an authenticator in the Open Fronthaul network.
+
+SEC-CTL-OFHPLS-4: An authenticator in an Open Fronthaul network shall perform port-based network access control on each point-to-point LAN segment as defined in IEEE 802.1X-2020 [12].
+
+SEC-CTL-OFHPLS-5: Port-based network access control between a supplicant and authenticator in an Open Fronthaul network shall use EAP TLS authentication as defined in IEEE 802.1X-2020 [12].
+
+Authenticator interface to an Authentication Server in the Open Fronthaul Network
+
+IEEE 802.1x describes an EAP-TLS exchange which includes an interface between an authenticator and authentication server. [12]
+
+SEC-CTL-OFHPLS-7: The interface between an authenticator and authentication server shall support IETF RADIUS standards, IETF RFC 2865[22], IETF RFC 2866[23], IETF RFC 3579[24], and successor standards.
+
+SEC-CTL-OFHPLS-8: The interface between an authenticator and authentication server should support IETF Diameter standards, IETF RFC 4072 [25] and successor standards.
+
+NOTE: Mechanisms to secure the interface between the authenticator and authentication server are out of scope of the O-RAN Alliance.
+
+O-DU as an Authenticator
+
+Configuration LLS-C1 [13] and Cascade Mode in the Shared Cell Concept [12] are cases where an O-DU and O-RU are Open Fronthaul network elements in a point-to-point LAN segment.
+
+SEC-CTL-OFHPLS-6: In the case of Configuration LLS-C1, the O-DU must support the authenticator functionality as defined in IEEE 802.1X-2020 [12].
+
+Authentication and authorization procedure for 802.1x Port based Network Access Control
+
+IEEE 802.1X-2020 is optional to support.
+
+NOTE: Further security requirements for IEEE 802.1X-2020 will continue to be studied. It is intended to evolve IEEE 802.1X-2020 to a mandatory requirement for the Open Fronthaul interface after completion of the study.
+
+General requirements
+
+Only those Open Fronthaul network elements acting as a supplicant that have mutually authenticated with an authenticator are authorized to participate in the Open Fronthaul network. If an authenticator port is to be activated in the Open Fronthaul, then the authenticator initially places the port into an unauthorized state that allows EAP over LAN (EAPOL) packets for EAP authentication and blocks all other traffic. If the mutual authentication has been successful and the operator authorizes operation for the network element port, then the port is switched to the authorized state whereby non-EAPOL packets can be sent and received.
+
+SEC-CTL-OFHPLS-9: Open Fronthaul network elements acting as an authenticator shall place each of its unauthorized ports into a state that allows EAPOL traffic and block all other Ethernet traffic.
+
+SEC-CTL-OFHPLS-10: Open Fronthaul network elements acting as an authenticator should be able to implement authorization policies that apply to its authorized ports. Authorization policies may include tagging authorized traffic with a particular VLAN-ID as it egresses the Open Fronthaul network element and/or enforcing access control policies that restrict the type of traffic able to be forwarded by the Open Fronthaul network element.
+
+Manufacturer Install Certificates
+
+IEEE 802.1X [12] defines encapsulation of the Extensible Authentication Protocol (EAP). Using such an approach, a supplicant implements an EAP method according to its supported credentials. Prior to a supplicant enrolling in an operator’s PKI, a manufacturer installed certificate shall be used together with an EAP-TLS dialogue to enable certificate-based mutual authentication to be performed between an authenticator and a supplicant.
+
+SEC-CTL-OFHPLS-11: The O-RU shall have installed a Manufacturer Installed X.509 Certificate.
+
+Security Procedure
+
+The following procedure describes the authentication and authorization, based on IEEE 802.1 Port based Network Access Control, of point-to-point LAN segments between a supplicant and another Open Fronthaul network element acting as an authenticator.
+
+SEC-CTL-OFHPLS-12: The normal operation procedure shown in Figure 52 shall be performed to authenticate and authorize an O-RU within an Open Fronthaul network.
+
+FFS: Identify end-to-end signalling flow for other Open Fronthaul network elements acting as a supplicant.
+
+FFS: other operation procedures, to include, but not limited to, procedures to take into account existing operator provided certificates and for upgrading an O-RU to support IEEE 802.1X.
+
+				@startuml
+
+				!pragma teoz true
+
+				skinparam defaultTextAlignment center
+
+				participant "Authentication\nServer" as AAA
+
+				participant "IEEE 802.1x\nAuthenticator" as AUT
+
+				participant "IEEE 802.1x \nSupplicant" as SUP
+
+				note over AAA
+
+				  Manufacturer Trust
+
+				  Root Installed
+
+				end note
+
+				&note over SUP
+
+				  Manufacturer Installed
+
+				  X.509 Certificate
+
+				end note
+
+				&note over AUT
+
+				  Port in unauthorized
+
+				  state - blocks all
+
+				  traffic other than
+
+				  EAPOL traffic
+
+				end note
+
+				group Initial limited-access when authenticated using manufacturer certificate
+
+				    SUP->AUT: EAPoL Start
+
+				    AUT->SUP: EAP-Request/Identity
+
+				    SUP->AUT: EAP-Response/Identity (from Manufacturer Installed X.509 Certificate Subject DN)
+
+				    AUT->AAA: RADIUS-Access-Request or Diameter-EAP-Request (EAP-Response)
+
+				    AAA->AUT: RADIUS-Access-Challenge or Diameter-EAP-Answer (EAP-Request)
+
+				    AUT->SUP: EAPoL (EAP-Request)
+
+				    note over AAA, SUP
+
+				      EAP Dialogue Continues using Manufacturer Installed X.509 Certificate
+
+				    end note
+
+				    AAA->AAA: Select Security Policy \nfor Manufacturer Installed X.509 Certificate
+
+				    AAA->AUT: RADIUS-Access-Accept or Diameter-EAP-Answer (EAP-Success) \nIncluding security policy, e.g., Provisioning/Enrollment VLAN
+
+				    AUT->SUP: EAP-Success
+
+				    AUT->AUT: Set port to authorized state.\nAssign port to provided security policy, \ne.g., Provisioning/Enrollment VLAN
+
+				end
+
+				group Enrollment into operator PKI
+
+				    note over AUT, SUP
+
+				      Certificate Enrollment Completes & Provision of Operator X.509 Certificate
+
+				    end note
+
+				    SUP->SUP: Install\nOperator X.509\nCertificate
+
+				end
+
+				group Subsequent full operational access when authenticated using operator installed certificate
+
+				    note over SUP
+
+				      re-start of Supplicant
+
+				      triggers interface
+
+				      re-initialization
+
+				    end note
+
+				    note over AUT
+
+				      Interface re-initialization:
+
+				      resets port to unauthorized
+
+				      state - blocks all traffic
+
+				      other than EAPOL traffic
+
+				    end note
+
+				    SUP->AUT: EAPoL Start
+
+				    AUT->SUP: EAP-Request/Identity
+
+				    SUP->AUT: EAP-Response/Identity (from Operator X.509 Certificate Subject DN)
+
+				    AUT->AAA: RADIUS-Access-Request or Diameter-EAP-Request (EAP-Response)
+
+				    AAA->AUT: RADIUS-Access-Challenge or Diameter-EAP-Answer (EAP-Request)
+
+				    AUT->SUP: EAPoL (EAP-Request)
+
+				    note over AAA, SUP
+
+				      EAP Dialogue Continues using Operator Installed X.509 Certificate
+
+				    end note
+
+				    AAA->AAA: Select Security Policy\nfor Operator Installed X.509 Cert
+
+				    AAA->AUT: RADIUS-Access-Accept or Diameter-EAP-Answer (EAP-Success) \nIncluding security policy, e.g., Operational VLAN
+
+				    AUT->SUP: EAP-Success
+
+				    AUT->AUT: Set port to authorized state.\nAssign port to provided security policy, \ne.g., Operational VLAN
+
+				    note over SUP
+
+				      Normal Supplicant
+
+				      start up continues
+
+				    end note
+
+				end
+
+				@enduml
+
+Figure 52 : Normal Operation of 802.1X Port Based Authentication in the O-RAN Fronthaul architecture
+
+The authentication and authorization procedure may fail at any moment, for example because of no response from the supplicant after a network request. In that case, the normal operation procedure will be terminated as specified in IEEE 802.1X-2020 [12].
+
+R1 Interface
+
+R1 is the interface between rApps and Non-RT RIC Framework via which R1 Services can be produced and consumed. See R1 specification [39].
+
+Requirements
+
+REQ-SEC-R1-1: R1 interface shall support confidentiality, integrity, and replay protection.
+
+REQ-SEC-R1-2: R1 interface shall support mutual authentication and authorization.
+
+Security Controls
+
+Figure 53 : mTLS on R1 interface
+
+SEC-CTL-R1-1: For the security protection at the transport layer on R1 interface, TLS shall be supported as specified in O-RAN Security Protocols Specifications [3], section 4.2.
+
+SEC-CTL-R1-2: For the mutual authentication of the Non-RT RIC Framework and rApps, the R1 interface shall support mTLS as shown in Figure 53 and specified in O-RAN Security Protocols Specifications [3], section 4.2.
+
+SEC-CTL-R1-3: The R1 interface shall support authorization using OAuth 2.0, as specified in O-RAN Security Protocols Specifications [3], section 4.7.
+
+Transversal requirements
+
+Software Bill of Materials
+
+Removed in release November 2021
+
+Void
+
+Requirements
+
+Removed in release November 2021
+
+Void
+
+Common Application Lifecycle Management
+
+For Common Application Lifecycle Management requirements, refer to [16]
+
+Requirements
+
+REQ-SEC-ALM-FUN2-1: The Application Package shall be digitally signed by the Solution Provider.
+
+REQ-SEC-ALM-FUN3-1: The SMO shall have the capability to verify the digital signature of the Application Package.
+
+Network Protocols and Services
+
+Each O-RAN component serves important network function(s) based on a list of its necessary network protocols and services supported through its network interface(s). Proper, transparent, and secure network protocols and services enabled on each O-RAN component is essential for its overall security posture with the reduced risk.
+
+Requirements
+
+REQ-SEC-NET-1: A list of network protocols and services supported on the O-RAN component shall be clearly documented by its vendor. Unused protocols shall be disabled.
+
+Robustness of Common Transport Protocols
+
+IP, UDP, TCP, SCTP, SSH, HTTP and HTTP2 are the common transport protocols widely used by any O-RAN components for network communications and services. Robust implementation of those common transport protocols can significantly improve the security of each O-RAN component and system overall.
+
+Requirements
+
+REQ-SEC-TRAN-1: Common transport protocols (IP, UDP, TCP, SCTP, SSH, HTTP and HTTP2) used in O-RAN system should be able to handle unexpected inputs (not in-line with protocol specification) without functional compromise. The unexpected inputs include random mutations of the protocol headers and payloads, as well as targeted fuzzing with state awareness.
+
+Robustness against Volumetric DDoS Attack
+
+Distributed Denial of Service (DDoS) attack is one of the most common security risks for any O-RAN component with external facing network interface(s). DDoS attack often results in service interruption and even worse system crash and prolonged network outage. A volumetric DDoS attack can come from a bad actor or adversary, or a misconfiguration by the operator.
+
+Requirements
+
+REQ-SEC-DOS-1: An O-RAN component with external network interface shall be able to withstand network transport protocol based volumetric DDoS attack without system crash and returning to normal service level after the attack
+
+Robustness of OS and Applications
+
+The robustness of the O-RAN component in the OS and application(s) installed is fundamental to the overall security posture of the O-RAN system.
+
+Requirements
+
+REQ-SEC-SYS-1: Known vulnerabilities in the OS and applications of an O-RAN component shall be clearly identified and documented by its vendor
+
+Password-Based Authentication
+
+Weak, stolen, and re-used passwords are some of the common and leading causes of data breaches and tried-and-true ways of gaining access to systems, services, and applications. Password configuration(s) for both remote password based and Web UI login interfaces on O-RAN components shall be examined to valid secure password policies are supported and enforced.
+
+Requirements
+
+REQ-SEC-PASS-1: If password is used as an authentication attribute, O-RAN component vendors shall follow security best practices to mitigate risks resulting from different password-based authentication attacks such as brute-forcing, unauthorized password resets, man-in-the-middle, and dictionary attacks.
+
+SBOM Guidelines for O-RAN
+
+SBOM Overview
+
+This section provides guidance for generation, delivery, and use of a software bill of materials (SBOM).
+
+SBOM is a fundamental component of a mature Software Development Lifecycle (SDLC) process. SBOM is an industry best practice part of secure software development that enhances the understanding of the upstream software supply chain so that vulnerability notifications and updates can be properly and safely handled across the installed customer base.   The U.S. Department of Commerce (DoC) and the National Telecommunications and Information Administration (NTIA) define SBOM as “a formal record containing the details and supply chain relationships of various components used in building software.” The SBOM documents proprietary and third-party software, including commercial and free and open-source software (FOSS), used in software products.  The SBOM is maintained and used by the software supplier and stored and viewed by the network operator.
+
+Summary of U.S. DoC and NTIA Report
+
+The DoC, in coordination with NTIA, published a report “The Minimum Elements for a Software Bill of Materials (SBOM)” [17] that provides guidance on the data fields, automation, and processes to be used by suppliers and customers. Some key points are provided below:
+
+SBOM Data Fields
+
+The SBOM must contain as minimum fields: Supplier Name, Component Name, Version of the Component, Other Unique Identifiers, Dependency Relationship, Author of the SBOM data, and Timestamp.
+
+SBOM Automation
+
+The interoperable data formats used to generate and consume SBOMs must be either Software Package Data eXchange (SPDX) [18], CycloneDX [19], or Software Identification (SWID) [20] tags.
+
+SBOM Practices
+
+DoC advises that the cryptographic hash and digital signature of the SBOM may be defined in the contractual agreement between the software supplier and customer.
+
+DoC advises the terms for access control to the SBOM may be defined in the contractual agreement between the software supplier and customer.
+
+Depth is the level of upstream suppliers maintained in the SBOM.  DoC advises an SBOM should contain all primary (top level) components, with all their transitive dependencies listed. At a minimum, all top-level dependencies must be listed with enough detail to seek out the transitive dependencies recursively.
+
+The commercial software supplier is not obligated to make the SBOM publicly available.
+
+SBOM Requirements for O-RAN
+
+The SBOM delivery should be made under contractual agreement with specific terms that include the following items:
+
+REQ-SBOM-001: The O-RAN vendor should provide the SBOM with every O-RAN software delivery, including patches, to the network operator.
+
+REQ-SBOM-002: The minimum set of data fields must be according to NTIA guidance.  Additional fields may be required on a contractual basis.
+
+REQ-SBOM-003: Vulnerabilities must not be included as an additional data field because it would represent a static view from a specific point in time, while vulnerabilities are constantly evolving.
+
+NOTE: The SBOM should be used by vendors and operators to periodically check against known vulnerability databases to identify potential risk.
+
+NOTE: The level of risk for a vulnerability should be determined by the software vendor and operator with consideration of the software product, use case, and network environment.
+
+NOTE: The SBOM provides transparency into the use of open-source software having known vulnerabilities or contributions from individuals or companies in adversarial nations, but it does not protect against zero-day vulnerabilities that were unintentionally or maliciously inserted, exploited, or discovered and not reported.
+
+REQ-SBOM-004: SBOM Depth must be provided at top-level.
+
+REQ-SBOM-005: SBOM depth must be provided to a second-level for O-RAN Software Community (OSC) sourced software to indicate which OSC modules are used and which individual and/or company contributed the software for that module.
+
+REQ-SBOM-006: SBOM depth should be provided to second-level for any used open source software.
+
+REQ-SBOM-007: A hash must be generated for the SBOM.
+
+REQ-SBOM-008: A digital signature must be provided for the SBOM.
+
+REQ-SBOM-009: Access control to the SBOM must be established on a need-to-know basis to limit security risk and protection of intellectual property.  Access controls should be agreed upon between the vendor and operator and contractually specified.
+
+REQ-SBOM-010: The SBOM must be encrypted in transfer and storage.
+
+NOTE: As stated in the DoC/NTIA report, “…some have raised concerns that adversaries could take advantage and target those critical components for novel attacks. Further research is necessary to understand the optimal structure and incentives for sharing, protecting, and using SBOM data."
+
+REQ-SBOM-011: The SBOM must be provided in Software Package Data eXchange (SPDX) [17], CycloneDX [18], or Software Identification (SWID) [19] format.
+
+NOTE: ISO/IEC 5962:2021 - Information technology — SPDX® Specification V2.2.1, published August 2021, specifies SPDX as the standard data format for communicating the component and metadata information associated with SBOM.
+
+Annex A (informative):
+Security Principles mapping to Security Requirements
+
+Table 01: Security Principles mapping to Security Requirements defined in [4].
+
+Components
+
+Interfaces
+
+SP
+
+O-RU
+
+O-DU
+
+O-CU
+
+O-CLOUD
+
+Near RT RIC
+
+Non RT RIC
+
+SMO
+
+FH M-Plane
+
+FH S-Plane
+
+FH CU-Plane
+
+E2
+
+O1
+
+A1
+
+SP-AUTH
+
+REQ-SEC-OCLOUD-1
+
+SP-ACC
+
+SP-CRYPTO
+
+SP-TCOMM
+
+REQ-SEC-O2-1
+
+REQ-SEC-A1-1
+
+SP-SS
+
+SP-SB
+
+SP-UPDT
+
+SP-RECO
+
+SP-OPNS
+
+SP-ASSU
+
+SP-PRV
+
+SP-SLC
+
+SP-ISO
+
+REQ-SEC-OCLOUD-2
+
+SP-PHY
+
+SP-CLD
+
+SP-ROB
+
+Annex B (informative):
+Security: List of 3GPP security requirements
+
+Table 01: References for 3GPP Security requirements
+
+Reference
+
+Title
+
+Version
+
+Date
+
+TS 33.501
+
+Security architecture and procedures for 5G system
+
+17.0.0
+
+16/12/2020
+
+TS 33.511
+
+Security Assurance Specification (SCAS) for the next generation - Node B (gNodeB) network product class
+
+16.5.0
+
+25/09/2020
+
+TS 33.117
+
+Catalogue of general security assurance requirements
+
+16.6.0
+
+16/12/2020
+
+TR 33.818
+
+Security Assurance Methodology (SECAM) and Security Assurance Specification (SCAS) for 3GPP virtualized network products
+
+0.9.2
+
+04/12/2020
+
+TR 33.848
+
+Study on security impacts of virtualisation
+
+0.5.0
+
+02/01/2020
+
+Table 02: 3GPP Security requirements
+
+Item
+
+Title
+
+3GPP Security requirements
+
+3GPP specifications
+
+NESAS/SCAS
+
+gNodeB-specific security functional requirements
+
+#1
+
+Mitigation of bidding down attacks in Xn handovers
+
+An attacker could attempt a bidding down attack by making the UE and the network entities respectively believe that the other side does not support a security feature, even when both sides in fact support that security feature. It shall be ensured that a bidding down attack, in the above sense, can be prevented.
+In the Path-Switch message, the target gNB shall send the UE's 5G security capabilities, UP security policy with corresponding PDU session ID received from the source gNB to the AMF.
+
+TS 33.501 §5.1.1 & §6.7.3.1
+
+TS 33.511 §4.2.2.1.14
+
+#2
+
+Authentication and Authorization
+
+Access network authorization: Assurance shall be provided to the UE that it is connected to an access network that is authorized by the serving network to provide services to the UE. This authorization is 'implicit' in the sense that it is implied by a successful establishment of access network security. This access network authorization applies to all types of access networks.
+
+TS 33.501 §5.1.2
+
+#3
+
+Requirements on gNB related to keys
+
+The gNB shall allow for use of encryption and integrity protection algorithms for AS (Access Stratum) and NAS (Non Access Stratum) protection having keys of length 128 bits. The network interfaces shall support the transport of 256-bit keys. The keys used for UP (User Plane), NAS and AS protection shall be dependent on the algorithm with which they are used.
+
+TS 33.501 §5.1.3
+
+#4
+
+Subscriber privacy
+
+The SUPI should not be transferred in clear text over gNB except routing information, e.g. Mobile Country Code (MCC) and Mobile Network Code (MNC).
+
+TS 33.501 §5.2.5
+
+#5
+
+User data and signalling data confidentiality
+
+The gNB shall support ciphering of user data between the UE and the gNB.
+The gNB shall activate ciphering of user data based on the security policy sent by the SMF.
+The gNB shall support ciphering of RRC-signalling.
+The gNB shall implement the following ciphering algorithms:
+- NEA0, 128-NEA1, 128-NEA2 as defined in Annex D of 3GPP TS 33.501.
+The gNB may implement the following ciphering algorithm:
+- 128-NEA3 as defined in Annex D of 3GPP TS 33.501.
+Confidentiality protection of user data between the UE and the gNB is optional to use.
+Confidentiality protection of the RRC-signalling is optional to use.
+Confidentiality protection should be used whenever regulations permit.
+The PDCP protocol, as specified in TS 38.323 between the UE and the NG-RAN, shall be responsible for user plane data confidentiality protection.
+
+TS 33.501 §5.3.2
+
+TS 33.511 §4.2.2.1.6 & §4.2.2.1.7 & §4.2.2.1.10 & §4.2.2.1.11
+
+#6
+
+User data and signalling data integrity
+
+The gNB shall support integrity protection and replay protection of user data between the UE and the gNB.
+The gNB shall activate integrity protection of user data based on the security policy sent by the SMF.
+The gNB shall support integrity protection and replay protection of RRC-signalling.
+The gNB shall support the following integrity protection algorithms:
+- NIA0, 128-NIA1, 128-NIA2 as defined in Annex D of 3GPP TS 33.501.
+The gNB may support the following integrity protection algorithm:
+- 128-NIA3 as defined in Annex D of 3GPP TS 33.501.
+Integrity protection of the user data between the UE and the gNB is optional to use, and shall not use NIA0.
+All RRC signalling messages except those explicitly listed in TS 38.331 as exceptions shall be integrity-protected with an integrity protection algorithm different from NIA0, except for unauthenticated emergency calls.
+NIA0 shall be disabled in gNB in the deployments where support of unauthenticated emergency session is not a regulatory requirement.
+The PDCP protocol, as specified in TS 38.323 between the UE and the NG-RAN, shall be responsible for user plane data integrity protection.
+
+TS 33.501 §5.3.3
+
+TS 33.511 §4.2.2.1.1 & §4.2.2.1.2 & §4.2.2.1.8 & §4.2.2.1.9
+
+#7
+
+RRC integrity check failure
+
+The RRC integrity checks shall be performed both in the ME and the gNB. In case failed integrity check (i.e. faulty or missing MAC-I) is detected after the start of integrity protection, the concerned message shall be discarded. This can happen on the gNB side or on the ME side.
+
+TS 33.501 §6.5.1
+
+#8
+
+UP integrity check failure
+
+If the gNB or the UE receives a PDCP PDU which fails integrity check with faulty or missing MAC-I after the start of integrity protection, the PDU shall be discarded.
+
+TS 33.501 §6.6.4
+
+#9
+
+Requirements for the gNB setup and configuration
+
+Setting up and configuring gNBs by O&M systems shall be authenticated and authorized by gNB so that attackers shall not be able to modify the gNB settings and software configurations via local or remote access.
+- The certificate enrolment mechanism specified in TS 33.310 for base station should be supported for gNBs. The decision on whether to use the enrolment mechanism is left to operators.
+- Communication between the O&M systems and the gNB shall be confidentiality, integrity and replay protected from unauthorized parties. The security associations between the gNB and an entity in the 5G Core or in an O&M domain trusted by the operator shall be supported. These security association establishments shall be mutually authenticated. The security associations shall be realized according to TS 33.210 and TS 33.310.
+- The gNB shall be able to ensure that software/data change attempts are authorized.
+- The gNB shall use authorized data/software.
+- Sensitive parts of the boot-up process shall be executed with the help of the secure environment.
+- Confidentiality of software transfer towards the gNB shall be ensured.
+- Integrity protection of software transfer towards the gNB shall be ensured.
+- The gNB software update shall be verified before its installation (cf. sub-clause 4.2.3.3.5 of TS 33.117).
+
+TS 33.501 §5.3.4
+
+#10
+
+Requirements for key management inside the gNB
+
+Any part of a gNB deployment that stores or processes keys in cleartext shall be protected from physical attacks. If not, the whole entity is placed in a physically secure location, then keys in cleartext shall be stored and processed in a secure environment. Keys stored inside a secure environment in any part of the gNB shall never leave the secure environment except when done in accordance with 3GPP specifications.
+
+TS 33.501 §5.3.5
+
+#11
+
+Requirements for handling user plane data for the gNB
+
+Any part of a gNB deployment that stores or processes user plane data in cleartext shall be protected from physical attacks. If not, the whole entity is placed in a physically secure location, then user plane data in cleartext shall be stored and processed in a secure environment.
+
+TS 33.501 §5.3.6
+
+#12
+
+Requirements for handling control plane data for the gNB
+
+Any part of a gNB deployment that stores or processes control plane data in cleartext shall be protected from physical attacks. If not, the whole entity is placed in a physically secure location, then control plane data in cleartext shall be stored and processed in a secure environment.
+
+TS 33.501 §5.3.7
+
+#13
+
+Requirements for secure environment of the gNB
+
+The secure environment shall support secure storage of sensitive data, e.g. long-term cryptographic secrets and vital configuration data.
+The secure environment shall support the execution of sensitive functions, e.g. en-/decryption of user data and the basic steps within protocols which use long term secrets (e.g. in authentication protocols).
+The secure environment shall support the execution of sensitive parts of the boot process.
+The secure environment's integrity shall be assured.
+Only authorised access shall be granted to the secure environment, i.e. to data stored and used within it, and to functions executed within it.
+
+TS 33.501 §5.3.8
+
+#14
+
+Requirements for the gNB F1 interfaces
+
+F1-C interface shall support confidentiality, integrity and replay protection.
+All management traffic carried over the CU-DU link shall be integrity, confidentiality and replay protected.
+The gNB shall support confidentiality, integrity and replay protection on the gNB DU-CU F1-U interface for user plane.
+F1-C and management traffic carried over the CU-DU link shall be protected independently from F1-U traffic.
+Security mechanisms
+In order to protect the traffic on the F1-U interface, IPsec ESP and IKEv2 certificates-based authentication shall be supported as specified in sub-clause 9.1.2 of 3GPP TS 33.501 with confidentiality, integrity and replay protection.
+In order to protect the traffic on the F1-C interface, IPsec ESP and IKEv2 certificates-based authentication shall be supported as specified in sub-clause 9.1.2 of 3GPP TS 33.501with confidentiality, integrity and replay protection.
+IPsec is mandatory to implement on the gNB-DU and on the gNB-CU. On the gNB-CU side, a SEG may be used to terminate the IPsec tunnel.
+In addition to IPsec, for the F1-C interface, DTLS shall be supported as specified in RFC 6083 to provide integrity protection, replay protection and confidentiality protection. Security profiles for DTLS implementation and usage shall follow the provisions given in clause 6.2 of TS 33.210.
+
+TS 33.501 §5.3.9 & §9.8.2
+
+#15
+
+Requirements for the gNB E1 interfaces
+
+The E1 interface between CU-CP and CU-UP shall be confidentiality, integrity and replay protected.
+Security mechanisms
+In order to protect the traffic on the E1 interface, IPsec ESP and IKEv2 certificates-based authentication shall be supported as specified in sub-clause 9.1.2 of of 3GPP TS 33.501 with confidentiality, integrity and replay protection.
+In addition to IPsec, DTLS shall be supported as specified in RFC 6083 to provide integrity protection, replay protection and confidentiality protection. Security profiles for DTLS implementation and usage shall follow the provisions given in clause 6.2 of TS 33.210.
+IPsec is mandatory to support on the gNB-CU-UP and the gNB-CU-CP. Observe that on both the gNB-CU-CP and the gNB-CU-UP sides, a SEG may be used to terminate the IPsec tunnel.
+
+TS 33.501 §5.3.10 & §9.8.3
+
+#16
+
+Security mechanisms for the N2/Xn interface
+
+The transport of control plane data and user data over Xn/N2 shall be integrity, confidentiality and replay-protected.
+Security mechanisms
+In order to protect the traffic on the Xn reference point, it is required to implement IPsec ESP and IKEv2 certificate- based authentication as specified in sub-clause 9.1.2 of 3GPP TS 33.501 with confidentiality, integrity and replay protection. IPsec shall be supported on the gNB.
+In addition to IPsec, for the Xn-C interface, DTLS shall be supported as specified in RFC 6083 to provide integrity protection, replay protection and confidentiality protection. Security profiles for DTLS implementation and usage shall follow the provisions given in clause 6.2 of TS 33.210.
+
+TS 33.501 §9.2 & §9.4
+
+TS 33.511 §4.2.2.1.16 & §4.2.2.1.17
+
+#17
+
+AS  algorithms selection
+
+The serving network shall select the algorithms to use dependent on: the UE security capabilities of the UE, the configured allowed list of security capabilities of the currently serving network entity.
+Each gNB shall be configured via network management with lists of algorithms which are allowed for usage. There shall be one list for integrity algorithms, and one for ciphering algorithms. These lists shall be ordered according to a priority decided by the operator.
+
+TS 33.501 §6.7.3.0 & §5.11.2
+
+TS 33.511 §4.2.2.1.12
+
+#18
+
+Key refresh at the gNB
+
+Key refresh shall be possible for KgNB, KRRC-enc, KRRC-int, KUP-int, and KUP-enc and shall be initiated by the gNB when a PDCP COUNTs are about to be re-used with the same Radio Bearer identity and with the same KgNB.
+The network is responsible for avoiding reuse of the COUNT with the same RB identity and with the same key, e.g. due to the transfer of large volumes of data, release and establishment of new RBs, and multiple termination point changes for RLC-UM bearers. In order to avoid such re-use, the network may e.g. use different RB identities for RB establishments, change the AS security key, or an RRC_CONNECTED to RRC_IDLE/RRC_INACTIVE and then to RRC_CONNECTED transition." as specified in TS 38.331 [6], clause 5.3.1.2.
+
+TS 33.501 §6.9.4.1
+TS 38.331 §5.3.1.2
+
+TS 33.511 §4.2.2.1.13
+
+#19
+
+AS protection algorithm selection in gNB change
+
+The target gNB shall select the algorithm with highest priority from the UE's 5G security capabilities according to the locally configured prioritized list of algorithms (this applies for both integrity and ciphering algorithms). The chosen algorithms shall be indicated to the UE in the Handover Command message if the target gNB selects different algorithms compared to the source gNB.
+
+TS 33.501 §6.7.3.1 & §6.7.3.2
+
+TS 33.511 §4.2.2.1.15
+
+#20
+
+Key update at the gNB on dual connectivity
+
+When executing the procedure for adding subsequent radio bearer(s) to the same SN, the MN shall, for each new radio bearer, assign a radio bearer identity that has not previously been used since the last KSN change. If the MN cannot allocate an unused radio bearer identity for a new radio bearer in the SN, due to radio bearer identity space exhaustion, the MN shall increment the SN Counter and compute a fresh KSN, and then shall perform a SN Modification procedure to update the KSN.
+The SN shall request the Master Node to update the KSN over the Xn-C, when uplink and/or downlink PDCP COUNTs are about to wrap around for any of the SCG DRBs or SCG SRB.
+
+TS 33.501 §6.10.2.1 & §6.10.2.2.1
+
+TS 33.511 §4.2.2.1.18
+
+#21
+
+Unauthorized Viewing
+
+When the system is not under maintenance, there shall be no system function that reveals confidential system internal data in the clear to users and administrators. Such functions could be, for example, local or remote OAM CLI or GUI, logging messages, alarms, configuration file exports etc. Confidential system internal data contains authentication data (i.e. PINs, cryptographic keys, passwords, cookies) as well as system internal data that is not required for systems administration and could be of advantage to attackers (i.e. stack traces in error messages).
+
+TS 33.511 §4.2.3.2.2
+TS 33.117 §4.2.3.2.2
+
+#22
+
+Protecting data and information in storage
+
+For sensitive data in (persistent or temporary) storage read access rights shall be restricted. Files of a system that are needed for the functionality shall be protected against manipulation.
+In addition, the following rules apply for:
+- Systems that need access to identification and authentication data in the clear, e.g. in order to perform an authentication. Such systems shall not store this data in the clear, but scramble or encrypt it by implementation-specific means.
+- Systems that do not need access to sensitive data (e.g. user passwords) in the clear. Such systems shall hash this sensitive data.
+- Stored files on the network product: examples for protection against manipulation are the use of checksum or cryptographic methods.
+
+TS 33.511 §4.2.3.2.3
+TS 33.117 §4.2.3.2.3
+
+#23
+
+Protecting data and information in transfer
+
+Usage of cryptographically protected network protocols is required.
+The transmission of data with a need of protection shall use industry standard network protocols with sufficient security measures and industry accepted algorithms. In particular, a protocol version without known vulnerabilities or a secure alternative shall be used.
+
+TS 33.511 §4.2.3.2.4
+TS 33.117 §4.2.3.2.4
+
+#24
+
+System handling during overload situations
+
+The system shall provide security measures to deal with overload situations which may occur as a result of a denial of service attack or during periods of increased traffic, or reach the congestion threshold. In particular, partial or complete impairment of system availability shall be avoided. Potential protective measures include:
+- Restricting available RAM per application.
+- Restricting maximum sessions for a Web application.
+- Defining the maximum size of a dataset.
+- Restricting CPU resources per process.
+- Prioritizing processes.
+- Overload control method, e.g. limiting amount or size of transactions of a user or from an IP address in a specific time range.
+
+TS 33.511 §4.2.3.3
+TS 33.117 §4.2.3.3.1
+
+#25
+
+Boot from intended memory devices only
+
+The network product can boot only from the memory devices intended for this purpose.
+
+TS 33.511 §4.2.3.3
+TS 33.117 §4.2.3.3.2
+
+#26
+
+System handling during excessive overload situations
+
+The system shall act in a predictable way if an overload situation cannot be prevented. A system shall be built in this way that it can react on an overload situation in a controlled way. However, it is possible that a situation happens where the security measures are no longer sufficient.
+In such case it shall be ensured that the system cannot reach an undefined and thus potentially insecure state. In an extreme case this means that a controlled system shutdown is preferable to uncontrolled failure of the security functions and thus loss of system protection.
+The vendor shall provide a technical description of the network product's Over Load Control mechanisms (especially whether these mechanisms rely on cooperation of other network elements e.g. eNode B) and the accompanying test case for this requirement will check that the description provides sufficient detail in order for an evaluator to understand how the mechanism is designed.
+
+TS 33.511 §4.2.3.3
+TS 33.117 §4.2.3.3.3
+
+#27
+
+System robustness against unexpected input
+
+During transmission of data to a system it is necessary to validate input to the network product before processing. This includes all data which is sent to the system. Examples of this are user input, values in arrays and content in protocols. The following typical implementation error shall be avoided:
+- No validation on the lengths of transferred data
+- Incorrect assumptions about data formats
+- No validation that received data complies with the specification
+- Insufficient handling of protocol errors in received data
+- Insufficient restriction on recursion when parsing complex data formats
+- White listing or escaping for inputs outside the values margin
+
+TS 33.511 §4.2.3.3
+TS 33.117 §4.2.3.3.4
+
+#28
+
+Network product Software integrity validation
+
+1) Software package integrity shall be validated in the installation/upgrade stage.
+2) Network product shall support software package integrity validation via cryptographic means, e.g. digital signature. To this end, the network product has a list of public keys or certificates of authorised software sources, and uses the keys to verify that the software update is originated from only these sources.
+3) Tampered software shall not be executed or installed if integrity check fails.
+4) A security mechanism is required to guarantee that only authorized individuals can initiate and deploy a software update, and modify the list mentioned in bullet 2.
+
+TS 33.511 §4.2.3.3
+TS 33.117 §4.2.3.3.5
+
+#29
+
+System functions shall not be used or accessed without successful authentication and authorization
+
+The usage of a system function without successful authentication on basis of the user identity and at least one authentication attribute (e.g. password, certificate) shall be prevented. System functions comprise, for example network services (like SSH, SFTP, Web services), local access via a management console, local usage of operating system and applications. This requirement shall also be applied to accounts that are only used for communication between systems. An exception to the authentication and authorization requirement are functions for public use such as those for a Web server on the Internet, via which information is made available to the public.
+
+TS 33.117 §4.2.3.4.1.1
+
+#30
+
+The network product shall use accounts that allow unambiguous identification of the user
+
+Users shall be identified unambiguously by the network product. The network product shall support assignment of individual accounts per user, where a user could be a person, or, for Machine Accounts, an application, or a system. The network product shall not enable the use of group accounts or group credentials, or sharing of the same account between several users, by default. The network product shall support a minimum number of 50 individual accounts per user data base if not explicitly specified in a SCAS of a particular network product, so that accountability for each user is ensured even in large operator networks. The network product shall not support user access credentials unrelated to an account.
+NOTE: The network product may support independent user data bases for different access methods, e.g. one data base for command shell access on OS level and another data base for GUI access. User data bases may be stored locally on the network product or on a central AAA system that the network product accesses for user authentication.
+
+TS 33.117 §4.2.3.4.1.2
+
+#31
+
+Account protection by at least one authentication attribute
+
+The various user and machine accounts on a system shall be protected from misuse. To this end, an authentication attribute is typically used, which, when combined with the user name, enables unambiguous authentication and identification of the authorized user.
+Authentication attributes include:
+- Cryptographic keys
+- Token
+- Passwords
+This means that authentication based on a parameter that can be spoofed (e.g. phone numbers, public IP addresses or VPN membership) is not permitted. Exceptions are attributes that cannot be faked or spoofed by an attacker.
+
+TS 33.511 §4.2.3.4.1
+TS 33.117 §4.2.3.4.2.1
+
+#32
+
+Predefined accounts shall be deleted or disabled
+
+All predefined or default accounts shall be deleted or disabled. Many systems have default accounts (e.g. guest, ctxsys), some of which are preconfigured with or without known passwords. These standard users shall be deleted or disabled. Should this measure not be possible the accounts shall be locked for remote login. In any case disabled or locked accounts shall be configured with a complex password as specified in clause 4.2.3.4.3.1 Password Structure of TS 33.117. This is necessary to prevent unauthorized use of such an account in case of misconfiguration.
+Exceptions to this requirement to delete or disable accounts are accounts that are used only internally on the system involved and that are required for one or more applications on the system to function. Also, for these accounts remote access or local login shall be forbidden to prevent abusive use by users of the system.
+
+TS 33.511 §4.2.3.4.1
+TS 33.117 §4.2.3.4.2.2
+
+#33
+
+Predefined or default authentication attributes shall be deleted or disabled
+
+Normally, authentication attributes such as password or cryptographic keys will be preconfigured from producer, vendor or developer of a system. Such authentication attributes shall be changed by automatically forcing a user to change it on 1st time login to the system or the vendor provides instructions on how to manually change it.
+
+TS 33.511 §4.2.3.4.1
+TS 33.117 §4.2.3.4.2.3
+
+#34
+
+Password Complexity rule
+
+The setting by the vendor shall be such that a network product shall only accept passwords that comply with the following complexity criteria:
+1) Absolute minimum length of 8 characters (shorter lengths shall be rejected by the network product). It shall not be possible setting this absolute minimum length to a lower value by configuration.
+2) Comprising at least three of the following categories:
+- at least 1 uppercase character (A-Z)
+- at least 1 lowercase character (a-z)
+- at least 1 digit (0-9)
+- at least 1 special character (e.g. @;!$.)
+The network product shall use a default minimum length of 10 characters. The minimum length of characters in the passwords shall be configurable by the operator. The default minimum length is the value configured by the vendor before any operator-specific configuration has been applied. The special characters may be categorized in sets according to their Unicode category.
+The network product shall at least support passwords of a length of 64 characters or a length greater than 64 characters.
+If a central system is used for user authentication, password policy is performed on the central system and additional assurance shall be provided that the central system enforces the same password complexity rules as laid down for the local system in this subclause. If a central system is not used for user authentication, the assurance on password complexity rules shall be performed on the Network Product.
+When a user is changing a password or entering a new password, the system checks and ensures that it meets the password requirements. Above requirements shall be applicable for all passwords used (e.g. application-level, OS-level, etc.).
+
+TS 33.117 §4.2.3.4.3.1
+
+#35
+
+Password changes
+
+If a password is used as an authentication attribute, then the system shall offer a function that enables a user to change his password at any time. When an external centralized system for user authentication is used it is possible to redirect or implement this function on this system.
+Password change shall be enforced after initial login.
+The system shall enforce password change based on password management policy. In particular, the system shall enforce password expiry.
+Previously used passwords shall not be allowed up to a certain number (Password History).
+The number of disallowed previously used passwords shall be:
+- Configurable;
+- Greater than 0;
+- And its default value shall be 3. This means that the network product shall store at least the three previously set passwords. The maximum number of passwords that the network product can store for each user is up to the manufacturer.
+When a password is about to expire a password expiry notification shall be provided to the user.
+Above requirements shall be applicable for all passwords used (e.g. application-level, OS-level, etc.). An exception to this requirement is machine accounts.
+
+TS 33.117 §4.2.3.4.3.2
+
+#36
+
+Protection against brute force and dictionary attacks
+
+If a password is used as an authentication attribute, a protection against brute force and dictionary attacks that hinder password guessing shall be implemented.
+Brute force and dictionary attacks aim to use automated guessing to ascertain passwords for user and machine accounts. Various measures or a combination of these measures can be taken to prevent this.
+The most commonly used protection measures are:
+1) Using the timer delay (this delay could be the same or increased depending the operator's policy for each attempt, e.g. double the delay, or 5 minutes delay, or 10 minutes delay) for each newly entered password input following an incorrect entry ("tar pit").
+2) Blocking an account following a specified number of incorrect attempts, refer to 4.2.3.4.5 of TS 33.117. However, it has to be taken into account that this solution needs a process for unlocking and an attacker can force this to deactivate accounts and make them unusable.
+3) Using CAPTCHA to prevent automated attempts (often used for Web applications).
+4) Using a password blacklist to prevent vulnerable passwords.
+NOTE: Password management and blacklist configuration may be done in a separate node that is different to the node under test, e.g. a SSO server or any other central credential manager.
+In order to achieve higher security, it is often meaningful to combine two or more of the measures named here. It is left to the vendor to select appropriate measures.
+Above requirements shall be applicable for all passwords used (e.g. application-level, OS-level, etc.). An exception to this requirement is machine accounts.
+
+TS 33.117 §4.2.3.4.3.3
+
+#37
+
+Hiding password display
+
+The password shall not be displayed in such a way that it could be seen and misused by a casual local observer. Typically, the individual characters of the password are replaced by a character such as "*". Under certain circumstances it may be permissible for an individual character to be displayed briefly during input. Such a function is used, for ex ample, on smartphones to make input easier. However, the entire password is never output to the display in plaintext.
+Above requirements shall be applicable for all passwords used (e.g. application-level, OS-level, etc.). An exception to this requirement is machine accounts.
+
+TS 33.117 §4.2.3.4.3.4
+
+#38
+
+Network Product Management and Maintenance interfaces
+
+The network product management shall support mutual authentication mechanisms, the mutual authentication mechanism can rely on the protocol used for the interface itself or other means.
+
+TS 33.117 §4.2.3.4.4.1
+
+#39
+
+Policy regarding consecutive failed login attempts
+
+a) The maximum permissible number of consecutive failed user account login attempts should be configurable by the operator. The definition of the default value set at manufacturing time for maximum number of failed user account login attempts shall be less than or equal to 8, typically 5. After the maximum permissible number of consecutive failed user account login attempts is exceeded by a user there shall be a block delay in allowing the user to attempt login again. This block delay and also the capability to set period of the block delay, e.g. double the delay, or 5 minutes delay, or 10 minutes delay, after each login failure should be configurable by the operator. The default value set at manufacturing time for this delay shall be greater than or equal to 5 sec.
+b) If supported, infinite (permanent) locking of an account that has exceeded maximum permissible number of consecutive failed user account login attempts should also be possible via configuration, with the exception of administrative accounts which shall get only temporarily locked.
+
+TS 33.117 §4.2.3.4.5
+
+#40
+
+Authorization policy
+
+The authorizations for accounts and applications shall be reduced to the minimum required for the tasks they have to perform.
+Authorizations to a system shall be restricted to a level in which a user can only access data and use functions that he needs in the course of his work. Suitable authorizations shall also be assigned for access to files that are components of the operating system or of applications or that are generated by the same (e.g. configuration and logging files).
+Alongside access to data, execution of applications and components shall also take place with rights that are as low as possible. Applications should not be executed with administrator or system rights.
+
+TS 33.117 §4.2.3.4.6.1
+
+#41
+
+Role-based access control
+
+The network product shall support Role Based Access Control (RBAC). A role-based access control system uses a set of controls which determines how users interact with domains and resources. The domains could be Fault Management (FM), Performance Management (PM), System Admin, etc. The RBAC system controls how users or groups of users are allowed access to the various domains and what type of operation they can perform, i.e. the specific operation command or command group (e.g. View, Modify, Execute).
+The network product supports RBAC, in particular, for OAM privilege management for network product Management and Maintenance, including authorization of the operation for configuration data and software via the network product console interface.
+
+TS 33.117 §4.2.3.4.6.2
+
+#42
+
+Protecting sessions – logout function
+
+The system shall have a function that allows a signed in user to logout at any time. All processes under the logged in user ID shall be terminated on log out. The network product shall be able to continue to operate without interactive sessions.
+Only for debugging purposes, processes under a logged in user ID may be allowed to continue to run after detaching the interactive session.
+
+TS 33.511 §4.2.3.5
+TS 33.117 §4.2.3.5.1
+
+#43
+
+Protecting sessions – inactivity timeout
+
+An OAM user interactive session shall be terminated automatically after a specified period of inactivity. It shall be possible to configure an inactivity time-out period.
+NOTE: The kind of activity required to reset the timeout timer depends on the type of user session.
+
+TS 33.511 §4.2.3.5
+TS 33.117 §4.2.3.5.2
+
+#44
+
+Security event logging
+
+Security events shall be logged together with a unique system reference (e.g. host name, IP or MAC address) and the exact time the incident occurred. For each security event, the log entry shall include user name and/or timestamp and/or performed action and/or result and/or length of session and/or values exceeded and/or value reached.
+IETF RFC 3871, section 2.11.10 specifies the minimum set of security events. Each vendor shall document what security events the product logs so that it can be verified by testing.
+
+TS 33.511 §4.2.3.6
+TS 33.117 §4.2.3.6.1
+
+#45
+
+Log transfer to centralized storage
+
+a) The Network Product shall support forwarding of security event logging data to an external system. Secure transport protocols in accordance with clause 4.2.3.2.4 of TS 33.117, shall be used.
+b) Log functions should support secure uploading of log files to a central location or to an external system for the Network Product that is logging.
+
+TS 33.511 §4.2.3.6
+TS 33.117 §4.2.3.6.2
+
+#46
+
+Protection of security event log files
+
+The security event log shall be access controlled (file access rights) so only privileged users have access to the log files.
+
+TS 33.511 §4.2.3.6
+TS 33.117 §4.2.3.6.3
+
+#47
+
+Growing (dynamic) content shall not influence system functions
+
+Growing or dynamic content (e.g. log files, uploads) shall not influence system functions. A file system that reaches its maximum capacity shall not stop a system from operating properly. Therefore, countermeasures shall be taken such as usage of dedicated filesystems, separated from main system functions, or quotas, or at least a file system monitoring to ensure that this scenario is avoided.
+
+TS 33.511 §4.2.4
+TS 33.117 §4.2.4.1.1.1
+
+#48
+
+Processing of ICMPv4 and ICMPv6 packets
+
+Processing of ICMPv4 and ICMPv6 packets which are not required for operation shall be disabled on the network product. In particular, there are certain types of ICMP4 and ICMPv6 that are not used in most networks, but represent a risk.
+ICMP message types which on receipt lead to responses or to configuration changes are not mentioned in this requirement, but they may be necessary to support relevant and specified networking features. Those must be documented.
+Certain ICMP types are generally permitted and do not need to be specifically documented. Those are marked as "Permitted" in below table.
+The network product shall not send certain ICMP types by default, but it may support the option to enable utilization of these types (e.g. for debugging).
+Echo Reply can be sent by default.
+In case of remote base station auto deployment, Router Advertisement can be processed.
+
+TS 33.511 §4.2.4
+TS 33.117 §4.2.4.1.1.2
+
+#49
+
+IP packets with unnecessary options or extension headers shall not be processed
+
+IP packets with unnecessary options or extension headers shall not be processed. IP options and extension headers (e.g. source routing) are only required in exceptional cases. So, all packets with enabled IP options or extension headers shall be filtered.
+
+TS 33.511 §4.2.4
+TS 33.117 §4.2.4.1.1.3
+
+#50
+
+Authenticated Privilege Escalation only
+
+There shall not be a privilege escalation method in interactive sessions (CLI or GUI) which allows a user to gain administrator/root privileges from another user account without re-authentication. Implementation example: Disable insecure privilege escalation methods so that users are required to (re-)login directly into the account with the required permissions.
+
+TS 33.511 §4.2.4
+TS 33.117 §4.2.4.1.2.1
+
+#51
+
+System account identification
+
+Each system account in UNIX® shall have a unique UID.
+
+TS 33.511 §4.2.4
+TS 33.117 §4.2.4.2.2
+
+#52
+
+HTTPS
+
+The communication between Web client and Web server shall be protected using TLS. The TLS profile defined in Annex E of TS 33.310 shall be followed with the following modifications: Cipher suites with NULL encryption shall not be supported
+
+TS 33.511 §4.2.5
+TS 33.117 §4.2.5.1
+
+#53
+
+Webserver logging
+
+Access to the webserver shall be logged. The web server log shall contain the following information:
+- Access timestamp
+- Source (IP address)
+- (Optional) Account (if known)
+- (Optional) Attempted login name (if the associated account does not exist)
+- Relevant fields in http request. The URL should be included whenever possible.
+- Status code of web server response
+
+TS 33.511 §4.2.5
+TS 33.117 §4.2.5.2.1
+
+#54
+
+User sessions
+
+To protect user sessions the Network Product shall support the following session ID and session cookie requirements:
+1. The session ID shall uniquely identify the user and distinguish the session from all other active sessions.
+2. The session ID shall be unpredictable.
+3. The session ID shall not contain sensitive information in clear text (e.g. account number, social security, etc.).
+4. In addition to the Session Idle Timeout (see clause 4.2.3.5.2 Protecting sessions – Inactivity timeout of TS 33.117), the Network Product shall automatically terminate sessions after a configurable maximum lifetime This maximum lifetime defines the maximum session span. When the maximum lifetime expires, the session shall be closed, the session ID shall be deleted and the user shall be forced to (re)authenticate in the web application and to establish a new session. The default value for this maximum lifetime shall be set to 8 hours.
+5. Session ID's shall be regenerated for each new session (e.g. each time a user log in).
+6. The session ID shall not be reused or renewed in subsequent sessions.
+7. The Network Product shall not use persistent cookies to manage sessions but only session cookies. This means that neither the "expire" nor the "max-age" attribute shall be set in the cookies.
+8. Where session cookies are used the attribute 'HttpOnly' shall be set to true.
+9. Where session cookies are used the 'domain' attribute shall be set to ensure that the cookie can only be sent to the specified domain.
+10. Where session cookies are used the 'path' attribute shall be set to ensure that the cookie can only be sent to the specified directory or sub-directory.
+11. The Network Product shall not accept session identifiers from GET/POST variables.
+12. The Network Product shall be configured to only accept server generated session ID's.
+
+TS 33.511 §4.2.5
+TS 33.117 §4.2.5.3
+
+#55
+
+HTTP input validation
+
+The Network Product shall have a mechanism in place to ensure that web application inputs are not vulnerable to command injection or cross-site scripting attacks. The Network Product shall validate, filter, escape, and encode user-controllable input before it is placed in output that is used as a web page that is served to other users.
+
+TS 33.511 §4.2.5
+TS 33.117 §4.2.5.4
+
+#56
+
+Packet filtering
+
+The Network Product shall provide a mechanism to filter incoming IP packets on any IP interface (see RFC 3871 for further information).
+In particular the Network Product shall provide a mechanism:
+1) To filter incoming IP packets on any IP interface at Network Layer .and Transport Layer of the stack ISO/OSI.
+2) To allow specified actions to be taken when a filter rule matches. In particular at least the following actions should be supported:
+a. Discard/Drop: the matching message is discarded; no subsequent rules are applied and no answer is sent back.
+b. Accept: the matching message is accepted.
+c. Account: the matching message is accounted for i.e. a counter for the rule is incremented. This action can be combined with the previous ones. This feature is useful to monitor traffic before its blocking.
+3) To enable/disable for each rule the logging for Dropped packets, i.e. details on messages matching the rule for troubleshooting.
+4) To filter on the basis of the value(s) of any portion of the protocol header.
+5) To reset the accounting.
+6) The Network Product shall provide a mechanism to disable/enable each defined rule.
+
+TS 33.511 §4.2.6.2.1
+TS 33.117 §4.2.6.2.1
+
+#57
+
+Manipulated packets that are sent to an address of the network device shall not lead to an impairment of availability
+
+A network device shall be not affected in its availability or robustness by incoming packets, from other network element, that are manipulated or differing the norm. This means that appropriate packets shall be detected as invalid and be discarded. The process shall not be affecting the performance of the network device. This robustness shall be just as effective for a great mass of invalid packets as for individual or a small number of packets.
+Examples of such packets are:
+- Mass-produced TCP packets with a set SYN flag to produce half-open TCP connections (SYN flooding attack).
+- Packets with the same IP sender address and IP recipient address (Land attack).
+- Mass-produced ICMP packets with the broadcast address of a network as target address (Smurf attack).
+- Fragmented IP packets with overlapping offset fields (Teardrop attack).
+- ICMP packets that are larger than the maximum permitted size (65,535 Bytes) of IPv4 packets (Ping-of-death attack).
+- Uncorrelated reply packets (i.e. packets which cannot be correlated to any request).
+Sometimes the relevant behaviour of the network device will be configured. In other cases, the behaviour of the network device may only be verified by the relevant tests.
+
+TS 33.511 §4.2.6.2.2
+TS 33.117 §4.2.6.2.2
+
+#58
+
+GTP-U Filtering
+
+The following capability is conditionally required:
+- For each message of a GTP-U-based protocol, it shall be possible to check whether the sender of this message is authorized to send a message pertaining to this protocol.
+NOTE: The check could be performed e.g. against a whitelist or blacklist of permitted message type / sender identity combinations.
+- At least the following actions should be supported when the check is satisfied:
+- Discard: the matching message is discarded.
+- Accept: the matching message is accepted.
+- Account: the matching message is accounted for, i.e. a counter for the rule is incremented. This action can be combined with the previous ones. This feature is useful to monitor traffic before its blocking.
+This requirement is conditional in the following sense: It is required that at least one of the following two statements holds:
+- The Network Product supports the capability described above and this is stated in the product documentation.
+- The Network Product's product documentation states that the capability is not supported and that the Network Product needs to be deployed together with a separate entity which provides the capability described above.
+NOTE : Such a separate entity could e.g. be a GTP Firewall.
+NOTE: Test cases for this separate entity are not provided in the present document, but are believed to be similar to them.
+NOTE: The test cases are only applicable to all network product classes utilizing GTP-U based protocol.
+
+TS 33.511 §4.2.6.2.4
+TS 33.117 §4.2.6.2.4
+
+gNodeB-specific security hardening requirements
+
+Technical Baseline
+
+#59
+
+No unnecessary or insecure services / protocols
+
+The network product shall only run protocol handlers and services which are needed for its operation, and which do not have any known security vulnerabilities.
+
+TS 33.117 §4.3.2.1
+
+#60
+
+Restricted reachability of services
+
+The network product shall restrict the reachability of services so that they can only be reached on interfaces where their usage is required. On interfaces were services are active, the reachability should be limited to legitimate communication peers.
+
+TS 33.117 §4.3.2.2
+
+#61
+
+No unused software
+
+Unused software components or parts of software which are not needed for operation or functionality of the network product shall not be installed or shall be deleted after installation.
+
+TS 33.117 §4.3.2.3
+
+#62
+
+No unused functions
+
+During installation of software and hardware often functions will be activated that are not required for operation or function of the system.
+Also, hardware functions which are not required for operation or function of the system (e.g. unused interfaces) shall be permanently deactivated. Permanently means that they shall not be reactivated again after network product reboot.
+EXAMPLE: A debugging function in software which can be used for troubleshooting shall not be activated during normal operation of the network product.
+
+TS 33.117 §4.3.2.4
+
+#63
+
+No unsupported components
+
+The network product shall not contain software and hardware components that are no longer supported by their vendor, producer or developer, such as components that have reached end-of-life or end-of-support. Excluded are components that have a special support contract. This contract shall guarantee the correction of vulnerabilities over components' lifetime.
+
+TS 33.117 §4.3.2.5
+
+#64
+
+Remote login restrictions for privileged users
+
+Direct login as root or equivalent highest privileged user shall be limited to the system console only. Root user will not be allowed to login to the system remotely.
+
+TS 33.117 §4.3.2.6
+
+#65
+
+Filesystem Authorization privileges
+
+The system shall be designed to ensure that only users that are authorized to modify files, data, directories or file systems have the necessary privileges to do so.
+EXAMPLE: On unix® systems a 'sticky' bit may be set on all directories where all users have written permissions. This ensures that only the file's owner, the directory's owner, or root user can rename or delete the file. Without the sticky bit being set, any user that has write and execute permissions for the directory can rename or delete files within the directory, regardless of the file's owner.
+
+TS 33.117 §4.3.2.7
+
+Operating Systems
+
+#66
+
+IP-Source address spoofing mitigation
+
+Systems shall not process IP packets if their source address is not reachable via the incoming interface. Implementation example: Use of "Reverse Path Filter" (RPF) provides this function.
+
+TS 33.117 §4.3.3.1.1
+
+#67
+
+Minimized kernel network functions
+
+Kernel based network functions not needed for the operation of the network element shall be deactivated.
+In particular the following ones shall be disabled by default:
+- IP Packet Forwarding between different interfaces of the network product.
+
+TS 33.117 §4.3.3.1.2
+
+#68
+
+No automatic launch of removable media
+
+The network product shall not automatically launch any application when removable media device such as CD-, DVD-, USB-Sticks or USB-Storage drive is connected. If the operating system supports an automatic launch, it shall be deactivated unless it is required to support availability requirements.
+
+TS 33.117 §4.3.3.1.3
+
+#69
+
+Syn Flood Prevention
+
+The network product shall support a mechanism to prevent Syn Flood attacks (e.g. implement the TCP Syn Cookie technique in the TCP stack by setting net.ipv4.tcp_syncookies = 1 in the linux sysctl.conf file). This feature shall be enabled by default.
+
+TS 33.117 §4.3.3.1.4
+
+#70
+
+Protection mechanisms against buffer overflows
+
+The system shall support mechanisms for buffer overflow protection. Documentation which describes these buffer overflow mechanisms and also how to check that they have been enabled and/or implemented shall be provided.
+
+TS 33.117 §4.3.3.1.5
+
+#71
+
+External file system mount restrictions
+
+If normal users are allowed to mount external file systems (attached locally or via the network), OS-level restrictions shall be set properly in order to prevent privilege escalation or extended access permissions due to the contents of the mounted file systems.
+Implementation example: In Linux® systems, administrators shall set the options nodev and nosuid in the /etc/fstab for all filesystems, which also have the "user" option.
+
+TS 33.117 §4.3.3.1.6
+
+Web Servers
+
+#72
+
+No system privileges for web server
+
+No web server processes shall run with system privileges. This is best achieved if the web server runs under an account that has minimum privileges. If a process is started by a user with system privileges, execution shall be transferred to a different user without system privileges after the start.
+
+TS 33.117 §4.3.4.2
+
+#73
+
+Unused HTTP methods shall be deactivated
+
+HTTP methods that are not required shall be deactivated. Standard requests to web servers only use GET, HEAD, and POST. If other methods are required, they shall not introduce security leaks such as TRACK or TRACE.
+
+TS 33.117 §4.3.4.3
+
+#74
+
+Any add-ons and components that are not required shall be deactivated
+
+All optional add-ons and components of the web server shall be deactivated if they are not required. In particular, CGI or other scripting components, Server Side Includes (SSI), and WebDAV shall be deactivated if they are not required.
+
+TS 33.117 §4.3.4.4
+
+#75
+
+No compiler, interpreter, or shell via CGI or other server-side scripting
+
+If CGI (Common Gateway Interface) or other scripting technology is used, the CGI directory - or other corresponding scripting directory - shall not include compilers or interpreters (e.g. PERL interpreter, PHP interpreter/compiler, Tcl interpreter/compiler or operating system shells).
+
+TS 33.117 §4.3.4.5
+
+#76
+
+No CGI or other scripting for uploads
+
+If CGI or other scripting technology is used, the associated CGI/script directory shall not be used for uploads.
+
+TS 33.117 §4.3.4.6
+
+#77
+
+No execution of system commands with SSI
+
+If Server Side Includes (SSI) is active, the execution of system commands shall be deactivated.
+
+TS 33.117 §4.3.4.7
+
+#78
+
+Access rights for web server configuration files shall only be granted to the owner of the web server process or to a user with system privileges
+
+Access rights for web server configuration files shall only be granted to the owner of the web server process or to a user with system privileges. Implementation example: Delete "read" and "write" access rights for "others." Only grant "write" access to the user who configures the web server.
+
+TS 33.117 §4.3.4.8
+
+#79
+
+Default content shall be removed
+
+Default content (examples, help files, documentation, aliases) that is provided with the standard installation of the web server shall be removed.
+
+TS 33.117 §4.3.4.9
+
+#80
+
+No directory listings / Directory Browsing
+
+Directory listings (indexing) / "Directory browsing" shall be deactivated.
+
+TS 33.117 §4.3.4.10
+
+#81
+
+Information about the web server in HTTP headers shall be minimized
+
+The HTTP header shall not include information on the version of the web server and the modules/add-ons used.
+
+TS 33.117 §4.3.4.11
+
+#82
+
+Web server information in error pages shall be deleted
+
+User-defined error pages shall not include version information about the web server and the modules/add-ons used. Error messages shall not include internal information such as internal server names, error codes, etc. Default error pages of the web server shall be replaced by error pages defined by the vendor.
+
+TS 33.117 §4.3.4.12
+
+#83
+
+File type- or script-mappings that are not required shall be deleted
+
+File type- or script-mappings that are not required shall be deleted, e.g. php, phtml, js, sh, csh, bin, exe, pl, vbe, vbs.
+
+TS 33.117 §4.3.4.13
+
+#84
+
+The web server shall only deliver files which are meant to be delivered
+
+Restrictive access rights shall be assigned to all files which are directly or indirectly (e.g. via links or in virtual directories) in the web server's document directory. In particular, the web server shall not be able to access files which are not meant to be delivered.
+
+TS 33.117 §4.3.4.14
+
+#85
+
+Only execute rights in CGI/Scripting directory
+
+If CGI or other scripting technology is used, only the CGI/Scripting directory is configured with execute rights. Other directories used or meant for web content do not have execute rights.
+
+TS 33.117 §4.3.4.15
+
+Network Devices
+
+#86
+
+Traffic Separation
+
+The network product shall support physical or logical separation of traffic belonging to different network domains. For example, O&M traffic and control plane traffic belong to different network domains. See RFC 3871 for further information.
+
+TS 33.117 §4.3.5.1
+
+Basic vulnerability testing requirements
+
+#87
+
+Port scanning
+
+It shall be ensured that on all network interfaces, only documented ports on the transport layer respond to requests from outside the system.
+
+TS 33.117 §4.4.2
+
+#88
+
+Vulnerability scanning
+
+The purpose of vulnerability scanning is to ensure that there are no known vulnerabilities (or that relevant vulnerabilities are identified and remediation plans in place to mitigate them) on the Network Product, both in the OS and in the applications installed, that can be detected by means of automatic testing tools via the Internet Protocol enabled network interfaces.
+Vulnerability scanning tools may also report false positives and they shall be investigated and documented in the test report.
+
+TS 33.117 §4.4.3
+
+#89
+
+Robustness and fuzz testing
+
+It shall be ensured that externally reachable services are reasonably robust when receiving unexpected input.
+
+TS 33.117 §4.4.4
+
+Virtualization
+
+#90
+
+VNF package and VNF image integrity
+
+1) VNF package and image shall contain integrity validation value (e.g. MAC).
+2) VNF package shall be integrity protected during onboarding and its integrity shall be validated by the NFVO.
+
+TR 33.818 §5.2.5.5.3.3.5.1
+TR 33.848 §5.18.3
+
+#91
+
+GVNP lifecycle management security
+
+1) VNF shall authenticate VNFM when VNFM initiates a communication to VNF.
+2) VNF shall be able to establish securely protected connection with the VNFM.
+3) VNF shall check whether VNFM has been authorized when VNFM access VNF's API.
+4) VNF shall log VNFM's management operations for auditing.
+
+TR 33.818 §5.2.5.5.7.1
+
+#92
+
+Secure executive environment provision
+
+The VNF shall support to compare the owned resource state with the parsed resource state from VNFD (VNF Description) by the VNFM. The VNF can query the parsed resource state by the VNFM from the OAM. The VNF shall send an alarm to the OAM if the two resource states are inconsistent. This comparing process can be triggered periodically by the VNF, or the administrator can manually trigger the VNF to perform the comparing process.
+
+TR 33.818 §5.2.5.5.7.2
+
+#93
+
+Traffic Separation
+
+The virtualised network product shall support logical separation of traffic belonging to different network domains. For example, O&M traffic and control plane traffic belong to different network domains. See RFC 3871 for further information.
+
+TR 33.818 §5.2.5.5.8.5.1
+TS 33.117 §4.3.5.1
+
+#94
+
+Inter-VNF and intra-VNF Traffic Separation
+
+The network used for the communication between the VNFCs of a VNF (intra-VNF traffic) and the network used for the communication between VNFs (inter-VNF traffic) shall be separated to prevent the security threats from the different networks affect each other.
+
+TR 33.818 §5.2.5.5.8.5.2
+
+#95
+
+Instantiating VNF from trusted VNF image
+
+A VNF shall be initiated from a trusted VNF image which includes one or more than one images. The VNF image shall be signed by an authorized party. The authorized party is trusted by the operators.
+
+TR 33.818 §5.2.5.6.6.1
+TR 33.848 §5.18.3
+
+#96
+
+Secure virtualisation resource management
+
+To prevent a compromised VIM from changing the assigned virtualised resource, the VNF shall alert to the OAM. For example, when an instantiated VNF is running, a compromised VIM can delete a VM which is running VNFCI, the VNF shall alert to the OAM when the VNF cannot detect a VNFC message.
+A VNF shall log the access from the VIM.
+NOTE: The VIM manages the virtualisation resource assignment and synchronization of virtualised resource state information. In the implementation, the VIM and the virtualisation layer are coupled and provided by one vendor, they trust each other. Whether the VIM is trust or not is based on operator's decision.
+
+TR 33.818 §5.2.5.6.7.1
+
+#97
+
+Secure executive environment creation
+
+When an attacker tampers a driver which provided by the hardware and used to create the executive environment, the virtualisation layer shall alert the driver error to the administrator for checking the error and finding the attack at latter.
+NOTE: Whether the hardware is trust or not is based on operator's decision to ensure the virtualisation layer and the VNF to be run on the trusted hardware.
+
+TR 33.818 §5.2.5.6.7.2
+
+#98
+
+VM escape protection
+
+To defence the attack that an attacker utilizes a vulnerability of a VNF to attack a virtualisation layer and then control the virtualisation layer, the virtualisation layer shall implement the following requirements:
+The virtualisation shall reject the abnormal access from the VNF (e.g. the VNF accesses the memory which is not allocated to the VNF) and log the attacks.
+
+TR 33.818 §5.2.5.6.7.3
+
+#99
+
+Secure hardware resource management
+
+The VIM manages the hardware resource configuration and state information exchange. When the VIM is compromised to change the hardware resource configuration, an alert shall be triggered by the hardware. The administrator can check the alert and find the attack at latter.
+
+TR 33.818 §5.2.5.7.7.1
+
+#100
+
+Secure hardware resource management information
+
+When a compromised Virtualisation layer tampers the hardware resource configuration which is received from the VIM to result in the configuration error of the hardware, the hardware shall trigger an alert. The administrator can check the alert and find the attack at latter.
+NOTE: Whether the virtualisation layer is trust or not is based on operator's decision.
+
+TR 33.818 §5.2.5.7.7.2
+
+#101
+
+Trusted platform
+
+The host system shall implement a Hardware-Based Root of Trust (HBRT) ((e.g. TPM, HSM)) as Initial Root of Trust. The trust state of the platform shall be measured and a trusted chain shall be built.
+
+TR 33.818 §5.2.5.7.7.3
+
+Annex C (informative):
+Guidance on Security Requirements & Controls
+
+C.1 O-Cloud
+
+Controls given in this section are designed as a guidance and non-normative. The implementation of those non-normative controls depends on the security policies within the O-Cloud Service Provider, O-RAN  App/VNF/CNF provider and Service Provider.
+
+C.1.1 Software Package Protection at the O-Cloud Network Functions and Applications Layer
+
+Potential controls on REQ-SEC-OCLOUD-IMG-1 and REQ-SEC-OCLOUD-IMG-4
+
+App/VNF/CNF packages need to be frequently tested throughout the lifecycle of the App/VNF/CNF:
+
+During Development
+
+During on-boarding, within the O-Cloud images repository and during instantiation
+
+During Runtime
+
+Vulnerability scanning
+
+Static Application Security Testing (SAST)
+
+Dynamic Application Security testing (DAST)
+
+Penetration testing
+
+Software composition analysis
+
+to be performed frequently for vulnerability scanning or misconfiguration on App/VNF/CNF packages. E.g., Check for malware, secrets stored in package.
+
+Responsible: App/VNF/CNF Provider
+
+Vulnerability scanning
+
+Dynamic Application Security testing (DAST) to be performed for:
+
+Certifying the App/VNF/CNF for functionality as well as authenticity, integrity, and packaging compliance.
+
+Blocking deployments if the package doesn’t comply with the Service Provider security policies
+
+For scanning and detecting potential vulnerabilities
+
+Checking for malware
+
+Scanning for unnecessary system tools and libraries not required by App/VNF/CNF
+
+Software composition analysis
+
+Etc.
+
+Responsible: App/VNF/CNF Provider, Service Provider
+
+Perform continuous scanning/monitoring for known vulnerability or misconfiguration on runtime workloads, check for any open ports, VM/Container escape, etc.
+
+Responsible: Service Provider
+
+Tools used for static code and dynamic security analysis, analysis of code being released, and penetration test results must be shared with the Service Provider.
+
+C.1.2 Secure storage of cryptographic keys and sensitive data
+
+Potential solutions for SEC-CTL-OCLOUD-SS-1
+
+The following potential implementation options for encrypting cryptographic keys and sensitive data within the O-Cloud platform could be used. The appropriate option to be used depends on the sensitivity of the data to be protected and needs to be assessed/determined by the Service provider.
+
+Software based:
+
+Software-based KMS vaults supporting management of keys, including creation, rotation, and revocation, as well as encrypting and decrypting sensitive data with managed keys [57].
+
+Use a vTPM: A virtual Trusted Platform Module (vTPM) is a software-based representation of a physical Trusted Platform Module 2.0 chip to provide secure storage of credentials or keys [62]. A vTPM acts as any other virtual device. It performs the same functions as a TPM, but it performs cryptographic coprocessor capabilities in software. It should comply with the TPM 2.0 specification [61].
+
+Hardware based
+
+Hardware-based key vaults: The use of Key Management Service (KMS) based on an HSM [55], [56], [60]. The data is encrypted using a data encryption key (DEK); a new DEK is generated for each encryption. The DEKs are encrypted with a key encryption key (KEK) that is stored and managed in the HSM of the KMS provider.
+
+A hardware TPM [59], [61]. For data encryption, an encryption key is stored on disk but encrypted with the TPM master key (the storage root key (SRK)). This encryption key can only be used after it was decrypted by an authenticated TPM. The actual data encryption/decryption is then done by the main CPU, only decryption/encryption of the encryption key is done inside the TPM.
+
+Potential solutions for SEC-CTL-OCLOUD-SS-2
+
+Overwriting with zero (e.g., /dev/zero) or simple patterns.
+
+Overwriting with random data using:
+
+True random data source (e.g., /dev/random). This solution takes too long to wait for the entropy generation.
+
+Pseudorandom data source (e.g., /dev/urandom) can be used as a reasonable source of pseudorandom data.
+
+Potential solutions for SEC-CTL-OCLOUD-SS-3
+
+Each data center adheres to a strict disposal policy and uses the techniques described to achieve compliance with NIST SP 800-88 Revision 1 “Guidelines for Media Sanitization” [53] and DoD 5220.22-M “National Industrial Security Program Operating Manual.” [54].
+
+C.1.3 Chain of Trust
+
+Potential solutions for SEC-CTL-OCLOUD-COT-1
+
+There are many ways to measure platform integrity. In many cases, a hardware security module is used to store measurement data such as a HSM and TPM. Various platform integrity technologies build their own CoTs [58] and listed here below:
+
+UEFI Secure Boot (SB)
+
+Intel Trusted Execution Technology (TXT)
+
+Intel Boot Guard
+
+Intel Platform Firmware Resilience (PFR)
+
+Intel Technology Example Summary
+
+AMD Platform Secure Boot (AMD PSB)
+
+Arm TrustZone Trusted Execution Environment (TEE) for Armv8-A
+
+Arm Secure Boot and the Chain of Trust (CoT)
+
+Cisco Platform Roots of Trust
+
+IBM Chain of Trust (CoT)
+
+For more details, see [58], clause 3.2.
+
+Potential solutions for SEC-CTL-OCLOUD-COT-2
+
+Please refer to the following technology examples in [58], clause 6.1 for more information:
+
+Intel Security Libraries for the Data Center (ISecL-DC)
+
+Remote AS - Project Veraison (VERificAtIon of atteStatiON)
+
+IBM Platform Attestation Tooling
+
+Relevant information on the AS is provided in [58], clause 6.1 and [44], clause 6.6.
+
+The following figure shows an example of remote AS:
+
+The AS from the hardware layer to the O-RAN App/VNF/CNF includes the following steps (see figure):
+
+Attestation of the O-Cloud platform
+
+RoT measures and verifies hardware resources (server platform) including firmware/BIOS. It then launches the hardware resources.
+
+The server act as the attester of the OS/virtualization layer. It measures, verifies and launches the OS/virtualization layer.
+
+The attestation results and corresponding measurements are maintained by the management platform (e.g. Kubernetes) acting as the trust agent.
+
+Attestation of App/VNF/CNF
+
+The attestation process is initiated by the management platform requesting to instantiate a new App/VNF/CNF:
+
+The virtualization layer verifies the virtual instance.
+
+Virtualized RoT (vRoT) measures the App/VNF/CNF. The vRoT is a virtual instance associated to the hardware protected RoT. The virtualization layer provides this virtual resource to the virtual instance.
+
+Corresponding measurements are reported to the trust agent. The trust agent exposes the attestation results to authorized attestation server (could be within the SMO) so that it verifies collected measurements against trust policies already defined by administrators.
+
+Revision history
+
+Date
+
+Revision
+
+Description
+
+2022.11.10
+
+05.00
+
+Tbd.
+
+2022.07.20
+
+04.00
+
+Added/updated requirements and controls for:
+
+O-Cloud Image Security
+
+Non-RT RIC, rApps, and A1 and R1 Interfaces
+
+Near-RT RIC
+
+2022.03.23
+
+03.00
+
+Added/updated requirements and controls for:
+
+Near-RT RIC and xApps
+
+Open Fronthaul Interface - C, S and U Planes
+
+	Open Fronthaul Point-to-Point LAN Segment
+
+2021.11.09
+
+02.00
+
+Added requirements for
+
+Open Fronthaul Point-to-Point LAN Segment
+
+SBOM
+
+Network Protocols and Services
+
+Robustness of Common Transport Protocols
+
+Robustness against Volumetric DDoS Attack
+
+Robustness of OS and Applications
+
+Password-Based Authentication
+
+2021.07.01
+
+01.00
+
+Final initial version 01.00
+
+History
+
+Date
+
+Revision
+
+Description
+
+2022.11.18
+
+05.00
+
+Published as Final version 05.00
+
+2022.07.20
+
+04.00
+
+Published as Final version 04.00
+
+2022.03.23
+
+03.00
+
+Published as Final version 03.00
+
+2021.11.09
+
+02.00
+
+Published as Final version 02.00
+
+2021.07.01
+
+01.00
+
+Published as Final version 01.00
+
+	________________________________________________________________________________________________© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.	52

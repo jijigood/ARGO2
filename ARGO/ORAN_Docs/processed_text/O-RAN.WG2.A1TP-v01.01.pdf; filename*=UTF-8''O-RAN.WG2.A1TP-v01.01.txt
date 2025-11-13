@@ -1,0 +1,374 @@
+O-RAN.WG2.A1TP-v01.01
+Technical Specification
+O-RAN Working Group 2 (Non-RT RIC and A1 interface WG)
+A1 interface: Transport Protocol
+.
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited,
+save that you may print or download extracts of the material on this site for your personal use, or copy
+the material on this site for the purpose of sending to individual third parties for their information provided
+that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third
+party that these conditions apply to them and that they must comply with them.
+
+                                 O-RAN.WG2.A1TP-v01.01
+Technical Specification
+
+O-RAN Working Group 2 (Non-RT RIC and A1 interface WG)
+
+A1 interface: Transport Protocol
+
+Copyright © 2021 by O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving,
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License
+Agreement contained in the Annex ZZZ of this specification. All other rights reserved.
+
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189
+.
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           1
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           2
+O-RAN.WG2.A1TP-v01.01
+Revision History 1
+Date Revision Author Description
+2019.09.30 01.00 Patric Lind
+(Ericsson)
+First version
+2021.03.13 01.01 Patric Lind
+(Ericsson)
+Editorial corrections to apply latest template and update references.
+Clarification of HTTP port number.
+ 2
+  3
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           3
+O-RAN.WG2.A1TP-v01.01
+Contents 1
+Revision History ................................................................................................................................................. 2 2
+Chapter 1 Introductory Material ......................................................................................................................... 4 3
+1.1 Scope ................................................................................................................................................................. 4 4
+1.2 References.......................................................................................................................................................... 4 5
+1.3 Definitions and Abbreviations ........................................................................................................................... 5 6
+1.3.1 Definitions .................................................................................................................................................... 5 7
+1.3.2 Abbreviations ............................................................................................................................................... 5 8
+Chapter 2 A1 Interface protocol stack ................................................................................................................ 5 9
+2.1 General ............................................................................................................................................................... 5 10
+2.2 Reference model ................................................................................................................................................ 5 11
+2.3 Functions and protocol stack ............................................................................................................................. 5 12
+Chapter 3 Network layer .................................................................................................................................... 6 13
+Chapter 4 Transport layer ................................................................................................................................... 6 14
+Chapter 5 Security .............................................................................................................................................. 6 15
+Chapter 6 Application ......................................................................................................................................... 6 16
+Chapter 7 Data interchange ................................................................................................................................ 7 17
+Annex ZZZ : O-RAN Adopter License Agreement ........................................................................................... 7 18
+Section 1: DEFINITIONS .................................................................................................................................................. 7 19
+Section 2: COPYRIGHT LICENSE ................................................................................................................................... 7 20
+Section 3: FRAND LICENSE ............................................................................................................................................ 8 21
+Section 4: TERM AND TERMINATION .......................................................................................................................... 8 22
+Section 5: CONFIDENTIALITY ....................................................................................................................................... 8 23
+Section 6: INDEMNIFICATION ....................................................................................................................................... 9 24
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ...................................................................................... 9 25
+Section 8: ASSIGNMENT ................................................................................................................................................. 9 26
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS ...................................................................................................... 9 27
+Section 10: BINDING ON AFFILIATES .......................................................................................................................... 9 28
+Section 11: GENERAL ....................................................................................................................................................... 9 29
+ 30
+31
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           4
+O-RAN.WG2.A1TP-v01.01
+Chapter 1 Introductory Material 1
+1.1 Scope 2
+This Technical Specification has been produced by the O-RAN Alliance. 3
+The contents of the present document are subject to continuing work within O-RAN and may change following formal 4
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-5
+RAN with an identifying change of release date and an increase in version number as follows:  6
+Release xx.yy.zz 7
+where: 8
+xx the first two-digit value is incremented for all changes of substance, i.e. technical enhancements, corrections, 9
+updates, etc. (the initial approved document shall have xx=01). 10
+yy the second two-digit value is incremented when editorial only changes have been incorporated in the 11
+document. 12
+zz the third two-digit value is included only in working versions of the document indicating incremental 13
+changes during the editing process; externally published documents never have this third two-digit value 14
+included. 15
+The present document specifies the transport protocol of the A1 interface. It is part of a TS-family covering the O-RAN 16
+WG2: A1 interface as identified below: “General Aspects and Principles”. “Transport Protocol”. “Application 17
+Protocol”. “Type Definitions”. 18
+1.2 References 19
+The following documents contain provisions which, through reference in this te xt, constitute provisions of the present 20
+document. 21
+- References are either specific (identified by date of publication, edition numbe r, version number, etc.) or 22
+non-specific. 23
+- For a specific reference, subsequent revisions do not apply. 24
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 25
+a GSM document), a non-specific reference implicitly refers to the latest version of that document. 26
+[1] O-RAN WG2: “A1 interface: General Aspects and Principles” 27
+[2] O-RAN WG2: “A1 interface: Application Protocol” 28
+[3] O-RAN WG2: “A1 interface: Type Definitions” 29
+[4] IETF RFC 793: "Transmission Control Protocol". 30
+[5] IETF RFC 5246: "The Transport Layer Security (TLS) Protocol Version 1.2" 31
+[6] IETF RFC 8446: " The Transport Layer Security (TLS) Protocol Version 1 .3" 32
+[7] IETF RFC 2818: "HTTP over TLS" 33
+[8] IETF RFC 7230: "Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing" 34
+[9] IETF RFC 7321: " Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content” 35
+[10] IETF RFC 7540: " Hypertext Transfer Protocol Version 2 (HTTP/2)"  36
+[11] IETF RFC 8259: "The JavaScript Object Notation (JSON) Data Interchange Format."  37
+[12] IETF RFC 8200 (2017-07): "Internet Protocol, Version 6 (IPv6) Specification". 38
+[13] IETF RFC 791 (1981-09): "Internet Protocol". 39
+ 40
+ 41
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           5
+O-RAN.WG2.A1TP-v01.01
+1.3 Definitions and Abbreviations 1
+1.3.1 Definitions 2
+For the purposes of the present document, the following terms and definitions apply.  3
+A1:  Interface between Non-RT RIC and Near-RT RIC 4
+1.3.2 Abbreviations 5
+For the purposes of the present document, the following abbreviations apply.  6
+RT  Real Time 7
+RIC  RAN Intelligent Controller 8
+ 9
+Chapter 2 A1 Interface protocol stack 10
+2.1 General 11
+This document is part of a document family that specifies the O-RAN A1 interface. The other documents are A1 12
+interface: Generic Aspects and Principles [1], A1 interface: Application Protocol [2], and A1 interface: Type 13
+Definitions [3]. 14
+2.2 Reference model 15
+The A1 interface is defined between the Non-RT RIC and the Near-RT RIC functions. The A1 architecture and 16
+principles are described in A1 interface: General Aspects and Principles [1]. 17
+non-RT RIC
+near-RT RIC
+A1 interface
+ 18
+Figure 2.2-1: A1 interface reference model 19
+2.3 Functions and protocol stack 20
+The following layers of the protocol stack for A1 interface are described in the following chapters:  21
+- TCP [4] provides the communication service at the transport layer; 22
+- TLS [5][6] is used to provide secure HTTP [7][8] connections; 23
+- HTTP [9][10] is used as application level protocol; 24
+- The data interchange layer constitutes the transport of documents in the JSON format [11]. 25
+Figure 2.3-1 illustrates the protocol stack of the A1 interface. 26
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           6
+O-RAN.WG2.A1TP-v01.01
+ 1
+JSON
+HTTP
+TCP
+IP
+Data link layer
+Physical layer
+Data Interchange
+Application
+Transport
+Network
+Data link
+Physical
+TLSSecurity
+ 2
+Figure 2.3-1: A1 protocol stack 3
+Chapter 3 Network layer 4
+A1 may be transported over IPv6 (IETF RFC 8200 [12]) and/or IPv4 (IETF RFC 791 [13]). 5
+Chapter 4 Transport layer 6
+TCP (IETF RFC 793 [4]) shall be used as transport protocol. 7
+NOTE: When using TCP as the transport protocol, an HTTP connection is mapped to a TCP connection.  8
+Both Non-RT RIC and Near-RT RIC may act as HTTP client and HTTP server. As a result, Non-RT RIC and Near-RT 9
+RIC may establish a TCP connection for each direction. This permits bidirectional communication. 10
+Chapter 5 Security 11
+For the security protection at the transport layer, TLS v1.2 (IETF RFC 5246 [5]) shall be supported, and TLS v1.3 12
+(IETF RFC 8446 [6]) should be supported. 13
+Chapter 6 Application 14
+As application layer, HTTP/1.1 (IETF RFC 7231 [9]) shall be supported, and HTTP/2 (IETF RFC 7540 [10]) should be 15
+supported. 16
+HTTP over TLS (as defined in IETF RFC 2818 [7] and updated in IETF RFC 7230 [8]) shall be supported. 17
+HTTP details such as standard headers, custom headers, error codes, methods , URIs etc are specified in A1 interface: 18
+Application Protocol [2]. 19
+The default TCP port numbers should be used for HTTP operation. 20
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           7
+O-RAN.WG2.A1TP-v01.01
+Chapter 7 Data interchange 1
+As a data interchange format, JSON (IETF RFC 8259 [11]) shall be supported. The objects transported in HTTP 2
+messages, and the data types in JSON format, are specified in A1 interface: Type Definitions [3].  3
+Annex ZZZ : O-RAN Adopter License Agreement 4
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER 5
+AGREES TO THE TERMS OF THIS AGREEMENT. 6
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 7
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 8
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 9
+Section 1: DEFINITIONS 10
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 11
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 12
+fifty (50%) percent or more of the voting stock or equity in an entity. 13
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in ha rdware, 14
+software or combinations thereof) that fully conforms to a Final Specification. 15
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 16
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 17
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 18
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 19
+Specification. The term “O-RAN Specifications” includes Minor Updates. 20
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 21
+patents and design registrations, throughout the world, which (i) are o wned or otherwise licensable by a Member, 22
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 23
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment  of 24
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 25
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 26
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 27
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 28
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 29
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 30
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 31
+claims shall be considered Necessary Claims. 32
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 33
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 34
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 35
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 36
+Section 2: COPYRIGHT LICENSE 37
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 38
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 39
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 40
+furtherance of implementations of an ORAN 41
+Specification. 42
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 43
+agreement with O-RAN Alliance. 44
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           8
+O-RAN.WG2.A1TP-v01.01
+Section 3: FRAND LICENSE 1
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separat e 2
+Patent License Agreement to each Adopter under Fair Reasonable And Non - Discriminatory (FRAND) terms and 3
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 4
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 5
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 6
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 7
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 8
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 9
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 10
+customers of such licensed Compliant Implementations. 11
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 13
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 14
+its Affiliates for its license of Necessary Claims to its licensees. 15
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 16
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 17
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 18
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 19
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 20
+Compliant Implementations; provided, however, that such license will not e xtend: (a) to any part or function of a 21
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 22
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is n ot making a reciprocal 23
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 24
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distribut ors 25
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 26
+licensed Compliant Implementations. 27
+Section 4: TERM AND TERMINATION 28
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 30
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thi rty 31
+(30) days after being given notice specifying the breach. 32
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 33
+after termination of this Agreement, Adopter will continue to grant licens es (a) to entities who become Adopters after 34
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 35
+version that was current as of the date of termination. 36
+Section 5: CONFIDENTIALITY 37
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 38
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 39
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 41
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 42
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 43
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 44
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 45
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasona ble prior 46
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 47
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 48
+Alliance’s prior written approval. 49
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           9
+O-RAN.WG2.A1TP-v01.01
+Section 6: INDEMNIFICATION 1
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 2
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Inde mnitees”), 3
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 4
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 5
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 6
+products that comply with O-RAN Specifications. 7
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 8
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 9
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 10
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 11
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 12
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 13
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O -RAN 14
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 15
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIANCE AND THE 16
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 17
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 18
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 19
+CONDITION FOR O-RAN SPECIFICATIONS. 20
+Section 8: ASSIGNMENT 21
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 22
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 23
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 24
+Alliance may freely assign this Agreement. 25
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 26
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 27
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 28
+including as licensees under Section 3. 29
+Section 10: BINDING ON AFFILIATES 30
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 31
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 32
+and are also entitled to the benefits of the rights of Adopter hereunder. 33
+Section 11: GENERAL 34
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  35
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 36
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 37
+to the subject matter of this Agreement.  38
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 39
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 40
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledg es that this Agreement 41
+prohibits any communication that would violate the antitrust laws. 42
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 43
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 44
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 45
+Contributors or Academic Contributors. 46
+
+________________________________________________________________________________________________
+© 2021 O-RAN Alliance e.V.  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+           10
+O-RAN.WG2.A1TP-v01.01
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 1
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 2
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 3
+full force and effect. 4
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 5
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 6
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 7
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 8
+force and effect. 9

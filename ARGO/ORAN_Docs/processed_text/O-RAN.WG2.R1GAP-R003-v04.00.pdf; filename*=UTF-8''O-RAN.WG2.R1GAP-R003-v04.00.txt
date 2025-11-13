@@ -1,0 +1,919 @@
+Technical Specification
+
+O-RAN Work Group 2 (Non-RT RIC and A1 Interface WG)
+
+R1 interface: General Aspects and Principles
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form w ithout the prior
+written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the mate rial of this specification
+for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information
+provided that you acknowledge O -RAN ALLIANCE as the source of the material and that yo u inform the third party that these conditions
+apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+                              O-RAN.WG2.R1GAP-R003-v04.00
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2
+O-RAN.WG2.R1GAP-R003-v04.00
+Contents 1
+Foreword............................................................................................................................................................. 3 2
+Modal verbs terminology ................................................................................................................................... 3 3
+1 Scope ........................................................................................................................................................ 4 4
+2 References ................................................................................................................................................ 4 5
+2.1 Normative references ......................................................................................................................................... 4 6
+2.2 Informative references ....................................................................................................................................... 5 7
+3 Definition of terms, symbols and abbreviations ....................................................................................... 5 8
+3.1 Terms ................................................................................................................................................................. 5 9
+3.2 Symbols ............................................................................................................................................................. 5 10
+3.3 Abbreviations ..................................................................................................................................................... 5 11
+4 General Aspects of R1 Interface and R1 Services ................................................................................... 6 12
+4.1 Introduction........................................................................................................................................................ 6 13
+4.2 General principles .............................................................................................................................................. 6 14
+4.3 Specification objectives ..................................................................................................................................... 6 15
+4.4 Capabilities ........................................................................................................................................................ 7 16
+5 R1 Services ............................................................................................................................................... 7 17
+5.1 Service management and exposure services ...................................................................................................... 7 18
+5.1.1 General ......................................................................................................................................................... 7 19
+5.1.2  Bootstrap service .......................................................................................................................................... 8 20
+5.1.3 Service registration service .......................................................................................................................... 8 21
+5.1.4 Service discovery service ............................................................................................................................. 9 22
+5.1.5  Heartbeat service ........................................................................................................................................ 10 23
+5.1.6 Authentication and authorization ............................................................................................................... 10 24
+5.1.7 rApp registration service ............................................................................................................................ 11 25
+5.2 Data management and exposure services ......................................................................................................... 11 26
+5.2.1 General ....................................................................................................................................................... 11 27
+5.2.2 Data registration service ............................................................................................................................. 13 28
+5.2.3 Data discovery service ............................................................................................................................... 14 29
+5.2.4 Data request service ................................................................................................................................... 14 30
+5.2.5 Data subscription service ........................................................................................................................... 15 31
+5.2.6 Data delivery services ................................................................................................................................ 16 32
+5.2.7 Data offer service ....................................................................................................................................... 17 33
+5.3 A1-related Services .......................................................................................................................................... 18 34
+5.3.1 General ....................................................................................................................................................... 18 35
+5.3.2 A1 policy management service .................................................................................................................. 18 36
+5.3.3 A1 enrichment information related services ............................................................................................... 20 37
+5.4 RAN OAM -related Services ........................................................................................................................... 20 38
+5.4.1 General ....................................................................................................................................................... 20 39
+5.4.2 Network Information service...................................................................................................................... 21 40
+5.4.3 Fault management (FM) service................................................................................................................. 21 41
+5.4.4 Performance management (PM) service .................................................................................................... 22 42
+5.4.5 Configuration management (CM) service .................................................................................................. 22 43
+5.5 O2-related Services .......................................................................................................................................... 23 44
+5.5.1 General ....................................................................................................................................................... 23 45
+5.5.2 O2 Infrastructure management service ....................................................................................................... 24 46
+5.6 AI/ML Workflow Services .............................................................................................................................. 24 47
+6 R1 Interface Protocol Structure .............................................................................................................. 24 48
+Revision history ................................................................................................................................................ 25 49
+History .............................................................................................................................................................. 25 50
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3
+O-RAN.WG2.R1GAP-R003-v04.00
+Foreword 1
+This Technical Specification (TS) has been produced by O-RAN Alliance. 2
+Modal verbs terminology 3
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", 4
+"can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal 5
+forms for the expression of provisions). 6
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.  7
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4
+O-RAN.WG2.R1GAP-R003-v04.00
+1 Scope 1
+The contents of the present document are subject to continuing work within O-RAN and may change 2
+following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, 3
+it will be re-released by O-RAN with an identifying change of version date and an increase in version 4
+number as follows: 5
+version xx.yy.zz 6
+where: 7
+xx: the first digit-group is incremented for all changes of substance, i.e. technical enhancements, 8
+corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with 9
+leading zero if needed. 10
+yy: the second digit-group is incremented when editorial only changes have been incorporated in the 11
+document. Always 2 digits with leading zero if needed. 12
+zz: the third digit-group included only in working versions of the document indicating incremental 13
+changes during the editing process. External versions never include the third digit-group.  Always 14
+2 digits with leading zero if needed. 15
+The present document specifies the general aspects and principles of the R1 interface. It is part of a 16
+planned TS-family covering the R1 interface specifications.   17
+2 References 18
+2.1 Normative references 19
+References are either specific (identified by date of publication and/or edition number or version number) 20
+or non-specific. For specific references, only the cited version applies. For non-specific references, the latest 21
+version of the referenced document (including any amendments) applies. 22
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O-RAN 23
+cannot guarantee their long term validity. 24
+The following referenced documents are necessary for the application of the present document. 25
+[1] ORAN TS: "A1 Interface: Application Protocol"("A1AP"). 26
+[2]  O-RAN TS: "Non-RT RIC & A1 Interface: Use Cases and Requirements"("UCR"). 27
+[3]    O-RAN TS: "Non-RT RIC Functional Architecture Specification". 28
+[4]     O-RAN TS: "Security Protocols Specifications". 29
+[5]     O-RAN TS: "Transport protocols for R1 Services"("R1TP"). 30
+[6]     O-RAN TS: "O2IMS-Interface Specifications" ("O2IMS"). 31
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5
+O-RAN.WG2.R1GAP-R003-v04.00
+2.2 Informative references 1
+References are either specific (identified by date of publication and/or edition number or version number) 2
+or non-specific. For specific references, only the cited version applies. For non-specific references, the latest 3
+version of the referenced document (including any amendments) applies. 4
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O-RAN 5
+cannot guarantee their long term validity. 6
+The following referenced documents are not necessary for the application of the present document, but 7
+they assist the user with regard to a particular subject area. 8
+[i.1]3GPP TR 21.905: "3rd Generation Partnership Project; Technical Specification Group Services and 9
+System Aspects; Vocabulary for 3GPP Specifications". 10
+3 Definition of terms, symbols and abbreviations 11
+3.1 Terms 12
+For the purposes of the present document, the following terms apply: 13
+Non-RT RIC: O-RAN non-real-time RAN Intelligent Controller: a logical function in the SMO framework that 14
+enables non-real-time control and optimization of RAN elements and resources, AI/ML workflow including 15
+model training and updates, and policy-based guidance of applications/features in Near-RT RIC. The Non-RT 16
+RIC is comprised of the Non-RT RIC framework and Non-RT RIC applications (rApps). 17
+Non-RT RIC framework: Functionality internal to the SMO framework that logically terminates the A1 18
+interface and provides the R1 services to rApps through the R1 interface. 19
+rApp: Non-RT RIC application: an application designed to consume and/or produce R1 Services. 20
+ NOTE:     rApps can leverage the functionality provided by the SMO and Non-RT RIC frameworks to 21
+deliver value added services related to intelligent RAN optimization and operation. 22
+R1 Interface: Interface between rApps and Non-RT RIC framework via which R1 Services can be produced 23
+and consumed. 24
+R1 Services: A collection of services including, but not limited to, service registration and discovery services, 25
+authentication and authorization services, AI/ML workflow services, and A1, O1 and O2 related services. 26
+ 27
+3.2 Symbols 28
+Void 29
+3.3 Abbreviations 30
+For the purposes of the present document, the following abbreviations apply. 31
+AI     Artificial Intelligence 32
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6
+O-RAN.WG2.R1GAP-R003-v04.00
+EI     Enrichment Information 1
+FQDN    Fully Qualified Domain Name 2
+FM    Fault Management  3
+ML          Machine Learning 4
+PM    Performance Management   5
+RAN    Radio Access Network 6
+RBAC                   Role Based Access Control 7
+RIC    RAN Intelligent Controller   8
+RT     Real-time 9
+SMO    Service Management and Orchestration 10
+TBAC                   Target Based Access Control 11
+4 General Aspects of R1 Interface and R1 Services 12
+4.1 Introduction 13
+This chapter covers the general aspects for R1 interface. 14
+4.2 General principles 15
+The general principles for the specification of the R1 interface are as follows: 16
+- The R1 interface is an open logical interface within the O-RAN architecture between the rApps 17
+and the Non-RT RIC framework. 18
+- The R1 interface supports the exchange of control signalling information and the collection and 19
+delivery of data between endpoints.  20
+- The R1 interface enables multi-vendor rApps to consume or produce the R1 services and is 21
+independent of specific implementations of the SMO and Non-RT RIC framework. 22
+- The R1 interface is defined in an extensible way that enables new services and data types to be 23
+added without needing to change the protocols or the procedures. 24
+4.3 Specification objectives 25
+The R1 interface specifications shall: 26
+- Facilitate inter-connection between rApps and Non-RT RIC framework supplied by different 27
+vendors. 28
+- Provide a level of abstraction between rApps and SMO/Non-RT RIC framework that can be the 29
+consumers and or producers of R1 services. 30
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7
+O-RAN.WG2.R1GAP-R003-v04.00
+4.4 Capabilities 1
+As described in UCR[3], the R1 interface shall support: 2
+- Registration and Deregistration of R1 services, 3
+- Authentication of rApps, 4
+- Authorization of requests to access R1 services, 5
+- Facilitation of service discovery and service notifications for the registered R1 Services, 6
+- Registration and Deregistration of data types, 7
+- Subscription and Unsubscription for registered data types and collection and delivery of data for 8
+subscribed data types,  9
+- Functionalities related to A1, O1 and O2 interfaces, and AI/ML workflow services. 10
+5 R1 Services  11
+5.1 Service management and exposure services 12
+5.1.1 General  13
+As described in the Non-RT RIC Architecture specification [3], the Service management and exposure 14
+services provided by the SMO/Non-RT RIC framework enable: 15
+- rApp registration, 16
+- Registration of services,  17
+- Discovery of services, 18
+- Authentication and authorization, 19
+- Communication support, 20
+- Bootstrap (optional), 21
+- Heartbeat (optional). 22
+Additionally, if the Bootstrap service is provided by the SMO/Non-RT RIC framework, an rApp can use it to 23
+discover the endpoints of the Service management and exposure services. 24
+If the Heartbeat service is provided by the SMO/Non-RT RIC framework, an rApp can use it to maintain its 25
+R1 service registration status with the Service management and exposure services Producer. 26
+The Service management and exposure services handle R1 services that are produced and/or consumed by 27
+rApps, as well as R1 services that are produced by functions in the SMO/Non-RT RIC framework and 28
+consumed by rApps. Additionally, the information related to the registered services is stored and the status 29
+of the service registrations is kept updated. 30
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8
+O-RAN.WG2.R1GAP-R003-v04.00
+The Service management and exposure services also handle the authorization of Service Consumers. When 1
+an R1 service is registered, it is available for discovery and invocation, by authorized Service Consumers. 2
+In the following, the term "Service Producer" refers to the role of an rApp to register and produce a service, 3
+and the term "Service Consumer" refers to the role of an rApp to discover and consume a service, using the 4
+Service management and exposure service. The term "Service management and exposure services 5
+Producer" refers to the logical R1 Service management and exposure functions in the SMO/Non-RT RIC 6
+framework acting as Service Producers of one or more of the Service management and exposure services.  7
+NOTE:     An rApp can discover services produced by other functions than rApps via the R1 interface, 8
+while services registered by rApps cannot be discovered by other functions than rApps via the 9
+R1 interface. The R1 interface only specifies how rApp interacts using the Service management 10
+and exposure services in the roles of Service Producer and Service Consumer. 11
+5.1.2  Bootstrap service  12
+5.1.2.1 Overview 13
+If the Bootstrap service is provided by the SMO/Non-RT RIC framework, an rApp can use it to discover the 14
+endpoints of the Service management and exposure services.  15
+5.1.2.2 Bootstrap 16
+The endpoint on which the Bootstrap service can be reached shall be version independent. It can be 17
+provisioned to the rApp or can be obtained e.g., from a fixed well-known address or FQDN. 18
+The following procedure is defined:   19
+Discover bootstrap: This procedure enables determination of the endpoints of the other Service 20
+management and exposure services. 21
+5.1.3 Service registration service 22
+5.1.3.1 Overview 23
+This service allows Service Producers to register information about the R1 services they produce. 24
+5.1.3.2   Registration of services  25
+Register service is a procedure where a Service Producer declares its produced services to the Service 26
+management and exposure services Producer. Upon successful registration of a service, the information 27
+about the services is stored. Deregister service is a procedure where a Service Producer declares which 28
+services are no longer provided. The Service Producer can also update the registered information related to 29
+a service. 30
+When registering a service, the Service Producer provides the information about the service, and may 31
+provide information on, but not limited to, the following: 32
+- profile of the service,  33
+- information on how to access the service, 34
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9
+O-RAN.WG2.R1GAP-R003-v04.00
+- information on the API, 1
+- limitations/capabilities of the Service Producer. 2
+The following procedures are defined:  3
+Register service: A Service Producer uses this procedure to register an R1 service that it produces 4
+with the capabilities that are being exposed. On receiving the request, the Service management 5
+and exposure services Producer determines whether the Service Producer is authorized to 6
+produce the service, and whether there are any conflicts. In the response, the Service 7
+management and exposure services Producer informs the Service Producer on the capabilities 8
+that they are allowed to expose. 9
+Deregister service: A Service Producer can use this procedure to deregister an R1 service that it 10
+is registered to provide. 11
+Update service registration: A Service Producer can use this procedure to update the registration 12
+of an R1 service that it provides. 13
+5.1.4 Service discovery service 14
+5.1.4.1 Overview 15
+This service allows Service Consumers to discover R1 services they intend to consume. 16
+5.1.4.2  Discovery of services  17
+For service discovery, a set of procedures enables a Service Consumer to retrieve information on available 18
+services based on selection criteria.  19
+NOTE:  Available services either have been registered by service-producing rApps using the Service 20
+registration service (in case these are produced by rApps) or have been made known to the 21
+Service discovery service Producer by other means (in case they are produced by Service 22
+Producers inside the SMO/Non-RT RIC framework). 23
+Upon receiving the request to discover services, the Service management and exposure services Producer 24
+verifies the identity of the Service Consumer (see clause 5.1.6). The Service management and exposure 25
+services Producer retrieves the stored service information, applies the authorization policy, and performs 26
+filtering of service information based on the selection criteria provided in the request. 27
+The following procedures are defined:  28
+Discover services: A Service Consumer uses this procedure to discover registered services. The 29
+Service Consumer can provide selection criteria to inquire about the registered services. The 30
+response contains a filtered list of available services based on which services the consumer is 31
+authorized to access.  32
+Subscribe service availability: A Service Consumer can subscribe to notifications regarding 33
+changes in service(s) that are available and thereby receive a notification when a service has been 34
+registered, updated, or deregistered by a Service Producer. The subscription is created for the 35
+Service Consumer based on the services and capabilities that it is authorized to access, i.e., the 36
+Service Consumer only gets notified about changes in registration status of services that it is 37
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10
+O-RAN.WG2.R1GAP-R003-v04.00
+authorized to access. Upon subscription, the Service Consumer can pass selection criteria in order 1
+to control the set of services about which it wishes to be notified.  2
+Unsubscribe service availability: A Service Consumer can unsubscribe from notifications 3
+regarding changes in the available services. 4
+Notify service availability changes: The Service management and exposure services Producer can 5
+use this procedure to notify a subscribed Service Consumer about changes in the set of registered 6
+services that the Service Consumer is authorized to access. 7
+5.1.5  Heartbeat service 8
+5.1.5.1 Overview 9
+A Service Producer can use the Heartbeat service to maintain its R1 service registration status with the 10
+Service management and exposure services Producer if this service is provided.  11
+5.1.5.2 Heartbeat 12
+The Service Producer sends a heartbeat message periodically, where the period may be specified in the 13
+response of the Register service procedure. On receiving the heartbeat message, the Service management 14
+and exposure services Producer validates it and sends a response to the Service Producer which may 15
+include information modifying the heartbeat message period. If a valid request is not received for a 16
+specified duration from a particular Service Producer, the Service management and exposure services 17
+Producer marks the Service Producer as no longer active, which may impact the state or discoverability of 18
+the produced services. The Service management and exposure services Producer will record the changes of 19
+the state or discoverability of the services related to the Service Producer that is no longer active and notify 20
+the Service Consumers subscribed to receive notifications of status changes via Notify service availability 21
+changes procedure.  22
+The following procedure is defined:  23
+Heartbeart: A Service Producer can use this procedure to maintain its R1 service registrations. 24
+5.1.6 Authentication and authorization 25
+5.1.6.1 Overview 26
+Authentication and authorization are realized as a combination of procedures and services that allow 27
+asserting the identity of Service Producers and Service Consumers and ensure that only authorized 28
+consumers can access the R1 services. 29
+5.1.6.2 Authentication    30
+Authentication will be performed to authenticate the Service Consumers and/or Service Producers to allow 31
+them to provide and/or access R1 Services. Service Consumers and/or Service Producers can initiate secure 32
+communication for R1 services that they are authorized to use, after the authentication information is 33
+validated. 34
+Authentication procedures shall comply to all the requirements specified in the Security Protocols 35
+Specifications  [4] . 36
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11
+O-RAN.WG2.R1GAP-R003-v04.00
+5.1.6.3  Authorization  1
+Authorization procedures are used to grant Service Consumers access to registered R1 services and to allow 2
+Service Producers to produce R1 services.  3
+Authorization may be based on a mechanism to enforce authorization by policies, where exposed R1 4
+services are further subject to authorization policies before granting access to registered services. 5
+Authorization policies refer to the attributes that are associated to the Service Consumer. For example, 6
+authorization policy can be RBAC or TBAC and the additional details are supplied in the policy attributes.  7
+The following procedures are defined:  8
+Request access: A Service Consumer can use the Request access procedure to request access 9
+to the exposed services that it can discover. A token may be granted for subsequent use of any 10
+R1 services that require authorization. 11
+Revoke access: A Service Consumer with appropriate privileges (administrator) can use the 12
+Revoke access procedure to revoke the access to exposed R1 services. 13
+5.1.7 rApp registration service 14
+5.1.7.1 Overview 15
+The rApp consumes this service to register with the Service management and exposure services Producer.   16
+5.1.7.2 rApp registration management  17
+The rApp consumes this service to register with the Service management and exposure services Producer 18
+and may provide the following information such as rApp name, vendor, software version, certificates, role 19
+of the rApp (Service Producer and / or Service Consumer), and security credentials. On successful 20
+registration, the Service management and exposure services Producer responds with an rApp identifier 21
+(rAppID).  22
+NOTE:  The procedure for provisioning the security credentials by an rApp with the Service 23
+management and exposure services Producer is FFS. 24
+The following procedure is defined:   25
+Registration: An rApp can use this procedure to register with Service management and exposure 26
+services Producer. 27
+5.2 Data management and exposure services  28
+5.2.1 General 29
+As described in the Non-RT RIC Architecture specification [3], the Data management and exposure services 30
+enable: 31
+- Registration of data types, 32
+- Discovery of data types, 33
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12
+O-RAN.WG2.R1GAP-R003-v04.00
+- Request for data, 1
+- Subscription to data, 2
+- Collection of data from Data Producers and consumption of data by Data Consumers, 3
+- Access to optional data processing in the SMO/Non-RT RIC framework. 4
+The Data management and exposure services use data types as descriptions of certain types of data that 5
+are available.  A data type is defined by a data type identifier and the syntax of the data type is given by an 6
+associated schema. A data type is defined by one schema while a schema may be associated with one or 7
+multiple data types. 8
+When a data type has been registered, it is available for discovery, and request for / subscription to data, 9
+by authorized Data Consumers. Further, the data instances for a data type may be stored or the actual data 10
+production may be triggered by the SMO/Non-RT RIC framework on the need for data collection, including 11
+based on a request for data by a Data Consumer or a data offer from a Data Producer. 12
+Data Consumer refers to an rApp that can consume data for a data type and Data Producer refers to an 13
+rApp that can produce data for a data type. 14
+Based on data type information, to trigger data collection or data consumption, data instances can be 15
+requested or subscribed to. While a data request causes the delivery of a data instance as a one-time 16
+response, a data subscription potentially causes multiple data delivery actions. Data consumption refers to 17
+a Data Consumer requesting for or subscribing to a data instance. Data collection refers to the SMO/Non-RT 18
+RIC framework requesting for or subscribing to a data instance. 19
+When initiating a data request or data subscription, the data instance to obtain is defined by the data type 20
+information and by additional characteristics as listed below. 21
+NOTE:  Data type information can be made available to Data Consumers using the Discover data types 22
+procedure (see clause 5.2.3 Data discovery service  23
+5.2.3.1 Overview  24
+Data Consumers consume this service to discover available data types. The Data management and 25
+exposure functions in the SMO/Non-RT RIC framework produce this service. 26
+5.2.3.2 ) or from configuration. Data type information can be made available by Data Producers to the 27
+Data management and exposure functions using the the Register data procedure (see clause 28
+5.2.2.2 ).  29
+This information that defines a data instance may contain, but is not limited to, the following parameters: 30
+- data type identifier, 31
+- time interval for the data instance (start and end of the interval during which the data have 32
+been or will be collected), 33
+- granularity of collection (how often data are to be collected), 34
+- periodicity of delivery (how often data instances are to be delivered), 35
+- scope (i.e., filter on the data), 36
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13
+O-RAN.WG2.R1GAP-R003-v04.00
+- target (i.e., filter on the managed objects that the data is associated with). 1
+The collection of data from the Data Producers can for instance be started based on a trigger from a Data 2
+Consumer that requests/subscribes to specified data that needs to be generated and collected, at the 3
+discretion of functions in the SMO/Non-RT RIC framework or based on a data offer from a Data Producer. If 4
+an additional Data Consumer request for / subscribes to a data instance of a certain data type and scope 5
+that is already being collected by the Data Management and Exposure functions, no additional data 6
+collection will be started with the Data Producer if the collected data meets the criteria of additional 7
+request.  8
+Data management and exposure services include services that are produced by the Data management and 9
+exposure functions, as well as services to be produced by the Data Producers or Data Consumers and 10
+consumed by the Data management and exposure functions.  11
+NOTE: In the Non-RT RIC Architecture specification [3], it is described that the Data management and 12
+exposure services can enable an rApp to discover and consume data types produced by 13
+functions other than rApps, and that data types produced by rApps can be consumed by 14
+functions other than rApps. The R1 interface only specifies how rApps interact with the Data 15
+management and exposure service in the roles of Data Producer and Data Consumer. 16
+5.2.2 Data registration service  17
+5.2.2.1 Overview  18
+Data Producers consume this service to register data types. The Data management and exposure functions 19
+in the SMO/Non-RT RIC framework produce this service. 20
+5.2.2.2 Registration of data types  21
+Register data type is a procedure where a Data Producer declares a data type it can provide to the Data 22
+registration and discovery service Producer. Deregister data type is a procedure where a Data Producer 23
+declares a data type to be no longer available.  24
+As part of the Register data type procedure, the Data Producer provides the data type identifier and further 25
+information about the data type, such as if it is stored e.g., in an object store or can be continuously 26
+produced and delivered and may provide information on, including but not limited to, the following: 27
+- information on how to collect the data, e.g., a reference to a message bus or a location in an 28
+object store, 29
+- periodicity of the data, in case it is generated periodically, 30
+- information on the data syntax (schema), 31
+- limitations/capabilities of the Data Producer to filter the data (e.g., to provide only certain types 32
+of events if requested so by the Data Consumers), 33
+- the supported data delivery methods (i.e., push and pull) by the Data Producer, 34
+- information whether the Data Producer supports data request or data subscription or both. 35
+The following procedures are defined:  36
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14
+O-RAN.WG2.R1GAP-R003-v04.00
+Register data type: A Data Producer uses this procedure to register a data type for which it can 1
+produce data instances. On receiving the request, the Data registration and discovery service 2
+Producer determines whether the Data Producer is authorized to produce the data type, and 3
+whether there are any conflicts, e.g., if the data type is already registered. In the response, the 4
+Data registration and discovery service Producer informs the Data Producer if it is allowed to 5
+produce the data type. 6
+Deregister data type: A Data Producer can use this procedure to deregister a data type that it has 7
+previously registered for which it is no longer able to produce data instances. 8
+5.2.3 Data discovery service  9
+5.2.3.1 Overview  10
+Data Consumers consume this service to discover available data types. The Data management and 11
+exposure functions in the SMO/Non-RT RIC framework produce this service. 12
+5.2.3.2 Discovery of data types  13
+This set of procedures enables a Data Consumer to retrieve information on the registered data types. 14
+Discovery of a data type does not imply availability of data instances of that data type. It is just an 15
+indication that Data Consumers can request or subscribe to data for that data type. It can happen that the 16
+actual data production is only triggered by the request or subscription actions of the Data Consumers. 17
+The following procedures are defined:  18
+Discover data types: A Data Consumer can discover the data types that are available. For each 19
+data type, a data type identifier and additional metadata are provided. 20
+Query data type information: A Data Consumer can retrieve information on a specific data type 21
+identified by a data type identifier. Such information enables the Data Consumer to formulate a 22
+request or subscription for data instances of that data type. 23
+Subscribe data types changes: A Data Consumer can subscribe to notifications regarding changes 24
+in the set of available data types and thereby receive notifications when data types have been 25
+registered or deregistered. The subscription is created for the Data Consumer based on the data 26
+types that it is authorized to access, i.e., the Data Consumer can only subscribe to get notified 27
+about changes in availability status of data types that it is authorized to access. 28
+Unsubscribe data types changes: A Data Consumer can unsubscribe from notifications regarding 29
+changes in the set of available data types. 30
+Notify data types changes: The Data registration and discovery service Producer uses this 31
+procedure to notify a subscribed Data Consumer about changes in the set of available data types. 32
+5.2.4 Data request service   33
+5.2.4.1 Overview  34
+For data consumption, Data Consumers consume this service to request data instances, and the Data 35
+management and exposure functions in the SMO/Non-RT RIC framework produce this service. 36
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15
+O-RAN.WG2.R1GAP-R003-v04.00
+For data collection, the Data management and exposure functions in the SMO/Non-RT RIC framework 1
+consume this service to request data instances, and Data Producers produce this service. 2
+5.2.4.2 Requesting data   3
+This set of procedures allows a Data request service Consumer to specify a data instance (for a registered 4
+data type) to be delivered to it. The data instance is defined by information specified in clause 5.2.1 5
+Data request is a one-time request and is performed via Request data procedure. 6
+A data request can be stopped using the Cancel data request procedure.  7
+The following procedures are defined:  8
+Request data: The Service Consumer provides, to the Data request and subscription service 9
+Producer, information on the data it requests based on the data type information. 10
+Cancel data request: The Service Consumer cancels a data request. 11
+5.2.5 Data subscription service   12
+5.2.5.1 Overview  13
+For data consumption, Data Consumers consume this service to subscribe to data instances, and the Data 14
+management and exposure functions in the SMO/Non-RT RIC framework produce this service. 15
+For data collection, the Data management and exposure functions in the SMO/Non-RT RIC framework 16
+consume this service to subscribe to data instances, and Data Producers produce this service. 17
+5.2.5.2 Subscribing to data   18
+This set of procedures allows a Data subscription service Consumer to specify a data instance (for a 19
+registered data type) to be delivered to it, and to choose the delivery service to use (push or pull). The data 20
+instance is defined by information specified in clause5.2.1. 21
+Subscribe data is a procedure that initiates the delivery of a data instance in potentially multiple chunks of 22
+data. A data subscription can be stopped using the Unsubscribe data procedure.  23
+The following procedures are defined:  24
+Subscribe data: The Service Consumer provides, to the Data request and subscription service 25
+Producer, information on the data it wants to subscribe to based on the data type information 26
+retrieved using the Discover data types procedure. 27
+Notify data availability: The Service Consumer is provided information on the availability and 28
+retrieval scheme of the subscribed data instance. As a precondition, the Service Consumer must 29
+have used the Subscribe data procedure to create a subscription. 30
+Unsubscribe data: The Service Consumer cancels a data subscription. 31
+The procedures for delivery of data instances are described in clause (5.2.6).  32
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16
+O-RAN.WG2.R1GAP-R003-v04.00
+5.2.6 Data delivery services   1
+5.2.6.1 Overview  2
+Data delivery is handled through a set of services as defined below which deliver data as requested using 3
+the Request data or the Subscribe data procedure (see clause 5.2.4) or indicated using the Create data offer 4
+procedure (see clause5.2.6). 5
+Data delivery messages relate to a particular data request, data subscription or data offer. The data can be 6
+delivered in different ways, e.g.: 7
+- as part of the payload of a data delivery message, 8
+- as a data stream, 9
+- a REST endpoint, a message bus or object store location. 10
+The means where and how the data can be retrieved can be made known to the recipient of the data by 11
+different means as part of the Request data, Subscribe data, Notify data availability or Create data offer 12
+procedure. 13
+NOTE: Additional procedures for data delivery can be added in later releases. 14
+5.2.6.2 Pull data service  15
+The pull data service allows the Service Consumer to obtain data via a pull mechanism from the Service 16
+Producer. Retrieval of data can occur once or multiple times (polling). 17
+For data consumption, Data Consumers consume this service and the Data management and exposure 18
+functions in the SMO/Non-RT RIC framework produce this service. 19
+For data collection, the Data management and exposure functions in the SMO/Non-RT RIC framework 20
+consume this service and Data Producers produce this service. 21
+The following procedure is defined:  22
+Retrieve data: The Service Consumer retrieves, from the Service Producer, data instances about 23
+whose existence the Service Consumer has been informed as part of the Request data, Notify data 24
+availability or Create data offer procedure, using a pull communication mechanism. 25
+5.2.6.3  Push data service 26
+The push data service allows the Service Consumer to push data to the Service Producer,  27
+For data consumption, the Data management and exposure functions in the SMO/Non-RT RIC framework 28
+consume this service and Data Consumers produce this service. 29
+For data collection, Data Producers consume this service and the Data management and exposure functions 30
+in the SMO/Non-RT RIC framework produces this service. 31
+The following procedure is defined:  32
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17
+O-RAN.WG2.R1GAP-R003-v04.00
+Push data: The Service Consumer provides, to the Service Producer a data instance using a push 1
+communication mechanism as arranged as part of the Request data, Subscribe data or Create data 2
+offer procedure.  3
+5.2.7 Data offer service   4
+5.2.7.1 Overview  5
+Data Producers consume this service to request producing data to the Data offer service Producer for 6
+immediate collection and storage. The Data management and exposure functions in the SMO/Non-RT RIC 7
+framework produce this service.  8
+5.2.7.2 Managing a data offer 9
+This service allows a Data Producer to declare to the Data offer service Producer that it intends to produce 10
+data instances for immediate collection and storage by the latter. Prior to creating a data offer, the Data 11
+Producer has registered the related data type. 12
+The Data Producer provides information on the data that it intends to provide based on the data type 13
+information it has provided during data registration (see clause5.2.2.2 ) and specifies additional 14
+characteristics of the data instance it intends to provide, similar to the information passed in the data 15
+request or data subscription (see clause 5.2.4 and 5.2.5). 16
+The Data Producer can further indicate that it no longer intends to produce data for a data offer by deleting 17
+the offer.  18
+The Data offer service Producer can indicate to the Data Producer that it does no longer wishes to receive 19
+data related to the offer by sending a data offer termination notification to the Data Producer, 20
+subsequently stopping collecting data related to the offer and terminating the offer.  21
+The following procedures are defined:  22
+Create data offer: A Data Producer provides, to the Data offer service Producer, information on the 23
+data it intends to deliver based on the data type information passed during the Register data type 24
+procedure. In case the push data service is intended to be used for data delivery, the Data offer 25
+service Producer provides to the Service Consumer information regarding the endpoint on which to 26
+receive the pushed data. In case the pull data service is intended to be used for data delivery, the 27
+Data offer service Producer provides to the Service Consumer information regarding the endpoint 28
+on which to receive the data availability notifications. 29
+Terminate data offer: A Data Producer terminates a data offer it has created. 30
+Notify data offer termination: The Data offer service Producer provides, to the Data Producer, a 31
+notification that it intends to stop collecting data from the data offer and terminating the offer. 32
+Following the reception of such notification, the Data Producer shall not deliver further data 33
+related to the data offer. The procedures for the delivery of data instances are described in clause 34
+(5.2.6) 35
+ 36
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18
+O-RAN.WG2.R1GAP-R003-v04.00
+5.3 A1-related Services  1
+5.3.1 General    2
+As described in the Non-RT RIC Architecture specification [3], the A1-related services produced by the 3
+SMO/Non-RT RIC framework enable the following functionalities related to the management of A1 policies 4
+and A1 enrichment information: 5
+- Creation, modification, deletion, and query of A1 policies. 6
+- Discovery of supported A1 policy types.  7
+- Querying the status of A1 policies.  8
+- Subscribe to event notifications related to A1 policies.  9
+- Registration and deregistration of EI types.  10
+5.3.2 A1 policy management service 11
+5.3.2.1 Overview  12
+The A1 Policy management service is an R1 service that enables an rApp (the consumer of that service) to  13
+- discover available A1 policy types and subscribe to notifications on added or removed A1 policy 14
+types,  15
+- query for details of A1 policy types and details of A1 policy and status,  16
+- create, update, and delete an A1 policy.  17
+The term "A1 policy management service Producer" refers to the A1-related functions in the SMO/Non-RT 18
+RIC framework acting as Service Producer of the A1 policy management service. The term "A1 policy 19
+management service Consumer" refers to an rApp acting as Service Consumer of the A1 policy 20
+management service. 21
+NOTE 1: Another name for this service that does not depend on southbound interface naming is FFS. 22
+NOTE 2: The terms A1 policy type, A1 policy type identifier, A1 policy and A1 policy identifier refer to 23
+definitions made for the A1-P service over the A1 interface, see A1 Application Protocol [[1]], 24
+and are used unchanged in the procedures of the A1 policy management service over the R1 25
+interface. 26
+5.3.2.2 A1 Policy management 27
+The following procedures are defined: 28
+Query Near-RT RIC identifiers: An A1 policy management service Consumer can use this procedure 29
+to query the Near-RT RIC identifiers. The A1 policy management service Producer will respond with a 30
+list of Near-RT RIC identifiers.  31
+Query A1 policy type identifiers: An A1 policy management service Consumer can use this procedure 32
+to query for the available A1 policy types. The A1 policy management service Producer will respond 33
+with the list of identifiers for all the available A1 policy types.  34
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19
+O-RAN.WG2.R1GAP-R003-v04.00
+Subscribe to policy type availability changes: An A1 policy management service Consumer can use 1
+this procedure to subscribe to notifications on policy type availability changes, i.e.  when an A1 policy 2
+type becomes available or when an A1 policy type becomes unavailable.  3
+Query A1 policy type:  An A1 policy management service Consumer can use this procedure to query 4
+the details of an A1 policy type by providing the A1 policy type identifier. The A1 policy management 5
+service Producer will respond with information about the A1 policy type.  6
+Query A1 policy identifiers: An A1 policy management service Consumer can use this procedure to 7
+query for the A1 policies, or a subset of the A1 policies by providing query parameters such as A1 8
+policy type identifier or Near-RT RIC identifier. The A1 policy management service Producer will 9
+return the list of A1 policy identifiers that matches with the query criteria. 10
+Query A1 policy: An A1 policy management service Consumer can use this procedure to query for 11
+the details of an A1 policy by providing the A1 policy identifier. The A1 policy management service 12
+Producer will respond with information about the A1 policy. 13
+Create A1 policy: An A1 policy management service Consumer can use this procedure to create an A1 14
+policy by providing the below parameters:  15
+- Information about the A1 policy,  16
+- A1 policy type identifier, 17
+- Near-RT RIC identifier. 18
+On receiving the request, the A1 policy management service Producer determines whether the A1 19
+policy type is supported by the Near-RT RIC, assigns an A1 policy identifier for the new A1 policy, and 20
+informs the A1 policy management service Consumer on the outcome of the A1 policy creation.  21
+Update A1 Policy: An A1 policy management service Consumer can use this procedure to update an 22
+A1 policy by providing the below parameters:  23
+- information about the A1 policy,  24
+- A1 policy identifier.   25
+On receiving the request, the A1 policy management service Producer determines whether the A1 26
+policy is available in the Near-RT RIC and informs the A1 policy management service Consumer on 27
+the outcome of the A1 policy update.  28
+Query A1 policy status: An A1 policy management service Consumer can use this procedure to query 29
+the status of a single A1 policy by providing the A1 policy identifier.  The A1 policy management 30
+service Producer will respond with the status of the A1 policy.  31
+Subscribe to A1 policy status changes: An A1 policy management service Consumer can use this 32
+procedure to subscribe to notifications on status changes of A1 policy. i.e., when an A1 policy status 33
+becomes enforced or not enforced. 34
+Delete A1 policy: An A1 policy management service Consumer can use this procedure to delete an 35
+existing A1 policy. The A1 policy management service Producer will respond with the outcome of the 36
+A1 policy deletion.  37
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20
+O-RAN.WG2.R1GAP-R003-v04.00
+NOTE:     In the responses of the above procedures, the A1 policy management service Producer can 1
+either use stored information that has already been received via the A1 interface (e.g., 2
+information on available A1 policy types), or information directly resulting from an A1 3
+procedure performed due to the R1 procedure (e.g., creation of an A1 policy). 4
+5.3.3 A1 enrichment information related services 5
+5.3.3.1 Overview  6
+A1 enrichment information related services enable rApp to register and deregister of EI types of which data 7
+it can produce as the source for the EI job results delivered over the A1 interface. 8
+5.3.3.2 A1 enrichment information  9
+The following procedures are defined: 10
+Register EI type: An rApp uses this procedure to register an EI type that it can produce as the source 11
+for the EI job results delivered over the A1 interface to the A1 enrichment information functions. In 12
+the registration request, the rApp includes the EI source data type registered in the DME functions. 13
+On receiving the request, the A1 enrichment information functions can subscribe EI source data from 14
+DME functions using the EI source data type. In the response, the A1 enrichment information 15
+functions inform the rApp on the EI type capabilities that it is registered to provide.  16
+Deregister EI type: An rApp can use this procedure to deregister EI types that it has previously 17
+registered, but that it is no longer able to produce. 18
+5.4 RAN OAM-related Services   19
+5.4.1 General  20
+As described in the Non-RT RIC Architecture specification [3], the RAN OAM-related services produced by 21
+the SMO/Non-RT RIC framework provide access to OAM functionality that enables the Service Consumer: 22
+- To obtain information about alarms. 23
+- To change their acknowledgment status. 24
+- To obtain performance information related to the network. 25
+- To obtain the current configuration of the network. 26
+- To provision changes of the configuration of the network. 27
+- To obtain additional information related to the network. 28
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21
+O-RAN.WG2.R1GAP-R003-v04.00
+5.4.2 Network Information service    1
+5.4.2.1 Overview  2
+The Network Information service provides to the Service Consumer information related to the network, in 3
+particular the RAN, that has been aggregated from multiple information sources that the SMO has access 4
+to, e.g., configuration, topology, network element state, geolocation, inventory, etc.  5
+5.4.2.2   Queries related to information about cells   6
+The Network Information service supports various information queries that give the rApps access to 7
+information aggregated from multiple sources.  8
+The following procedure is defined:  9
+Query cells-related information: This service operation allows to query aggregated information 10
+related to RAN cells. 11
+NOTE:  How to query the information, and how this relates to the Data management and exposure 12
+services, is FFS. 13
+5.4.3 Fault management (FM) service  14
+5.4.3.1 Overview  15
+The Fault management service allows the Service Consumer to obtain information about alarms.    16
+The RAN OAM-related functions in the SMO/Non-RT RIC framework produce this service.  17
+5.4.3.2 Querying alarm information 18
+The FM service shall allow the Service Consumer to query alarm information.  19
+The following procedure is defined:  20
+Query alarms: This procedure allows the Service Consumer to query the alarm list to obtain the 21
+whole list, a subset of the alarms in the list, or an individual alarm. The Service Consumer may 22
+specify a set of filtering criteria to control what is returned as result. 23
+5.4.3.3 Changing the alarm acknowledgement state 24
+The FM service shall allow the Service Consumer to change the acknowledgement state of individual alarms 25
+(i.e., to acknowledge or unacknowledge them).  26
+The following procedure is defined:  27
+Change alarm acknowledgement state: This procedure allows the Service Consumer to change 28
+the acknowledgement state of an alarm (i.e., to acknowledge or unacknowledge it). 29
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22
+O-RAN.WG2.R1GAP-R003-v04.00
+5.4.4 Performance management (PM) service  1
+5.4.4.1 Overview  2
+The performance management service allows the Service Consumer to access performance information 3
+that was collected from the network elements by the Service Producer.   4
+The RAN OAM-related functions in the SMO/Non-RT RIC framework produce this service.   5
+5.4.4.2   Querying performance information 6
+The PM service shall allow to query performance information using a set of filtering criteria.  7
+The following procedure is defined:  8
+Query performance information: This procedure allows to query performance information that 9
+has been collected from the network elements. The Service Consumer specifies a set of filtering 10
+criteria to determine the set of information returned. 11
+NOTE:  How to query the information, and how this relates to the Data management and exposure 12
+services, is FFS. 13
+5.4.5 Configuration management (CM) service  14
+5.4.5.1 Overview  15
+In the following, the term "Service Consumer" refers to the role of an rApp that consumes the Configuration 16
+management (CM) service. The term "Configuration management service Producer" refers to the role of the 17
+logical RAN OAM-related functions in the SMO/Non-RT RIC framework rk producing the CM service. 18
+The CM service allows the Service Consumer to access configuration information pertaining to the managed 19
+entities, as obtained by the CM service Producer. The CM service further allows the Service Consumer to 20
+request configuration changes related to the managed entities.  21
+NOTE:     As a preliminary definition in the context of R1, the term "managed entities" represents (i) the 22
+RAN nodes and RAN functions managed by the SMO via O1 or M-plane interfaces, and (ii) the 23
+group of these known as RAN-specific network slice subnets. The exact definition of the term 24
+"managed entity" is FFS. 25
+The following capabilities are provided by the CM service Producer over the R1 interface: 26
+- Retrieving configuration schemas 27
+- Reading configuration data 28
+- Writing configuration changes 29
+5.4.5.2 Retrieving configuration schemas 30
+The CM service allows the Service Consumer to retrieve information pertaining to the configuration 31
+schemas of one or more managed entities.  32
+The following procedure is defined: 33
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23
+O-RAN.WG2.R1GAP-R003-v04.00
+Get schemas: A Service Consumer can use this procedure to retrieve configuration schemas for 1
+the managed entities. The CM service Producer will respond with the requested schemas. The 2
+schemas provide information about which configuration attributes are supported by the 3
+managed entities. 4
+5.4.5.3 Reading configuration data 5
+The CM service allows the Service Consumer to read the configuration data, related to one or 6
+moremanaged entities. 7
+The following procedure is defined: 8
+Read Configuration: This procedure enables the Service Consumer to obtain configuration data 9
+(including the configuration attributes) related to one or more managed entities from the CM 10
+service Producer, subject to optional filtering criteria. The CM service Producer responds to the 11
+Service Consumer by providing the requested configuration data or indicates a failure with an 12
+appropriate cause.  13
+5.4.5.4 Writing configuration changes 14
+The CM service allows the Service Consumer to write configuration changes, related to one or 15
+more managed entities.  16
+The following procedure is defined: 17
+Write Configuration: This procedure enables the Service Consumer to request the CM service 18
+Producer for writing configuration changes related to one or more managed entities. The CM 19
+service Producer responds to the Service Consumer with the status of the write operation for 20
+the configuration changes requested by the Service Consumer or indicates a failure with an 21
+appropriate cause.     22
+5.5 O2-related Services  23
+5.5.1 General  24
+As described in the Non-RT RIC Architecture specification [3], the O2-related services produced by the 25
+SMO/Non-RT RIC framework provide access to O-Cloud management functionality that enables the Service 26
+Consumer: 27
+• To obtain information related to O-Cloud infrastructure management such as, 28
+- Infrastructure Inventory. 29
+- Infrastructure Monitoring. 30
+- Infrastructure Provisioning. 31
+- Infrastructure Lifecycle Management. 32
+- Infrastructure Software Management. 33
+• To obtain information related to O-Cloud deployment management such as, 34
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24
+O-RAN.WG2.R1GAP-R003-v04.00
+- Deployment Inventory. 1
+- Deployment Monitoring. 2
+- Deployment Lifecycle Management. 3
+• To provision changes of the configuration of the O-Cloud. 4
+• To obtain additional information related to the O-Cloud. 5
+NOTE: Details about O-Cloud deployment management services, provision of configuration changes, 6
+additional information related to the O-Cloud are FFS. 7
+5.5.2 O2 Infrastructure management service   8
+5.5.2.1 Overview  9
+O2 Infrastructure management service allows the Service Consumer to obtain information related to O-10
+Cloud infrastructure management services. 11
+O2 related functions in the SMO/Non-RT RIC framework produce this service as specified in O2IMS [6]. 12
+5.5.2.2 Query O2-IMS Information  13
+O2 Infrastructure management service shall support various information queries that give the rApps access 14
+to information related O-Cloud infrastructure management services. 15
+The following procedures are defined: 16
+ 17
+Query O2ims_Infrastructure Inventory related information: This service procedure allows to 18
+query information related to infrastructure resource inventory and event notification service of O-19
+Cloud.  20
+Query O2ims_InfrastructureMonitoring related information: This service procedure allows to 21
+query information related to telemetry reporting. 22
+Query O2ims_InfrastructureProvisioning information: This service procedure allows to query 23
+information related to O-Cloud provisioning services. 24
+Query O2ims_InfrastructureLifecycleManagement information: This service procedure allows to 25
+query information related to support of procedures for the automation of O-Clouds lifecycle 26
+events. 27
+5.6 AI/ML Workflow Services   28
+NOTE: AI/ML Workflow services are FFS. 29
+6 R1 Interface Protocol Structure  30
+The “R1TP" specification [5] defines the R1 transport protocol stack.  31
+
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25
+O-RAN.WG2.R1GAP-R003-v04.00
+Revision history  1
+Date Revision Description
+2021-11-23 01.00.05 • First version as approved by WG2
+• introduing the Service management and exposure services and Data
+management and exposure services
+
+2021-12-09 01.00.08 Implemented CR: NOK-2021-12-07-WG2-CR-0029-R1GAP-DME leftover comment #42
+from review_v02
+
+2022-02-10 01.00.09 Implemented CR: NOK.AO-2021-12-07-WG2-CR-0028-R1GAP-DME refactoring to make
+data delivery service-based_v04
+2022-02-17 01.00.10 Implemented CR: RMI-2022.01.26-WG2-CR-0002.R1GAP.O2 Related services-v04 on
+O2 Related Services
+2022-02-24 01.00.11 Implemnted CR: ERI-2021.12.01.WG2-CR-0051.R1GAP. A1 Related Services -v06.docx
+2022-03-24 01.00.12 Editorial updates to 01.00.11.
+2022-05-02 02.00.01 Implemented CR NOK-CR-0031-R1GAP-Document structure review comment
+NOK05_v03, NOK -CR-0033-R1GAP-Missing general clauses_v01, NOK-CR-0034-
+R1GAP-Review leftovers policy identifier_v01, ERI-CR-0074-R1GAP Updates to A1
+Policy management service-v02, NOK-2022-04-12-WG2-CR-0032-R1GAP-Review
+leftovers small issues_v02.
+2022-05-12 02.00.02 Implemented INT -CR-00034-authorization in SME services-v01 and  NOK.AO-CR-0040-
+R1GAP-DME Data Offer_v03.
+2022-06-28 02.00.03 Implemented ERI-CR-0075-R1GAP Updates to Service management and Exposure
+service-v04 and NEC-CR-0015-R1GAP change of the status of the A1 policy-v02, NOK-
+2022-06-21-WG2-CR-0042-R1GAP-Alarm Ack_v02.
+2022-07-08 02.00.04 Implemented NOK-2022-06-21-WG2-CR-0044-R1UCR-Alarm Ack-v02.
+2022-07-14 02.00.05 Implemented CMCC-2022.06.24-WG2-CR-0010-Add A1 EI related services in R1GAP-
+v02 and CMCC-2022.06.16-WG2-CR-0009-R1GAP updates on service management and
+exposure service-v01.
+2022-07-20 02.00.06 Implemented NOK.AO-2022-06-28-WG2-CR-0047-R1GAP-
+Fixing_data_type_discovery_v02,MAV.AO-2022-06-22-WG2-CR-0003, CR004,CR006,
+and CR007-R1GAP Configuration management service Overview R1draftFinal-v08.
+2022-09-22 03.00.01 Implemented NOK.AO-2022-08-05-WG2-CR-0055-R1GAP-DME services modularization
+and refactoring_v03 and NOK.AO-2022-08-05-WG2-CR-0054-R1GAP-SME services
+modularization_v02.
+2022-09-27 03.00.02 Implemented NOK-2022-09-22-WG2-CR-0060-R1GAP-Fixes to DME service followup of
+CR 0055_v02 and NEC-2022.09.12-WG2-CR-0023-R1GAP  supported data delivery
+method in Register data type procedure-v01
+2022-10-27 03.00.03 Implemented NOK.AO-2022-09-29-WG2-CR-0062-R1GAP-Support of request and
+subscription in DME data type registration_v02 and ERI-2022.10.19-WG2-CR-0130-R1
+GAP update to New TS template-v01 to update the templete to New O-RAN TS template
+2022-11-10 03.00.04 Implemented NEC-2022.10.13-WG2-CR-0025-R1GAP Clarification on heartbeat service -
+v01 and changed the font(from Times new roamn to Calibri) to aling with O-RAN template
+2022-11-18 03.00.05 Implemented comments from Nokia, Jio, Ericsson ,QCM and Intel
+ 2
+History 3
+Date Revision Description
+2022-11-18 04.00 Published as Final version 04.00
+2022-07-27 03.00 Published as Final version 03.00.
+2022-03-31 02.00 Published as Final version 02.00
+2021-11-23 01.00 Published as Final version 01.00
+ 4

@@ -1,0 +1,1948 @@
+Technical Specification
+Copyright©2024bytheO-RANALLIANCEe.V.
+Thecopyingorincorporationintoanyotherworkofpartorallofthematerialavailableinthisspecificationinanyform
+withoutthepriorwrittenpermissionofO-RANALLIANCEe.V. isprohibited,savethatyoumayprintordownloadextracts
+ofthematerialofthisspecificationforyourpersonaluse,orcopythematerialofthisspecificationforthepurposeofsending
+toindividualthirdpartiesfortheirinformationprovidedthatyouacknowledgeO-RANALLIANCEasthesourceofthe
+materialandthatyouinformthethirdpartythattheseconditionsapplytothemandthattheymustcomplywiththem.
+O-RANALLIANCEe.V.,BuschkaulerWeg27,53347Alfter,Germany
+RegisterofAssociations,BonnVR11238,VATIDDE321720189
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-
+v05.00
+Non-RT RIC: Architecture
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Contents
+Foreword.............................................................................................................................................................4
+Modalverbsterminology....................................................................................................................................4
+1 Scope........................................................................................................................................................5
+2 References................................................................................................................................................5
+2.1 Normativereferences..........................................................................................................................................5
+2.2 Informativereferences........................................................................................................................................5
+3 Definitionofterms,symbolsandabbreviations.......................................................................................6
+3.1 Terms...................................................................................................................................................................6
+3.2 Symbols...............................................................................................................................................................6
+3.3 Abbreviations......................................................................................................................................................7
+4 Overview..................................................................................................................................................7
+4.1 Non-RTRICinO-RANOverallArchitecture....................................................................................................7
+4.2 Non-RTRICComposition..................................................................................................................................7
+5 Requirements............................................................................................................................................7
+5.1 RequirementsfortheNon-RTRICFramework..................................................................................................7
+5.2 RequirementsforR1.........................................................................................................................................10
+5.3 RequirementsforrApps....................................................................................................................................10
+6 Non-RTRICArchitecture......................................................................................................................10
+7 R1ServiceDefinitions...........................................................................................................................11
+7.1 GeneralDescription..........................................................................................................................................11
+7.2 Servicemanagementandexposureservices.....................................................................................................12
+7.3 Datamanagementandexposureservices..........................................................................................................12
+7.4 A1-relatedServices...........................................................................................................................................13
+7.4.1 A1policymanagementservices..................................................................................................................13
+7.4.2 A1enrichmentinformationrelatedservices................................................................................................14
+7.5 RANOAM-relatedServices.............................................................................................................................14
+7.6 O2-relatedservices............................................................................................................................................15
+7.7 AI/MLworkflowservices.................................................................................................................................15
+7.8 rAppmanagementservices...............................................................................................................................16
+7.9 TE&IV-relatedservices....................................................................................................................................16
+8 Non-RTRICFunctionDefinitions.........................................................................................................16
+8.1 GeneralDescriptions.........................................................................................................................................16
+8.2 R1servicemanagementandexposurefunctions..............................................................................................17
+8.2.1 Serviceregistrationanddiscoveryfunctions...............................................................................................17
+8.2.2 Authenticationandauthorisationfunctions.................................................................................................17
+8.3 Datamanagementandexposurefunctions........................................................................................................17
+8.4 A1-relatedfunctions..........................................................................................................................................18
+8.4.1 A1Policyfunctions.....................................................................................................................................18
+8.4.2 A1enrichmentinformationfunctions.........................................................................................................18
+8.5 RANOAM-relatedfunctions............................................................................................................................19
+8.6 O2-relatedfunctions..........................................................................................................................................19
+8.7 AI/MLworkflowfunctions...............................................................................................................................19
+9 ExternalInterfaces..................................................................................................................................20
+9.1 A1Interface.......................................................................................................................................................20
+9.2 OtherInterfaces.................................................................................................................................................20
+10 Procedures..............................................................................................................................................20
+10.1 Datamanagementandexposureprocedures.....................................................................................................20
+10.1.1 Subscribedataproceduresindataconsumptionandcollection..................................................................20
+10.1.2 Requestdataprocedureindataconsumptionanddatacollection...............................................................26
+10.1.3 O1relateddatacollectionproceduresbasedondatasubscription..............................................................28
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+10.1.4 O2relateddatacollectionproceduresbasedondatasubscription..............................................................30
+10.1.5 Dataofferprocedures..................................................................................................................................32
+10.2 A1-relatedprocedures.......................................................................................................................................35
+10.2.1 EIresultscollectionfromrApps..................................................................................................................35
+10.3 RANOAM-relatedprocedures.........................................................................................................................38
+10.3.1 Alarmqueryprocedure................................................................................................................................38
+10.3.2 Changealarmacknowledgementstateprocedure.......................................................................................39
+10.3.3 Readconfigurationdataprocedure..............................................................................................................41
+10.3.4 Writeconfigurationchangesprocedure.......................................................................................................43
+10.4 AI/MLworkflowprocedures............................................................................................................................45
+10.4.1 rAppsregister,discoverAI/MLmodels,andsubscribetomodelschanges...............................................45
+10.4.2 AI/MLtrainingprocedures..........................................................................................................................47
+10.4.3 AI/MLmodelstorageandretrievalprocedures...........................................................................................54
+Annex (informative): Change History.........................................................................................................56
+History..............................................................................................................................................................57
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Foreword
+ThisTechnicalSpecification(TS)hasbeenproducedbyWG2oftheO-RANAlliance.
+ThecontentsofthepresentdocumentaresubjecttocontinuingworkwithinO-RANandmaychangefollowingformalO-RAN
+approval.ShouldtheO-RANAlliancemodifythecontentsofthepresentdocument,itwillbere-releasedbyO-RANwithan
+identifyingchangeofversiondateandanincreaseinversionnumberasfollows:
+versionxx.yy.zz
+where:
+xx: thefirstdigit-groupisincrementedforallchangesofsubstance,i.e.technicalenhancements,corrections,updates,etc.
+(theinitialapproveddocumentwillhavexx=01). Always2digitswithleadingzeroifneeded.
+yy: theseconddigit-groupisincrementedwheneditorialonlychangeshavebeenincorporatedinthedocument.Always2
+digitswithleadingzeroifneeded.
+zz: thethirddigit-groupincludedonlyinworkingversionsofthedocumentindicatingincrementalchangesduringthe
+editingprocess.Externalversionsneverincludethethirddigit-group. Always2digitswithleadingzeroifneeded.
+Modal verbs terminology
+Inthepresentdocument"shall","shall not","should","should not","may","need not","will","will not","can"and
+"cannot"aretobeinterpretedasdescribedinclause3.2oftheO-RANDraftingRules(Verbalformsfortheexpressionof
+provisions).
+"must"and"must not"areNOT allowedinO-RANdeliverablesexceptwhenusedindirectcitation.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+1 Scope
+ThepresentdocumentspecifiesthetechnicalspecificationfortheNon-RTRIC(RANIntelligentController)architecture.This
+documentcollectsrequirementsontheNon-RTRICframework,hostedapplications,andservicesoftheR1interface.This
+documentspecifiesNon-RTRICframeworkfunctionalitiesandservicesexposedtotheapplications.
+2 References
+2.1 Normative references
+Referencesareeitherspecific(identifiedbydateofpublicationand/oreditionnumberorversionnumber)ornon-specific.For
+specificreferences,onlythecitedversionapplies.Fornon-specificreferences,thelatestversionofthereferenceddocument
+(includinganyamendments)applies.
+NOTE: Whileanyhyperlinksincludedinthisclausewerevalidatthetimeofpublication,O-RANcannotguaranteetheir
+long-termvalidity.
+Thefollowingreferenceddocumentsarenecessaryfortheapplicationofthepresentdocument.
+[1] Void.
+[2] O-RANTS:“O-RANArchitectureDescription”(“OAD”).
+[3] O-RANTS:“Non-RTRICandA1/R1interface:UseCaseandRequirements”(“WG2UCR”).
+[4] O-RANTS:“A1interface:GeneralAspectsandPrinciples”(“A1GAP”).
+[5] O-RANTS:“A1interface:ApplicationProtocol”(“A1AP”).
+[6] O-RANTS:“A1interface:TransportProtocol”(“A1TP”).
+[7] O-RANTS:“A1interface:TypeDefinitions”(“A1TD”).
+[8] O-RANTS:“O-RANOperationsandMaintenanceArchitecture”(“OAMArch”).
+[9] O-RANTS:“R1interface:GeneralAspectsandPrinciples”(“R1GAP”).
+[10] O-RANTS:“SecurityRequirementsSpecification”(“SRS”).
+[11] O-RANTS:“O-RANOperationsandMaintenanceInterfaceSpecification”(“O1interface”).
+[12] O-RANTS:“TopologyExposureandInventoryManagementServicesUseCasesandRequirement
+Specification”(“TE&IV”).
+[13] O-RANTS:“O2InterfaceGeneralAspectsandPrinciples”(“O2GAP”).
+2.2 Informative references
+Referencesareeitherspecific(identifiedbydateofpublicationand/oreditionnumberorversionnumber)ornon-specific.For
+specificreferences,onlythecitedversionapplies.Fornon-specificreferences,thelatestversionofthereferenceddocument
+(includinganyamendments)applies.
+NOTE: Whileanyhyperlinksincludedinthisclausewerevalidatthetimeofpublication,O-RANcannotguaranteetheir
+long-termvalidity.
+Thefollowingreferenceddocumentsarenotnecessaryfortheapplicationofthepresentdocument,buttheyassisttheuserwith
+regardtoaparticularsubjectarea.
+[i.1] 3GPPTR21.905:“Vocabularyfor3GPPSpecifications”.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+3 Definition of terms, symbols and abbreviations
+3.1 Terms
+Forthepurposesofthepresentdocument,thetermsanddefinitionsgivenin3GPPTR21.905[i.1]andthefollowingapply.
+Atermdefinedinthepresentdocumenttakesprecedenceoverthedefinitionofthesameterm,ifany,in3GPPTR21.905[i.1].
+Functions anchored inside the Non-RT RIC framework: LogicalfunctionsintheSMOframeworkthatarepartoftheNon-
+RTRICframework.
+NOTE1: Thedefinitionmakesnoassumptiononthemandatoryoroptionalqualifierofthefunctionbeinganchored.
+Functions anchored outside the Non-RT RIC framework: LogicalfunctionsintheSMOframeworkthatarenotpartofthe
+Non-RTRICframework.
+NOTE2: Thedefinitionmakesnoassumptiononthemandatoryoroptionalqualifierofthefunctionbeinganchored.
+Non-RT RIC (O-RAN Non-Real-Time RAN Intelligent Controller): alogicalfunctionwithinSMOthatenablesnon-real-
+timecontrolandoptimizationofRANelementsandresources,AI/MLworkflowincludingmodeltrainingandupdates,and
+policy-basedguidanceofapplications/featuresinNear-RTRIC.
+Near-RT RIC (O-RAN Near-Real-Time RAN Intelligent Controller): alogicalfunctionthatenablesnear-real-timecontrol
+andoptimizationofRANelementsandresourcesviafine-grained(e.g.UEbasis,Cellbasis)datacollectionandactionsover
+E2interface.
+Non-anchored functions: LogicalfunctionsintheSMOframeworkthatmayormaynotbepartoftheNon-RTRIC
+framework.
+NOTE3: Thedefinitionmakesnoassumptiononthemandatoryoroptionalqualifierofthefunctionbeingnon-anchored.
+R1 Data Producer: Anentitycapableofproducingdatawhichcanbeconsumedbyotherentitiesandofregisteringfor
+discoveryinformationaboutthetypesofthesedatainthecontextofthedatamanagementandexposureservice.
+R1 Data Consumer: Anentitycapableofconsumingdataoriginatingfromotherentitiesinthecontextofthedata
+managementandexposureservice.
+AI/ML model: AnalgorithmthatappliesAI/MLtechniquestoproducemodeloutputdatabasedonmodelinputdata.
+AI/ML model training: AprocesstotrainanAI/MLmodelbylearningtheinput/outputrelationshipinadatadrivenmanner
+andobtainatrainedAI/MLmodelthatcanbeusedforinference.
+AI/ML model parameter: InternalparameterofanAI/MLmodelthatislearntduringAI/MLmodeltraining.
+Hyperparameter: AparameterwhosevaluecontrolsthelearningprocessandthetopologyofanAI/MLmodelandwhich
+influencesthequalityofthelearningprocess.
+AI/ML model inference: AprocessofusinganAI/MLmodeltoproducemodeloutputdatabasedonmodelinputdata.
+AI/ML model performance monitoring: AprocedurethatmonitorstheinferenceperformanceofadeployedAI/MLmodel.
+rApp instance: AnindividualoccurrenceofaNon-RTRICapplicationrunningintheNon-RTRICruntimeenvironment.
+rApp instance identifier: AuniqueidentifierforeachrAppinstance,assignedbytheSMO/Non-RTRICframeworkduring
+rAppregistration.
+DME type:datatypemanagedandexposedbytheDMEservicesandidentifiedbyadatatypeidentifier.
+3.2 Symbols
+Void.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+3.3 Abbreviations
+Forthepurposesofthepresentdocument,thefollowingabbreviationsapply.
+AI ArtificialIntelligence
+EI EnrichmentInformation
+ML MachineLearning
+Near-RTRIC Near-real-timeRANIntelligentController
+Non-RTRIC Non-real-timeRANIntelligentController
+rAppId rAppInstanceIdentifier
+RAN RadioAccessNetwork
+SMO ServiceManagementandOrchestration
+TE&IV TopologyExposureandInventoryManagement
+4 Overview
+4.1 Non-RT RIC in O-RAN Overall Architecture
+Non-RealTimeRANIntelligentController(Non-RTRIC)isthefunctionalityinternaltotheServiceManagementand
+Orchestration(SMO)frameworkinO-RANoverallarchitecture,asshowninO-RANOAD[2],Figure4.1-2.
+ Non-RTRICrepresentsasubsetoffunctionalityoftheSMOframework.
+ Non-RTRICsupportsintelligentRANoperationandoptimization.
+ Non-RTRIClogicallyterminatestheA1interface,anditprovidespolicy-basedguidanceandenrichmentinformation
+totheNear-RTRICs.AI/MLmodelmanagementontheA1interfaceisnotspecifiedinthepresentdocument.
+ Non-RTRICcanaccessotherSMOframeworkfunctionalities,forexampleinfluencingwhatiscarriedacrosstheO1,
+openfronthaulM-planeandO2interface.
+4.2 Non-RT RIC Composition
+Non-RTRICiscomprisedof:
+ Non-RTRICFramework–FunctionalityinternaltotheSMOFrameworkthat:
+- LogicallyterminatestheA1interfacetotheNear-RTRIC.
+- ExposessetofR1servicestoNon-RTRICApplications(rApps).
+ Non-RTRICApplications(rApps)–ApplicationsthatleveragethefunctionalitiesavailableintheSMO/Non-RTRIC
+frameworktoprovidevalueaddedservicesrelatedtoRANoperationandoptimization.ThescopeofrAppsincludes,
+butisnotlimitedto,radioresourcemanagement,dataanalytics,andprovidingenrichmentinformation.
+5 Requirements
+5.1 Requirements for the Non-RT RIC Framework
+[REQ-NRTFWK-FUN1] The Non-RT RIC framework shall support functionality to register services along with
+their service producers in the Non-RT RIC and SMO.
+[REQ-NRTFWK-FUN2] The Non-RT RIC framework shall support functionality to allow service consumers to
+discover services.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+[REQ-NRTFWK-FUN3] The Non-RT RIC framework shall support functionality to allow service consumers to
+subscribe/unsubscribe notifications about newly registered/updated/deregistered
+services.
+[REQ-NRTFWK-FUN4] The Non-RT RIC framework shall support functionality to notify subscribed service
+consumers about newly registered/updated/deregistered services.
+[REQ-NRTFWK-FUN5] The Non-RT RIC framework shall support functionality to authenticate service
+consumers.
+[REQ-NRTFWK-FUN6] The Non-RT RIC framework shall support functionality to authorize service consumers
+to access services.
+[REQ-NRTFWK-FUN7] The Non-RT RIC framework shall support functionality to send messages to and
+receive messages from the Near-RT RIC via the A1 interface.
+[REQ-NRTFWK-FUN8] The Non-RT RIC framework shall support functionality to allow Data Consumers
+(including rApps) to register DME types they consume, if such functionality is not
+supported in the SMO framework.
+[REQ-NRTFWK-FUN9] The Non-RT RIC framework shall support functionality to allow Data Producers
+(including rApps) to register DME types they produce, if such functionality is not
+supported in the SMO framework.
+[REQ-NRTFWK-FUN10] The Non-RT RIC framework shall support functionality to allow Data Consumers
+(including rApps) to subscribe/request instances of registered DME types for
+consumption, if such functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN10a] The Non-RT RIC framework shall support functionality to allow Data Producers
+(including rApps) to offer instances of registered DME types for collection and storage,
+if such functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN11] The Non-RT RIC framework shall support functionality to train AI/ML models, if such
+functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN12] The Non-RT RIC framework shall support functionality to allow service consumers to
+store and retrieve trained AI/ML models, if such functionality is not supported in the
+SMO framework
+[REQ-NRTFWK-FUN13] The Non-RT RIC framework shall support functionality to monitor the performance for
+deployed AI/ML models in runtime, if such functionality is not supported in the SMO
+framework
+[REQ-NRTFWK-FUN14] The Non-RT RIC framework may support functionality to collect external enrichment
+information from external enrichment information sources.
+[REQ-NRTFWK-FUN15] The Non-RT RIC framework may support functionality to retrieve trained AI/ML models
+(and metadata) from external AI/ML service providers.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+[REQ-NRTFWK-FUN16] The Non-RT RIC framework may support functionality to allow external sources to inject
+RAN intents, suspend/resume/check rApps, and
+configure/check/initiate/suspend/resume/terminate AI/ML training processes.
+[REQ-NRTFWK-FUN17] The Non-RT RIC framework shall support functionality to consolidate the alarm
+information from multiple managed entities, if such functionality is not supported in the
+SMO framework.
+[REQ-NRTFWK-FUN18] The Non-RT RIC framework shall support functionality to store alarm acknowledgement
+state for alarms originating from managed entities that do not support alarm
+acknowledgement state change, if such functionality is not supported in the SMO
+framework.
+[REQ-NRTFWK-FUN19] The Non-RT RIC framework shall have the capability to identify the potentially
+applicable Near-RT RIC(s) for A1 policy creation if the Near-RT RIC identifier is absent
+in the create A1 policy request received from the rApp.
+NOTE: SelectionofpotentiallyapplicableNear-RTRIC(s)maybebased,e.g.,onthecontentofthereceivedcreateA1
+policyrequestoronconfiguration.
+[REQ-NRTFWK-FUN20] The Non-RT RIC framework shall support the functionality to collect trace data, from
+multiple managed entities, if such functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN21] The Non-RT RIC framework shall support the functionality to collect analytical data from
+the Near-RT RIC, if such functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN22] The Non-RT RIC framework shall support functionality to allow Data Consumers
+(including rApps) to consume Deployment Telemetry metrics collected by the O2-
+related functions.
+[REQ-NRTFWK-FUN23] The Non-RT RIC framework shall support functionality to allow Data Consumers
+(including rApps) to consume Infrastructure Telemetry metrics collected by the O2-
+related functions.
+[REQ-NRTFWK-FUN24] The Non-RT RIC framework shall support functionality that allows managing the
+configuration of an rApp, if such functionality is not supported in the SMO framework.
+[REQ-NRTFWK-FUN25] The Non-RT RIC framework shall support functionality that allows obtaining, from an
+rApp, information about that rApp's performance, if such functionality is not supported in
+the SMO framework.
+[REQ-NRTFWK-FUN26] The Non-RT RIC framework shall support functionality that allows obtaining, from an
+rApp, fault information related to that rApp, if such functionality is not supported in the
+SMO framework.
+[REQ-NRTFWK-FUN27] The Non-RT RIC framework shall support functionality that allows obtaining, from an
+rApp, logging information reported by the rApp, if such functionality is not supported in
+the SMO framework.
+[REQ-NRTFWK-FUN28] The Non-RT RIC framework shall support functionality to store log information received
+from rApps, if such functionality is not supported in the SMO framework.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+[REQ-NRTFWK-FUN29] The Non-RT RIC framework shall support functionality that allows an rApp to obtain,
+over the R1 interface, TE&IV information based on the requirements defined in O-RAN
+TE&IV [12], if such functionality is not supported in the SMO framework.
+Inaddition,thesecurityrequirementsfortheNon-RTRICspecifiedinO-RANSRS[10],clause5.1.2apply.
+5.2 Requirements for R1
+O-RANWG2UCR[3]specifiesR1interfacefunctionalrequirements.
+5.3 Requirements for rApps
+ThesecurityrequirementsforrAppsspecifiedinO-RANSRS[10],clause5.1.2apply.
+6 Non-RT RIC Architecture
+ThefollowingfiguredepictsthereferencearchitectureoftheNon-RTRICaspartoftheSMOframework.
+Figure 6-1: Non-RT RIC Reference Architecture
+TherearethreecategoriesoflogicalfunctionsinNon-RTRICframeworkandSMOframework:
+ FunctionsanchoredinsidetheNon-RTRICframework,whichareindicatedinsolidblueboxinFigure6-1.
+ FunctionsanchoredoutsidetheNon-RTRICframework,whichareindicatedinsolidorangeboxinFigure6-1.
+ Non-anchoredfunctions,whichareindicatedindashedlineboxinFigure6-1.
+ThecategoriesaredefinedinClause3.1.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Thedecompositionoflogicalfunctionsisnotmandatory,anditisuptovendor’simplementation.
+NOTE1: TheremightbeotherSMOframeworkfunctionsorotherNon-RTRICframeworkfunctionswhichmayprovide
+additionalservicesexposedviatheR1interfaceorprovideEIforA1enrichmentinformationservices.Theseare
+notspecifiedinthepresentdocument.
+NOTE2: OtherSMOframeworkfunctionsmaybedefinedbyotherO-RANWGsandthepotentialimpactsonNon-RT
+RICarchitecturearenotspecifiedinthepresentdocument.
+NOTE3: WhethertheA1-relatedfunctionsareanchoredfunctionsornotisnotspecifiedinthepresentdocument.
+NOTE4: Amongotherfunctionalities,theOtherSMOframeworkfunctionsalsorealizeOAMfunctionalityrelatedto
+RAN-specificnetworkslicing.
+NOTE5: TheTopologyExposureandInventoryManagementfunctionsarenotelaboratedinthispresentdocument.
+TheR1servicesareacollectionofservicesproducedbylogicalfunctionsintheSMO/Non-RTRICframeworkorbyrApps.
+R1servicemanagementandexposurefunctionsenable(notlimitedto):ServiceRegistration,ServiceDiscovery,Service
+Notification,Authorization,Authentication,Communicationsupport,andoptionalbootstrapandheartbeatservices.
+TherAppmanagementfunctionsenablethemanagementofrAppswithinthecontextoftheSMO/Non-RTRICframework.
+Suchfunctionsenable(notlimitedto)theconfigurationofrApps,providingaccesstofaultandperformancerelated
+informationfromrApps,andfacilitationofrApploggingfunctionality.ThroughtheuseofR1,rAppmanagementfunctions
+canprovideaccesstothesefunctionalitiesinaconsistentmannertoallrApps.Suchconsistencyisparticularlyvaluableas
+rAppscanbeprovidedindependentlybydifferentrAppvendors.
+TheR1terminationenablestheNon-RTRICframeworkandrAppstoexchangemessagestoaccesstheR1servicesviatheR1
+interface.
+Theimplementation-specificinterfaces,whichareindicatedbythedashedlineinFigure6-1,allowthelogicalfunctionsin
+SMO/Non-RTRICframeworktocommunicatewitheachotherbymeansoutsidethescopeofthepresentdocument.
+7 R1 Service Definitions
+7.1 General Description
+Aserviceisasetofcapabilitiesrelatedtoeachother,offeredbyaserviceproducertoserviceconsumer(s)forconsumption.
+Thecapabilitieswithinaservicetypicallyhaveacommonpurposeandcanbeinter-dependent.Inordertoimprovere-
+usability,themutualcouplingacrossanytwoservicesisusuallyavoidedorminimized.Servicesareproducedbyservice
+producersandconsumedbyserviceconsumersthroughserviceendpoints(typicallyAPIs).Theinteroperabilityofservice
+producersandserviceconsumersisensuredbysupportoftherelatedserviceendpoints,butitdoesnotdependonthe
+decompositionoflogicalfunctions.Beingaserviceproducerand/oraserviceconsumerisaroleofanrApporofalogical
+functionintheSMOortheNon-RTRICframework(seeClause6).
+ThesetofR1serviceswhichcanbeaccessedviatheR1interfaceincludes(butisnotlimitedto):
+ Servicemanagementandexposureservices,whichincludeserviceregistrationandservicediscoveryservices,
+authenticationservices,authorizationservicesandcommunicationsupportservices.Theservicemanagementand
+exposureservicessupportextensibilityofthesetofR1services.
+ Datamanagementandexposureservices,whichdeliverdatacreatedorcollectedbyDataProducerstoData
+Consumersaccordingtotheirneeds.
+ A1-relatedservices,whichprovideaccesstofunctionalityrelatedtoA1.
+ AI/MLworkflowservices,whichprovideaccesstoAIandMLworkflow.
+ RANOAM-relatedservices,whichprovideaccesstoRANOAMfunctionalityrelatedtotheO1andopenfronthaul
+M-planeinterfaces,andtotheOAMfunctionalityrelatedtoRAN-specificnetworkslicingintheSMOframework.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+ O2-relatedservices,whichprovideaccesstofunctionalityrelatedtoO2.
+ rAppmanagementservices,whichprovidefunctionalityformanagingrApps.
+ TE&IV-relatedservices,whichprovideaccesstotopologyandinventorydata.
+NOTE: ApartoftheserviceslistedabovemaybeusedonotherO-RAN-definedinterfacesaswell.
+7.2 Service management and exposure services
+Thefollowingservicemanagementandexposureservicesaredefined:
+ Bootstrapservice(Optional):ItenablesanrApptodiscovertheendpointsoftheservicemanagementandexposure
+service.
+ Registrationofservices:Itallowstoregisterserviceswhichincludesstoringandmaintainingprofileabouteach
+service.Itfurtherallowstoderegisterservicesanddeletetheserviceprofile.
+ Discoveryofservices:Itsupportsservicediscoveryforaserviceconsumertofindservicesbasedonitsselection
+criteriaifitisprovided.Further,basedonthesubscription,itnotifiesitsserviceconsumersaboutthenewly
+registered/updated/deregisteredservices.
+ Heartbeatservice(Optional):ItenablesanrApptomaintainitsR1serviceregistrationstatuswiththeService
+managementandexposureservicesProducer.
+ Authentication:Itallowstheauthenticationofaserviceproducerand/oraserviceconsumer.
+ Authorisation:ItsupportstograntServiceConsumersaccesstoregisteredR1servicesandtoallowserviceproducers
+toproduceR1services.
+ Communicationsupport(Optional):ItsupportsinteractionofR1serviceconsumersandproducerswitheachother.
+NOTE: Communicationsupportisnotspecifiedinthepresentdocument.
+7.3 Data management and exposure services
+Thefollowingdatamanagementandexposureservicesaredefined:
+ Dataregistrationservice:DataregistrationallowsdataproducerstocommunicateinformationabouttheDMEtypes
+thattheyareabletoproduce.DataproducersneedtobeauthorizedtoregisterDMEtypes.
+ Datadiscoveryservice:DatadiscoveryallowsDataConsumerstodiscoveravailableDMEtypesintheSMO/Non-RT
+RICframework.DataConsumersneedtobeauthorizedtodiscoverDMEtypes.
+ Datasubscriptionservice:UsingtheSubscribedataprocedure,itallowsDataConsumerstoconsumedata
+continuouslyfromtheSMO/Non-RTRICframeworkanditfurtherallowstheSMO/Non-RTRICframeworkto
+collectdatacontinuouslyfromDataProducers.
+ Datarequestservice:UsingtheRequestdataprocedure,itallowsDataConsumerstoconsumedataoncefromthe
+SMO/Non-RTRICframeworkanditfurtherallowstheSMO/Non-RTRICframeworktocollectdataoncefromData
+Producers.
+ Datadeliveryservices:TheseallowtodeliverdataforconsumptionfromtheSMO/Non-RTRICframeworktoData
+Consumers.TheyfurtherallowtodeliverdataforcollectionfromDataProducerstotheSMO/Non-RTRIC
+framework.
+ Dataofferservice:ItallowsaDataProducertotriggerthecollectionofadatainstancebytheSMO/Non-RTRIC
+frameworkfromthisDataProducer.
+ Dataprocessingservices[Optional]:TheseallowserviceconsumerstoaccessdataprocessingintheSMO/Non-RT
+RICframework.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+NOTE: Dataprocessingservicesarenotspecifiedinthepresentdocument.
+DataProducers(e.g.,rApps)communicateinformationabouttheDMEtypesthattheyproduceindataregistration.Data
+ProducerscancommunicateconstraintsrelatedtotheauthorizationoftheDataConsumerstodiscoverregisteredDMEtypes
+andaccessproduceddata.DataProducerscommunicateinformationabouthowthedataarecollectedbytheSMO/Non-RT
+RICframework(e.g.,collectionperiodicity,event-triggerconditions,pushorpull,etc.).
+DataConsumers(e.g.,rApps)communicateinformationabouttheDMEtypesthattheywanttodiscover.DataConsumers
+subscribe/requestdatafromtheSMO/Non-RTRICframeworkforconsumptionwithspecificDMEtype,periodicity,and
+delivery(orreporting)method,scope,etc.Thedelivery(orreporting)methodcontainsinformationabouthowthe
+subscribed/requesteddataaredeliveredfromtheSMO/Non-RTRICframework(e.g.,deliveryperiodicity,event-trigger
+conditions,pushorpull,etc.).
+ADataProducerthatintendstotriggerthecollectionofadatainstancethatitproducesdefinesadataofferbyprovidingtothe
+SMO/Non-RTRICframeworkinformationaboutthedatainstanceitintendstoproduce.Theinformationaboutthedataoffer
+includesthepropertiesofthedatainstanceandthesupporteddeliveryservices.Thecollectionofthedatainstancestartswhen
+thedataoffercreationhasbeenconfirmedbytheSMO/Non-RTRICframework.
+SMO/Non-RTRICframeworkcollectsdataproducedbyDataProducers.SMO/Non-RTRICframeworkdeliversdatatoData
+Consumersforconsumption.SMO/Non-RTRICframeworkstorescollecteddata.Ifthecollectionofthedatawastriggeredby
+adatasubscriptionordatarequest,datastorageisoptional.SMO/Non-RTRICframeworkcanoptionallyprocesscollected
+and/orstoreddata(e.g.,quantization,normalization,labelling,correlation,etc.).
+7.4 A1-related Services
+7.4.1 A1 policy management services
+A1policymanagementservicesprovidedbytheSMO/Non-RTRICframeworkenable:
+ DiscoveryofsupportedA1policytypes.
+- rAppqueriessupportedA1policytypes.
+- rAppsubscribes/unsubscribesnotificationforchangesofsupportedA1policytypes.SMO/Non-RTRIC
+frameworknotifiesthesubscribedevents(e.g.,newpolicytypesareaddedintothesupportinglist,existing
+policytypesareremoved,etc.).
+ Creating,updating,querying,anddeletingA1policies.
+- rAppcreatesA1policiesintheSMO/Non-RTRICframework.SMO/Non-RTRICframeworkassignsunique
+policyidentifiersforcreatedA1policies.
+- rAppupdatesA1policiescreatedbyitselfusingassignedpolicyidentifiers.
+- rAppqueriesA1policiesintheSMO/Non-RTRICframework.
+ rAppqueriesA1policiesappliedtoagivenscope(e.g.,aUE,agroupofUEs,aslice,aQoSflow,acell,a
+Near-RTRIC,apolicytype,etc.).SMO/Non-RTRICframeworkreturnsqueriedA1policiesalongwith
+assignedpolicyidentifiers.
+ rAppqueriesA1policiesusingpolicyidentifiers,ifidentifiersareknowntotherApp.
+ rAppcanqueryA1policiescreatedbyitself.
+ rAppcanqueryA1policiescreatedbyotherrAppwithSMO/Non-RTRICframework’sauthorization.
+- rAppdeletesA1policiescreatedbyitselfusingassignedpolicyidentifiers.
+ QueryingenforcementstatusofA1policies.
+- rAppqueriesenforcementstatusofA1policiesusingpolicyidentifiers,ifidentifiersareknowntotherApp.
+- rAppcanqueryenforcementstatusofA1policiescreatedbyitself.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+- rAppcanqueryenforcementstatusofA1policiescreatedbyotherrAppwithSMO/Non-RTRICframework’s
+authorization.
+ SubscriptiontoeventnotificationsrelatedtoA1policies.
+- rAppsubscribes/unsubscribesnotificationsforthecreation,modification,anddeletionofA1policiescreatedby
+otherrApps.SMO/Non-RTRICframeworknotifiesrAppofthesubscribedevents(e.g.,anewA1policyis
+created,anA1policyisupdated,anA1policyisremoved,etc.),iftherAppisauthorizedbytheSMO/Non-RT
+RICframeworktoreceivenotificationsrelatedtoA1policiescreatedbyotherrApps.
+ SubscriptionrequestcanbebasedonagivenscopetowhichA1policiesareapplied(e.g.,aUE,agroup
+ofUEs,aslice,aQoSflow,acell,aNear-RTRIC,apolicytype,etc.).
+ SubscriptionrequestforA1policymodificationanddeletioncanbebasedonpolicyidentifiers,ifpolicy
+identifiersareknowntotherApp.
+- rAppsubscribes/unsubscribesnotificationsforchangesinenforcementstatusofA1policies.SMO/Non-RTRIC
+frameworknotifiesrAppofthesubscribedevents.IfthesubscriptionrequestappliestotheA1policiescreated
+byotherrApps,rAppneedsauthorizationfromtheSMO/Non-RTRICframeworktoreceivenotificationsfor
+enforcementstatuschangesofA1policiescreatedbyotherrApps.
+ SubscriptionrequestcanbebasedonagivenscopetowhichA1policiesareapplied(e.g.,aUE,agroup
+ofUEs,aslice,aQoSflow,acell,aNear-RTRIC,apolicytype,etc.).
+ Subscriptionrequestcanbebasedonpolicyidentifiers,ifidentifiersareknowntotherApp.
+7.4.2 A1 enrichment information related services
+A1enrichmentinformationrelatedservicesproducedbytheSMO/Non-RTRICframeworkenable:
+ Registration/deregistrationofEItypes.
+- rAppregistersEItypesofwhichdataitcanproduceasthesourcefortheEIjobresultsdeliveredovertheA1
+interface.
+- rAppderegistersEItypesithasregisteredpreviously.
+NOTE: EItypescannotperdefinition,seeO-RANA1AP[5],beupdated.Ifatypedefinitionismodified,therApp
+needstoregisteranewEItypeandmayderegisterthepreviousEItype.
+7.5 RAN OAM-related Services
+RANOAM-relatedservicesproducedbytheSMO/Non-RTRICframeworkenablerApps:
+ Toobtaininformationaboutalarmsrelatedtothenetworkelements.
+ Toobtainperformanceinformationrelatedtothenetworkelements,includingbutnotlimitedtoinformationrelated
+tonetworkslicing.
+ Toobtainthecurrentconfigurationofthenetworkelements,includingbutnotlimitedtoinformationrelatedto
+networkslicing.
+ Toprovisionchangestotheconfigurationofthenetworkelements,includingbutnotlimitedtoinformationrelatedto
+networkslicing.
+ Toobtaintraceinformationrelatedtothenetwork.
+ Toobtainadditionalinformationrelatedtothenetworkelements,includingbutnotlimitedtoinformationrelatedto
+networkslicing.
+Here,thenetworkelementsrefertotheE2nodes,O-RUandtheNear-RTRIC.TheRANOAM-relatedservicesprovide
+accesstoOAMfunctionalityfor(i)theE2nodesandtheNear-RTRICviatheO1interface,(ii)theO-RUsviatheOpen
+FronthaulM-planeinterface,and(iii)RAN-specificnetworkslicingintheSMOframework.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+7.6 O2-related services
+O2-relatedservicesproducedbytheSMO/Non-RTRICframeworkenablerApps:
+ ToobtaininformationrelatedtoO-Cloudinfrastructuremanagementservicessuchas,
+- InfrastructureInventory.
+- InfrastructureMonitoring.
+- InfrastructureProvisioning.
+- InfrastructureLifecycleManagement.
+- InfrastructureSoftwareManagement.
+ ToobtaininformationrelatedtoO-Clouddeploymentmanagementservicessuchas,
+- DeploymentInventory.
+- DeploymentMonitoring.
+- DeploymentLifecycleManagement.
+ ToprovisionchangesoftheconfigurationoftheO-Cloud.
+ ToobtainadditionalinformationrelatedtotheO-Cloud.
+NOTE: DetailsaboutO-Clouddeploymentmanagementservices,provisioningofconfigurationchangesandadditional
+relatedinformationarenotspecifiedinthepresentdocument.
+7.7 AI/ML workflow services
+ThefollowingAI/MLworkflowservicesaredefined:
+ AI/MLtrainingservices:allowanAI/MLtrainingserviceconsumertorequesttrainingofanAI/MLmodelby
+specifyingthetrainingrequirements(e.g.requireddata,model,validationcriteria,etc).AI/MLtrainingservicescan
+beproducedbytheSMO/Non-RTRICframeworkorbyrApps.
+ AI/MLmodelmanagementandexposureservices:ServicesareproducedbytheSMO/Non-RTRICframeworkand
+enable
+- AI/MLmodelregistration/deregistration:allowsanrApptoregister,updatetheregistrationof,andderegister
+theAI/MLmodelthatitprovides.AnrAppneedstobeauthorisedtoregister,updatetheregistrationof,or
+deregistertheAI/MLmodelitprovides.
+- AI/MLmodeldiscovery:allowsanrApptodiscoverregisteredAI/MLmodel(s)basedonitsselectioncriteriaif
+itisprovided.AnrAppneedstobeauthorisedtodiscoverregisteredAI/MLmodels.
+- AI/MLmodelchangesubscription:allowsanrApptosubscribeandreceivenotificationsofchangesofa
+registeredAI/MLmodel.
+- AI/MLmodelstorage:allowsanrApptorequestthestorageofanAI/MLmodelitregisteredandtheAI/ML
+modelassociatedinformation.
+- AI/MLmodeltrainingcapabilityregistration/deregistration(optionalservice):allowsanAI/MLtrainingservice
+producertoregister/update/deregisteritscapabilityoftraininganAI/MLmodel.
+- AI/MLmodelretrieve:allowsanrApptorequestmodellocationdetailsofaspecificversionofaregistered
+AI/MLmodel.
+ AI/MLmodelperformancemonitoringservices:allowanauthorisedAI/MLperformancemonitoringservice
+consumertorequestmonitoringtheperformanceofadeployedAI/MLmodel.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+NOTE1: TherelationshipbetweenthedeployedAI/MLmodelandtheproducersandconsumersoftheAI/MLmodel
+performancemonitoringservicesisnotspecifiedinthepresentdocument.
+NOTE2: AnauthorizedrAppcanrequestdeploymentofaspecificversionofaregisteredAI/MLmodel.
+7.8 rApp management services
+ThefollowingrAppmanagementservicesaredefined:
+ rAppRegistrationservice:ThisallowsrApptoregisterwiththerAppmanagementservicesProducer.
+ rAppConfigurationservice:ThisserviceallowsrAppconfigurationsettingstobesetandread.
+ rAppPerformanceservice:ThisserviceallowsanrApptoreportontheperformanceoftherAppitselforits
+communicationwithotherentities.
+ rAppFaultservice:ThisserviceallowsanrApptoreportfaultsthatarerelatedtotherAppitselfortoits
+communicationwithotherentities.
+ rAppLogInformationservice:ThisserviceallowsanrApptoconveytheloginformationthattherAppwishesto
+report.
+7.9 TE&IV-related services
+TE&IV-relatedservicesinSMO/Non-RTRICframeworkenablerAppstoaccesstopologyandinventoryinformation.
+RelationshipinformationbetweenvariousTE&IVresourcetypes(e.g.,RANresourcesandO-Cloudresources)isanexample
+oftopologyinformation.
+8 Non-RT RIC Function Definitions
+8.1 General Descriptions
+IntheNon-RTRICarchitectureinClause6,R1servicesareprovidedbyacollectionoflogicalfunctionsinSMO/Non-RT
+RICframeworkorrApps.Theselogicalfunctions,asdefinedinClause6,include(butarenotlimitedto):
+ R1servicemanagementandexposurefunctions:Thesefunctionsproduceservicemanagementandexposureservices.
+ Datamanagementandexposurefunctions:Thesefunctionsproducedatamanagementandexposureservices.
+ AI/MLworkflowfunctions:ThesefunctionsproduceAI/MLworkflowservices.
+ rAppmanagementfunctions:ThesefunctionsproducerAppmanagementservices
+ A1-relatedfunctions:ThesefunctionsproduceA1relatedservices.
+ RANOAM-relatedfunctions:ThesefunctionsproduceRANOAM-relatedservices.
+ O2-relatedfunctions:ThesefunctionsproduceO2relatedservices.
+ R1termination:ItenablestheNon-RTRICframeworkandrAppstoexchangemessagestoaccesstheR1servicesvia
+theR1interface.
+ A1termination:ItenablestheNon-RTRICframeworkandtheNear-RTRICtoexchangemessagesovertheA1
+interface.
+ O1termination:ItenablestheSMOframeworktoexchangemessageswiththeNear-RTRIC/E2nodesovertheO1
+interface.
+ OpenfronthaulM-planetermination:ItenablestheSMOframeworktoexchangemessageswiththeO-RUsoverthe
+OpenfronthaulM-planeinterface.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+ O2termination:ItenablestheSMOframeworktoexchangemessageswiththeO-CloudovertheO2interface.
+ OtherSMOfunctions:Amongotherfunctionalities,thesefunctionsalsoofferRAN-specificslicemanagement
+functionality.
+ Externalterminations:ThesefunctionsenabletheSMO/Non-RTRICframeworktoexchangemessageswithexternal
+entitiesoverinterfacesoutsidethescopeofO-RAN.
+NOTE: TheSMOfunctionsofferingtheslicemanagementservicesandwhethertheseshallbeconsideredasR1services
+isforfuturestudy.
+8.2 R1 service management and exposure functions
+8.2.1 Service registration and discovery functions
+Theserviceregistrationanddiscoveryfunctionsarelogicalfunctionsthatproducetheserviceregistration,service
+deregistration,servicediscovery,servicenotification,communicationsupportservicesandoptionalbootstrapandheartbeat
+servicesspecifiedinClause7.2.
+Examplesofserviceproducersinclude:servicemanagementandexposureservicesproducer,A1-relatedservicesproducer,etc.
+ExamplesofserviceconsumersarerApps.ItisnotedthatrAppscanalsobeserviceproducersandlogicalfunctionscanalso
+beserviceconsumers.
+Aserviceproduceroranentityactingonitsbehalfcansendaserviceregistrationrequesttotheserviceregistrationand
+discoveryfunctionstoregisterservices.Aserviceconsumercaneithersendaservicediscoveryrequesttotheservice
+registrationanddiscoveryfunctionstodiscovertheservicesandtheendpointsonwhichtheycanbeconsumed,orsenda
+servicerequestdirectlyifitreceivesaservicenotificationwiththerelatedinformationontheserviceandontheendpointson
+whichitcanbeconsumed.
+8.2.2 Authentication and authorisation functions
+Theauthenticationandauthorisationfunctionsarelogicalfunctionsthatproducetheauthenticationandauthorisationservices
+specifiedinClause7.2.
+8.3 Data management and exposure functions
+Thedatamanagementandexposurefunctionsarelogicalfunctionsthatproducethedataregistrationanddiscoveryservice,the
+datarequestandsubscriptionservice,thedataofferserviceandoptionaldataprocessingservicesspecifiedinClause7.3.They
+furtherinitiatedatacollectionbyconsumingthedatarequestandsubscriptionservice.Additionally,theyproduceandconsume
+thedatadeliveryservicesinordertoobtaincollecteddatafromdataproducersandtoallowdataconsumerstoobtaindatafrom
+thedatamanagementandexposurefunctionsforconsumption.
+ThedatamanagementandexposurefunctionstrackDMEtypesthatareregistered.Theymatchdatadiscoveryrequestsagainst
+suchDMEtypes.IftheDMEtypeisregistered,thedatamanagementandexposurefunctionsidentifyavalidDataProducer,
+whichcanbeapreviouslyregisteredDataProducerrApporotherDataProducersintheSMO/Non-RTRICframework(e.g.,
+RANOAM-relatedfunctions).Thedatamanagementandexposurefunctionsoptionallyprovidedataprocessingfunctionality
+oncollecteddata(e.g.,quantization,normalization,correlation,labelling,etc.).
+WhenDataConsumersusetheSubscribedataproceduretoinitiatecontinuousdataconsumption,thedatamanagementand
+exposurefunctionschecktheavailabilityofthesubscribeddataafterreceivingadatasubscriptionrequestfromaData
+Consumer.Ifthesubscribeddataarealreadybeingcollected,thedatamanagementandexposurefunctionsdeliverthedatato
+theDataConsumerwhentheybecomeavailable.IfthedataarenotalreadybeingcollectedandavalidDataProduceris
+identified,thedatamanagementandexposurefunctionsinitiatedatacollectiontoobtaindatafromtheidentifiedData
+Producer.Whenthecollecteddatabecomeavailable,thedatamanagementandexposurefunctionsdeliverthedatatotheData
+Consumer.
+WhenDataConsumersusetheRequestdataproceduretoinitiateone-timedataconsumption,thedatamanagementand
+exposurefunctionschecktheavailabilityoftherequireddataafterreceivingaone-timedatarequestfromaDataConsumer.If
+therequesteddataareavailable,thedatamanagementandexposurefunctionsdeliverthedatatotheDataConsumer.Ifthe
+dataarenotavailableandavalidDataProducerisidentified,thedatamanagementandexposurefunctionsinitiatedata
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+collectiontoobtaindatafromtheidentifiedDataProducer.Whenthecollecteddatabecomeavailable,thedatamanagement
+andexposurefunctionsdeliverthedatatotheDataConsumer.
+WhenaDataProducerusesthecreateDataofferproceduretotriggerdatacollection,thedatamanagementandexposure
+functionssetupanendpointforreceivingdataavailabilitynotificationsorpushdatamessages(dependingonthedelivery
+methodchosen)andconfirmthecreationofthedataoffertotheDataProducer.Datacollectionstartsoncethedataoffer
+creationisconfirmed,andproceedsuntilthedataofferisterminatedbytheDataProducerorbythedatamanagementand
+exposurefunctions.Thedatamanagementandexposurefunctionsstorethecollecteddataforlaterconsumption.
+Theuseofadatarepositoryforstoringdataduringdatacollectionisoptionalifdatacollectionwastriggeredbyadatarequest
+ordatasubscriptionfromaDataConsumer.ItisrequiredifdatacollectionwastriggeredbyadataofferfromaDataProducer.
+Datacanbeoptionallypre-processedbeforebeingstored,andcanbeoptionallypost-processedafterbeingread.
+NOTE: Insteadofstoringdatainadatarepository,datamanagementandexposurefunctionscanbrokerdatafromData
+ProducerstoDataConsumers.
+8.4 A1-related functions
+8.4.1 A1 Policy functions
+ThelogicalfunctionsthatproducetheA1policymanagementserviceswhichareexposedtorAppsviatheR1interfaceare
+calledthe“A1policyfunctions".Theyrealizethefollowingfunctionalities:
+ ProducingA1policymanagementserviceswhichareexposedtorAppsviatheR1interface.
+- ThecorrespondingservicedefinitioncanbefoundinClause7.4.1.
+ PerformingA1policyconflictmitigation.
+- IfmorethanonepolicygenerationrAppssetcontradictingA1policystatementstothesameoroverlapping
+policyscopeidentifiers,A1policyfunctiondecidestorejectthecreation/modificationrequestofoneormore
+A1policiesortotemporarilysuspendtheenforcementofoneormoreA1policies.
+ InterfacingwithNear-RTRICsthroughA1termination
+- A1policyfunctiondeterminestheNear-RTRICforgeneratedA1policies.
+- A1policyfunctionsendsA1policycreation,update,anddeletionrequeststotheNear-RTRIC.
+- A1policyfunctionqueriessupportedA1policytypesofconnectedNear-RTRICs.
+- A1policyfunctionqueriesenforcementstatusofA1policies.
+- A1policyfunctionreceivesA1policyfeedbackfromtheNear-RTRIC.
+8.4.2 A1 enrichment information functions
+“A1enrichmentinformationfunctions”producetheA1enrichmentinformationrelatedserviceswhichareexposedtorApps
+viatheR1interface.ThecorrespondingservicesdefinitioncanbefoundinClause7.4.2.“A1enrichmentinformation
+functions”alsoproducetheA1-EIservicewhichisexposedtoNear-RTRICsviatheA1interface.Thecorrespondingservice
+definitioncanbefoundintheA1interfacespecification,seereferencesinClause9.1.“A1enrichmentinformationfunctions”
+collectdatathataretobedeliveredasEIjobresultstoNear-RTRICsviathedatamanagementandexposurefunctions.
+NOTE: ThedatadeliveredasEIjobresultscanbeproducedbyrAppsorbyexternalenrichmentinformationsources.
+“A1enrichmentinformationfunctions”realizethefollowingfunctionalities:
+ HandlingofEItypesregisteredbyrAppsviatheR1interface.
+ HandlingofEIjobscreatedbytheNear-RTRICsviatheA1interface.
+ CollectingdatathataretobedeliveredasEIjobresultstotheNear-RTRICsviatheA1interface.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+ InterfacingwithNear-RTRICsthroughA1termination.
+8.5 RAN OAM-related functions
+ThelogicalfunctionsthatproducetheRANOAM-relatedserviceswhichareexposedtorAppsviatheR1interfacearecalled
+the“RANOAM-relatedfunctions”.Theyrealizethefollowingfunctionalities:
+ ProducingRANOAM-relatedserviceswhichareexposedtorAppsviatheR1interface.
+- ThecorrespondingservicedefinitioncanbefoundinClause7.5.
+ PerformingCMconflictmitigation.
+ InterfacingwithNear-RTRICsandE2nodesthroughO1termination.
+- RANOAM-relatedfunctionsreceivefaultnotificationsandobtainalarmlistfromNear-RTRICsandE2nodes.
+- RANOAM-relatedfunctionsprovisionconfigurationchangestoNear-RTRICsandE2nodes.
+- RANOAM-relatedfunctionscollectperformancedatafromNear-RTRICsandE2nodes.
+- RANOAM-relatedfunctionscollecttracedatafromE2nodes.
+ InterfacingwiththeO-RUsthroughOpenFronthaulM-planetermination.
+- RANOAM-relatedfunctionsreceivefaultnotificationsandobtainalarmlistfromtheO-RUs.
+- RANOAM-relatedfunctionsprovisionconfigurationchangestotheO-RUs.
+- RANOAM-relatedfunctionscollectperformancedatafromtheO-RUs.
+ InterfacingwiththeRAN-specificslicemanagementfunctionalityintheSMOframework.
+- RANOAM-relatedfunctionsprovisionconfigurationchanges,relatedtoRAN-specificnetworkslicing.
+- RANOAM-relatedfunctionscollectperformancedata,relatedtoRAN-specificnetworkslicing.
+8.6 O2-related functions
+TheO2interfaceisanopenlogicalinterfacewithinO-RANarchitecture.ThelogicalfunctionsthatproducetheO2-related
+serviceswhichareexposedtorAppsviatheR1interfacearecalledthe“O2-relatedfunctions”.O2-relatedfunctionsinclude
+FOCOMandNFO.Theyrealizethefollowingfunctionalities:
+ ProducingO2-relatedserviceswhichareexposedtorAppsviatheR1interface.
+- ThecorrespondingservicedefinitioncanbefoundinClause7.6.
+ InterfacingwithO-CloudthroughO2termination.
+- O2-relatedfunctionsreceiveO-CloudinfrastructureFCAPS(PM,CM,FM)dataviaO-CloudIMS,seeO-RAN
+O2GAP[13].
+- O2-relatedfunctionsreceiveO-ClouddeploymentFCAPS(PM,CM,FM)dataviaO-CloudDMS,seeO-RAN
+O2GAP[13].
+- O2-relatedfunctionsprovisionconfigurationchangestoO-Cloud.
+ PerformingconflictmitigationforO-CloudconfigurationChanges.
+8.7 AI/ML workflow functions
+TheAI/MLworkflowfunctionsarelogicalfunctionsthatproducethefollowingAI/MLworkflowservicesasspecifiedin
+Clause7.7:
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+ AI/MLtrainingservices,
+ AI/MLmodelmanagementandexposureservices,whichenablesAI/MLmodelregistration/deregistration,AI/ML
+modeldiscovery,AI/MLmodelchangesubscription,AI/MLmodelstorageandoptionallyAI/MLmodeltraining
+capabilityregistration.
+9 External Interfaces
+9.1 A1 Interface
+O-RANA1GAP[4]specifiesA1interfacegeneralaspectsandprinciples.
+O-RANA1AP[5]specifiesA1interfaceapplicationprotocols.
+O-RANA1TP[6]specifiesA1interfacetransportprotocols.
+O-RANA1TD[7]specifiesdatamodelanddatatypesusedintheA1interface.
+9.2 Other Interfaces
+NOTE: OtherexternalinterfacesincludeexternalEIinterface,externalAI/MLinterface,interfaceforexternaloversight,
+whichareoutofscopeofthepresentspecification.
+10 Procedures
+10.1 Data management and exposure procedures
+Thisclausedemonstratesexampleproceduresrelatedtodatamanagementandexposure(DME)servicesproducedand
+consumedbySMO/Non-RTRICframework.ADataConsumerrApprequest/subscribedatafromSMO/Non-RTRIC
+framework,andtherequested/subscribeddataarecollectedfromanotherDataProducerrApporotherO-RANentities.
+NOTE: ItisnotrequiredtousethesametypeofDMEservicesprocedureindataconsumptionanddatacollection.
+DataconsumptiondenotestheproceduresofDataConsumerrApprequesting/subscribingdatafromSMO/Non-RTRIC
+framework.DatacollectiondenotestheproceduresofSMO/Non-RTRICframeworkrequesting/subscribingdatafromData
+ProducerrAppsorotherO-RANentities.
+10.1.1 Subscribe data procedures in data consumption and collection
+Figure10.1.1-1illustratesanexampleworkflowofusingDMEservicestosubscribedataanddeliverdataovertheR1
+interface.Inthisexample,itisassumedthat
+ TwoDataConsumerrAppssubscribethesamedatainstance(i.e.,sameDMEtypeandscope)fromtheDME
+functions.
+ TherequesteddataareproducedbyaDataProducerrApp.
+ TheDMEfunctionssubscribedatainstancefromtheDataProducerrApp.
+ Dataaredeliveredusingpullorpushdatadeliveryorbypointtomultipointstreamingdatadelivery.Incaseofpull
+delivery,thepulldeliverydetailscanbecontainedinsubscribedataresponseordataavailabilitynotification.The
+DataConsumermakesapullrequestbasedonthereceivedpulldeliverydetails.Incaseofpointtomultipoint
+streamingdatadelivery,DMEfunctionsinformtheDataConsumerwhichdatastreamendpointtoconsumerthe
+subscribeddatafrom.
+WhenthefirstDataConsumerrAppinitiatestheSubscribedataproceduretoobtaindata,theDMEfunctionsfirstidentifythe
+DataProducerfortherequesteddatainstance.Inthisexample,oneDataProducerrAppwhichisalreadyregisteredasbeing
+capableofproducingthesubscribeddataareidentifiedastheDataProducer.TheDMEfunctionsfigureoutthereisnodata
+subscriptionfortherequesteddatainstanceyet,andtheDMEfunctionssubscribedatafromDataProducerrApp.Incaseof
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+pulldelivery,theDataProducerrAppnotifiesthedataavailabilitytotheDMEfunctionsandprovidespulldatadetailsinthe
+notification.TheDMEfunctionsthenpulldatafromtheDataProducerrApp.Incaseofpushdelivery,theDataProducerrApp
+pushesthedatatotheDMEfunctions.TheDMEfunctionsmayoptionallyprocessthedataorstorethedatainthedata
+repositoryforfutureusage.Incaseofpulldelivery,theDMEfunctionsfurthernotifythedataavailabilitytothefirstData
+ConsumerrApp.TherAppthenpullsthedatafromtheDMEfunctions.Incaseofpushdelivery,theDMEfunctionspushthe
+datatotheDataConsumerrApp.Incaseofpointtomultipointstreamingdatadelivery,theDMEfunctionsconfiguresthedata
+streamendpointunlessitisalreadyconfigured.TheDataProducerrAppwritesthedatatothestreamendpointandData
+ConsumerrAppreadsthedatafromthestreamendpoint.
+WhenthesecondDataConsumerrAppsendsadatasubscriptionrequesttotheDMEfunctions,theDMEfunctionsfindout
+thatthedatasubscriptionfortherequesteddatainstanceisalreadyestablished.Therefore,theDMEfunctionsdonotsetup
+additionaldatasubscriptionwiththeDataProducerrApp.Oncenewdataareavailable,thefollowingstepsareexecuted:In
+caseofpulldelivery,theDataProducernotifiesthedataavailabilitytotheDMEfunctions,andthesepullthedatafromthe
+DataProducer.Incaseofpushdelivery,theDataProducerpushesthedatatotheDMEfunctions.TheDMEfunctionsmay
+optionallyprocessthedataandstorethedatainthedatarepositoryforfutureusage.Incaseofpulldelivery,theDME
+functionsfurthernotifythedataavailabilitytobothDataConsumerrAppswhichthenpullthedatafromtheDMEfunctions.In
+caseofpushdelivery,theDMEfunctionspushthedatatobothDataConsumerrApps.Incaseofpointtomultipointstreaming
+datadelivery,theDMEfunctionsinformthesecondDataConsumerrAppwhichdatastreamendpointtouse.TheData
+ProducerrAppwritesthedatatothedatastreamendpointandtheDataConsumerrAppreadsthedatafromthedatastream
+endpoint.
+TheDMEfunctionscanusedifferentprocedurestodeliverdatatoDataConsumerrAppsevenifbothDataConsumerrApps
+subscribethesamedatainstance.Forexample,theDMEfunctionscannotifydataavailabilitytotheoneDataConsumerrApp
+allowingtherApptopulldata,meanwhiletheDMEfunctionspushdatatoanotherDataConsumerorboththeDataConsumer
+rAppsreadthedatafromthedatastreamendpointprovidedbytheDMEfunctions.
+NOTE1: Pushcontentcanbe(1)notificationsthatcarryadatapayloador(2)streamsofdata.
+NOTE2: Notifications,pulldatadelivery,andpushdatadeliverymayrequiretheset-upofadedicatedcommunication
+channelthatallowsthecontenttobepulled/pushed.Suchdedicatedcommunicationchannelsmaymapto,e.g.,
+Kafkatopic,WebSocketconnection,gRPCconnection,etc.Alternatively,individualHTTPrequestsmaybe
+usedaspushmessages.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Consumer rApp #1" as app1
+participant "Data Consumer rApp #2" as app2
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+endbox
+box #ivory
+participant "Data Producer rApp" as src
+endbox
+endbox
+group Data Consumer rApp #1 subscribes data
+app1 -> dme : <<R1>> Subscribe data request
+alt Pull or push data delivery
+app1 <- dme : <<R1>> Subscribe data response
+else Point to multipoint streaming data delivery
+dme --> dme : Configure data stream endpoint
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+app1 <- dme : <<R1>> Subscribe data response (data stream endpoint)
+end
+end
+dme --> dme : Find out that data instance\nis not being collected;\nidentify the Data Producer
+group DME functions subscribes data from Data Producer rApp
+alt Pull or push data delivery
+src <- dme : <<R1>> Subscribe data request
+else Point to multipoint streaming data delivery
+src <- dme: <<R1>> Subscribe data request (data stream endpoint)
+end
+src -> dme : <<R1>> Subscribe data response
+end
+loop data available
+alt Pull delivery
+src -> dme : <<R1>> Notify data availability (pull delivery details)
+src <- dme : <<R1>> Pull data request
+src -> dme : <<R1>> Pull data response (with data payload)
+else Push delivery
+src -> dme : <<R1>> Push data message (with data payload)
+end
+opt
+dme --> dme : Processing data
+end
+opt
+dme --> dme: Storing data
+end
+alt Pull delivery
+app1 <- dme : <<R1>> Notify data availability (pull delivery details)
+app1 -> dme : <<R1>> Pull data request
+app1 <- dme : <<R1>> Pull data response (with data payload)
+else Push delivery
+app1 <- dme : <<R1>> Push data message (with data payload)
+end
+end
+group Data Consumer rApp #2 subscribes data
+app2 -> dme : <<R1>> Subscribe data request
+alt Pull or push data delivery
+app2 <- dme : <<R1>> Subscribe data response
+else Point to multipoint streaming data delivery
+dme <-- dme : Configure data stream endpoint
+app2 <- dme : <<R1>> Subscribe data response (data stream endpoint)
+end
+end
+dme --> dme : Find out that data instance\nis already being collected
+loop data available
+alt Pull delivery
+src -> dme : <<R1>> Notify data availability (pull delivery details)
+src <- dme : <<R1>> Pull data request
+src -> dme : <<R1>> Pull data response (with data payload)
+else Push delivery
+src -> dme : <<R1>> Push data message (with data payload)
+end
+opt
+dme --> dme : Processing data
+end
+opt
+dme --> dme: Storing data
+end
+alt Pull delivery
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+app1 <- dme : <<R1>> Notify delivery details (pull delivery details)
+app1 -> dme : <<R1>> Pull data request
+app1 <- dme : <<R1>> Pull data response (with data payload)
+app2 <- dme : <<R1>> Notify data availability (pull delivery details)
+app2 -> dme : <<R1>> Pull data request
+app2 <- dme : <<R1>> Pull data response (with data payload)
+else Push delivery
+app1 <- dme : <<R1>> Push data message (with data payload)
+app2 <- dme : <<R1>> Push data message (with data payload)
+end
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.1-1: Example workflow using Subscribe data and Notify data availability procedures
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure10.1.1-2illustratesanexampleworkflowofusingUnsubscribedataprocedurestoterminatedatasubscriptionindata
+consumptiondataanddatacollection.Intheexample,itisassumedthatthetwoDataConsumerrAppsinthefigurearethe
+onlytwoDataConsumerswhichhavesubscribedthedatainstanceproducedbytheDataProducerrApp.
+WhenthesecondDataConsumerrAppinitiatestheUnsubscribedataprocedure,theDMEfunctionsfindoutthattheproduced
+dataarealsosubscribedbythefirstDataConsumerrApp.Therefore,theDMEfunctionscan'tunsubscribefromtheData
+ProducerrApp.
+WhenthefirstDataConsumerrAppinitiatestheUnsubscribedataprocedure,theDMEfunctionsfigureoutthatthedata
+subscriptionisnolongerneeded.Hence,inthisexample,theDMEfunctionsidentifytheDataProducerrAppandsendan
+unsubscriptionrequesttocancelthedatasubscription.Incaseofpointtomultipointstreamingdatadelivery,theDataProducer
+rAppstopsproducingthedatatothedatastreamendpoint.
+NOTE3: TheDMEfunctionsarenotrequiredtounsubscribedatafromDataProducerseveniftherearenoData
+Consumersrequestingorsubscribingthesedata.TheDMEfunctionsmaycollectdatafromDataProducersfor
+itsownpurposes.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Consumer rApp #1" as app1
+participant "Data Consumer rApp #2" as app2
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+endbox
+box #ivory
+participant "Data Producer rApp" as src
+endbox
+endbox
+group Data Consumer rApp #2 unsubscribes data
+app2 -> dme : <<R1>> Unsubscribe data request
+app2 <- dme : <<R1>> Unsubscribe data response
+end
+dme --> dme : Find out that data are subscribed \n by other Data Consumers
+group Data Consumer rApp #1 unsubscribes data
+app1 -> dme : <<R1>> Unsubscribe data request
+app1 <- dme : <<R1>> Unsubscribe data response
+end
+dme --> dme : Find out that data subscription \n is no longer required;\nidentify the Data
+Producer
+opt DME unsubscribes data from Data Producer rApp
+src <- dme : <<R1>> Unsubscribe data request
+src -> dme : <<R1>> Unsubscribe data response
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 26
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.1-2: Example workflow using Unsubscribe data procedure
+10.1.2 Request data procedure in data consumption and data collection
+Figure10.1.2-1illustratesanexampleworkflowofusingDMEservicestorequestanddeliverdataovertheR1interface.In
+thisexample,itisassumedthat
+ TwoDataConsumerrAppsrequestthesamedatainstance(i.e.,sameDMEtypeandscope)usingRequestdata
+procedure.
+ TherequesteddataareproducedbyaDataProducerrApp.
+ TheDMEfunctionsrequestdatafromtheDataProducerrAppusingRequestdataprocedure.
+ Dataaredeliveredusingpulldelivery.Thepulldeliverydetailsarecontainedintherequestdataresponse.TheData
+Consumermakesapullrequestbasedonthereceivedpulldeliverydetails.
+ ThepulldeliverydetailsprovideDataConsumerinformationofhowtoformulateapulldatarequestforthedelivery
+ofrequesteddata(e.g.,aURIfromwhichtofetchthedata).
+WhenthefirstDataConsumerrAppinitiatestheRequestdataproceduretoobtaindata,theDMEfunctionsfirstcheckwhether
+therequesteddataareavailableinthedatarepository.Inthisexample,itfiguresoutthatdataarenotavailable.ThentheDME
+functionsidentifytheDataProducerrAppastheDataProducer,e.g.,basedonDMEtyperegistrationrecords.TheDME
+functionssenddatarequesttotheDataProducerrApp,andthedataaredeliveredfromtheDataProducerrAppusingpull
+delivery.TheDMEfunctionsthensenddatarequestresponsetothefirstDataConsumerrAppcarryingpulldeliverydetails.
+ThefirstDataConsumerrApppullsdatafromtheDMEfunctions.TheDMEfunctionsmayoptionallyprocessdataandstore
+thedatainthedatarepositoryforfutureusage.
+WhenthesecondDataConsumerrAppsendsdatarequesttotheDMEfunctions,theDMEfunctionsnoticethattherequested
+dataarealreadyavailableinthedatarepository.ThentheDMEfunctionsretrieverequesteddatafromdatarepositoryand
+respondsthesecondDataConsumerrAppwithpulldeliverydetails.ThedataarepulledbythesecondDataConsumerrApp.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 27
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Consumer rApp #1" as app1
+participant "Data Consumer rApp #2" as app2
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+database "Data repository" as db
+endbox
+box #ivory
+participant "Data Producer rApp" as src
+endbox
+endbox
+group Data Consumer rApp #1 requests data
+app1 -> dme : <<R1>> Request data request
+dme --> dme : Find out that requested data \n are not available in the data repository
+app1 <- dme : <<R1>> Request data response (pull delivery details)
+group Obtain data not available in the repository
+src <- dme : <<R1>> Request data request
+src -> dme : <<R1>> Request data response (pull delivery details)
+src <- dme : <<R1>> Pull data request
+src -> dme : <<R1>> Pull data response (with data payload)
+opt
+dme --> dme : Processing data
+end
+opt
+dme <--> db: Storing data
+end
+end
+app1 -> dme : <<R1>> Pull data request
+app1 <- dme : <<R1>> Pull data response (with data payload)
+end
+group Data Consumer rApp #2 requests data
+app2 -> dme : <<R1>> Request data request
+dme --> dme : Find out that requested data \n are available in the data repository
+app2 <- dme : <<R1>> Request data response (pull delivery details)
+group Obtain data that are available in the repository
+dme <--> db: Retrieving data
+end
+app2 -> dme : <<R1>> Pull data request
+app2 <- dme : <<R1>> Pull data response (with data payload)
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 28
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.2-1: Example workflow using Request data procedure
+10.1.3 O1 related data collection procedures based on data subscription
+Figure10.1.3-1illustratesanexampleworkflowofhowdatamanagementandexposure(DME)functionsintheSMO/Non-RT
+RICframeworkcollectO1-relateddatabasedonthedatasubscriptionfromaDataConsumerrApp.
+Inthisexample,whentheDataConsumerrAppinitiatesthesubscribedataproceduretoobtainO1relateddata,theDME
+functionsacknowledgethedatasubscription,andcheckwhethersubscribeddataarebeingcollectedalreadyornot.Ifthe
+subscribeddataarenotbeingcollected,theDMEfunctionsinitiatesdatacollectionproceduretocollectfromnodes
+terminatingtheO1interfaceviatheRANOAM-relatedfunctions.TherelatedprocedureshavebeenspecifiedinO-RAN
+OAMArch[8],clause4.2.2“O-RANMeasurementDataCollectionUseCase”.WhentheDMEfunctionsreceivethe
+collecteddatafromtheRANOAM-relatedfunctions,theynotifytheDataConsumerrApp,andthesubscribeddataare
+deliveredusingpullorpushdataservices.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 29
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+NOTE: DatadeliveryproceduresaredefinedinO-RANR1GAP[9],clause5.2.6.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+skinparam sequenceReferenceHeaderBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Consumer rApp" as dc
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+participant " RAN OAM-related functions" as OAM
+endbox
+endbox
+participant “Nodes terminating O1 interface” as dp
+autonumber
+dc -> dme : <<R1>> Subscribe data request
+dme ->dc : <<R1>> Subscribe data response
+dme --> dme : check if the subscribed data are being collected already
+group if subscribed data are not being collected yet
+dme <--> OAM : Implementation specific communication
+ref over OAM, dp
+As specified in Clause 4.2.2.3.1
+“Measurement Data Collection Creation”
+in O-RAN.WG10.OAM-Architecture
+end
+end
+loop data available
+alt File-based delivery
+ref over OAM, dp
+As specified in Clause 4.2.2.3.2
+“Measurement Data File Consumption”
+in O-RAN.WG10.OAM-Architecture
+end
+else Streaming delivery
+ref over OAM, dp
+As specified in Clause 4.2.2.3.3
+“Measurement Streaming Data Consumption”
+in O-RAN.WG10.OAM-Architecture
+end
+end
+OAM --> dme : implementation-specific data delivery
+alt pull delivery
+dme -> dc: <<R1>> Notify data availability (pull delivery details)
+dc -> dme: <<R1>> Pull data request
+dme -> dc: <<R1>> Pull data response (data payload)
+else push delivery
+dme -> dc : <<R1>>Push data message (data payload)
+end
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 30
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.3-1: Example workflow for O1 related data collection procedure via DME
+10.1.4 O2 related data collection procedures based on data subscription
+Figure10.1.4-1illustratesanexampleworkflowofhowdatamanagementandexposure(DME)functionsintheSMO/Non-RT
+RICframeworkcollectO2relateddatabasedonthedatasubscriptionfromaDataConsumerrApp.
+Inthisexample,whentheDataConsumerrAppinitiatestheSubscribedataproceduretoobtainO2relateddata,theDME
+functionsacknowledgethedatasubscription,andcheckwhethersubscribeddataarebeingcollectedalreadyornot.Ifthe
+subscribeddataarenotbeingcollected,theDMEfunctionsinitiateDatacollectionproceduretocollectfromDMSviatheO2
+relatedfunctions.ThisprocedurehasbeenspecifiedinO-RANOAMArch[8],clause2.2.2“O-RANMeasurementData
+CollectionUseCase”.WhentheDMEfunctionsreceivethecollecteddatafromtheO2relatedfunctions,itnotifiestheData
+ConsumerrApp,andthesubscribeddataaredeliveredusingpullorpushdataservices.
+NOTE: DatadeliveryproceduresaredefinedinO-RANR1GAP[9],clause5.2.6.
+@startuml
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+skinparam sequenceReferenceHeaderBackgroundColor Transparent
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 31
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Consumer rApp" as dc
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+participant "O2 related functions" as OAM
+endbox
+endbox
+participant “DMS” as dp
+autonumber
+dc -> dme : <<R1>> Subscribe data request
+dme ->dc : <<R1>> Subscribe data response
+dme --> dme : Check if the subscribed data are being collected already
+group if subscribed data are not being collected yet
+dme <--> OAM : Implementation specific communication
+ref over OAM, dp
+As specified in Clause 4.2.2.3.1
+“Measurement Data Collection Creation”
+in O-RAN.WG10.OAM-Architecture
+End
+End
+loop data available
+alt File-based delivery
+ref over OAM, dp
+As specified in Clause 4.2.2.3.2
+“Measurement Data File Consumption”
+in O-RAN.WG10.OAM-Architecture
+end
+else Streaming delivery
+ref over OAM, dp
+As specified in Clause 4.2.2.3.3
+“Measurement Streaming Data Consumption”
+in O-RAN.WG10.OAM-Architecture
+end
+end
+OAM --> dme : Implementation-specific data delivery
+alt pull delivery
+dme -> dc: <<R1>> Notify data availability (pull delivery details)
+dc -> dme: <<R1>> Pull data request
+dme -> dc: <<R1>> Pull data response (data payload)
+else push delivery
+dme -> dc : <<R1>> Push data message (data payload)
+end
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 32
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.4-1: Example workflow for O2 related data collection procedure via DME
+10.1.5 Data offer procedures
+Figure10.1.5-1illustratesanexampleworkflowofusingtheDMEservicesbyaDataProducertotriggertheDMEfunctions
+tocollectadatainstanceproducedbythatDataProducerandtostoreitforlaterconsumption.
+TheDataProducerrAppfirstneedstoregisteraDMEtypeforthedatainstanceitintendstoproduce.TherApptheninitiates
+theCreatedataofferproceduretotriggerthecollectionofadatainstanceofthatDMEtypewhichitintendstoproduce.The
+parametersofthedatainstanceandthesupporteddeliveryservicesareindicatedintherequest.Afterreceivingtherequest,the
+DMEfunctionsfirstcheckwhethertheDataProducerhasregisteredtheDMEtypeforwhichitintendstoproduceaninstance.
+Uponsuccess,theDMEfunctionssetupanendpointforthereceptionofdataavailabilitynotificationsorpushdatamessages,
+dependingonthedeliveryservicechosen,andcommunicatethisinformationtotheDataProducer.Datacollectioncanstart
+immediatelyafterthedataoffercreationhasbeenacknowledgedbytheDMEfunctions.
+Whendataareavailable,theDataProducersendsadataavailabilitynotificationtotheDMEfunctionsandthesepullthedata,
+ortheDataProducerpushesthedatatotheDMEfunctions.Then,theDMEfunctionsstorethesedataforsubsequent
+consumption.
+WhentheDataProducerintendstostopdataproduction,itterminatesthedataofferbyusingtheTerminatedataoffer
+procedure.Datacollectionendsuponsuccessfulexecutionofthatprocedure.Whenthedatamanagementandexposure
+functionsintendtostopreceivingproduceddata,theysendadataofferterminationnotificationtotheDataProducer.
+Subsequently,possiblyafteradelaytoallowtheDataProducertoreacttothenotification,thedatamanagementandexposure
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 33
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+functionsstopdatacollectionandterminatethedataoffer.Uponreceivingthisnotification,theDataProducerstopsdata
+production.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+skinparam lifelineStrategy solid
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Data Producer rApp" as rapp
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and\nExposure functions" as dme
+database "Data repository" as db
+endbox
+endbox
+group Data Producer rApp registers DME type
+rapp -> dme: <<R1>> Register DME type request
+rapp <- dme: <<R1>> Register DME type response
+end
+group Data Producer rApp creates data offer
+rapp -> dme: <<R1>> Create data offer request(info about data instance and delivery)
+dme --> dme: Create data offer\nand prepare\ndelivery endpoint
+dme -> rapp: <<R1>> Create data offer response (endpoint details for notify data
+availability\nor push data)
+end
+group Data are collected from Data Producer rApp
+loop data available
+alt pull delivery
+rapp -> dme: <<R1>> Notify data availability (pull details)
+dme -> rapp: <<R1>> Pull data request
+rapp -> dme: <<R1>> Pull data response (data)
+else push delivery
+rapp -> dme: <<R1>> Push data (data)
+end
+dme <--> db: Store data
+end
+end
+group Data offer termination
+alt Data Producer rApp terminates data offer
+rapp -> dme: <<R1>> Terminate data offer request
+dme --> dme: Delete data offer and\nstop collecting data
+dme -> rapp: <<R1>> Terminate data offer response
+else DME functions terminate data offer
+dme -> rapp: <<R1>> Notify data offer termination
+dme --> dme: Stop collecting data\nand terminate data offer
+rapp --> rapp: Stop producing data
+end
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 34
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 35
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.1.5-1: Example workflow using Data offer Procedures to trigger the collection and storage of data
+for later consumption
+10.2 A1-related procedures
+10.2.1 EI results collection from rApps
+Figure10.2.1-1illustratesanexampleworkflowofcollectingdatafromrApps(overtheR1interface)thatisdeliveredasEI
+jobresultstotheNear-RTRICs(overtheA1interface).EIjobresultsrefertothedatabeingtransferredfromtheNon-RTRIC
+totheNear-RTRICs,whileEIsourcedatareferstothedataproducedbytherAppthatactsasthesourceforthedataprovided
+asEIjobresults.Correspondingly,EItypereferstothedatatypethatismadeavailabletotheNear-RTRICswhilethe
+correspondingDME typeregisteredbytherAppisreferredtoasEIsourceDMEtype.Moreover,EIjobreferstoarequestfor
+EIbytheNear-RTRICwhileEIsourcedatasubscriptionreferstothecorrespondingsubscriptiontotherAppthatactsthe
+sourceforthedata.
+NOTE1: EIsourcedatatypereferstoanyDMEtypethatisregisteredwiththeDMEfunctionsandthecorrespondingdata
+areusedasthesourceofEIjobresults.
+TherAppwhichgeneratestheenrichmentinformationfirstregisterstheEIsourceDMEtypeinthedatamanagementand
+exposure(DME)functions.AftersuccessfulDMEtyperegistration,therAppregisterstheEItypeforwhichitcanproduce
+enrichmentinformationtotheA1enrichmentinformationfunctions.Intheregistrationrequest,therAppshouldincludetheEI
+sourceDMEtyperegisteredintheDMEfunctions.TheEItypeistobeexposedviatheA1interfacetotheNear-RTRIC.The
+EIsourceDMEtypeallowstheA1enrichmentinformationfunctionstosubscribeEIsourcedatafromDMEfunctions.
+TheA1enrichmentinformationfunctionsqueryDMEfunctionsabouttheEIsourceDMEtype.Ifthequeryissuccessful,the
+EItyperegisteredbytherAppismadeavailableovertheA1interface.TheNear-RTRICqueriesavailableEItypeidentifiers
+intheNon-RTRIC.TheNear-RTRICqueriesEItypeandcreatesanEIjobviatheA1interface.AfterreceivingtheEIjob
+creationrequestfromtheNear-RTRIC,theA1enrichmentinformationfunctionssubscribeEIsourcedatafromDME
+functions.TheDMEfunctionsfurthersubscribeEIsourcedatafromtherAppovertheR1interface.
+EachtimenewEIsourcedataareavailable,therAppdeliversEIsourcedatatotheDMEfunctionsusingpullorpushdelivery.
+TheDMEfunctionsdeliverEIsourcedatatotheA1enrichmentinformationfunctions.TheA1enrichmentformation
+functionsestablishtheconnectionwithNear-RTRICandpushtheEIjobresultsviatheA1interface.
+NOTE2: Non-RTRICframeworkinternalinteractionsarenotspecified.
+NOTE3: AsanalternativetousingtheDatasubscriptionprocedure,theDatarequestprocedurecanbeusedtocollectEI
+sourcedatafromtherApp.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "rApp" as app
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "Data Management and Exposure functions" as dme
+participant "A1 enrichment information functions" as eif
+endbox
+endbox
+Participant "Near-RT RIC" as ran
+group rApp register EI source DME type to DME functions
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 36
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+app -> dme : <<R1>> EI source DME type registration request
+app <- dme : <<R1>> EI source DME type registration response
+end
+group rApp register EI type
+app -> eif : <<R1>> EI type registration request
+app <- eif : <<R1>> EI type registration response
+end
+group A1 EI functions query EI source DME type from DME
+eif --> dme : EI source DME type query request
+eif <-- dme : EI source DME type query response
+end
+group Query EI type identifiers
+ran -> eif : <<A1>> EI type identifiers query request
+ran <- eif : <<A1>> EI type identifiers query response
+end
+group Query EI type
+ran -> eif : <<A1>> EI type query request
+ran <- eif : <<A1>> EI type query response
+end
+group Create EI job
+ran -> eif : <<A1>> EI job creation request
+ran <- eif : <<A1>> EI job creation response
+end
+group A1 EI functions subscribe EI source data from DME
+eif --> dme : EI source data subscription request
+eif <-- dme : EI source data subscription response
+end
+group DME functions subscribe EI source data from rApp
+dme -> app : <<R1>> EI source data subscription request
+dme <- app : <<R1>> EI source data subscription response
+end
+loop EI source data available
+alt pull delivery
+app -> dme: <<R1>> Notify data availability (pull delivery details)
+app <- dme: <<R1>> Pull data request
+app -> dme: <<R1>> Pull data response (EI source data in payload)
+else push delivery
+app -> dme : <<R1>> Push data message (EI source data in payload)
+end
+dme --> eif : EI source data delivery
+group Deliver EI job results
+eif -> ran : <<A1>> Push EI job results request
+eif <- ran : <<A1>> Push EI job results response
+end
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 37
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 38
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.2.1-1: Example workflow for EI results collection procedures
+NOTE4: AprocedureforEIsourcedatacollectionfromexternalsourcesisnotspecifiedinthepresentdocument.
+10.3 RAN OAM-related procedures
+10.3.1 Alarm query procedure
+Figure10.3.1-1illustratesanexampleworkflowofqueryingalarminformation.Alarminformationfromthenodesterminating
+theO1interfaceistypicallyreceivedbytheSMOviaO1.ItisconsolidatedbytheSMO/Non-RTRICframeworkandcanbe
+queriedbyrAppsviatheR1interface.
+NOTE: M-Planealarmsandslicealarmsarenotspecifiedinthepresentdocument.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+skinparam lifelineStrategy solid
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "rApp" as rapp
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant " RAN OAM-related functions" as o1rf
+endbox
+endbox
+participant "Nodes terminating O1 interface" as me
+group SMO/Non-RT RIC FWK consolidates alarm information
+alt Using alarm notifications
+ref over o1rf, me
+<b>1</b> As specified in Clause 6.2.1.3 "Fault Notification - Procedures"
+in O-RAN.WG10.O1-Interface
+end
+else Using alarm list
+ref over o1rf, me
+<b>2</b> As specified in Clause 6.2.2.3 "Fault Supervision Control -
+Procedures"
+in O-RAN.WG10.O1-Interface
+end
+end
+autonumber 3
+o1rf --> o1rf: Consolidate alarm information
+end
+rapp -> o1rf: <<R1>> Query alarm information request(rApp identifier, filter criteria)
+rapp <- o1rf: <<R1>> Query alarm information response(alarm information)
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 39
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.3.1-1: Example workflow of alarm query
+10.3.2 Change alarm acknowledgement state procedure
+Figure10.3.2-1illustratesanexampleworkflowofchangingtheacknowledgementstateofanalarm.Alarminformationfrom
+thenodesterminatingtheO1interfaceistypicallyreceivedbytheSMOviaO1.ItisconsolidatedbytheSMO/Non-RTRIC
+framework.TherAppscanchangetheacknowledgementstateofthealarmsthatareknownbytheSMO/Non-RTRIC
+framework.AlarmacknowledgmentstateinformationisusuallymanagedbytheSMO/Non-RTRICframeworkandisonly
+passedtotheradionodes/Near-RTRICifalarmacknowledgement/unacknowledgementissupportedbytheseentities.
+NOTE: M-Planealarmsandslicealarmsarenotspecifiedinthepresentdocument.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+skinparam lifelineStrategy solid
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "rApp" as rapp
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "RAN OAM-related functions" as o1rf
+endbox
+endbox
+participant "Nodes terminating O1 interface" as me
+group SMO/Non-RT RIC FWK consolidates alarm information
+alt Using alarm notifications
+ref over o1rf, me
+<b>1</b> As specified in Clause 6.2.1.3 "Fault Notification - Procedures"
+in O-RAN.WG10.O1-Interface
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 40
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+end
+else Using alarm list
+ref over o1rf, me
+<b>2</b> As specified in Clause 6.2.2.3 "Fault Supervision Control -
+Procedures" in O-RAN.WG10.O1-Interface
+end
+end
+autonumber 3
+o1rf --> o1rf: Consolidate alarm information
+end
+rapp -> o1rf: <<R1>> Change alarm acknowledgement state request\n(rApp identifier, alarm
+identifier, new acknowledgment state)
+o1rf --> o1rf: Store alarm acknowledgement state information
+rapp <- o1rf: <<R1>> Change alarm acknowledgement state response
+opt if alarm acknowledgement state change is supported by managed entity
+ref over o1rf, me
+<b>7</b> Update alarm state as specified in Clause 6.2.2.3
+"Fault Supervision Control - Procedures" in O-RAN.WG10.O1-Interface
+end
+end
+@enduml
+Figure 10.3.2-1: Example workflow of alarm acknowledgement state change
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 41
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+10.3.3 Read configuration data procedure
+Figure10.3.3-1andFigure10.3.3-2illustrateanexampleworkflowofreadingthecurrentCMconfigurationsofthenetwork
+elements.CMconfigurationdatafromtheRANnodesterminatingtheO1interfaceistypicallyreceivedbytheSMOviaO1.It
+iscachedandcontinuouslysynchronizedbytheSMO/Non-RTRICframework(seeFigure10.3.3-1)andcanberetrievedby
+rAppsviatheR1interface(seeFigure10.3.3-2).ThereadconfigurationdatarequestinitiatedbyrAppsmaycontainrequests
+forreadingconfigurationdataformultipleRANnodesinordertosavebandwidthontheR1interface.
+NOTE: ReadconfigurationdataprocedureisdefinedinO-RANR1GAP[9],clause5.4.5.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 70
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+autonumber
+box "Non-RT RIC" #whitesmoke
+box "Non-anchored functions in SMO/Non-RT RIC Framework" #cadetBlue
+participant "RAN OAM-related functions" as fmsp
+endbox
+endbox
+participant “Nodes terminating O1 interface” as dp
+loop Synchronize configuration data with RAN nodes
+alt
+ref over fmsp,dp
+As specified in Clause 6.1.5.3
+"Read Managed Object Instance Attributes - Procedures"
+in O-RAN.WG10.O1-Interface
+end
+else
+ref over fmsp,dp
+As specified in Clause 6.1.6.3
+"Notify Managed Object Instance Attributes - Procedures"
+in O-RAN.WG10.O1-Interface
+end
+end
+fmsp --> fmsp: Consolidate information
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 42
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.3.3-1: Example workflow for synchronizing configuration data in the SMO/Non-RT RIC framework
+with RAN nodes
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 70
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "rApp" as rapp
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC Framework" #cadetBlue
+participant "RAN OAM-related functions" as fmsp
+endbox
+endbox
+participant “Nodes terminating O1 interface” as dp
+autonumber
+rapp -> fmsp: <<R1>> Request for reading configuration data (rAppId, queryCriteria)
+fmsp --> fmsp: Check if the requested data has been \n collected already and in sync with the
+RAN nodes
+opt if the requested data has not being collected yet or not in sync with the RAN nodes
+ref over fmsp,dp
+As specified in Clause 6.1.5.3
+"Read Managed Object Instance Attributes - Procedures"
+in O-RAN.WG10.O1-Interface
+end
+end
+fmsp -> rapp: <<R1>> Read configuration data response <configurationData>
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 43
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.3.3-2: Example workflow for Read configuration data procedure
+TheRANOAM-relatedfunctionsmaymaintainalocaldatastore(implementationspecific)cachingpartoralloftheCM
+configurationsoftheRANnodesforfastretrievalofconfigurationdatafromrAppsandminimizingthesignallingoverheadon
+theO1interface.Inthisexample,asillustratedinFigure10.3.3-1,theRANOAM-relatedfunctionssynchronizethe
+configurationdatainitslocaldatastorewiththeRANnodescontinuouslybasedonReadMOIattributesproceduresor
+notificationsofMOIattributechangesovertheO1interfaceorinternalknowledgeoftheattributechangesmadebytherApps
+andframeworkfunctionswithintheSMOwhichisimplementationspecific.WhentherAppinitiatestheReadconfiguration
+dataprocedure,asillustratedinFigure10.3.3-2,theRANOAM-relatedfunctionsoptionallycheckiftherequested
+configurationdatahasbeencollectedalreadyandisuptodate.TherequestedconfigurationdatabytherAppmightnotbe
+alwayscachedinthelocaldatastore.Iftherequesteddatahasnotbeingcollected,theRANOAM-relatedfunctionsinitiate
+readMOIattributesprocedurestocollectthelatestconfigurationdatafromtheRANnodesviatheO1interfaceasspecifiedin
+O-RANO1interface[11],clause6.1.5.3.Finally,aReadconfigurationdataresponsewiththelatestconfigurationdataissent
+torAppbytheRANOAM-relatedfunctions.
+10.3.4 Write configuration changes procedure
+Figure10.3.4-1illustratesanexampleworkflowofwritingtheCMconfigurationchangestothenetworkelements.CM
+configurationsintheRANnodesterminatingtheO1interfacearetypicallymanagedbytheSMOviaO1.Configuration
+informationisconsolidatedbytheSMO/Non-RTRICframeworkandcanbemodifiedbyrAppsviatheR1interface.The
+writeconfigurationchangesrequestinitiatedbyrAppsmaycontainbundledwriterequestsformultipleRANnodesinorderto
+savebandwidthontheR1interface.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 70
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "rApp" as rapp
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC Framework" #cadetBlue
+participant "RAN OAM-related functions" as fmsp
+endbox
+endbox
+participant “Nodes terminating O1 interface” as dp
+autonumber
+opt
+rapp -> fmsp: <<R1>> Subscribe for write configuration job status notifications request
+fmsp -> rapp: <<R1>> Subscribe for write configuration job status notifications response
+end
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 44
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+rapp -> fmsp: <<R1>> Request for writing configuration changes\n(rAppId, configuration changes
+information)
+fmsp --> fmsp: AuthZ
+fmsp --> fmsp: Validate request
+fmsp --> fmsp: Store request
+fmsp -> rapp: <<R1>> Write configuration changes response (requestId)
+fmsp --> fmsp: Process request
+ref over fmsp,dp
+As specified in Clause 6.1.3.3
+"Modify Managed Object Instance Attributes - Procedures"
+in O-RAN.WG10.O1-Interface
+end
+alt if subscribed
+fmsp -> rapp: <<R1>> Write configuration changes job status notification \n(requestId,
+configuration changes result)
+else otherwise
+rapp -> fmsp: <<R1>> Query write configuration job status (requestId)
+fmsp -> rapp: <<R1>> Query write configuraiton job status reponse (configuration changes
+result)
+end
+@enduml
+Figure 10.3.4-1: Example workflow for Write configuration changes procedure
+Thewriteconfigurationchangesrequestishandledinasynchronousapproach.WhentherAppinitiatestheWriteconfiguration
+changesprocedure,theRANOAM-relatedfunctionsauthenticatetherequestwithSME,validatetherequest,storetherequest
+asjobandacknowledgetherequestbysendingwriteconfigurationchangesresponseindicatingthattherequesthasbeen
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 45
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+acceptedforprocessing,buttheprocessingjobhasnotbeencompleted.Anassignedrequestedidentifyingthecreated
+processingjobisincludedintheresponse.Theactualprocessingjobforthewriteconfigurationchangesrequestwhich
+includese.g.,conflictdetection,conflictmitigationandwritingtheconfigurationchangestoeachRANnodeasrequestedvia
+theO1interface,happensasynchronously.IftherApphassubscribedforthenotificationofthewriteconfigurationchanges
+jobstatus,theRANOAM-relatedfunctionssendanotificationtotherApponcethewriteconfigurationchangesjobis
+complete,indicatingthecompletionofthejobandprovidinginformationaboutsuccess,partialsuccess,orfailureresultwith
+failurereasons.Otherwise,therAppcanqueryforthewriteconfigurationchangesjobstatusandresultwithqueryprocedures.
+10.4 AI/ML workflow procedures
+ThisclausedemonstratesexampleproceduresrelatedtoAI/MLworkflowservicesproducedbySMO/Non-RTRICframework
+andconsumedbyrApps.
+10.4.1 rApps register, discover AI/ML models, and subscribe to models changes
+Figure10.4.1-1illustratesanexampleworkflowofrAppsusingAI/MLworkflowfunctionstoregister,discoverAI/ML
+modelsandsubscribetoregisteredmodelschanges.
+AmodelproducerrAppsendsarequesttotheAI/MLworkflowfunctionstoregisteranAI/MLmodel.TheregisterAI/ML
+modelrequestcontainsAI/MLmodelinformation(e.g.,modelaccuracy,modelusagescenario,modeltrainingdataset
+information,etc.).Uponreceiptoftheregistrationrequest,theAI/MLworkflowfunctionsauthorizethemodelproducerrApp
+andregistertheAI/MLmodel.Aftersuccessfulregistration,theAI/MLworkflowfunctionsassignanAI/MLmodel
+registrationidentifierandcommunicatethisregistrationidentifiertothemodelproducerrAppinaregisterAI/MLmodel
+response.
+AmodelconsumerrAppsendsarequesttotheAI/MLworkflowfunctionstodiscoverregisteredAI/MLmodelsbasedon
+optionalselectioncriteria.Afterreceivingtherequest,theAI/MLworkflowfunctionsauthorizethemodelconsumerrAppand
+communicatetothemodelconsumerrAppthemodelidentifier(s)andmetadataofAI/MLmodel(s)thatmatchtheprovided
+selectioncriteria.
+ThemodelconsumerrAppcansendasubscribeAI/MLmodelchangerequesttotheAI/MLworkflowfunctionstosubscribeto
+thechangesinaregisteredAI/MLmodel.Uponreceiptofthesubscriptionrequest,AI/MLworkflowfunctionsauthorizethe
+modelconsumerrAppandcreateasubscription.Aftersuccessfulsubscription,theAI/MLworkflowfunctionscommunicateto
+themodelconsumerrAppthesubscriptionIDinasubscribeAI/MLmodelchangeresponse.
+WhenthereisachangeinthesubscribedAI/MLmodel,theAI/MLworkflowfunctionssendnotificationsofchangesinthe
+registeredAI/MLmodeltothesubscribedAI/MLmodelconsumerrApp.
+WhenthemodelproducerrAppsendsaderegisterrequesttotheAI/MLworkflowfunctionstoderegisteraregisteredAI/ML
+model,theAI/MLworkflowfunctionsderegistertheAI/MLmodelandcommunicatetotherAppthatthederegistrationwas
+successful.TheAI/MLworkflowfunctionssendnotificationsofthederegistrationoftheregisteredAI/MLmodeltothe
+subscribedAI/MLmodelconsumerrApp.
+ThemodelconsumerrAppcansendanunsubscriberequesttotheAI/MLworkflowfunctionstounsubscribetochangesina
+registeredAI/MLmodel.Uponreceptionoftheunsubscriberequest,theAI/MLworkflowfunctionsunsubscribethemodel
+consumerrApptotheAI/MLmodelchange.Aftersuccessfullyunsubscribing,theAI/MLworkflowfunctionscommunicateto
+themodelconsumerrAppthatunsubscribingwassuccessful.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+autonumber
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "Model Consumer rApp" as rApp
+endbox
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 46
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+box " Non-anchored functions in SMO/Non-RT RIC Framework " #cadetBlue
+participant "AI/ML workflow functions" as ML
+endbox
+box #ivory
+participant "Model Producer rApp" as src
+endbox
+endbox
+group Model Producer rApp register model
+src -> ML: <<R1>> Register AI/ML model request (rAppID, AI/ML model information)
+ML -> ML: Authz
+ML -> ML: register AI/ML model
+ML -> src: <<R1>> Register AI/ML model response (AI/ML model registration identifier)
+end
+group Model Consumer rApp discover model
+rApp -> ML: <<R1>> Discover AI/ML model request (rAppID, selection criteria)
+ML -> ML: Authz
+ML -> rApp: <<R1>> Discover AI/ML model response（AI/ML model identifier(s) and metadata)
+end
+group Model Consumer rApp subscribe model change
+rApp -> ML: <<R1>> Subscribe AI/ML model change request (rAppID, AI/ML model identifier(s))
+ML -> ML: Create subscription
+ML -> rApp: <<R1>> Subscribe AI/ML model change response (subscription ID)
+end
+group The subscribed model has been changed
+ML -> rApp: <<R1>> Notify AI/ML model changes (subscription ID, AI/ML model identifier,
+available change details)
+end
+group The subscribed model has been deregistered
+group Model Producer rApp deregister model
+src -> ML: <<R1>> Deregister AI/ML model (rAppID, AI/ML model registration identifier)
+ML -> ML: Deregister AI/ML model
+ML -> src: <<R1>> Deregister AI/ML model response
+end
+ML -> rApp: <<R1>> Notify AI/ML model deregistration (subscription ID, AI/ML model identifier)
+end
+group Model Consumer rApp unsubscribe model change
+rApp -> ML: <<R1>> Unsubscribe AI/ML model change request (rAppID, subscription ID)
+ML -> ML: Unsubscription model change
+ML -> rApp: <<R1>> Unsubscribe AI/ML model change response
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 47
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.4.1-1: Example workflow of AI/ML model registration, discovery, and subscription to a registered
+AI/ML model changes
+NOTE: Themetadataincludesmodelrelatedinformation,e.g.,trainingdatasetinformation,etc.
+10.4.2 AI/ML training procedures
+ThefollowingfiguresillustrateanexampleworkflowsofanAI/MLtrainingservicesConsumerrApprequestingAI/ML
+trainingofanAI/MLmodel.InFigure10.4.2-1,theAI/MLworkflowfunctionsintheNon-RTRICframeworkaretheAI/ML
+trainingservicesProducer.InFigure10.4.2-2,anAI/MLtrainingservicesProducerrAppproducestheAI/MLtraining
+services.InFigure10.4.2-3,theAI/MLworkflowfunctionscoordinateAI/MLtrainingintheSMO/Non-RTRIC,andthey
+relaytrainingrequestandsubsequentmessagesbetweentheAI/MLtrainingservicesConsumerAppandaproperAI/ML
+trainingservicesProducerrAppbasedonregisteredtrainingcapabilities.
+TheAI/MLtrainingservicesConsumerrAppsendsatrainingrequesttotheAI/MLtrainingservicesProducer,providing
+modelidentifierofthemodeltobetrained,informationaboutrequireddatafortraining,trainingrequirementssuchas
+validationcriteria,andaURItoreceivenotifications,etc.TheAI/MLtrainingservicesProducer,ifacceptsthetraining
+request,sendsbackrequesttrainingresponsecontainingatrainingidentifier.
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 48
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Afteracceptingthetrainingrequest,theAI/MLtrainingservicesProducermayretrievethemodelfromthemodelrepository
+andconsumestrainingdataviaDMEbasedontheinformationprovidedbytheAI/MLtrainingservicesConsumerrApp.The
+AI/MLtrainingservicesProducerthenperformsthetraining.
+TheAI/MLtrainingservicesConsumerrAppcanquerythetrainingjobstatususingthereceivedtrainingjobidentifier.The
+AI/MLtrainingservicesProducerprovidesthetrainingjobstatusintheresponsetothequery.
+IftheAI/MLtrainingservicesConsumerrAppwantstocanceltheon-goingtraining,itsendsacanceltrainingrequesttothe
+AI/MLtrainingservicesProducerprovidingthetrainingjobidentifier.TheAI/MLtrainingservicesProducerthenterminates
+thetrainingandresponsetotheAI/MLtrainingservicesConsumerrApp.
+Ifthetrainingcompletes,theAI/MLtrainingservicesProducermaystorethetrainedmodelinthemodelrepository,anditthen
+notifiestheAI/MLtrainingservicesConsumerrAppaboutthecompletionofthetraining,sendingthenotificationtothe
+notificationURIreceivedinthetrainingrequest.
+TheAI/MLtrainingservicesConsumerrAppcanretrievethetrainedmodelfromthemodelrepository,iftheAI/MLtraining
+servicesProducerhasstoredthetrainedmodelinthemodelrepository.
+NOTE: ThemodelrepositorycanbeimplementedaspartoftheAI/MLworkflowfunctions.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "AI/ML training services \n Consumer rApp" as con
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "AI/ML workflow functions" as aif
+participant "DME functions" as dme
+database "Model repository" as rep
+endbox
+endbox
+autonumber
+con -> aif: <<R1>> Request training request \n (model id, required data, validation criteria,
+notifcation URI, etc.)
+con <- aif: <<R1>> Request training response (training job id)
+rnote over aif, rep
+Retrieve model (optional)
+end note
+rnote over aif, dme
+Data consumption for training data
+end note
+rnote over aif
+Perform training
+end note
+con -> aif: <<R1>> Query training job status request (training job id)
+con <- aif: <<R1>> Query training job status response (training job status)
+alt AI/ML training services Consumer cancels training
+con -> aif: <<R1>> Cancel training request (training job id)
+rnote over aif
+Terminate training
+end note
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 49
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+con <- aif: <<R1>> Cancel training response
+else AI/ML training services Producer completes training
+rnote over aif
+Training completed
+end note
+rnote over aif, rep
+Store model (optional)
+end note
+con <- aif: <<R1>> Training job status notification \n (training job id, model id, training
+job status: "Completed")
+end
+@enduml
+Figure 10.4.2-1: Example workflow of AI/ML training: AI/ML workflow functions act as the training service
+Producer
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 50
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "AI/ML training services \n Consumer rApp" as con
+participant "AI/ML training services \n Producer rApp" as pro
+endbox
+box "Non-anchored functions in \n SMO/Non-RT RIC FWK" #cadetBlue
+participant "DME functions" as dme
+database "Model repository" as rep
+endbox
+endbox
+autonumber
+con -> pro: Request training request \n (model id, required data, \n validation criteria,
+notification URI, etc.)
+con <- pro: Request training response (training job id)
+rnote over pro, rep
+<<R1>> Retrieve model (optional)
+end note
+rnote over pro, dme
+<<R1>> Data consumption for training data
+end note
+rnote over pro
+Perform training
+end note
+con -> pro: Query training job status request (training job id)
+con <- pro: Query training job status response (training job status)
+alt AI/ML training services Consumer cancels training
+con -> pro: Cancel training request (training job id)
+rnote over pro
+Terminate training
+end note
+con <- pro: Cancel training response
+else AI/ML training services Producer completes training
+rnote over pro
+Training completed
+end note
+rnote over pro, rep
+<<R1>> Store model (optional)
+end note
+con <- pro: Training job status notification \n (training job id, model id, training job
+status: "Completed")
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 51
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.4.2-2: Example workflow of AI/ML training: AI/ML training services Producer rApp acts as the
+AI/ML training services Producer
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "AI/ML training services \n Consumer rApp" as con
+participant "AI/ML training services \n Producer rApp" as pro
+endbox
+box "Non-anchored functions in SMO/Non-RT RIC FWK" #cadetBlue
+participant "AI/ML workflow functions" as aif
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 52
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+participant "DME functions" as dme
+database "Model repository" as rep
+endbox
+endbox
+autonumber
+con -> aif: <<R1>> Request training request \n (model id, required data, validation criteria,
+notifcation URI, etc.)
+aif --> aif: Identify proper training \n service Producer rApp
+pro <- aif: <<R1>> Request training request \n (model id, required data, \n validation
+criteria, notifcation URI, etc.)
+pro -> aif: <<R1>> Request training response \n (training job id)
+con <- aif: <<R1>> Request training response (training job id)
+rnote over pro, rep
+<<R1>> Retrieve model (optional)
+end note
+rnote over pro, dme
+<<R1>> Data consumption for training data
+end note
+rnote over pro
+Perform training
+end note
+con -> aif: <<R1>> Query training job status request (training job id)
+pro <- aif: <<R1>> Query training job status request \n (training job id)
+pro -> aif: <<R1>> Query training job status response \n (training job status)
+con <- aif: <<R1>> Query training job status response (training job status)
+alt AI/ML training services Consumer cancels training
+con -> aif: <<R1>> Cancel training request (training job id)
+pro <- aif: <<R1>> Cancel training request \n (training job id)
+rnote over pro
+Terminate training
+end note
+pro -> aif: <<R1>> Cancel training response
+con <- aif: <<R1>> Cancel training response
+else AI/ML training services Producer completes training
+rnote over pro
+Training completed
+end note
+rnote over pro, rep
+<<R1>> Store model (optional)
+end note
+pro -> aif: <<R1>> Training job status notification \n (training job id, model id, \n training
+job status: "Completed")
+con <- aif: <<R1>> Training job status notification \n (training job id, model id, training
+job status: "Completed")
+end
+@enduml
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 53
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Figure 10.4.2-3: Example workflow of AI/ML training: AI/ML workflow functions coordinate AI/ML training
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 54
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+10.4.3 AI/ML model storage and retrieval procedures
+Figure10.4.3-1illustratesanexampleworkflowofAI/MLmodelstorageandretrieval.
+TheAI/MLtrainingservicesconsumerrAppsendstrainingrequesttotheAI/MLtrainingservicesproducerrApp.After
+acceptingthetrainingrequest,theAI/MLtrainingservicesproducerrAppmaysendaretrievemodelrequesttotheAI/ML
+workflowfunctions,containingthemodelidentifieroftheAI/MLmodeltobetrained.TheAI/MLworkflowfunctionsvalidate
+theretrievalrequestandprovidethemodellocationdetailsoftherequestedAI/MLmodel.TheAI/MLtrainingservices
+producerrAppmayretrievethemodeltobetrainedviathemodellocationdetails.
+TheAI/MLtrainingservicesproducerrApptrainstheAI/MLmodel.Afterthecompletionofthemodeltraining,theAI/ML
+trainingservicesproducerrAppmaysendstoremodelrequesttotheAI/MLworkflowfunctionstostorethetrainedmodel.It
+providesthemodelidentifierandmodellocationdetailsforthetrainedmodelintherequest.TheAI/MLworkflowfunctions
+responsetothestoragerequestwithanupdatedidentifierforthetrainedmodel.
+TheAI/MLtrainingservicesproducerrAppnotifiestheAI/MLtrainingservicesconsumerrAppaboutthecompletionofthe
+modeltraining.TheAI/MLtrainingservicesconsumerrAppthenmaysendretrievemodelrequesttotheAI/MLworkflow
+functionswiththeupdatedmodelidentifiertoretrievethetrainedmodel.TheAI/MLworkflowfunctionsresponsetothe
+retrievalrequestwiththemodellocationdetailsofthetrainedmodel.
+@startuml
+!pragma teoz true
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+skinparam SequenceGroupBackgroundColor Transparent
+skinparam SequenceGroupBodyBackgroundColor Transparent
+box "Non-RT RIC" #whitesmoke
+box #ivory
+participant "AI/ML Training service \n consumer rApp" as con
+participant "AI/ML Training service \n producer rApp" as pro
+endbox
+box "Non-anchored functions \n in SMO/Non-RT RIC FWK" #cadetBlue
+participant "AI/ML workflow functions" as aif
+endbox
+endbox
+autonumber
+con -> pro: request training request \n (model id, required data, \n validation criteria,
+notifcation URI, etc.)
+con <- pro: request training response \n (training job id)
+opt
+pro -> aif: <<R1>> retrieve model request \n (rApp id, model id)
+pro <- aif: <<R1>> retrieve model response \n (model location details)
+end
+rnote over pro
+Train AI/ML model
+end note
+opt
+pro -> aif: <<R1>> store model request \n (rApp id, model id, \n model location details)
+pro <- aif: <<R1>> store model response \n (updated model id)
+end
+con <- pro: Notify training complete \n (training job id, training job status, \n updated
+model id)
+opt
+con -> aif: <<R1>> retrieve model request (rApp id, updated model id)
+con <- aif: <<R1>> retrieve model response (model location details)
+end
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 55
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+@enduml
+Figure 10.4.3-1: Example workflow of AI/ML model storage and retrieval
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 56
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+Annex (informative):
+Change History
+Date Revision Description
+2023.11.16 05.00 Address the received editorial comments
+2023.11.10 04.00.04 Implemented CRs:
+NOK-2023.10.30-WG2-CR-0115-NonRT RIC ARCH-DME type terminology
+cleanup_v01.docx
+INT-2023.11.01-WG2-CR-0062-Editable reference architecture figure-v01.docx
+2023.11.07 04.00.03 Implemented CRs:
+NOK-2023.10.17-WG2-CR-0110-NonRT RIC ARCH-Update rApp instance
+definition_v01.docx
+INT.AO-2023.10.10-WG2-CR-0056-Non-RT RIC ARCH TS ODR update-v03.docx
+INT-2023.10.19-WG2-CR-0058-rApp registration from SME to rApp management-
+v01.docx
+INT.AO-2023.10.20-WG2-CR-0060-Non-RT RIC ARCH TS ODR update part 2-v01.zip
+INT.AO-2023.10.19-WG2-CR-0059-ML model terms-v01.docx
+2023.10.17 04.00.02 Implemented CR:
+INT.AO-2023.09.27-WG2-CR-0054-rAppId definition in Non-RT RIC Arch-v03.docx
+2023.08.31 04.00.01 Implemented CR:
+NEC.AO-2023.08.02-WG2-CR-0040-Non RT RIC ARCH-AIML model deployment
+services-v4.docx
+2023.07.28 04.00 Address the received editorial comments
+© 2024 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 57
+O-RAN.WG2.Non-RT-RIC-ARCH-R003-v05.00
+History
+Date Revision Description
+2023-11-16 05.00 V05.00 Publication
+2023-07-28 04.00 V04.00 Publication
+2023.03.27 03.00 v03.00 Publication
+2022.07.30 02.01 v02.01 Publication
+2022.03.30 02.00 v02.00 Publication
+2021.07.16 01.00 v01.00 Publication

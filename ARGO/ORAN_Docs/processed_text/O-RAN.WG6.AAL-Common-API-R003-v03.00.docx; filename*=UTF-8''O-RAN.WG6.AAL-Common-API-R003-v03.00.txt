@@ -1,0 +1,5189 @@
+O-RAN.WG6.AAL-Common-API-R003-v03.00
+
+                      O-RAN.WG6.AAL-Common-API-R003-v03.00
+
+   O-RAN.WG6.AAL-Common-API-R003-v03.00
+
+Technical Specification
+
+O-RAN Working Group 6
+
+(Cloudification and Orchestration Workgroup)
+
+Acceleration Abstraction Layer
+
+Common API
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+Chapter 1 Introductory Material	4
+
+1.1 Scope	4
+
+1.2 References	4
+
+1.3 Definitions and Abbreviations	4
+
+1.3.1 Definitions	4
+
+1.3.2 Abbreviations	4
+
+Chapter 2 Overview	5
+
+2.1 General	5
+
+2.2 Document Structure	6
+
+Chapter 3 AAL Common requirements and Object Model	7
+
+3.1 AALI-C Mgmt Requirements	7
+
+3.2 AALI-C App Requirements	8
+
+3.2.1 AALI-C-APP Transport Abstraction Requirements and Operations	8
+
+3.3 Object model and scenarios	9
+
+3.3.1 HW Accelerator Modelling	9
+
+3.3.2 AAL-LPU Modelling	11
+
+3.3.3 Naming convention	12
+
+Chapter 4 AALI-C-Mgmt	13
+
+4.1 AALI-C-Mgmt operations and events	13
+
+4.2 AALI-C-Mgmt use case workflows	14
+
+4.2.1 HW Accelerator installation/bootstrap use case workflow	14
+
+4.2.2 e2e Life Cycle Management use case workflow (Informational)	17
+
+4.3 AALI-C-Mgmt API details	23
+
+4.3.1 Capabilities discovery and configuration	23
+
+4.3.1.1 getAalHwAccelStatus	23
+
+4.3.1.2 getAalLpuStatus	23
+
+4.3.1.3   getAalAccelInfo	24
+
+4.3.1.4   setAalAccelConfig	26
+
+4.3.1.5 startAalLpu	27
+
+4.3.1.6 stopAalLpu	28
+
+Chapter 5 AALI-C-APP	29
+
+5.1 AALI-C-App Identification & Representation	29
+
+5.2 AALI-C-App operations and events	29
+
+5.3 AALI-C-App Operations and Events Sequence and State Diagram	30
+
+5.3.1 AALI-C-App State	30
+
+5.3.2 AALI-C-App API Init Sequence	33
+
+5.3.3 AAL-C-Transport API Sequence	35
+
+5.4 AALI-C-App API details	36
+
+5.4.1 Capabilities discovery and configuration	37
+
+5.4.1.1 getAalLpuInfo	37
+
+5.4.2 AALI-C-App Configuration Services	37
+
+5.4.2.1 createAalProfileInstance	37
+
+5.4.2.2 setAalProfileInstanceConfig	38
+
+5.4.2.3 deleteAalProfileInstance	39
+
+5.4.2.4 setAalProfileQueueConfig	40
+
+5.4.2.5 getAalProfileQueueConfig	41
+
+5.4.3 AALI-C-App Transport Operations	41
+
+5.4.3.1 createBufferPool	41
+
+5.4.3.2 allocBuffer	43
+
+5.4.3.3  getBufferAddr	44
+
+5.4.3.4  getBufferSize	44
+
+5.4.3.5  sendBuffer	45
+
+5.4.3.6   receiveBuffer	46
+
+5.4.3.7   freeBuffer	47
+
+5.4.3.8   destroyBufferPool	48
+
+Revision History	49
+
+History	50
+
+Introductory Material
+
+1.1 Scope
+
+This Technical Specification has been produced by the O-RAN Alliance.
+
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of release date and an increase in version number as follows:
+
+Release x.y.z
+
+where:
+
+x	the first digit is incremented for all changes of substance, i.e., technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+
+The present document focuses on the Common API related to common aspects of accelerator abstraction from an administration and application perspective.
+
+1.2 References
+
+3GPP TR 21.905: “Vocabulary for 3GPP Specifications”.
+
+O-RAN Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN.
+
+O-RAN O-RAN.WG1.O-RAN-Architecture-Description
+
+O-RAN O2 Interface General Aspects and Principles
+
+O-RAN Cloudification and Orchestration Use Cases and Requirements for O-RAN Virtualized RAN
+
+O-RAN O2ims Interface Specification
+
+O-RAN Acceleration Abstraction Layer General Aspects and Principles
+
+O-RAN Acceleration Abstraction Layer FEC Profiles
+
+O-RAN Acceleration Abstraction Layer High-PHY Profiles
+
+1.3 Definitions and Abbreviations
+
+1.3.1 Definitions
+
+For the purposes of the present document, the terms and definitions given in [2] apply.
+
+1.3.2 Abbreviations
+
+For the purposes of the present document, the terms and definitions given in [2] apply.
+
+AALI-C	Acceleration Abstraction Layer Interface-Common
+
+AALI-C-Mgmt	Acceleration Abstraction Layer Interface-Common-Management
+
+AALI-C-App	Acceleration Abstraction Layer Interface-Common-Application
+
+AALI-P	Acceleration Abstraction Layer Interface-Profile
+
+UC					Use Case
+
+Overview
+
+General
+
+The AAL General Aspects and Principles are described in [2] including a high-level architecture of the AAL and definition of the AAL profiles.
+
+The AAL interface has two parts:
+
+AALI-C: A profile independent set of functions between application(s) and underlying AAL implementation(s) including management and orchestration within an O-Cloud platform.
+
+AALI-P: A set of profile specific interfaces dependent upon the profile selected e.g., FEC.
+
+The AALI-P are addressed in FEC[8] and High-Phy specifications [9].
+
+Within the AALI-C interface there are two parts:
+
+AALI-C-Mgmt: Common administrative operations, actions, and events between the O-Cloud IMS and the HW Accelerator Manager. The IMS provides the O2 interface towards the SMO. The HW Accelerator Manager terminates the AALI-C-Mgmt interface.
+
+AALI-C-App: Common operations/actions/events toward RAN Application. These operators are between the AAL-App and the RAN application.
+
+Figure 2.1-1: Architecture
+
+The present document details the list of AALI-C operations and events, description with input/outputs, information models, state transition diagrams and requirements to implement an AAL interface.
+
+Note: The scope of the definition in this specification is southbound of the IMS, while reference to SMO is made to set the context, the normative definition of the exchange of information between the IMS and SMO, is part of the O2 IMS specification. [6]
+
+2.2 Document Structure
+
+This present document is structured as follows:
+
+Chapter 2 presents the overview and main purpose of this specification.
+
+Chapter 3 presents a list of requirements and object model.
+
+Chapter 4 presents the initialization and flow, operations and events associated with AALI-C-Mgmt.
+
+Chapter 5 presents the initialization and flow, operations and events associated with AALI-C-App.
+
+AAL Common requirements and Object Model
+
+3.1 AALI-C Mgmt Requirements
+
+Description
+
+Additional Info (TBD)
+
+[REQ-AALI-C-MGMT1]
+
+ The O-RAN SMO and the O-Cloud Infrastructure Management Service shall support the ability to uniquely identify the HW Accelerator, AAL-LPU and AAL Profile and AAL Profile Instance in a provider’s network.
+
+[REQ-AALI-C-MGMT2]
+
+The HW Accelerator Manager shall provide on demand query of the inventory and capabilities of the HW accelerator via the AALI-C-Mgmt interface.
+
+[REQ-AALI-C-MGMT3]
+
+The HW Accelerator Manager shall provide the capability to get the alarm dictionary via the AALI-C-Mgmt interface.
+
+[REQ-AALI-C-MGMT4]
+
+The HW Accelerator Manager shall provide fault information via the AALI-C-Mgmt:
+
+Autonomous notification of faults and alarm
+
+On demand query of the active and historical alarm list
+
+[REQ-AALI-C-MGMT5]
+
+The HW Accelerator Manager shall provide logs (if available) via the AALI-C-Mgmt.
+
+Start/Stop/Get logs (Alarm, optionally Fault, debug)
+
+[REQ-AALI-C-MGMT6]
+
+The HW Accelerator Manager shall provide performance information via the AALI-C-Mgmt:
+
+Reporting PM periodically
+
+On-demand retrieval of performance data
+
+[REQ-AALI-C-MGMT7]
+
+The HW Accelerator Manager shall provide state management services via the AALI-C-Mgmt.
+
+Retrieve the status
+
+Autonomous notification of state changes
+
+[REQ-AALI-C-MGMT8]
+
+The HW Accelerator Manager shall provide configuration management services via the AALI-C-Mgmt interface.
+
+Configure the number of AAL-LPUs to be supported
+
+Configure the Profiles to be support on the AAL-LPUs
+
+Retrieve AAL-LPU capabilities
+
+Configure performance collection interval
+
+[REQ-AALI-C-MGMT9]
+
+The HW Accelerator Manager shall may support installation and upgrade of the HW Accelerator Drivers/FW as applicable.
+
+[REQ-AALI-C-MGMT10]
+
+The HW Accelerator Manager shall support the following actions via the AALI-C-Mgmt interface:
+
+Restart/Reset HW Accelerator
+
+Power Cycle HW Accelerator
+
+Start AAL-LPU
+
+Stop AAL-LPU
+
+3.2 AALI-C App Requirements
+
+Note: This section is to be completed in the next release
+
+Requirement Number
+
+Description
+
+Additional Info
+
+3.2.1 AALI-C-APP Transport Abstraction Requirements and Operations
+
+	The transport between an Application and an AAL implementation can be of different types (e.g., based on shared memory, PCIe interconnect, over Ethernet). AALI-C-App shall support abstraction of these various transport mechanisms between an Application and an AAL implementation through a set of common transport APIs, constituting a transport abstraction framework. The related set of requirements and operations defined in the table below is complementing Sec. 2.5.1.12 of AAL GAnP Spec. [Ref. [7]]
+
+Requirement Number
+
+Description
+
+Operation
+
+[REQ-AALI-C-APP-TRANSPORT1]
+
+The Transport Abstraction Framework shall provide a method for the Application to request an AAL implementation to create buffer pool(s) constituting of buffers(s) of one size or more than one size.
+
+createBufferPool (Sec. 5.4.3.1)
+
+[REQ-AALI-C-APP-TRANSPORT2]
+
+The Transport Abstraction Framework shall provide a method for the Application to request an AAL implementation to allocate buffers.
+
+allocBuffer (Sec. 5.4.3.2)
+
+[REQ-AALI-APP-TRANSPORT3]
+
+The Transport Abstraction Framework shall support Synchronous (blocking), and Asynchronous (non-blocking) API calls for operations related to sending and receiving buffer(s) by the Application
+
+Synchronous (Blocking) API - blocks until the operation is complete and returns the status of the operation execution (success/failure).
+
+Asynchronous (Non-Blocking) API - returns immediately before the operation is complete. The Application invoking API calls in this mode can pre-register for a callback.
+
+sendBuffer (Sec. 5.4.3.5)
+
+receiveBuffer (Sec. 5.4.3.6)
+
+[REQ-AALI-C-APP-TRANSPORT4]
+
+The Transport Abstraction Framework shall support a method of enabling buffer ownership transfer from the Application to the AAL implementation.
+
+When the Application retains ownership of buffer(s), the AAL implementation shall not free the buffer(s) on completion of an operation until buffer ownership is transferred by the Application.
+
+If the Application does not retain ownership of the buffer(s), the AAL implementation shall assume ownership and free the buffer(s) on completion of an operation
+
+[REQ-AALI-C-APP-TRANSPORT5]
+
+The Transport Abstraction Framework shall support an operation for the Application to receive data in the buffer(s) allocated by the Application or the AAL implementation.
+
+sendBuffer (Sec. 5.4.3.5)
+
+[REQ-AALI-C-APP-TRANSPORT6]
+
+The Transport Abstraction Framework shall support an operation for freeing pre-allocated buffer(s).
+
+receiveBuffer (Sec. 5.4.3.6)
+
+[REQ-AALI-C-APP-TRANSPORT7]
+
+The Transport Abstraction Framework shall support an operation for destroying pre-created buffer pool(s).
+
+freeBuffer (Sec. 5.4.3.7)
+
+3.3 Object model and scenarios
+
+The AALI-C-Mgmt interface is the management interface that is used by the IMS for administrative operations/actions/events. The HW Accelerator Manager terminates the AALI-C-Mgmt interface.
+
+Operations and actions/events via AALI-C-Mgmt are applicable on the following entities:
+
+		HW Accelerator – Physical Managed Resource
+
+		AAL Logical Processing Unit (AAL-LPU) – Logical Managed Resource
+
+		AAL Profile – Logical Managed Resource
+
+The AALI-C-App interface is the application facing interface that is used by the application to discover, configure, and manage the AAL-Profile-Instance(s) and AAL-Queue(s) assigned to the application.
+
+Note: A Network Function or application may choose to use one or more AAL Profiles as part of its implementation.
+
+Operations and actions/events via AALI-C-App are applicable on the following entities:
+
+		AAL Logical Processing Unit (AAL-LPU) – Logical Managed Resource
+
+		AAL Profile Instance - Logical Managed Resource
+
+		AAL Queue - Logical Managed Resource
+
+HW accelerator: AAL Logical Processing Unit = 1: N2 (N2 >= 1)
+
+AAL Logical Processing Unit: AAL Profile Instance = 1: N3 (N3 >= 1)
+
+AAL Logical Processing Unit: AAL Queue = 1: N4 (N4 >= 1)
+
+AAL Profile Instance: AAL Profile Queues = 1: N4 (N4 >= 1)
+
+Note: The definition of these resources are defined in GAnP specification [7] section 1.3: The cardinality and relationship between these objects are derived from the GAnP specification [7] section 2.3. The various scenarios supported are also available in the GAnP [7] section 5.
+
+The Information model defined in [6] will be used to define these Managed Resources.
+
+Note 1:Usage of  'M', 'O', and 'CM' imply Mandatory, Optional and Conditional Mandatory in the spec.s
+
+3.3.1 HW Accelerator Modelling
+
+A HW Accelerator is a Physical Managed resource and can be modelled as below:
+
+HW Accelerator Managed Resource
+
+Attribute
+
+Qualifier
+
+Description
+
+resourceId = hw-accel-id
+
+M
+
+Identifier of the resource. Locally unique within the scope of an O-Cloud instance.
+
+description
+
+M
+
+Human readable description of the resource.
+
+resourceTypeId
+
+M
+
+Reference to the resource type of the resource.
+
+globalAssetId
+
+CM
+
+Identifier or serial number of the resource, if available. It is required only if the resource has been identified during its addition to the cloud as a reportable asset in the SMO inventory.
+
+resourcePooldId
+
+M
+
+Reference to the resource pool that the resource is part of.
+
+Elements – AAL-LPUs
+
+O
+
+The resource might be composed of smaller resources or other resource instances of a different type
+
+extensions
+
+O
+
+These are unspecified (not standardized) properties (keys) which are tailored by the vendor to extend the information provided about the Resource. Further work is planned to define additional common attributes specific to the ResourceClass indicated by the ResourceType.
+
+HW Accelerator Managed Resource Type
+
+Attribute
+
+Qualifier
+
+Description
+
+resourceTypeId
+
+M
+
+Identifier of the resource type. Globally unique across O-Cloud instances.
+
+description
+
+M
+
+Human readable description of the resource type.
+
+vendor
+
+M
+
+Name of the provider of the resource type.
+
+model
+
+M
+
+Information about the model of the resource type.
+
+version
+
+M
+
+Version or generation of the resource type.
+
+resourceKind - PHYSICAL
+
+M
+
+The kind (PHYSICAL, LOGICAL) of resource identified by the resource type
+
+resourceClass - ACCELERATOR
+
+M
+
+The enumerated set of values representing class (COMPUTE, NETWORKING, STORAGE, ACCELERATOR) of resource identified by resource type
+
+AlarmDictionary
+
+O
+
+Alarm Dictionary
+
+extensions
+
+O
+
+These are unspecified (not standardized) properties (keys) which are tailored by the vendor to extend the information provided about the ResourceType
+
+Additionally, HW Accelerator specific attributes can be added.
+
+Editor’s Note: The modelling aspects needs to be aligned with the WG6 O2 modelling discussions. The alignment may result in modifications to this section.
+
+3.3.2 AAL-LPU Modelling
+
+An AAL-LPU is a Logical Managed resource and can be modelled as below:
+
+AAL-LPU Managed Resource
+
+Attribute
+
+Qualifier
+
+Description
+
+resourceId = AAL-LPU
+
+M
+
+Identifier of the resource. Locally unique within the scope of an O-Cloud instance.
+
+description
+
+M
+
+Human readable description of the resource.
+
+resourceTypeId
+
+M
+
+Reference to the resource type of the resource.
+
+globalAssetId
+
+CM
+
+Identifier or serial number of the resource, if available. It is required only if the resource has been identified during its addition to the cloud as a reportable asset in the SMO inventory.
+
+resourcePooldId
+
+M
+
+Reference to the resource pool that the resource is part of.
+
+Elements –
+
+O
+
+The resource might be composed of smaller resources or other resource instances of a different type.
+
+extensions
+
+O
+
+These are unspecified (not standardized) properties (keys) which are tailored by the vendor to extend the information provided about the Resource  Further work is planned to define additional common attributes specific to the ResourceClass indicated by the ResourceType.
+
+AAL-LPU Managed Resource Type
+
+Attribute
+
+Qualifier
+
+Description
+
+resourceTypeId
+
+M
+
+Identifier of the resource type. Globally unique across O-Cloud instances.
+
+name
+
+M
+
+Human readable name of the resource type.
+
+description
+
+M
+
+Human readable description of the resource type.
+
+vendor
+
+M
+
+Name of the provider of the resource type.
+
+model
+
+M
+
+Information about the model of the resource type.
+
+version
+
+M
+
+Version or generation of the resource type.
+
+resourceKind - LOGICAL
+
+M
+
+The kind (PHYSICAL, LOGICAL) of resource identified by the resource type
+
+resourceClass - COMPUTE
+
+M
+
+The enumerated set of values representing class (COMPUTE, NETWORKING, STORAGE) of resource identified by resource type
+
+AlarmDictionary
+
+O
+
+Alarm Dictionary (AAL-LPU alarms)
+
+extensions
+
+O
+
+These are unspecified (not standardized) properties (keys) which are tailored by the vendor to extend the information provided about the ResourceType
+
+In our spec we can add a few extensions:
+
+Example:
+
+Profiles supported by LPU
+
+The Hardware Accelerator Manager is the AAL endpoint for the AALI-C-MGMT interface.
+
+3.3.3 Naming convention
+
+For the APIs the following naming convention will be used:
+
+For the Managed Resources:
+
+HW Accelerator - HW-Accel
+
+AAL LPU - AAL-LPU
+
+AAL Profile Instance - AAL-Profile-Instance
+
+AAL Queue - AAL-Queue
+
+Profile Naming convention:
+
+FEC Profile – AAL-FEC
+
+L1 DL High Phy Profile – AAL-DOWNLINK-High-PHY
+
+L1 UL High Phy Profile – AAL-UPLINK-High-PHY
+
+Operations and parameters naming convention:
+
+lowerCamelCase for operation names
+
+lower_snake_case for parameters
+
+Group of attributes are notified with a > sign.
+
+Example:
+
+A grouped list of variables a, b and c under one parameter i.e. parameter_name is shown as follows:
+
+parameter_name
+
+struct
+
+>a
+
+>b
+
+>c
+
+AALI-C-Mgmt
+
+4.1 AALI-C-Mgmt operations and events
+
+The below table lists the operations and events as part of the AALI-C-Mgmt interface.
+
+Category
+
+Operations/Events
+
+Objects
+
+Configuration Services
+
+Get configuration
+
+getAalHwAccelStatus
+
+getAalLpuStatus
+
+getAalAccelInfo  (inventory and capabilities)
+
+getPmCounters
+
+getAlarmDictionary
+
+getPmDictionary
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Set configuration (add/modify/delete) configuration (initial and inline updates):
+
+setAalAccelConfigSet
+
+setPmCollectionInterval (granularity/reporting etc.) (TBD)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Fault Management Services
+
+Leverage O2 IMS mechanism
+
+(TBD)
+
+Alarm Subscription
+
+AAL-HW-Accel
+
+AAL-LPU
+
+getAlarmList (Active/historical-Alarm/Event/Fault list)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+manageLogs (Start/Stop/Get logs (Alarm, optionally Fault, debug))
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Performance Services
+
+Leverage O2 IMS mechanism
+
+(TBD)
+
+PM Subscription
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Reporting of PM (file, streaming etc)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Autonomous Notifications
+
+Leverage O2 IMS mechanism
+
+(TBD)
+
+Alarm Notification (Autonomous)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+State Change notification (Autonomous)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+Operational commands
+
+uploadBootImage  (TBD)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+restartHwAccel (TBD)
+
+resetHwAccel (TBD)
+
+AAL-HW-Accel
+
+powerCycleHwAccel (TBD)
+
+AAL-HW-Accel
+
+startAalLpu
+
+AAL-LPU
+
+stopAalLpu
+
+AAL-LPU
+
+initiateTest (TBD)
+
+AAL-HW-Accel
+
+AAL-LPU
+
+4.2 AALI-C-Mgmt use case workflows
+
+4.2.1 HW Accelerator installation/bootstrap use case workflow
+
+This use case describes the procedure with a focus on the interaction with the Accelerator Manager for installing a HW accelerator and configuring the AAL-LPUs. This procedure would be applicable during the initial deployment of an O-Cloud and afterward to reconfigure or add new resources.
+
+This AAL UC flow can be executed during the O-Cloud Registration and Initialization Use Case, O-Cloud Inventory Update Use Case and the Hardware Infrastructure Scaling of O-Cloud Post Deployment Use Case [ Ref[5]: 3.1.4 “O-Cloud Registration and Initialization Use Case”, Configure AAL-LPU  “3.1.4 : O-Cloud Inventory Update Use Case (DMS Example)” and “3.1.5: Hardware Infrastructure Scaling of O-Cloud Post Deployment”].
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Install the Accelerator and (re)configure AAL-LPUs.
+
+Actors and Roles
+
+Cloud Installation Project Manager:
+
+SMO:
+
+FOCOM:
+
+IMS:
+
+Accelerator Manager:
+
+Assumptions
+
+This UC can be applicable during the O-Cloud Registration and Initialization or during Hardware Infrastructure Scaling of O-Cloud Post Deployment.
+
+Pre-conditions
+
+SMO/FOCOM is active and running normally
+
+	O-Cloud is available
+
+	IMS/DMS is already available
+
+	Accelerator Manager is available
+
+	SMO and IMS/DMS connectivity is established
+
+Begins when
+
+SMO sends request to Install Accelerator
+
+Step 1 (O)
+
+For some accelerators, IMS may upload a boot image for the HW accelerator to make it available to the AccelMgr via the AALI-C-Mgmt.
+
+Step 2 (M)
+
+IMS gets the HW accelerator info via AALI-C-Mgmt interface.
+
+Ends when
+
+HW Accelerator has been installed and the SMO has retrieved the Accelerator Info.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+HW Accelerator have been deployed on the O-Cloud.
+
+Traceability
+
+To be added later
+
+4.2.1.1	Sequence Diagram
+
+@startuml
+
+skinparam sequenceArrowThickness 1
+
+skinparam ParticipantPadding 2
+
+skinparam BoxPadding 5
+
+Autonumber
+
+Box "Personnel" #lightblue
+
+   Actor ProjectManager as "Cloud Installation\nProject Mgr"
+
+   Actor Installer as "Cloud Installer"
+
+End box
+
+Box "Service Management & Orchestration Framework" #gold
+
+   Participant "FOCOM" as FCC
+
+End box
+
+Box "O-Cloud      "#lightseagreen
+
+   Participant "IMS" as IMS
+
+   Participant AccelMgr as "Accelerator Manager"
+
+End box
+
+Note over Installer, FCC
+
+	PRECONDITIONS:
+
+	SMO/FOCOM is active and running normally
+
+	O-Cloud is available
+
+	IMS/DMS is already available
+
+	Accelerator Manager is available
+
+	SMO and IMS/DMS connectivity is established
+
+End Note
+
+== Use case: Install new HW Accelerator ==
+
+Note over Installer, FCC
+
+SMO sends request to Install Accelerator
+
+End Note
+
+opt Load boot image as needed
+
+Note over IMS
+
+If boot image is needed or new driver is needed then upload image
+
+End note
+
+IMS -> AccelMgr : <<AALI-C-Mgmt>> uploadBootImage
+
+AccelMgr -> IMS : <<AALI-C-Mgmt>> uploadBootImage Success
+
+End Opt
+
+IMS -> AccelMgr : <<AALI-C-Mgmt>> getAalAccelInfo request
+
+AccelMgr -> IMS : <<AALI-C-Mgmt>> getAalAccelInfo response (success)
+
+Note over FCC
+
+Accelerator Manager is installed and SMO has the inventory information about the Accelerator.
+
+SMO Updates cloud inventory
+
+End Note
+
+== End Use Case ==
+
+@enduml
+
+4.2.2 e2e Life Cycle Management use case workflow (Informational)
+
+Note: The e2e flow depicted in this section are known to be incomplete and are being provided as informational guidance to implementors on how the APIs documented in the remainder of the specification are to be used. These exchanges will be made normative in future versions of the specification”.
+
+This use case describes the e2e procedure with a focus on the interaction with the HW Accelerator Manager via the AALI-C-Mgmt interface for discovering the capabilities of the Accelerator, configuring the AAL-LPUs, instantiating an application (xNF) and optionally updating/reconfiguring the resources based on the needs of the xNF. The flow also shows the interaction with the application via the AALI-C-App to create an AAL-Profile-Instance.
+
+This AAL UC flow can be executed during the O-Cloud Registration and Initialization Use Case, O-Cloud Inventory Update Use Case and the Hardware Infrastructure Scaling of O-Cloud Post Deployment Use Case [ Ref[5]: 3.1.4 “O-Cloud Registration and Initialization Use Case”, Configure AAL-LPU  “3.1.4 : O-Cloud Inventory Update Use Case (DMS Example)” and “3.1.5: Hardware Infrastructure Scaling of O-Cloud Post Deployment”]. This use case is also related to the “3.2.1	Instantiate Network Function on O-Cloud”.
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Discover the capabilities of the accelerator and configure AAL-LPUs. Update HW Accelerator and configure AAL-LPU(s) based on application need
+
+Actors and Roles
+
+Cloud Installation Project Manager:
+
+SMO:
+
+FOCOM:
+
+NFO:
+
+IMS:
+
+DMS:
+
+Accelerator Manager:
+
+Assumptions
+
+This UC can be applicable for initial or subsequent deployment of the O-Cloud, (re)instantiation of xNF and adding/deleting resources or AAL-Profile-Instances.
+
+Pre-conditions
+
+SMO/FOCOM/NFO is active and running normally
+
+O-Cloud is available
+
+IMS/DMS is already available
+
+Accelerator Manager is available
+
+Accelerator is bootstrapped/installed: For some accelerators, IMS may upload a boot image for the HW accelerator to make it available to the AccelMgr via the AALI-C-Mgmt.
+
+SMO and IMS/DMS connectivity is established
+
+SMO Catalog, xNF Manifest is available
+
+FW/SW image Repo available
+
+SMO Inventory DB available
+
+Begins when
+
+SMO sends request to query the resource(s)
+
+Step 1-5 (M)
+
+SMO sends a query to retrieve the available O-Cloud Info. The IMS queries for the accelerator resource(s)’ using the getAalAccelInfo via AALI-C-Mgmt interface. This includes not only hardware info but also the capabilities (example: Vendor, Version, BIOS, AAL-LPU, and other capabilities supported by the Accel).
+
+SMO updates the inventory based on the response.
+
+Step 6-9 (M)
+
+Based on the planned Manifest, SMO/IMS configures the Accelerator (example: AAL-LPU capabilities, Profile images etc) using the setAalAccelConfig via the AALI-C-Mgmt interface.
+
+DMS inventory is updated.
+
+SMO updates the inventory based on the response.
+
+Step 10-16 (M)
+
+SMO sends request for xNF instantiation with a manifest file. SMO gets the deployment artifacts for containerized workload (e.g., Manifest/ Helm Charts). This includes requested resource and profiles.
+
+Using the setAalAccelConfig via the AALI-C-Mgmt interface the accelerator and AAL-LPU configuration may have to be updated as needed for each of the items in the manifest.
+
+Workload/Application is instantiated, and DMS/SMO inventory updated. Reference: Use Case 3.2.1.
+
+Step 17-18 (M)
+
+SMO configures the cell details, profile versions etc to the application via O1 interface
+
+Step 19 (M)
+
+Initialize AALI-C-App interface between the App and AAL
+
+Step 20-21 (M)
+
+Application queries to get the capabilities of the AAL-LPU assigned using the getAalAccelInfo via the AALI-C-App.
+
+In response, the Application get the aal-lpu-handle and the Profiles supported.
+
+Step 22-29 (M)
+
+Application creates one or many AAL-Profile-Instance via the AALI-C-App using setAalProfileInstance and starts the AAL-Profile-Instance. Application also sets the AAL-Queue configuration and starts the queue.
+
+Step 30-35 (M)
+
+If the AAL-Profile-Instance needs to be updated or is not needed anymore, Application via the AALI-C-App stops the AAL-Queue and AAL-Profile-Instance and deletes the AAL-Profile-Instance.
+
+Ends when
+
+Accelerator and AAL-LPUs have been configured, xNF instantiated and AAL Profile instance managed.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+xNF instantiated and AAL Profile instance managed.
+
+Traceability
+
+To be added later
+
+4.2.2.1	Sequence Diagram
+
+@startuml
+
+skinparam sequenceArrowThickness 1
+
+skinparam ParticipantPadding 2
+
+skinparam BoxPadding 5
+
+Autonumber
+
+Box "Service Management & Orchestration Framework" #gold
+
+   Participant "FOCOM/NFO" as FCC
+
+End box
+
+Box "O-Cloud      "#lightseagreen
+
+   Participant "IMS" as IMS
+
+   Participant DMS as "DMS"
+
+   Participant AccelMgr as "AAL Mgmt"
+
+   Participant "AAL App" as aal
+
+End box
+
+Box "Network Functions"#LightBlue
+
+  Participant "xNF App" as App
+
+End box
+
+Box "Network Functions"#DarkBlue
+
+  Participant "SMO" as O1
+
+End box
+
+Box "SW Repo" "#Blue
+
+      Participant "Repo" as Repo
+
+End box
+
+Note over FCC
+
+  PRECONDITIONS:
+
+  SMO/FOCOM is active and running normally
+
+  O-Cloud is available
+
+  IMS/DMS is already available
+
+  SMO and IMS/DMS connectivity is established
+
+  Accelerator Manager is available
+
+End Note
+
+== Use case: AAL Flow ==
+
+Note over FCC
+
+SMO Catalog, HW Accelerator Manifest, xNF Manifest available
+
+FW/SW image Repo available, SMO Inventory DB available
+
+end Note
+
+FCC -> IMS: <<O2>> QueryOcloudInfoRequest
+
+IMS -> AccelMgr : <<AALI-C-Mgmt>> getAalAccelInfo
+
+AccelMgr --> IMS : getAalAccelInfo response Success( Vendor, Version, Bios etc )
+
+IMS --> FCC : <<O2>> QueryOcloudInfoResponse
+
+FCC -> FCC : SMO Inventory updated
+
+Note over FCC,IMS
+
+Single Set command to configure the device with manifest,
+
+including AAL LPU and Profile Images.
+
+The SMO knows the pre-defined set of configurations that support different
+
+use cases that it wants to deploy.
+
+The configuration can be changed dynamically in the future.
+
+HW Accelerator Manager will be able to apply delta changes accordingly.
+
+end Note
+
+Note over FCC,IMS
+
+SMO triggers setting AAL Accel Config
+
+end Note
+
+IMS -> AccelMgr: <<AALI-C-Mgmt>> setAalAccelConfig \n(including AAL-LPU's, Supported AAL-Profile etc..)
+
+Note over AccelMgr, Repo
+
+Optionally, if needed, the SW/FW image is retrieved from the Repo
+
+End Note
+
+group DMS inventory update
+
+AccelMgr <--> DMS : DMS Info exchange
+
+Note over DMS
+
+ examples of info exchanged \n AAL-LPUs, AAL-Profile info etc
+
+End Note
+
+End
+
+AccelMgr --> IMS: setAalAccelConfig response success
+
+Note over FCC,IMS
+
+Response to SMO with success/failure of setting AAL Accel Config
+
+end Note
+
+FCC -> FCC : SMO Inventory update
+
+Note over FCC,IMS
+
+  SMO Instantiate xNFs
+
+  SMO gets the deployment artifacts for
+
+  containerized workload (e.g., Manifest/ Helm Charts).
+
+  This includes resource and profiles requested
+
+end Note
+
+REF over FCC : Use case 3.2.1 Orchestration Use Case Spec
+
+FCC -> DMS : <<O2>> Instantiate xNF
+
+Note over DMS
+
+The DMS manifest includes the LPU (Profile) required and I/O ports etc..
+
+end NOTE
+
+Note over DMS
+
+Kubernetes Example for High Phy Profile:
+
+requests:
+
+    oran.com/aal_highphy_lpu1: ‘1’ #assigns LPU 1 to the POD
+
+    Ethernet.com/ethernet_sriov_dpdk_port4: ‘1’ #mid haul
+
+    hugepages-1Gi: 2Gi
+
+    memory: 2G1
+
+ETSI Example for High Phy Profile: (TBD)
+
+Example for handling other profiles (TBD)
+
+end NOTE
+
+opt Set AAL Accel info if needed
+
+Note over DMS
+
+  Optionally, the IMS sets the AAL Accel Config
+
+  based on the information received from SMO
+
+  to add/modify resources as defined in the xNF instantiate request.
+
+End Note
+
+DMS --> FCC : <<DMS-SMO interface>>Update Accel info (to be define by O2dms)
+
+FCC -> IMS: <<O2>> Set AAL Accel Config \n(including AAL-LPU's, Supported AAL-Profile etc..)
+
+IMS -> AccelMgr: <<AAL-C-Mgmt>> Set AAL-Accel-Config \n(including AAL-LPU's, Supported AAL-Profile etc..)
+
+AccelMgr --> IMS: <<AAL-C-Mgmt>> Set AAL-Accel-Config response success
+
+IMS --> FCC : <<O2>> Set AAL Accel Config response success
+
+FCC --> DMS: Success
+
+End opt
+
+DMS -> App : xNF instantiated
+
+activate App
+
+DMS --> FCC : xNF instantiated response success
+
+O1 -> App : <<O1>> DU Configuration \n Cells, BW, Profile Version etc..
+
+App --> O1 : response Success
+
+Note over aal, App
+
+Kubernetes Example :
+
+Environmnet Variables are populated with the appropriate resource
+
+identifier for the application to use when initializing the AAL Implementation.
+
+In the example below it assumes an SRIOV AAL Implementation type using PCIE
+
+address to identify the correct HW Resource.
+
+PCIDEVICE_ORAN_COM_AAL_HIGHPHY_LPU=0000:67:06.3
+
+ETSI Example: TBD
+
+End NOTE
+
+Note over aal, App
+
+Initilize the AAL interface betwwen AAL and App
+
+end NOTE
+
+App <-> aal : Init AALI-C-App
+
+Note over aal, App
+
+Get AAL LPU information and
+
+create AAL Profile Instance
+
+end NOTE
+
+App -> aal : <<AALI-C-App>> getAalAccelInfo
+
+aal -> App : <<AALI-C-App>> Response LPU/Profile handle
+
+App -> aal : <<AALI-C-App>> createAalProfileInstance
+
+aal -> App : <<AALI-C-App>> Response Success
+
+App -> aal : <<AALI-C-App>> setAalProfileInstance/startAalProfileInstance/startAalProfileInstance
+
+aal -> App : <<AALI-C-App>> Response Success
+
+App -> aal : <<AALI-C-App>> setAalProfileQueueConfig
+
+aal -> App : <<AALI-C-App>> Response Success
+
+App -> aal : <<AALI-C-App>> startAalProfileQueue
+
+aal -> App : <<AALI-C-App>> Response Success
+
+Note over aal, App
+
+Delete AAL Profile Instance
+
+end NOTE
+
+App -> aal : <<AALI-C-App>> stopAalProfileQueue
+
+aal -> App : <<AALI-C-App>> Response Success
+
+App -> aal : <<AALI-C-App>> stopAalProfileInstance
+
+aal -> App : <<AALI-C-App>> Response Success
+
+App -> aal : <<AALI-C-App>> deleteAalProfileInstance
+
+aal -> App : <<AALI-C-App>> Response Success
+
+== End Use Case ==
+
+@enduml
+
+4.3 AALI-C-Mgmt API details
+
+Note: The AALI-C-Mgmt interface defines the administrative operations/actions/events between the O-Cloud IMS and the HW Accelerator Manager.
+
+4.3.1 Capabilities discovery and configuration
+
+4.3.1.1 getAalHwAccelStatus
+
+Description: The HW Accelerator Manager enables querying the status of the HW accelerator and the AAL-LPUs (per AAL-LPU or all AAL-LPUs).
+
+Pre-conditions: HW Accelerator Device is initialized, and HW Accelerator Manager is operational.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+getAalHwAccelStatus
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+Identifier
+
+Key
+
+This ID is unique within a O-Cloud
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_status
+
+Reference WG10 info model
+
+M
+
+Returns the status of the HW Accelerator
+
+status_of_operation
+
+Reference WG6 info model
+
+Returns the status of the operation
+
+4.3.1.2 getAalLpuStatus
+
+Description: The HW Acclerator Manager enables querying the status the AAL-LPUs (per AAL-LPU).
+
+Pre-conditions: HW Accelerator Device is initialized, and HW Accelerator Manager is operational.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+getAalLpuStatus
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+1..N
+
+Identifier
+
+Key
+
+This ID is unique within an O-Cloud
+
+aal_lpu_handle
+
+Identifier
+
+Key
+
+This ID is unique within a HW Accelerator
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the operation
+
+aal_lpu_status
+
+Reference WG10 object model
+
+M
+
+Returns the status of the AAL-LPU(s)
+
+4.3.1.3   getAalAccelInfo
+
+Description: This is used to query information about the HW Accelerator and capabilities of the AAL-LPU.
+
+Pre-conditions: HW Accelerator Device is initialized, and HW Accelerator Manager is operational. IMS is operational.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+getAalAccelInfo
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+1.. N
+
+Identifier
+
+Key
+
+Unique Identification of the AAL-HW-Accel in the O-Cloud. O-Cloud-> ResourcePoolD-> ResourceID (Resource).
+
+In this case the resource is a hw accelerator and therefore the hw_accel_id will map to the ResourceID.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+(Align with O2 Data model)
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG6 info model
+
+M
+
+Returns the status of the get-AAL-Accel-info procedure
+
+vendor_name
+
+1
+
+String
+
+M
+
+Name of the Vendor/Provider of the resource type
+
+date_of_manufacture
+
+1
+
+String
+
+M
+
+Date of the manufacture of the resource type.
+
+model
+
+1
+
+String
+
+M
+
+Information about the model of the resource type.
+
+serial_number
+
+1
+
+String
+
+M
+
+Serial number of the specific resource.
+
+hw_version
+
+1
+
+String
+
+M
+
+Version or generation of the resource type.
+
+bios_firmware-bmc_version
+
+1
+
+String
+
+M
+
+BIOS/FW/BMC Version of the resource type.
+
+max_num_aal_lpus
+
+0..1
+
+Integer
+
+O
+
+This parameter may be included if a device has an upper limit on AAL-LPUs it can support. Actual number of AAL-LPUs available at runtime may be lower based on resource usage, AAL-LPU SW used, and AAL-Profile SW and types instantiated on the AAL-LPU(s)
+
+num_aal_lpus_configured
+
+1
+
+Integer
+
+M
+
+Number of LPU(s) configured
+
+lpu_type
+
+1
+
+String
+
+M
+
+single/mixed
+
+single: all LPUs are identical.
+
+mixed: non-identical LPUs
+
+aal_lpu_list
+
+0.. N
+
+List of struct - inlined
+
+O
+
+List of AAL-LPUs and their characteristics:
+
+> aal_lpu_handle
+
+1
+
+Identifier
+
+M
+
+Uniquely identifies the AAL-LPU within the accelerator
+
+>aal_lpu_image_location
+
+0..1
+
+String
+
+O
+
+Path to the software/firmware image
+
+> aal_lpu_profile_list
+
+1
+
+String
+
+M
+
+List of AAL-Profile(s) supported (Profile Name ID, Image)
+
+Profiles will be defined, and the unique name will be associated here.
+
+> aal_lpu_config
+
+0..1
+
+Struct - Inlined
+
+O
+
+Can be one or more parameters that define the AAL-LPU persona – Some of the parameters are listed below
+
+>>aal_lpu_memory
+
+0..1
+
+Integer
+
+O
+
+AAL-LPU memory
+
+>>aal_lpu_multiprocessors_num
+
+0..1
+
+Integer
+
+O
+
+Number of Multi-Processors per AAL-LPU
+
+>>aal_lpu_compute_slices_num
+
+0..1
+
+Integer
+
+O
+
+Number of compute slices per AAL-LPU
+
+>>vendor_specific
+
+0..N
+
+List Key Value Pair
+
+String/String
+
+O
+
+Vendor specific AAL-LPU attribute
+
+Some examples: Number of DMA engines, number of encoders, number of decoders, number of JPEG engines, Number of OfA (Optical flow accelerator) engines
+
+Note: While this list provides the details of parameters between IMS and HW Accelerator Manager, further analysis is needed to understand what is needed by the SMO.
+
+4.3.1.4   setAalAccelConfig
+
+Description: This is used to configure the HW Accelerator and AAL-LPU.
+
+Pre-conditions: HW Accelerator Device is initialized, and HW Accelerator Manager is operational.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+setAalAccelConfig
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+1.. N
+
+Identifier
+
+Key
+
+Unique Identification of the AAL-HW-Accel in the O-Cloud. O-Cloud-> ResourcePoolD-> ResourceID (Resource).
+
+In this case the resource is a hw accelerator and therefore the hw_accel_id will map to the ResourceID.
+
+bios_firmware-bmc_version
+
+1
+
+String
+
+M
+
+BIOS/FW/BMC Version of the resource type.
+
+num_aal_lpus_configured
+
+1
+
+Integer
+
+M
+
+Number of LPU(s) configured
+
+lpu_type
+
+1
+
+String
+
+M
+
+single/mixed
+
+single: all LPUs are identical.
+
+mixed: non-identical LPUs
+
+aal_lpu_list
+
+0.. N
+
+List of struct - inlined
+
+O
+
+List of AAL-LPUs and their characteristics:
+
+> aal_lpu_handle
+
+1
+
+Identifier
+
+M
+
+Uniquely identifies the AAL-LPU within the accelerator
+
+>aal_lpu_image_location
+
+0..1
+
+String
+
+O
+
+Path to the Image
+
+> aal_lpu_profile_list
+
+1
+
+String
+
+M
+
+List of AAL-Profile(s) supported (Profile Name ID, Image)
+
+Profiles will be defined, and the unique name will be associated here.
+
+> aal_lpu_config
+
+0..1
+
+Struct - Inlined
+
+O
+
+Can be one or more parameters that define the AAL-LPU persona – Some of the parameters are listed below
+
+>>aal_lpu_memory
+
+0..1
+
+Integer
+
+O
+
+AAL-LPU memory
+
+>>aal_lpu_multiprocessors_num
+
+0..1
+
+Integer
+
+O
+
+Number of Multi-Processors per AAL-LPU
+
+>>aal_lpu_compute_slices_num
+
+0..1
+
+Integer
+
+O
+
+Number of compute slices per AAL-LPU
+
+>>vendor_specific
+
+0..N
+
+List Key Value Pair
+
+String/String
+
+O
+
+Vendor specific AAL-LPU attribute
+
+Some examples: Number of DMA engines, number of encoders, number of decoders, number of JPEG engines, Number of OfA (Optical flow accelerator) engines
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG6 info model
+
+M
+
+Returns the status of the procedure
+
+Note: While this list provides the details of parameters between IMS and HW Accelerator Manager, further analysis is needed to understand what is needed by the SMO.
+
+4.3.1.5 startAalLpu
+
+Description: This operation will start an AAL-LPU that is in the stopped state. The AAL-LPU is instantiated using the SW/FW image(s) and configuration that were provided in the setAalAccelConfig procedure.
+
+The AAL-LPU state machine is moved to a started / running state. When the AAL-LPU is in the started state it is ready to be used by the application.
+
+After successfully starting AAL-LPU using this procedure, the AAL-LPU can be stopped.
+
+Pre-conditions: HW Accelerator Device is initialized and HW Accelerator Manager is operational. The AAL-LPU has been successfully configured and is in the stopped state.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+startAalLpu
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+Identifier
+
+Key
+
+HW Accel ID is unique within an O-Cloud
+
+aal_lpu_handle
+
+Identifier
+
+Key
+
+AAL-LPU handle is unique within a HW Accelerator
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG6 info model
+
+M
+
+Returns the status of the procedure
+
+4.3.1.6 stopAalLpu
+
+Description: Moves AAL-LPU state machine to a stopped state.
+
+AAL-LPU service is stopped. Configuration changes on the AAL-LPU can be performed. Re-configuration of the AAL-LPU compute / memory resource partitioning can be performed. Drivers can be updated / re-installed and configured. Maintenance / debugging operations can be performed.
+
+After successfully stopping the AAL-LPU, the AAL-LPU can be (re-)configured, started or deleted.
+
+Pre-conditions: HW Accelerator Device is initialized, and HW Accelerator Manager is operational. The number of AAL-LPUs has been set on the HW Accelerator. The AAL-LPU has been successfully configured and is started. Applications have previously been migrated off the AAL-LPU.
+
+Triggers: On demand request via AALI-C-Mgmt interface
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+stopAalLpu
+
+IMS    =>    HW Accelerator Manager (AM)
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+hw_accel_id
+
+Identifier
+
+Key
+
+This ID is unique within an O-Cloud
+
+aal_lpu_handle
+
+Identifier
+
+Key
+
+This ID is unique within a HW Accelerator
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+AALI-C-APP
+
+5.1 AALI-C-App Identification & Representation
+
+Within a process address space each AAL-LPU can be abstracted using a generalized object handle.
+
+Depending on the HW design and implementation choice, an AAL-LPU implementation may want to accelerate multiple AAL profiles, offer support for sharing HW Accelerator resources between multiple threads and/or partition AAL-LPU resources between multiple cells. For this reason, Logical Managed Resources, AAL-Profile-Instance and AAL Queue can optionally be used by the network function to
+
+distinguish between multiple supported AAL profiles per AAL-LPU
+
+prioritize access to AAL-LPU resources
+
+group operation requests
+
+partition AAL-LPU resources
+
+allow parallel access through the AAL application interface for multiple threads / cores
+
+As Logical Managed Resources, an AAL Queue does not reflect a HW design specification or requirement but an AAL interface specification.
+
+The AALI-C-App initialization and configuration are done on a per AAL-LPU basis. That is, for each AAL-LPU that is assigned to the NF, the NF shall initialize and configure each AAL-Profile-Instance and AAL-Queue.
+
+5.2 AALI-C-App operations and events
+
+The below table lists the operations and events as part of the AALI-C-App interface.
+
+Category
+
+Operations/
+
+Events
+
+Objects
+
+Inventory Services
+
+getAalLpuInfo
+
+AAL-LPU
+
+Configuration Services
+
+createAalProfileInstance
+
+AAL-LPU
+
+getAalProfileInstanceConfig
+
+AAL-Profile-Instance
+
+setAalProfileInstanceConfig
+
+AAL-Profile-Instance
+
+deleteAalProfileInstance
+
+AAL-Profile-Instance
+
+setAalQueueConfig
+
+AAL-Queue
+
+getAalQueueConfig
+
+AAL-Queue
+
+Operations
+
+startAalProfileInstance
+
+AAL-Profile-Instance
+
+stopAalProfileInstance
+
+AAL-Profile-Instance
+
+startAalQueue
+
+AAL-Queue
+
+stopAalQueue
+
+AAL-Queue
+
+Transport Operations
+
+createBufferPool
+
+N/A
+
+allocBuffer
+
+N/A
+
+getBufferAddr
+
+N/A
+
+getBufferSize
+
+N/A
+
+sendBuffer
+
+N/A
+
+receiveBuffer
+
+N/A
+
+freeBuffer
+
+N/A
+
+destroyBufferPool
+
+N/A
+
+Editor’s note: Use of AAL-Queue operations for user plane data transfer and buffer API operations needs to be clarified.
+
+5.3 AALI-C-App Operations and Events Sequence and State Diagram
+
+5.3.1 AALI-C-App State
+
+The below state diagram shows the high-level state and state transitions for all AALI-C-App Operations and Events
+
+@startuml @startuml
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+hide empty description
+
+[*] --> AAL : Initialize
+
+state AAL {
+
+    [*] --> AALStopped
+
+    AALStopped --> AALStarted : startAalLpu
+
+    AALStarted --> AALStopped : stopAalLpu
+
+    AALStopped --> AALStopped : getAalLpuConfig
+
+    AALStarted --> AALProfileInstance
+
+}
+
+state AALProfileInstance {
+
+    [*] --> Stopped : createAalProfileInstance (s)
+
+    Stopped --> Started : startAalProfileInstance
+
+    Started --> Stopped : stopAalProfileInstance
+
+    Stopped --> Stopped : setAalProfileInstanceConfig
+
+    Started --> Started : getAalProfileInstanceConfig
+
+    Stopped --> [*] : deleteAalProfileInstance
+
+    Started --> AALQueue
+
+}
+
+state AALQueue {
+
+    [*] --> QueueStopped
+
+    QueueStopped --> QueueStarted : startAalQueue
+
+    QueueStarted --> QueueStopped : StopAalQueue
+
+    QueueStopped --> QueueStopped : setAalQueueConfig
+
+    QueueStarted --> QueueStarted : getAalQueueConfig\nPerform Operations
+
+}
+
+@enduml
+
+5.3.2 AALI-C-App API Init Sequence
+
+The below sequence diagram shows the high-level initialization and configuration procedure for the AALI-C-App.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << OAAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+note over ODU, AAL
+
+Assumed the O-DU is already instantiated on the O-Cloud
+
+With desired HW accelerator resources assigned from O2 and
+
+Configuration through O1 interface is complete
+
+endnote
+
+==Inventory Services==
+
+ODU -> AAL : Initialize
+
+AAL --> ODU : Initialization Response
+
+ODU -> AAL : getAalLpuInfo
+
+AAL --> ODU : Response getAalLpuInfo
+
+==Configuration & Operation Services==
+
+loop for each AAL-LPU
+
+loop for each AAL-Profile-Instance
+
+ODU -> AAL : createAalProfileInstance
+
+AAL --> ODU : AAL-Profile-Instance handle / identifier
+
+ODU -> AAL : setAalProfileInstanceConfig
+
+AAL --> ODU : return
+
+ODU -> AAL : startAalProfileInstance
+
+AAL --> ODU : return
+
+loop for each AAL-Queue
+
+ODU -> AAL : setAalQueueConfig
+
+AAL --> ODU : return
+
+ODU -> AAL : startAalQueue
+
+AAL --> ODU : return
+
+end loop
+
+end loop
+
+end loop
+
+@enduml
+
+5.3.3 AALI-C-Transport API Sequence
+
+The AALI-C-App Transport API sequence is divided into two sets of call flows in the following subsections:
+
+Sec. 5.3.3.1 focusses on call flows related to allocation of buffers(s) to be used with other AALI-C-App Transport APIs.
+
+Sec. 5.3.3.2 and its subsections focus on call flows detailing the various procedures for sending and receiving buffer(s) using AALI-C-App Transport API.
+
+ 5.3.3.1	Allocation of AAL Buffer(s)
+
+The AALI-C-App Transport API supports allocation of buffers from either pre-created buffer pool(s) or from memory not mapped to pre-created buffer pool(s). Send buffer(s) are allocated by the Application, while Receive buffer(s) are allocated either by the Application or by the AAL implementation.
+
+.
+
+Note 2: The terms "AAL" and "AAL implementation" are used interchangeably in the tables below.
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) creates and allocates memory to be used when offloading operations to the AAL implementation.
+
+Actors and Roles
+
+Application: calls buffer operations with desired input parameters.
+
+ AAL: executes buffer operations.
+
+Assumptions
+
+This sequence is representative of how the Application uses the buffer operations.
+
+Pre-conditions
+
+AAL implementation is initialized.
+
+Begins when
+
+The Application is ready to create buffers.
+
+Steps 1-2 (O)
+
+The Application can optionally create a buffer pool by calling the createBufferPool operation. On success, the AAL returns a buffer_pool_handle to the created buffer pool.
+
+Steps 3-4 (M)
+
+The Application allocates a buffer to use in future AAL operations. The buffer can be allocated from a pre-created buffer pool from steps 1 and 2, or can be dynamically allocated. On success, the AAL returns a buffer_handle.
+
+Steps 5 – 8 (O)
+
+The Application can retrieve the pointer to the buffer to add/modify/delete the content of the buffers. The Application can also check the size of the buffer.
+
+Steps 9 – 10 (M)
+
+Once the Application is finished with the buffer it can free the buffer by calling the bufferFree operation.
+
+Steps 11 – 12 (O)
+
+If previously created in steps 1 and 2 and the Application is finished with the buffer pool, the Application will destroy the buffer pool.
+
+Ends when
+
+All memory is freed and returned to the AAL implementation.
+
+Exceptions
+
+Exceptions can occur in steps 1, 3, 5, 7, 9 and 10 if the AAL fails to allocate or free memory. The AAL will report an error.
+
+Post Conditions
+
+Memory is freed, Application is free to continue processing.
+
+Traceability
+
+To be added later.
+
+5.3.3.1	Sequence Diagram
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+AALI-C-App Sequence assumptions (Sec. 5.3.2)
+
+End ref
+
+==Inventory Services==
+
+ref over ODU, AAL
+
+AALI-C-App API Sequence call flow related to Inventory Service (Sec. 5.3.2)
+
+End ref
+
+==Creating Buffer Pools and Allocating Buffers ==
+
+opt if buffer pool creation
+
+ODU -> AAL : createBufferPool
+
+activate AAL
+
+AAL --> ODU : return buffer pool handle(s)
+
+Deactivate AAL
+
+End opt
+
+Note over ODU, AAL
+
+Allocate a buffer using pre-created buffer pool with buffer_pool_handle
+
+or allocate dynamically with NULL buffer_pool_handle parameter
+
+Endnote
+
+ODU -> AAL : allocBuffer
+
+activate AAL
+
+AAL --> ODU : return buffer handle
+
+deactivate AAL
+
+autoactivate on
+
+opt Get buffer address and buffer size using buffer handle if needed
+
+ODU -> AAL : getBufferAddr
+
+AAL --> ODU: return buffer address
+
+ODU -> AAL: getBufferSize
+
+AAL --> ODU: return buffer size
+
+End opt
+
+ref over ODU, AAL
+
+AALI-C-App API Sequence call flow related to AAL-LPU, AAL-Profile-Instance
+
+ and AAL-Queue initialization & configuration (Sec. 5.3.2)
+
+end ref
+
+==Run Time Operations ==
+
+ref over ODU, AAL
+
+AALI-C-App API Sequence call flow related to Sending/Receiving Buffer(s) (Sec. 5.3.3.2)
+
+End ref
+
+==Free Buffer, Destroy Buffer Pool Operations ==
+
+ODU -> AAL : freeBuffer
+
+AAL --> ODU : success/failure
+
+opt if buffer pool was created by the Application
+
+ODU -> AAL : destroyBufferPool
+
+AAL --> ODU : success/failure
+
+End opt
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2 Procedure for Buffer(s) Send and Receive
+
+The AALI-C-App Transport API supports the following high level use cases
+
+Send Buffer Synchronous Mode with buffer free
+
+Send Buffer Synchronous Mode without buffer free
+
+Send Buffer Asynchronous Mode with buffer free
+
+Send Buffer Asynchronous Mode without buffer free
+
+Receive Buffer Synchronous Mode with non-NULL buffer_handles(s) input
+
+Receive Buffer Synchronous Mode with NULL buffer_handles(s) input
+
+Receive Buffer Asynchronous Mode with non-NULL buffer_handle(s) input
+
+Receive Buffer Asynchronous Mode with NULL buffer_handle(s) input
+
+	In the use cases above, 'with buffer free' and 'without buffer free' imply that the input parameter 'buffer_free' = 'TRUE' (or 1) and 'FALSE' (or 0) respectively in sendBuffer operation (Sec. 5.4.3.5).
+
+	These use cases are detailed in the sections below.
+
+5.3.3.2.1	Send Buffer Synchronous Mode with buffer free
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) sends buffer(s) to the AAL for processing in synchronous mode with buffer free.
+
+Actors and Roles
+
+Application: formats buffer and its content, and calls AAL to send the buffer.
+
+ AAL: executes sendBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the sendBuffer operation in a synchronous manner with buffer free enabled.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Buffer(s) to be sent are allocated.
+
+Begins when
+
+The Application is ready to send buffer.
+
+Step 1 (M)
+
+The Application calls the sendBuffer API to transfer the buffer to the AAL which will execute the sendBuffer operation. The Application thread invoking the API is blocked waiting for the sendBuffer operation to complete.
+
+Steps 2 - 3 (M)
+
+The AAL internally frees the buffer back to the buffer pool upon completion of the sendBuffer operation.
+
+Once done, the AAL returns the status of the operation back to the Application and unblock the Application call thread process.
+
+Ends when
+
+sendBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the sendBuffer operation fails. Status indicating failure will be returned in Step 3.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+Send Buffer Synchronous Mode with buffer free
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) sends buffer(s) to the AAL for processing in synchronous mode with buffer free.
+
+Actors and Roles
+
+Application: formats buffer and its content, and calls AAL to send the buffer.
+
+ AAL: executes sendBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the sendBuffer operation in a synchronous manner with buffer free enabled.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Buffer(s) to be sent are allocated.
+
+Begins when
+
+The Application is ready to send buffer.
+
+Step 1 (M)
+
+The Application calls the sendBuffer API to transfer the buffer to the AAL which will execute the sendBuffer operation. The Application thread invoking the API is blocked waiting for the sendBuffer operation to complete.
+
+Steps 2 - 3 (M)
+
+The AAL internally frees the buffer back to the buffer pool upon completion of the sendBuffer operation.
+
+Once done, the AAL returns the status of the operation back to the Application and unblock the Application call thread process.
+
+Ends when
+
+sendBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the sendBuffer operation fails. Status indicating failure will be returned in Step 3.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Synchronous Send Buffer (with buffer free) ==
+
+ODU -> AAL : sendBuffer
+
+Deactivate ODU
+
+note over AAL
+
+Perform operations and send all buffers.
+
+Return when all buffers are sent.
+
+endnote
+
+AAL -> AAL : free buffer
+
+AAL --> ODU : return status
+
+Activate ODU
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.2	Send Buffer Synchronous Mode without buffer free
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application sends buffer(s) to the AAL for processing in synchronous mode without buffer free.
+
+Actors and Roles
+
+Application: formats buffer and its content, and calls AAL to send the buffer.
+
+ AAL: executes sendBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the sendBuffer operation in a synchronous manner without buffer free enabled.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Buffer(s) to be sent are allocated.
+
+Begins when
+
+The Application is ready to send buffer.
+
+Steps 1 – 2 (M)
+
+The Application calls the sendBuffer API to transfer the buffer to the AAL which will execute the sendBuffer operation. The Application thread invoking the API is blocked waiting for the sendBuffer operation to complete.
+
+The AAL processes the operation and sends the buffers. Once done, the AAL returns the status of the operation back to the Application and unblock the Application call thread process.
+
+Step 3 (M)
+
+The Application, when finished with the buffer, calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+sendBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the sendBuffer operation fails. Status indicating failure will be returned in Step 2.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Synchronous Send Buffer (without buffer free) ==
+
+ODU -> AAL : sendBuffer
+
+deactivate ODU
+
+note over AAL
+
+Perform operations and send all buffers.
+
+Return when all buffers are sent.
+
+Endnote
+
+AAL --> ODU : return status
+
+activate ODU
+
+ODU -> AAL: freeBuffer
+
+AAL --> ODU : success/failure
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.3	Send Buffer Asynchronous Mode with buffer free
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application sends buffer(s) to the AAL for processing in asynchronous mode with buffer free.
+
+Actors and Roles
+
+Application: formats buffer and its content, and calls AAL to send the buffer.
+
+ AAL: executes sendBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the sendBuffer operation in an asynchronous manner with buffer free enabled.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Buffer(s) to be sent are allocated.
+
+Begins when
+
+The Application is ready to send buffer.
+
+Steps 1 – 3 (M)
+
+The Application calls the sendBuffer API to transfer the buffer to the AAL which will execute the sendBuffer operation.
+
+The Application thread invoking the API is returned immediately with the status of the API call, without being blocked until the completion of sendBuffer operation.
+
+The AAL continues to process the operation and sends the buffers. Upon completion of sendBuffer operation, the AAL internally frees the buffer back to the buffer pool.
+
+Step 4 (O)
+
+Once done, the AAL optionally returns the status of the operation back to the Application, if the Application preregisters for a callback.
+
+Ends when
+
+sendBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the sendBuffer API call fails. Status indicating failure will be returned in Step 2.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+				@startuml
+
+				Autonumber
+
+				Skinparam sequenceArrowThickness 2
+
+				skinparam ParticipantPadding 5
+
+				skinparam BoxPadding 10
+
+				Box “O-RAN” #NavajoWhite
+
+				   Participant “O-DU” as ODU << AAL-App>>
+
+				end box
+
+				Box “Cloud Platform” #lightseagreen
+
+				   participant “AAL” as AAL
+
+				End box
+
+				activate ODU
+
+				ref over ODU, AAL
+
+				Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+				end ref
+
+				==Asynchronous Send Buffer (with buffer free) ==
+
+				ODU -> AAL : sendBuffer
+
+				Activate AAL
+
+				note over AAL
+
+				Return immediately.
+
+				endnote
+
+				AAL --> ODU : return status of API
+
+				Note over AAL
+
+				Continue to process operations asynchronously
+
+				until all buffers sent.
+
+				endnote
+
+				AAL -> AAL: free Buffer
+
+				opt if a callback is preregistered
+
+				AAL -> ODU: execute preregistered callback function
+
+				End opt
+
+				deactivate AAL
+
+				deactivate ODU
+
+				@enduml
+
+5.3.3.2.4	Send Buffer Asynchronous Mode without buffer free
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application sends buffer(s) to the AAL for processing in asynchronous mode without buffer free.
+
+Actors and Roles
+
+Application: formats buffer and its content, and calls AAL to send the buffer.
+
+ AAL: executes sendBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the sendBuffer operation in an asynchronous manner without buffer free enabled.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Buffer(s) to be sent are allocated.
+
+Begins when
+
+The Application is ready to send buffer.
+
+Steps 1-2 (M)
+
+The Application calls the sendBuffer API to transfer the buffer to the AAL which will execute the sendBuffer operation.
+
+The Application thread invoking the API is returned immediately with the status of the API call, without being blocked until the completion of sendBuffer operation.
+
+The AAL continues to process the operation and sends the buffers.
+
+Steps 3-4 (CM)
+
+In case of without preregistered callback, the Application, when finished with the buffer [1], calls freeBuffer operation. The AAL returns the status of the API call immediately and internally frees the buffer upon completion of sendBuffer operation.
+
+Steps 5-7 (CM)
+
+In case of with preregistered callback, the AAL returns the status of the sendBuffer operation back to the Application, once done.
+
+The Application, when finished with the buffer [2], calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+sendBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the sendBuffer API call fails. Status indicating failure will be returned in Step 2.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+Note [1] : The Application should not modify the content of the buffer(s) after step 2.
+
+Note [2] : The Application can modify the content of the buffer(s) after step 5.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Asynchronous Send Buffer (without buffer free) ==
+
+ODU -> AAL : sendBuffer
+
+activate AAL
+
+note over AAL
+
+return immediately.
+
+endnote
+
+AAL --> ODU : return status of API
+
+Note over AAL
+
+Continue to process operations asynchronously
+
+until all buffers sent.
+
+endnote
+
+alt without callback
+
+   ODU -> AAL: freeBuffer
+
+   AAL --> ODU : success/failure
+
+   Note over AAL
+
+   Internally buffer is freed when sendBuffer completes.
+
+   endnote
+
+else with preregistered callback
+
+   AAL --> ODU: execute preregistered callback function
+
+   deactivate AAL
+
+   ODU -> AAL: freeBuffer
+
+   activate AAL
+
+   AAL --> ODU : success/failure
+
+   deactivate AAL
+
+end
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.5	Receive Buffer Synchronous Mode with non-NULL buffer_handle(s) input
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) receives buffer(s) from the AAL in synchronous mode with non-NULL buffer_handle(s) input.
+
+Actors and Roles
+
+Application: calls AAL to receive the buffer.
+
+ AAL: executes receiveBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the receiveBuffer operation in a synchronous manner with non-NULL buffer handle(s) input.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Receive buffer(s) are allocated.
+
+Begins when
+
+The Application is ready to receive buffer.
+
+Steps 1 – 2 (M)
+
+The Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation. The Application thread invoking the API is blocked waiting for the receiveBuffer operation to complete.
+
+Once done, the AAL returns the status of the operation back to the Application and unblock the Application call thread process.
+
+Steps 3 - 4 (M)
+
+The Application, when finished with the buffer, calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+receiveBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the receiveBuffer operation fails. Status indicating failure will be returned in Step 2.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Synchronous Receive Buffer==
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+note over AAL
+
+Perform operations and receive all buffers.
+
+Return when all buffers are sent.
+
+Endnote
+
+AAL --> ODU : return status
+
+activate ODU
+
+ODU -> AAL: freeBuffer
+
+AAL --> ODU : success/failure
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.6	Receive Buffer Synchronous Mode with NULL buffer_handle(s) input
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) receives buffer(s) from the AAL in synchronous mode with NULL buffer_handle(s) input.
+
+Actors and Roles
+
+Application: calls AAL to receive the buffer.
+
+ AAL: executes receiveBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the receiveBuffer operation in a synchronous manner with NULL buffer_handle(s) input.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started.
+
+Begins when
+
+The Application is ready to receive buffer.
+
+Steps 1 – 2 (M)
+
+The Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation including the allocation of the buffers. The Application thread invoking the API is blocked waiting for the receiveBuffer operation to complete.
+
+Once done, the AAL returns the status of the operation back to the Application and unblock the Application call thread process.
+
+Steps 3 - 4 (M)
+
+The Application, when finished with the buffer, calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+receiveBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the receiveBuffer operation fails. Status indicating failure will be returned in Step 2.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App >>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Synchronous Receive Buffer==
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+AAL -> AAL : allocate buffer
+
+note over AAL
+
+Perform operations and receive all buffers.
+
+Return when all buffers are sent.
+
+endnote
+
+AAL --> ODU : return status
+
+deactivate AAL
+
+activate ODU
+
+ODU -> AAL: freeBuffer
+
+AAL --> ODU : success/failure
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.7 Receive Buffer Asynchronous Mode with non-NULL buffer_handle(s) input
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) receives buffer(s) from the AAL in asynchronous mode with non-NULL buffer_handle(s) input.
+
+Actors and Roles
+
+Application: calls AAL to receive the buffer.
+
+ AAL: executes receiveBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the receiveBuffer operation in an asynchronous manner with non-NULL buffer_handle(s) input.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started. Receive buffer(s) are allocated.
+
+Begins when
+
+The Application is ready to receive buffer.
+
+Step 1-4 (CM)
+
+In case of without callback, the Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation. In the case no buffers are ready to be received the AAL implementation returns immediately indicating no buffers were received.
+
+The Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation. The AAL returns the status of the operation and the number of buffers received.
+
+Steps 5-8 (CM)
+
+In case of with preregistered callback, the Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation. In the case no buffers are ready to be received the AAL implementation returns immediately indicating the status of the operation. The AAL implementation waits asynchronously for buffers to be received. Upon receiving buffers, the pre-registered callback function is executed to asynchronously inform the Application that new buffers have been received.
+
+Steps 9-10 (M)
+
+The Application, when finished with the buffer, calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+receiveBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the receiveBuffer operation fails. Status indicating failure will be returned in Step 1 or 5 or 8.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App >>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Asynchronous Receive Buffer==
+
+alt without callback
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+note over AAL
+
+If no buffers received return immediately.
+
+In Asynchronous mode with no callback receive
+
+API behaves in a poll manner.
+
+endnote
+
+AAL --> ODU : (number of buffers = 0)
+
+activate ODU
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+AAL --> ODU : success (number of buffers)
+
+activate ODU
+
+else with preregistered callback
+
+ODU -> AAL : receiveBuffer
+
+Activate AAL
+
+AAL --> ODU : return status
+
+AAL -> AAL : wait for receive buffers
+
+note over AAL
+
+AAL executes receive operation.
+
+endnote
+
+AAL --> ODU: execute preregistered callback function
+
+deactivate AAL
+
+end
+
+activate ODU
+
+ODU -> AAL: freeBuffer
+
+AAL --> ODU : success/failure
+
+deactivate ODU
+
+@enduml
+
+5.3.3.2.8	Receive Buffer Asynchronous Mode with NULL buffer_handle input
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+The Application (e.g., O-DU) receives buffer(s) from the AAL in asynchronous mode with NULL buffer_handle input.
+
+Actors and Roles
+
+Application: calls AAL to receive the buffer.
+
+ AAL: executes receiveBuffer operation.
+
+Assumptions
+
+This sequence is representative of how the Application uses the receiveBuffer operation in an asynchronous manner with NULL buffer_handle input.
+
+Pre-conditions
+
+At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started.
+
+Begins when
+
+The Application is ready to receive buffer.
+
+Steps 1-5 (CM)
+
+In case of with callback, the Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receive. In the case no buffers are ready to be received the AAL implementation returns immediately indicating no buffers were received.
+
+The Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation including the allocation of the buffers. The AAL returns the status of the operation, newly allocated buffer_hanlde(s) and the number of buffers received.
+
+Steps 6-10 (CM)
+
+In case of with preregistered callback, the Application calls the receiveBuffer API to receive buffer content from the AAL which will execute the receiveBuffer operation. In the case no buffers are ready to be received the AAL implementation returns immediately indicating the status of the operation.
+
+The AAL implementation waits asynchronously for buffers to be received. The AAL allocates the buffers. Upon receiving buffers, the pre-registered callback function is executed to asynchronously inform the Application that new buffers have been received.
+
+Steps 11-12 (M)
+
+The Application, when finished with the buffer, calls freeBuffer operation and the AAL will free the buffer back to the buffer pool.
+
+Ends when
+
+receiveBuffer operation has completed.
+
+Exceptions
+
+Exceptions can occur if the receiveBuffer operation fails. Status indicating failure will be returned in Step 1 or 5 or 8.
+
+Post Conditions
+
+The Application can continue processing.
+
+Traceability
+
+To Be added later.
+
+@startuml
+
+Autonumber
+
+Skinparam sequenceArrowThickness 2
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+autoactivate on
+
+Box “O-RAN” #NavajoWhite
+
+   Participant “O-DU” as ODU << AAL-App>>
+
+end box
+
+Box “Cloud Platform” #lightseagreen
+
+   participant “AAL” as AAL
+
+End box
+
+activate ODU
+
+ref over ODU, AAL
+
+Section 5.3.3.1 Creating Buffer Pools and Allocating Buffers
+
+end ref
+
+==Asynchronous Receive Buffer==
+
+alt without callback
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+note over AAL
+
+If no buffers received return immediately.
+
+In Asynchronous mode with no callback receive
+
+API behaves in a poll mode manner.
+
+endnote
+
+AAL --> ODU : (number of buffers = 0)
+
+activate ODU
+
+ODU -> AAL : receiveBuffer
+
+deactivate ODU
+
+AAL -> AAL : Allocate buffer(s)
+
+AAL --> ODU : success (number of buffers)
+
+activate ODU
+
+else with preregistered callback
+
+ODU -> AAL : receiveBuffer
+
+AAL --> ODU : return status
+
+AAL -> AAL : wait for receive buffers
+
+AAL -> AAL : Allocate buffer(s)
+
+note over AAL
+
+AAL executes receive operation.
+
+endnote
+
+AAL --> ODU: execute preregistered callback function
+
+deactivate AAL
+
+deactivate AAL
+
+end
+
+activate ODU
+
+ODU -> AAL: freeBuffer
+
+AAL --> ODU : success/failure
+
+deactivate ODU
+
+@enduml
+
+5.4 AALI-C-App API details
+
+5.4.1 Capabilities discovery and configuration
+
+5.4.1.1 getAalLpuInfo
+
+Description: An application queries the handle and capabilities of the AAL-LPU(s) assigned to the application. AAL-LPUs may provide different capabilities such as different AAL Profiles can be supported by the AAL-LPUs that includes different types of AAL-Profile-Instances and AAL-Queue(s). The aal-lpu-handle is unique between the application and the AAL-LPUs assigned to the application. The aal-lpu-handle is generated by the AAL implementation.
+
+Pre-conditions: Application has at least 1 AAL-LPU assigned and available for use.
+
+Triggers: On demand request from the Application
+
+Frequency: Application Initialization time.
+
+Operation
+
+Direction
+
+getAalLpuInfo
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal_lpu_handle
+
+0 to 1
+
+O
+
+If supplied, the capabilities of only the AAL-LPU associated with the Handle is requested. If omitted, the capabilities of all the AAL-LPUs assigned to the application is requested.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal-lpu-cap-struct
+
+0 to many
+
+struct
+
+O
+
+Struct containing the aal-lpu-handle and the capabilities supported by this AAL-LPU including AAL Profile type(s) that are available to the calling application.
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+Note: List of AAL Profile types to be defined, e.g. High-PHY. Types should also be versioned, e.g. High-PHY.V1
+
+5.4.2 AALI-C-App Configuration Services
+
+Before using AAL-Profile-Instance services the application must first create the AAL-Profile-Instance, then configure the AAL-Profile-Instance and the AAL-Queue(s).
+
+5.4.2.1 createAalProfileInstance
+
+Description: The application creates an AAL-Profile-Instance on the AAL-LPU. The AAL-Profile-Instance is created based on the AAL Profile type that is requested by the application. The list of available AAL Profile type(s) is provided by the AALI in the getAalLpuInfo response. After successful creation, the AAL-Profile-Instance is in a ‘in use, stopped’ state. The application may now configure the AAL-Profile-Instance, AAL-Queue(s) and start the AAL-Profile-Instance.
+
+This procedure may be repeated by the application in order to create multiple AAL-Profile-Instances, of the same or different AAL Profile types.
+
+Pre-conditions: Application has at least 1 AAL-LPU assigned and available for use. The AAL Profile type that is requested to be created is provided by the AAL-LPU (listed in the AAL-LPU-Capability struct of the getAalLpuInfo response operation).
+
+Triggers: On demand request from the Application
+
+Frequency: Infrequent.
+
+Operation
+
+Direction
+
+createAalProfileInstance
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal_lpu_handle
+
+1
+
+N/A
+
+M
+
+The Handle of the AAL-LPU to create the profile instance on.
+
+aal_profile_instance_type
+
+1
+
+tbd
+
+M
+
+The type (and version) of an AAL-Profile-Instance (returned in the getAalLpuInfo operation) to create on this AAL-LPU
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+Status
+
+1
+
+M
+
+Result of the createProfileInstance operation
+
+aal_profile_instance_handle
+
+1
+
+C
+
+Handle of the AAL-Profile instance created in this create AAL-Profile-Instance Request.
+
+This field is only present if the createProfileInstance operation is successful
+
+aal_profile_instance_config
+
+1
+
+Struct
+
+C
+
+Structure containing the default settings of the AAL-Profile-Instance . This field is only present if the createProfileInstance operation is successful.
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+5.4.2.2 setAalProfileInstanceConfig
+
+Description: The application configures the AAL-Profile-Instance on the AAL-LPU for a specific AAL Profile configuration for use by the application.
+
+Pre-conditions: Application has successfully created the AAL-LPU-Profile instance on the AAL-LPU. The AAL-Profile-Instance is not started.
+
+Triggers: On demand request from the Application
+
+Frequency: Infrequent.
+
+Operation
+
+Direction
+
+setProfileInstanceConfig
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal_profile_instance_handle
+
+1
+
+N/A
+
+M
+
+The Handle of the AAL-Profile-Instance to be configured.
+
+aal_profile_instance_config
+
+1
+
+struct
+
+M
+
+Structure containing the AAL-Profile-Instance configuration to apply.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+5.4.2.3 deleteAalProfileInstance
+
+Description: The application may delete the AAL-Profile-Instance when it no longer requires it. For example, if a cell is deleted from the O-DU by upper layers or the OAM system, the AAL-Profile-Instance resources used to offload that cell can be deleted. After deleting the AAL-Profile-Instance, that AAL-Profile-Instance is no longer usable by the application.
+
+Pre-conditions: The Application has successfully stopped the AAL-Profile-Instance.
+
+Triggers: On demand request from the Application
+
+Frequency: Infrequent.
+
+Operation
+
+Direction
+
+deleteAalProfileInstance
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal_profile_instance_handle
+
+1
+
+N/A
+
+M
+
+The Handle of the AAL-Profile-Instance to delete.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+5.4.2.4 setAalProfileQueueConfig
+
+Note: Use of AAL-Queue operations for user plane data transfer and buffer API operations needs to be clarified.
+
+Description: The application configures the AAL-Queue on the AAL-Profile-Instance.
+
+If no AAL-Queue Handle is included, this operation will create and configure a new AAL-Queue. The response will include the AAL-Queue Handle for the AAL-Queue. To add an AAL-Queue to an AAL-Profile-Instance, the AAL-Profile-Instance must be stopped by the application.
+
+If an AAL-Queue Handle is supplied, the configuration of the AAL-Queue identified by the AAL-Queue Handle is modified with the supplied configuration. Any items already on the queue are deleted when this operation is called. The AAL-Queue must be in the stopped state.
+
+Pre-conditions: AAL-Profile-Instance has already successfully been created in the AAL-LPU. The application has successfully configured the AAL-Profile-Instance. The AAL-Queue (if already existing) is in the stopped state. To add an AAL-Queue to an AAL-Profile-Instance, the AAL-Profile-Instance must be stopped by the application. To re-configure an existing AAL-Queue on an AAL-Profile-Instance, the AAL-Profile-Instance does not need to be stopped by the application.
+
+Triggers: On demand request from the Application
+
+Frequency: Infrequent.
+
+Operation
+
+Direction
+
+setAalProfileQueueConfig
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal-profile-instance-handle
+
+1
+
+M
+
+The Handle of the AAL-Profile-Instance
+
+aal_profile_queue-handle
+
+1
+
+N/A
+
+O
+
+If this field is included, the operation is for an existing AAL-Queue.
+
+If this field is omitted, a new AAL-Queue is being configured.
+
+aal_profile_queue-config
+
+1
+
+struct
+
+M
+
+Structure containing the AAL-Queue configuration to apply. E.g.
+
+Direction (Input or Output);
+
+Max number of entries permitted.
+
+Queue priority (relative to the other queues of the same direction associated with this AAL-Profile-Instance)
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+aal_profile_queue-handle
+
+0 to 1
+
+C
+
+If no AAL-Queue Handle was included in the request, a new AAL-Queue Handle is returned if the operation was successful.
+
+5.4.2.5 getAalProfileQueueConfig
+
+Description: The application may query the current AAL-Profile-Instance queue configuration.
+
+Pre-conditions: AAL-Profile-Instance has already successfully been created in the AAL-LPU. The application has successfully created the AAL-Profile-Instance and the AAL-Queue.
+
+Triggers: On demand request from the Application
+
+Frequency: N/A
+
+Operation
+
+Direction
+
+getAalProfileQueueConfig
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+aal_profile_queue-handle
+
+1
+
+N/A
+
+The handle of the AAL-Queue to be queried.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure
+
+aal_profile_queue_config
+
+1
+
+structure
+
+C
+
+On success the struct that contains the AAL-Queue configuration.
+
+5.4.3 AALI-C-App Transport Operations
+
+5.4.3.1 createBufferPool
+
+Description: The createBufferPool operation shall support creation of N buffer pools (N>=1) of a specific buffer type, with buffer read/write access to the Application.
+
+The Application shall have the flexibility to invoke the createBufferPool operation either one time, or multiple times, to request creation of buffer pool(s) with multiple buffer sizes.
+
+The Application shall invoke the createBufferPool operation multiple times for creation of buffer pools of different buffer types.
+
+The Application shall not assume buffers in created buffer pools to be in a specific memory state (e.g., zero ’ed buffer).
+
+Buffer pool(s) and buffers are sharable by AAL-LPU(s).
+
+FFS: support for inter-accelerator buffer pool sharing.
+
+Pre-conditions: AAL implementation is initialized
+
+Triggers: On demand request from the Application
+
+Frequency:  No restriction
+
+Operation
+
+Direction
+
+createBufferPool
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+number_of_buffer_pools
+
+1
+
+integer
+
+M
+
+Indicates the number of buffer pool(s) creation requested by the Application
+
+buffer_type
+
+N
+
+integer
+
+M
+
+Indicates the type(s) of content that can be placed in buffers allocated from the buffer pool(s).
+
+AAL profile instances can share buffer pools of the same buffer type(s)
+
+The buffer type values are identified within the AAL profile specification.
+
+An empty list indicates that the buffer(s) within the buffer pool(s) do not have an intended type of content that can be placed in the buffer pool(s).
+
+buffer_size
+
+N
+
+integer
+
+M
+
+Indicates the buffer size for each requested buffer pool
+
+NOTE:
+
+Application shall indicate N buffer sizes, when requesting for creation of N buffer pool(s) (N>=1) in a single createBufferPool Operation
+
+number_of_buffers
+
+N
+
+integer
+
+M
+
+Indicates the size of each buffer pool, i.e., number of buffers available in each pool upon creation
+
+NOTE:
+
+Application shall indicate N buffer pool sizes, when requesting for creation of N buffer pool(s), (N>=1) in a single createBufferPool Operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure. Indicates the status of createBufferPool Operation execution (TRUE for success, FALSE for failure)
+
+If FALSE: Returns failure code if the AAL implementation does not support pre-created buffer pools.
+
+buffer_pool_handle
+
+N
+
+opaque handle
+
+M
+
+For each buffer pool, a handle to the pool
+
+NOTE: Each buffer_pool_handle is associated with a specific buffer_size
+
+A NULL shall be returned if the status_of_operation is FALSE (failure)
+
+5.4.3.2 allocBuffer
+
+Description: The allocBuffer operation shall support allocation of a buffer either from pre-created buffer pool(s), or from memory that is not associated with a pre-created buffer pool.
+
+Pre-conditions:  If a non-NULL buffer_pool_handle is passed, the buffers are allocated from the buffer pool(s) created using the createBufferPool operation.
+
+Triggers: On demand request from the Application
+
+Frequency: No restriction
+
+Operation
+
+Direction
+
+allocBuffer
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+buffer_pool_handle
+
+1
+
+opaque handle
+
+M
+
+A handle to a pre-created buffer pool generated using createBufferPool operation or a NULL handle.
+
+When a NULL handle is passed, the AAL implementation shall not use memory that is part of a pre-created buffer pool.
+
+message_size
+
+1
+
+integer
+
+M
+
+Indicates message size (in bytes) for which the Application is requesting buffer allocation
+
+NOTE:
+
+The Application shall not use the allocated buffer for a message greater than the indicated message_size.
+
+Whether/how an AAL implementation takes into consideration message_size in allocating the buffer is transparent to the Application.
+
+When the value of the buffer_pool_handle is not NULL:
+
+The Application shall request buffer allocation from a pre-created buffer pool with buffer_ size >= message_size > 0
+
+The Application can indicate the message_size equal to the buffer_size associated with the buffer_pool_handle.
+
+For optimal memory usage, Application should indicate a buffer_pool_handle with associated buffer_size closest to the indicated memory size.
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure. Indicates the status of allocBuffer Operation execution (TRUE for success, FALSE for failure)
+
+Note: If the status of the operation is FALSE:
+
+Returns a failure code if the AAL implementation requires buffers to be allocated from a pre-created buffer pool and the operation was invoked with buffer_pool_handle = NULL.
+
+Returns a failure code if the AAL implementation does not support pre-created buffer pools and the operation was invoked with a buffer_pool_handle that is not NULL.
+
+buffer_handle
+
+1
+
+opaque handle
+
+M
+
+Handle to the allocated buffer
+
+5.4.3.3  getBufferAddr
+
+Description: The getBufferAddr operation shall return address from buffer_handle
+
+Pre-conditions:  The buffer_handle is created using allocBuffer operation
+
+Triggers: On demand request from the Application
+
+Frequency: No restriction
+
+Operation
+
+Direction
+
+getBufferAddr
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+buffer_handle
+
+1
+
+opaque handle
+
+M
+
+buffer object handle returned by allocBuffer operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+buffer_address
+
+1
+
+void *
+
+M
+
+Pointer that points to the starting virtual address of the buffer for the Application to use. On error, buffer address will be NULL value.
+
+5.4.3.4  getBufferSize
+
+Description: The getBufferSize operation shall return the size of the buffer from buffer_handle
+
+Pre-conditions: buffer_handle is created using allocBuffer operation
+
+Triggers: On demand request from the Application
+
+Frequency: No restriction
+
+Operation
+
+Direction
+
+getBufferSize
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+buffer_handle
+
+1
+
+opaque handle
+
+M
+
+buffer object handle returned by allocBuffer operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+Indicates the status of getBufferSize operation execution (TRUE for success, FALSE for failure)
+
+buffer_size
+
+1
+
+Integer
+
+M
+
+Size of the buffer
+
+5.4.3.5  sendBuffer
+
+Description: The sendBuffer operation shall support enqueuing of N buffer(s) (N >=1) by the Application.  The Application shall either retain buffer ownership in sendBuffer operation or indicate buffer ownership transfer. Application shall indicate the synchronization mode ('synchronous' or 'asynchronous') in sendBuffer operation.
+
+AAL implementation shall support both modes of operation.
+
+For synchronous mode, the AAL implementation, upon execution completion of sendBuffer operation, shall return the status of the sendBuffer operation
+
+For asynchronous mode, AAL implementation shall return the status of sendBuffer operation execution, only if Application preregisters for a callback; otherwise AAL implementation is not expected to return the execution status of the sendBuffer operation
+
+FFS: Mechanism of sending details of AAL-Profile specific parameters
+
+Pre-conditions: Buffers are allocated through allocBuffer operation. At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started
+
+Triggers: On demand request from the Application
+
+Frequency: No restriction
+
+Operation
+
+Direction
+
+sendBuffer
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+number_of_buffers
+
+1
+
+integer
+
+M
+
+Indicates number of enqueued buffer(s) (N >=1)
+
+per_buffer_config
+
+N
+
+structure
+
+M
+
+Structure containing attributes corresponding to enqueued buffer(s).
+
+> buffer_handle
+
+1
+
+opaque handle
+
+M
+
+Indicates the buffer(s) containing metadata and payload to be sent.
+
+> buffer_free
+
+1
+
+integer
+
+M
+
+When “TRUE” or 1, the Application transfers ownership of the buffer to the AAL implementation, which is expected to free the buffer upon completion of the sendBuffer operation,  for each enqueued buffer.
+
+When "FALSE" or 0, the Application retains the ownership of the buffer and the AAL implementation shall not automatically free the buffer upon completion of the sendBuffer operation.
+
+aal_profile_instance_handle
+
+1
+
+opaque handle
+
+M
+
+Indicates the AAL-Profile-Instance corresponding to the buffer payload(s)
+
+aal_queue_handle
+
+1
+
+opaque handle
+
+M
+
+Indicates the AAL-Queue associated with the enqueued buffer(s)
+
+synchronization_mode
+
+1
+
+integer
+
+M
+
+Indicates synchronous/asynchronous mode of operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+Indicates the status of sendBuffer operation execution (success or failure) in synchronous mode and in asynchronous mode with preregistered callback
+
+FFS: Details of callback preregistration mechanism
+
+number_of_buffers_transmitted
+
+1
+
+integer
+
+M
+
+Indicates the total number of successfully transmitted buffers
+
+status_of_each_buffer
+
+N
+
+bool
+
+O
+
+Optionally, returns status of each buffer (success or failure)
+
+5.4.3.6   receiveBuffer
+
+Description: The receiveBuffer operation shall support dequeuing up to N buffer(s) (N >=1) by the Application. The Application shall indicate the synchronization mode ('synchronous' or 'asynchronous') in the receiveBuffer operation.
+
+AAL implementation shall support both modes of the operation.
+
+For synchronous mode, the AAL implementation, upon execution completion of receiveBuffer operation, shall return the status of the receiveBuffer operation
+
+For asynchronous mode, the AAL implementation shall return the status of receiveBuffer operation execution, only if Application preregisters for a callback; otherwise AAL implementation is not expected to return the execution status of the receiveBuffer operation
+
+Either the Application, or the AAL implementation shall allocate the receiving buffer(s) either from buffer pool(s) pre-created through createBufferPool operation or from memory not mapped to a pre-created buffer pool.
+
+Pre-conditions: At least one AAL-Profile-Instance is configured and started. At least one AAL-Queue is configured and started
+
+Triggers: On demand request from the Application
+
+Frequency: No restriction
+
+Operation
+
+Direction
+
+receiveBuffer
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+number_of_buffers
+
+1
+
+integer
+
+M
+
+Indicates maximum number of buffers (N >=1) that can be dequeued by the Application
+
+buffer_handle
+
+0..N
+
+opaque handle
+
+M
+
+Indicates dequeue buffer(s) allocated by the Application.
+
+If NULL, the AAL implementation allocates the dequeue buffer(s)
+
+The Application shall not use the dequeue buffer(s) allocated by the AAL implementation for any other subsequent send or receive operation
+
+aal_profile_instance_handle
+
+1
+
+opaque handle
+
+M
+
+Indicates the AAL-Profile-Instance corresponding to the dequeued buffer payloads
+
+aal_queue_handle
+
+1
+
+opaque handle
+
+M
+
+Indicates the AAL-Queue associated with the dequeued buffers
+
+synchronization_mode
+
+1
+
+integer
+
+M
+
+Indicates synchronous/asynchronous mode of operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+Indicates the status of receiveBuffer operation execution (success or failure) in synchronous mode and in asynchronous mode with preregistered callback
+
+FFS: details of callback preregistration mechanism
+
+number_of_received buffers
+
+1
+
+integer
+
+M
+
+Indicates number of buffers (L) to be received by the Application, which is < = maximum number of buffers (N)
+
+buffer_handle
+
+L
+
+opaque handle
+
+M
+
+Indicates dequeue buffer(s) where from Application retrieves the received data.
+
+buffer_content_size
+
+L
+
+integer
+
+O
+
+Optionally, indicates the size (in bytes) of the contents of each received buffer
+
+5.4.3.7   freeBuffer
+
+Description: The freeBuffer operation shall free the buffer back to the buffer pool to which the buffer was allocated from.
+
+If the buffer is not freed in the sendBuffer operation (i.e., buffer_free parameter is set to 0 or 'FALSE'), the freeBuffer operation shall free the buffer upon completion of the sendBuffer operation execution by the AAL implementation.
+
+Pre-conditions:  The buffer_handle is created using allocBuffer operation
+
+Post-condition: Upon successful completion of the freeBuffer operation, the buffer_handle is no longer usable by the Application
+
+Triggers: On demand request from the Application
+
+Frequency:  No restriction
+
+Operation
+
+Direction
+
+freeBuffer
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+buffer_handle
+
+1
+
+opaque handle
+
+M
+
+buffer object handle returned by allocBuffer operation
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+Indicates the status of freeBuffer Operation execution (TRUE for success, FALSE for failure)
+
+5.4.3.8   destroyBufferPool
+
+Description: The destroyBufferPool operation shall support termination of buffer pool, which will make buffer_handle(s) associated with the buffer pool unusable by the Application.
+
+Pre-condition:  The buffer_pool_handle is created using createBufferPool operation
+
+Trigger: On demand request from the Application
+
+Frequency: Infrequent
+
+Operation
+
+Direction
+
+destroyBufferPool
+
+Application    =>    AAL
+
+Input Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+buffer_pool _handle
+
+1
+
+opaque handle
+
+M
+
+Indicates handle to pre-created buffer pool
+
+Output Parameter
+
+Cardinality
+
+Data Type
+
+Qualifier
+
+Description
+
+status_of_operation
+
+1
+
+Reference WG10 object model
+
+M
+
+Returns the status of the procedure.
+
+Indicates the status of destroyBufferPool Operation execution (success or failure)
+
+Revision History
+
+Date
+
+Revision
+
+Author
+
+Description
+
+2022.2.28
+
+00.00.01
+
+VMware, Ericsson, Wind River, Nvidia, Marvell, AT&T, Orange, Qualcomm
+
+Initial skeleton
+
+2022.3.18
+
+00.00.02
+
+VMware
+
+Incorporated 2 CRs:
+
+Management Objects Model CR (VMWare)
+
+Common API Requirements CR (VMWare)
+
+2022.3.25
+
+00.00.03
+
+NVIDIA, Intel, VMware
+
+Incorporated 4 CRs:
+
+Transport abstraction (NVIDIA)
+
+AALI-C-App APIs (Intel)
+
+AALI-C-Mgmt Workflow CR (VMWare)
+
+AALI-C-Mgmt APIs CR (VMWare)
+
+2022.3.28
+
+01.00
+
+Padma Sudarsan VMware
+
+Spec for final approval
+
+2022.5.12
+
+01.00.01
+
+VMware
+
+Incorporate CR:
+
+Align AAL Definitions and Acronyms (Ericsson)
+
+2022.6.10
+
+01.00.02
+
+Padma Sudarsan VMware
+
+Incorporate 7 CRs
+
+AAL Transport Buffer Operations (Marvell)
+
+AAL Transport API Operations (Nvidia)
+
+AAL Transport Abstraction Requirements (Nvidia)
+
+AAL-LPU start/Stop (Ericsson)
+
+AAL Common API Spec Alignment (VMware)
+
+AAL Get Accel Info part 1 (VMware)
+
+AAL Common API e2e lcm flow (VMware et al.)
+
+2022.7.15
+
+01.00.03
+
+Padma Sudarsan VMware
+
+Editor changes:
+
+Modified cover page, footer, copyright, and Annex Z per new template
+
+Incorporate CRs:
+
+AAL Common API Application Operations (Ericsson)
+
+Editor Changes:
+
+Modify Naming Conventions for Operations/parameters
+
+Identify sections that are still in progress
+
+2022.7.20
+
+01.00.04
+
+Padma Sudarsan VMware
+
+Incorporate CRs:
+
+AAL Get Accel Info part 2 (VMware et al)
+
+AAL Common API e2e lcm flow enhancement (Intel, VMware.)
+
+AAL-C App Init Sequence alignment (VMware)
+
+Buffer Pool Create Operation (Nvidia et al)
+
+Buffer Send Operation (Nvidia et al))
+
+Buffer Receive buffer pool destroy operation (Nvidia et al)
+
+Editor Changes:
+
+Modify Naming Conventions for Operations/parameters etc.
+
+2022.7.21
+
+01.00.05
+
+Padma Sudarsan VMware
+
+Incorporate CRs:
+
+AAL-C-Transport Call flow (Nvidia et al)
+
+2022.7.25
+
+01.00.06
+
+Padma Sudarsan VMware
+
+Incorporate CRs:
+
+AAL-C-Transport Call flow (Nvidia et al) update
+
+Editorial Cleanup
+
+2022.11.07
+
+02.00.01
+
+Padma Sudarsan
+
+VMware
+
+Incorporate CRs:
+
+AAL Transport API-freeBuffer clarification (Nvidia)
+
+Transport Req. alignment with receiveBuffer and freeBuffer (Nvidia)
+
+Transport receives buffer Operation clarification (Nvidia)
+
+e2e lcm flow updates (VMware)
+
+Correct UML in AALI-C-App API Init Sequence (Ericsson)
+
+Add Detailed API Diagrams (Intel, Nvidia)
+
+Update allocBuffer (Qualcomm)
+
+Update createBufferPool (Qualcomm)
+
+2022.11.07
+
+02.00.02
+
+Padma Sudarsan
+
+VMware
+
+Editorial corrections based on comments from the member companies.
+
+History
+
+Date
+
+Revision
+
+Description
+
+2022.03.28
+
+01.00
+
+Published from version 00.00.03
+
+2022.08.01
+
+02.00
+
+Published from version 01.00.06
+
+2022.11.21
+
+03.00
+
+Published from version 02.00.02
+
+	________________________________________________________________________________________________© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.	3

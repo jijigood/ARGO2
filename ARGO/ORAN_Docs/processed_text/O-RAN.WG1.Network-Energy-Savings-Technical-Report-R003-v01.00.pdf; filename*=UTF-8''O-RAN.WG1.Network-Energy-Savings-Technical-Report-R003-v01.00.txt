@@ -1,0 +1,3696 @@
+O-RAN.WG1.NESUC-R003-v01.00
+Technical Report
+
+O-RAN Work Group 1 (Use Cases and Overall Architecture)
+
+Network Energy Saving Use Cases Technical Report
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this document in any form without the prior written
+permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this document for your
+personal use, or copy the material of this document for the purpose of sending to individual third parties for their information provided that
+you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and
+that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2
+O-RAN.WG1.NESUC-R003-v01.00
+Contents
+Foreword............................................................................................................................................................. 4
+Modal verbs terminology ................................................................................................................................... 4
+1 Scope ........................................................................................................................................................ 5
+2 References ................................................................................................................................................ 5
+2.1 Informative references ....................................................................................................................................... 5
+3 Definition of terms, symbols and abbreviations ....................................................................................... 6
+3.1 Terms ................................................................................................................................................................. 6
+3.2 Symbols ............................................................................................................................................................. 6
+3.3 Abbreviations ..................................................................................................................................................... 6
+4 Objectives and Requirements ................................................................................................................... 7
+4.1 Objectives .......................................................................................................................................................... 7
+4.2 Requirements ..................................................................................................................................................... 8
+5 Carrier and Cell Switch Off/On ............................................................................................................... 9
+5.1 Problem Statement, Solution and Value Proposition ......................................................................................... 9
+5.2 Architecture/Deployment Options ..................................................................................................................... 9
+5.2.1 Option 1: Non-RT RIC Deployment ............................................................................................................ 9
+5.2.1.1 Description and UML Diagram ............................................................................................................ 10
+5.2.1.2 O-RAN Entity Roles ............................................................................................................................. 12
+5.2.1.3 Input/Output Data Requirements .......................................................................................................... 13
+5.2.1.3.1 Summary ......................................................................................................................................... 13
+5.2.1.3.2 Detailed Input Requirements .......................................................................................................... 14
+5.2.1.3.3 Detailed Output Requirements ........................................................................................................ 17
+5.2.2 Option 2: Near-RT RIC Deployment ......................................................................................................... 18
+5.2.2.1 Description and UML Diagram ............................................................................................................ 18
+5.2.2.2 O-RAN Entity Roles ............................................................................................................................. 20
+5.2.2.3 Input/Output Data Requirements .......................................................................................................... 21
+5.2.2.3.1 Summary ......................................................................................................................................... 21
+5.2.2.3.2 Detailed Input Requirements .......................................................................................................... 22
+5.2.2.3.3 Detailed Output Requirements ........................................................................................................ 25
+5.3 Impact Analysis on O-RAN Work Groups ...................................................................................................... 25
+5.4 Relation and Impact on 3GPP Specifications .................................................................................................. 27
+5.4.1 Relation to 3GPP RAN Specifications ....................................................................................................... 27
+5.4.2 Ongoing Work in 3GPP Rel.18 RAN......................................................................................................... 27
+5.4.3 Impact on 3GPP RAN Specifications ........................................................................................................ 28
+5.4.4 Relation to 3GPP System Architecture Specifications ............................................................................... 28
+5.4.5 Ongoing Work in 3GPP Rel.18 System Architecture ................................................................................ 29
+5.4.6 Impact on 3GPP System Architecture Specifications ................................................................................ 29
+5.5 Gain Analysis................................................................................................................................................... 29
+5.5.1 Cell and Carrier Switch Off/On Energy Saving for 4T4R O-RU ............................................................... 31
+5.5.2 Cell and Carrier Switch Off/On Energy Saving for 64T64R O-RU ........................................................... 32
+5.6 Feasibility Analysis.......................................................................................................................................... 33
+6 RF Channel Reconfiguration .................................................................................................................. 34
+6.1 Problem Statement, Solution and Value Proposition ....................................................................................... 34
+6.2 Architecture/Deployment Options ................................................................................................................... 35
+6.2.1 Option 1: Non-RT RIC Deployment .......................................................................................................... 35
+6.2.1.1 Description and UML Diagram ............................................................................................................ 36
+6.2.1.2 O-RAN Entity Roles ............................................................................................................................. 38
+6.2.1.3 Input/Output Data Requirements .......................................................................................................... 39
+6.2.1.3.1 Summary ......................................................................................................................................... 39
+6.2.1.3.2 Detailed Input Requirements .......................................................................................................... 40
+6.2.1.3.3 Detailed Output Requirements ........................................................................................................ 44
+6.2.2 Option 2: Near-RT RIC Deployment ......................................................................................................... 44
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.2.1 Description and UML Diagram ............................................................................................................ 45
+6.2.2.2 O-RAN Entity Roles ............................................................................................................................. 47
+6.2.2.3 Input/Output Data Requirements .......................................................................................................... 49
+6.2.2.3.1 Summary ......................................................................................................................................... 49
+6.2.2.3.2 Detailed Input Requirements .......................................................................................................... 50
+6.2.2.3.3 Detailed Output Requirements ........................................................................................................ 53
+6.3 Impact Analysis on O-RAN Work Groups ...................................................................................................... 53
+6.4 Relation and Impact on 3GPP Specifications .................................................................................................. 55
+6.5 Gain Analysis................................................................................................................................................... 55
+6.5.1 RF Channel Reconfiguration ES Gain Analysis for 4T4R O-RU .............................................................. 55
+6.5.2 RF Channel Reconfiguration ES Gain Analysis for 64T64R O-RU .......................................................... 57
+6.6 Feasibility Analysis.......................................................................................................................................... 58
+6.6.1 Continuous operation during RF Channel Reconfiguration ....................................................................... 58
+6.6.2 Impact on Coverage ................................................................................................................................... 58
+6.6.3 Impact and Relation to UE specific Base Station Algorithms .................................................................... 58
+6.6.4 Limited O-RU / O-DU Capabilities ........................................................................................................... 58
+7 Summary and Conclusion ...................................................................................................................... 59
+Annex A (Informative): Design Principles for NES Features .......................................................................... 60
+Annex B (Informative): Load profile and O-RU functional blocks ................................................................. 62
+Revision history ................................................................................................................................................ 64
+History .............................................................................................................................................................. 65
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4
+O-RAN.WG1.NESUC-R003-v01.00
+Foreword
+This Technical Report (TR) has been produced by O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not",
+"can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal
+forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5
+O-RAN.WG1.NESUC-R003-v01.00
+1 Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following
+formal O-RAN approval. Should O-RAN modify the contents of the present document, it will be re -released
+by O-RAN with an identifying change of release date and an increase in version number as follows:
+Version x.y.z
+where:
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections,
+updates, etc. (the initial approved document will have x=01).
+y the second digit is incremented when editorial only changes have been incorporated in the document.
+z the third digit included only in working versions of the document indicating incremental changes
+during the editing process.
+The present document provides a technical report on Network Energy Saving use cases.
+2 References
+2.1 Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or
+non-specific. For specific references, only the cited version applies. For non-specific references, the latest
+version of the referenced document (including any amendments) applies.
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O-RAN
+cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document but they
+assist the user with regard to a particular subject area.
+[1] 3GPP TR 21.905, Vocabulary for 3GPP Specifications
+[2] ETSI ES 203 228, Environmental Engineering (EE); Assessment of mobile network energy
+efficiency
+[3] O-RAN Technical Specification, O-RAN Architecture Description
+[4] O-RAN Technical Specification, Non-RT RIC Architecture
+[5] O-RAN Technical Report, Cloud Architecture and Deployment Scenarios for O-RAN Virtualized
+RAN
+[6] O-RAN Technical Specification, Use Cases Detailed Specification
+[7] 3GPP TS 28.554, Management and orchestration; 5G end to end Key Performance Indicators (KPI)
+[8] 3GPP TS 28.310, Management and orchestration; Energy efficiency of 5G
+[9] 3GPP TS 38.300, NR; NR and NG-RAN Overall Description, Stage-2
+[10] ETSI ES 202 706-1, Metrics and measurement method for energy efficiency of wireless access
+network equipment; Part 1: Power consumption - static measurement method
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6
+O-RAN.WG1.NESUC-R003-v01.00
+[11] 3GPP TS 28.541, Management and orchestration; 5G Network Resource Model (NRM); Stage 2
+and stage 3
+[12] 3GPP TS 28.552, Management and orchestration; 5G performance measurements
+[13] 3GPP TS 32.425, Telecommunication management; Performance Management (PM); Performance
+measurements Evolved Universal Terrestrial Radio Access Network (E-UTRAN)
+[14] 3GPP TS 32.451, Telecommunication management; Key Performance Indicators (KPI) for Evolved
+Universal Terrestrial Radio Access Network (E-UTRAN); Requirements
+[15] 3GPP TS 32.551, Telecommunication management; Energy Saving Management (ESM); Concepts
+and requirements
+[16] 3GPP TS 38.331, NR; Radio Resource Control (RRC); Protocol specification
+[17] O-RAN Technical Specification, O-RAN Outdoor Macrocell Hardware Architecture and
+Requirements (FR1)
+3 Definition of terms, symbols and abbreviations
+3.1 Terms
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the
+following apply. A term defined in the present document takes precedence over the definition of the same
+term, if any, in 3GPP TR 21.905 [1].
+Energy Efficiency: relation between the useful output and energy/power consumption as defined in ETSI
+ES 203 228 [2]
+Energy Consumption: integral of power consumption over time as defined in ETSI ES 202 706-1 [10]
+3.2 Symbols
+No symbol is defined in this TR.
+
+3.3 Abbreviations
+For the purposes of this document, the abbreviations given in 3GPP TR 21.905 [1], 3GPP TS 38.300 [9], ETSI
+ES 203 228 [2], O-RAN.WG1.O-RAN-Architecture-Description [3], O-RAN.WG6.CADS [5] apply.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7
+O-RAN.WG1.NESUC-R003-v01.00
+4 Objectives and Requirements
+4.1 Objectives
+This Technical Report captures the outcome of the WG1 UCTG Network Energy Saving pre-normative phase.
+The objectives of the pre-normative phase are as follows:
+- study and investigate all required counters/KPI’s for monitoring and reporting of Energy Consumption
+and Energy Efficiency in real time for all O-RAN defined nodes such as O-RU, O-DU, O-CU as well
+as 3GPP defined logical components of network such as Cell, Carrier, gNB,
+- study requirements, key issues, proposed solutions, benefits of the Energy Saving proposals,
+- study potential impact and required enhancements to O -RAN interfaces such as E2, O1, A1, FH M -
+plane, FH CUS-Plane, R1, and Near-RT RIC API,
+- study potential impact and required enhancements on data models of all O-RAN entities,
+- identify the any possible impact on Non-RT RIC architecture, Near-RT RIC architecture and AI/ML
+workflow.
+
+The use cases studied in the NES pre-normative phase are:
+- Carrier and Cell Switch Off/On
+- RF Channel Reconfiguration Off/On
+- Advanced Sleep Mode
+- O-Cloud Resource Energy Saving Mode
+
+This version of the TR includes Carrier and Cell Switch Off/On and RF Channel Reconfiguration use cases.
+Algorithms discussed and analysed as part of the Network ES pre-normative phase will be examples only
+and will not be part of any specification as outcome of this pre-normative phase or subsequent work items.
+For each use case solution proposal, the detailed objectives are:
+- Review, evaluate applicability of, and select from existing deployment alternatives (Non -RT and/or
+Near-RT RIC) and AI/ML deployment scenarios and document respective findings:
+• Evaluate energy savings gains based on a E2 Node/O-RU/PNF/VNF energy consumption
+model using evaluation metrics/KPIs and including assessment of impact on network and
+user performance.
+• Study on a per sub-use case basis potential impact and enhancements on O-RAN interfaces
+(e.g.  O1, O2, A1, E2, O-FH) in terms of required input data and output configuration data.
+• Review existing counters, KPIs, and data models as specified/studied in 3GPP.
+• Study potential enhancements on existing counters, KPIs, and data models or define new
+counters, KPIs, and data models of all involved O-RAN entities.
+
+NES use cases should reuse the existing 3GPP measurements and measurement reporting for input data as well
+as the existing 3GPP configuration and provisioning management for the output data as much as possible.
+If new measurements or configuration parameters are essential to support new NES use cases, then these should
+preferably be based on parameters, variables, definitions and procedures that are already used in the 3GPP/O-
+RAN specifications.  The current standardization approach (specifying the new measurement in 3GPP
+specifications and referring to it in O -RAN specifications) should be prioritized over inventing new
+standardization approaches.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8
+O-RAN.WG1.NESUC-R003-v01.00
+4.2 Requirements
+This TR shall capture Energy consumption and Energy Efficiency related counters and KPIs including the
+following:
+
+O-RU Specific KPIs
+- Energy Efficiency and power consumption KPIs provided by real-time metering.
+
+O-CU/O-DU Hardware & Software / O-Cloud Software & Platform KPIs
+- O-CU/O-DU hardware (e.g. CPU, accelerators, NIC cards, fans and power supply, etc.) shall have the
+capability to measure and report power consumption values to the O -Cloud. The O -Cloud software
+shall be able to collect measurement data at the hardware component level (e.g., CPU, NIC, accelerator
+card, fans and power supply, etc.) and provide power, energy and environmental (PEE)
+parameters/KPIs. O-Cloud shall be able to report EE through O2 interface to the SMO or through
+North-Bound Interfaces (NBI) to external tools.
+- The O-Cloud software shall be able to provide PEE parameters/KPIs at the workload level (e.g. pod,
+O-CU/O-DU CNF, etc.), as well as for the O -Cloud platform software components themselves. O -
+Cloud shall be able to report energy efficiency through O2 interface to the  SMO or through NBI to
+external tools.
+- O-CU and O-DU shall provide CNF level energy efficiency counters/KPIs (e.g. power consumption,
+Traffic load, data volume, throughput), which shall be reported through O1 interface to the SMO or
+through NBI to external tools.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9
+O-RAN.WG1.NESUC-R003-v01.00
+5 Carrier and Cell Switch Off/On
+5.1 Problem Statement, Solution and Value Proposition
+Mobile networks often utilize multiple frequency layers (carriers) to cover the same service area. At low
+load, i.e. when the expected traffic volume is lower than a fixed threshold, ES can be achieved by switching
+off one or more carriers or entire cells without impairing the user experience. UEs previously served by the
+carrier or cell will be offloaded by the E2 Node to a new target carrier or cell prior to the switch off.
+However, the switch off/on decisions are not a trivial task. There are conflicting targets between system
+performance and energy savings. Other carriers and/or cells will have to serve the additional traffic and
+traffic is changing over time. E2 Nodes support a number of techniques effecting energy consumption which
+might also be load dependent. While energy savings for the switched off carrier and/or cell is maximized, the
+overall energy consumption of the network might even increase.
+Carrier and cell switch off/on control by the Non-RT or Near-RT RIC can consider overall network energy
+efficiency instead of local optimization. The switch off/on decision can optionally be made by an AI/ML
+model within the inference host, deployed at the Non-RT RIC (deployment option 1) or at the Near-RT RIC
+(deployment option 2) to further improve decision making. Among others, the AI/ML models' functionality
+may include prediction of future traffic, user mobility, and resource usage and may also predict expected
+energy efficiency enhancements, resource usage, and network performance for different ES optimization
+states.
+Before switching off/on carrier(s) and/or cell(s), the E2 Node may need to perform some preparation actions
+for off switching (e.g. check ongoing emergency calls and warning messages, to enable, disable, modify
+Carrier Aggregation and/or Dual Connectivity, to trigger HO traffic and UEs from cells/carriers to other cells
+or carriers, informing neighbour nodes via X2/Xn interface etc.) as well as for on switching (e.g., cell
+probing, informing neighbour nodes via X2/Xn interface etc.).
+5.2 Architecture/Deployment Options
+5.2.1 Option 1: Non-RT RIC Deployment
+In option 1, decision making, potentially including AI/ML Model Training and Inference, is done at the Non-
+RT RIC.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.1.1 Description and UML Diagram
+Table 5.2.1.1-1: Carrier and Cell Switch Off/On: AI/ML inference via Non-RT RIC
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal
+Enable Carrier and Cell switch off/on Energy Saving functions in the
+Network by means of configuration parameter change and Actions
+controlled by Non-RT RIC and allow for AI/ML-based solutions.
+
+Actors and Roles Non-RT RIC acting as Energy Saving decision making function.
+E2 Node and O-RU acting as configuration enforcement function.
+Assumptions
+O1 interface connectivity is established.
+Open FH M-Plane interface is established between E2 Node and O-RU
+and/or SMO and O-RU directly.
+Network is operational.
+Non-RT RIC has knowledge about overlapping carriers/cells and the
+coverage of those carriers/cells (e.g. which carrier/cell is a coverage
+layer and which is a capacity layer).
+
+Pre-conditions Operator has set the targets for Energy Saving functions in the Non-RT
+RIC.
+Begins when
+Operator enables the optimization functions for carrier and cell switch
+off/on Energy Saving functions and E2 Node and O -RU become
+operational.
+
+Step 1 (M)
+SMO initiates specific measurement data collection request towards E2
+Node and O-RU (via E2 Node and O -FH) for AI/ML model training and
+inference.
+
+Step 2 (M) E2 Node and O -RU send the configured measurement data to SMO
+periodically or event based.
+Step 3 (M) Non-RT RIC retrieves the collected measurement data for processing.
+Step 4 (M)
+Non-RT RIC trains the AI/ML models with the collected data. Trained
+AI/ML models are deployed, configured, and activated.
+
+Non-RT RIC constantly monitors
+(i) performance and energy consumption of the E2 Node(s)
+(ii) energy consumption of O-RU(s)
+
+Step 5 (M) Based on the AI/ML inference the Non-RT RIC may request the SMO to
+configure E2 Node to prepare and execute cell or carrier switch off/on.
+Step 6 (M)
+SMO instructs E2 Node via O1 interface to perform the received
+request(s) from the Non -RT RIC. O-RU is informed about the updated
+O-RU configuration via Open FH M -Plane interface by E2 Node. E2
+Node will notify SMO once cell or carrier switch off/on is completed.
+
+Step 7 (M)
+Non-RT RIC continuously analyzes  performance of AI/ML model. If
+energy saving objectives are not achieved, it may decide to initiate
+fallback mechanism, and/or AI/ML model update or retraining.
+
+Ends when E2 Node becomes non -operational or when the operator disables the
+optimization functions for Energy Saving.
+Exceptions None.
+Post Conditions
+Non-RT RIC continues close loop monitoring of Energy Saving function
+at E2 Node and O-RU.
+E2 Node(s) and O -RU(s) operate using the newly deployed
+parameters/models and state (off/on).
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11
+O-RAN.WG1.NESUC-R003-v01.00
+@startuml
+Skin rose
+skinparam defaultFontSize 12
+autonumber
+
+Box "Service Management & \n Orchestration Framework" #gold
+
+Participant "Collection & Control" as SMO
+Participant "Non-RT RIC" as NRTRIC
+
+End box
+
+Box "O-RAN Nodes" #lightpink
+ Participant  "Near-RT RIC" as RTRIC
+ Participant  "E2-Nodes" as E2NODES
+ Participant  "O-RUs" as ORUs
+End box
+
+group Data Collection
+autonumber 1.1
+SMO -> E2NODES  : <<O1>> Data collection request for Energy Saving
+E2NODES -> ORUs  : <<FH>> Data collection request for Energy Saving
+
+autonumber 2.1
+ORUs -> E2NODES  : <<FH>> Measurement Data Collection for Energy Saving
+E2NODES -> SMO   : <<O1>> Measurement Data Collection for Energy Saving
+autonumber 3
+SMO -> NRTRIC  : Data retrieval
+
+end
+
+group Data Analysis Training and Inference
+autonumber 4.1
+
+  NRTRIC -> NRTRIC : Performance and Energy Consumption Monitoring \n(E2 Node(s) & O-
+RU(s))
+ NRTRIC -> NRTRIC : AI/ML Model training and inference
+
+end
+
+autonumber 5
+group Actor Decision Making
+  NRTRIC -> SMO : Request to prepare and execute \nfor carrier(s) and cell(s) switch
+off/on
+
+autonumber 6.1
+
+SMO <-> E2NODES : <<O1>> E2-Node parameter configurations and recommendation for
+carrier(s) and cell(s) switch off/on, \nmessage response and/or notification of
+execution.
+ E2NODES <-> ORUs  : <<FH>> Update O-RU Configurations \nand notification of
+update
+
+autonumber 7
+
+  NRTRIC -> NRTRIC : Performance analysis of AI/ML model \n(with possible actions, e.g.
+fallback, re-training)
+end
+
+@enduml
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 5.2.1.1-1: Carrier and Cell Switch Off/On flow diagram: AI/ML inference via Non-RT
+RIC
+5.2.1.2 O-RAN Entity Roles
+1) Non-RT RIC
+➢ Collect configurations, performance indicators and measurement reports (e.g. cell load related
+information and traffic information, EE/EC measurement reports, geolocation information) from
+SMO, E2 Nodes and O-RUs (forwarded by SMO), for the purpose of decision making, optionally
+using training and inference of AI/ML models that assist such EE/ES functions.
+➢ (Optionally) Trigger EE/ES AI/ML model training/retraining.
+➢ (Optionally) Deploy, update, configure EE/ES AI/ML models in Non-RT RIC.
+➢ Analyze the received data from SMO, E2 Nodes, and O-RUs to determine EE/ES optimization (i.e.
+if carriers or cells are recommended to be switched off/on), optionally using AI/ML models
+➢ Signal updated configurations for EE/ES optimization to E2 Nodes (O-CU) via R1/O1.
+
+3) E2 Node
+➢ Report cell configuration, performance indicators and measurement reports (e.g. cell load related
+information and traffic information, EE/EC measurement reports) to SMO via O1 interface.
+➢ Perform actions required for EE/ES optimization
+o e.g. check ongoing emergency calls and warning messages, perform some preparation
+actions for Off Switching (e.g., to enable, disable, modify Carrier Aggregation and/or Dual
+Connectivity, to trigger HO traffic and UEs from cells/carriers to other cells or carriers,
+informing neighbour nodes via X2/Xn interface etc.) as well as for On Switching (e.g., cell
+probing, informing neighbour nodes via X2/Xn interface etc.) and make final decision on
+switch off/on and notify SMO via O1 about performed actions
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13
+O-RAN.WG1.NESUC-R003-v01.00
+4) O-RU Node
+➢ Report EC and EE related information via Open FH M-Plane interface to O-DU or alternatively to
+SMO directly.
+➢ Support actions required to perform EE/ES optimization.
+o updated carrier configuration (i.e. activation, deactivation or sleep)
+5.2.1.3 Input/Output Data Requirements
+5.2.1.3.1 Summary
+Input Data
+1) E2 Node to SMO/Non-RT RIC
+➢ Carrier/cell characteristics
+➢ EE/EC measurement reports
+➢ Load statistics per cell and per carrier
+➢ UE mobility information including cell or beam level measurements (e.g. RSRP, RSRQ, SINR)
+➢ Energy consumption
+
+2) O-RU to E2 Node
+➢ Power consumption metrics: Mean total/per carrier power consumption, mean total/per carrier transmit
+power
+
+Output Data
+1) SMO to E2 Node
+➢ Carrier(s) and/or cell(s) recommended to be switched off/on
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.1.3.2 Detailed Input Requirements
+Initialization:
+Table 5.2.1.3-1: Initialization
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing /New Definitions
+R1 SMO / rApp Optimization target for
+Carrier/Cell Switch Off/On
+ manual or
+event
+triggered
+New
+E.g., (average or max) NG-RAN
+data Energy Efficiency
+bit/J  3GPP TS 28.554 [7] (Cl. 6.7.1)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+Carrier/cell characteristics  - manual or
+event
+triggered
+(e.g., SMO
+feature
+activation,
+E2 Node
+startup /
+failure /
+reconfig.)
+New
+
+E.g., physical location, transmit
+direction, carrier frequency,
+coverage parameters, configured
+transmit power, beam width,
+coverage shape, tilt, azimuth,
+carrier-cell mapping, carrier-HW
+mapping
+  3GPP TS 28.541 [11] (Cl.
+4.3.6, 4.3.38, 4.3.39, 4.3.40,
+4.3.74)
+O-RAN.WG5.O-DU-O1 (Sec.
+10), O-RAN-WG5.O-CU-O1
+(Sec. 9)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15
+O-RAN.WG1.NESUC-R003-v01.00
+AI/ML Model Training:
+Table 5.2.1.3-2: AI/ML Model Training
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing Definitions
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL
+delivered from O-CU-UP to O-
+DU, per PLMN, per QoS level,
+per slice, per Interface (F1-U, Xn-
+U, X2-U))
+Mbit (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL
+delivered to O-CU-UP from O-
+DU, per PLMN, per QoS level,
+per slice, per Interface (F1-U, Xn-
+U, X2-U))
+Mbit (non-real
+time for
+training)
+ Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+RSRQ measurement per SSB per
+cell
+dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12] (Cl.
+5.1.1.31)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+RSRP measurement per SSB per
+cell
+dBm (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+SINR measurement per SSB per
+cell
+dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+Energy consumption kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Power consumed by hardware
+component
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12] (Cl.
+5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Transmit power mW (non-real
+time for
+training)
+Measurement and reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.2.1)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16
+O-RAN.WG1.NESUC-R003-v01.00
+Input Decision Making / AI/ML Inference:
+Table 5.2.1.3-3: Input Decision Making / AI/ML Inference
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing Definitions
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+Data Volume in DL delivered from O-
+CU-UP to O-DU, per PLMN, per QoS
+level, per slice, per Interface (F1-U,
+Xn-U, X2-U)
+Mbit > min  Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+Data Volume in UL delivered to O-
+CU-UP from O-DU, per PLMN, per
+QoS level, per slice, per Interface (F1-
+U, Xn-U, X2-U)
+Mbit > min  Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+RSRQ measurement per SSB per cell dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+RSRP measurement per SSB per cell  dBm > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+SINR measurement per SSB per cell  dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+Energy consumption kWh > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Power consumed by hardware
+component
+W > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Transmit power  mW > min Measurement and
+reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.2.1)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.1.3.3 Detailed Output Requirements
+Output Decision Making / AI/ML Inference:
+Table 5.2.1.3-4: Output Decision Making / AI/ML Inference
+Output Data
+Interface Source /
+Target
+Name/Description Units Config.
+Period
+Existing Definitions
+O1, R1 rApp / SMO /
+E2 Node (O-
+CU)
+Candidate carrier(s) / cells (s)
+recommended for energy saving to
+enter energySaving state (e.g., 3GPP
+TS 28.310 [8] Sec. 6.2.2)
+- > min 3GPP TS 28.541 [11]
+(Cl. 4.3.63)
+O-RAN-WG5.O-CU-O1
+(Sec. 9)
+Candidate carrier(s) / cell (s) for
+compensation (e.g., 3GPP TS 32.551
+[15] compensatingForEnergySaving,
+optional)
+- > min -
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+Confirmation (Success/Failure) - event
+triggered
+3GPP TS 28.310 [8] (Cl.
+6.2.2)
+O-FH (M-
+Plane)
+E2 Node (O-
+DU) / O-RU
+Updated carrier configuration (i.e.,
+activation, deactivation, or sleep)
+- > min O-RAN.WG4.MP
+(Sec. 15.3.2)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.2 Option 2: Near-RT RIC Deployment
+In option 2, decision making, potentially using AI/ML Model Inference, is done at Near-RT RIC. While
+AI/ML Model Training might be hosted in Non-RT or Near-RT RIC, the description below is based on
+AI/ML Model Training in the Non-RT RIC.
+5.2.2.1 Description and UML Diagram
+Table 5.2.2.1-1: Carrier and Cell Switch Off/On: AI/ML inference via Near-RT RIC
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal
+Enable Carrier and Cell switch off/on Energy Saving functions in the
+Network by means of configuration parameter change and Actions
+controlled by Near-RT RIC and allow for AI/ML-based solutions.
+
+Actors and Roles
+Non-RT RIC acting as AI/ML model management entity.
+Near-RT RIC acting as Energy Savings decision making function.
+E2 Node and O-RU acting as configuration enforcement function.
+
+Assumptions
+O1 connectivity is established between the SMO with E2 Node, and
+Near-RT RIC and Non-RT RIC.
+E2 interface connectivity is established between E2 Node and Near-RT
+RIC.
+A1 interface is established between Non -RT RIC and Near -RT RIC.
+Open FH M-Plane interface is established between E2 Node and O-RU.
+Network is operational.
+Near-RT RIC has knowledge about overlapping carriers/cells and the
+coverage of those carriers/cells (e.g. which carrier/cell is a coverage
+layer and which is a capacity layer).
+
+Pre-conditions Operator has set the targets for Energy Saving function in the Non -RT
+RIC.
+Begins when
+Operator enables the optimization functions for carrier and cell switch
+off/on Energy Saving functions and E2 Node and O -RU become
+operational.
+
+Step 1 (M) SMO initiates specific measurement data collection request towards E2
+Node and O-RU for AI/ML model training.
+Step 2 (M) E2 Node and O -RU send the configured measurement data to SMO
+periodically or event based.
+Step 3 (M) Non-RT RIC retrieves the collected measurement data for processing
+Step 4 (M)
+Non-RT RIC trains the AI/ML models with the collected data. Trained
+AI/ML models are deployed, configured, and activated in the Near -RT
+RIC.
+Step 5 (M)
+SMO may trigger EE/ES optimization and might provide policies guiding
+the Near-RT RIC EE/ES function via O1 and/or via Non-RT RIC and A1
+interface.
+
+Step 6 (M)
+Near-RT RIC constantly monitors
+(i) performance and energy consumption of the E2 Node(s)
+(ii) energy consumption of O-RU(s)
+Based on the AI/ML inference, considering optimization policies, the
+Near-RT RIC may request the E2 Node to prepare and execute cell or
+carrier switch off/on. E2 Node may request O -RU Node to prepare and
+execute cell or carrier switch off/on. E2 Node will notify Near -RT RIC
+once cell or carrier switch off/on is completed.
+
+Ends when E2 Node becomes non -Operational or when the operator disables the
+optimization functions for Energy Saving.
+Exceptions None.
+Post Conditions
+Near-RT RIC continues close loop monitoring of Energy Saving function
+at E2 Node and O-RU.
+E2 Node and O -RU operate using the newly deployed
+parameters/models and state (off/on).
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19
+O-RAN.WG1.NESUC-R003-v01.00
+@startuml
+skin rose
+skinparam defaultFontSize 12
+autonumber
+
+Box "Service Management & \n Orchestration Framework" #gold
+
+Participant "Collection & Control" as SMO
+Participant "Non-RT RIC" as NRTRIC
+
+End box
+
+Box "O-RAN Nodes" #lightpink
+ Participant  "Near-RT RIC" as RTRIC
+ Participant  "E2-Nodes" as E2NODES
+ Participant  "O-RUs" as ORUs
+End box
+
+group Data Collection
+autonumber 1.1
+SMO -> E2NODES  : <<O1>> Data collection request for Energy Saving
+E2NODES -> ORUs  : <<FH>> Data collection request for Energy Saving
+
+autonumber 2.1
+ORUs -> E2NODES  : <<FH>> Measurement Data Collection for Energy Saving
+E2NODES -> SMO   : <<O1>> Measurement Data Collection for Energy Saving
+autonumber 3
+SMO -> NRTRIC  : Data retrieval
+
+end
+
+autonumber 4.1
+group AI/ML workflow
+
+     NRTRIC -> NRTRIC : AI/ML Model training
+ NRTRIC -> RTRIC : <<O1>> or <<O2>> Deploy AI/ML model
+
+end
+
+autonumber 5.1
+group Optimization Trigger and Policy
+ alt
+          SMO -> RTRIC : <<O1>> Optimization Trigger/Target
+ else
+         NRTRIC -> RTRIC : <<A1>> A1 Policy
+ end
+end
+
+autonumber 6.1
+group Actor Data Collection & Decision Making
+     RTRIC -> E2NODES  : <<E2>> Data collection request for Energy Saving
+ E2NODES -> ORUs  : <<FH>> Data collection request for Energy Saving
+ ORUs -> E2NODES  : <<FH>> Measurement Data Collection for Energy Saving
+ E2NODES -> RTRIC   : <<E2>> Measurement Data Collection for Energy Saving
+
+ RTRIC -> RTRIC: AI/ML model inference
+     RTRIC <-> E2NODES : <<E2>> E2-Node parameters configuration and actions \nfor
+carrier(s) and cell(s) switch off/on preparation & execution \n and notication of
+execution
+ E2NODES <-> ORUs: <<FH>> Update O-RU configurations \nand notification of update
+
+end
+@enduml
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 5.2.2.1-1: Carrier and Cell Switch Off/On flow diagram: AI/ML inference via Near-RT
+RIC
+5.2.2.2 O-RAN Entity Roles
+1) Non-RT RIC
+➢ (Optionally) Collect configurations, performance indicators and measurement reports (e.g. cell load
+related information and traffic information, EE/EC measurement reports, geolocation information)
+from SMO, E2 Nodes and O-RUs (forwarded by SMO), for the purpose of training AI/ML models
+that assist such EE/ES functions.
+➢ (Optionally) Trigger EE/ES AI/ML model training/retraining.
+➢ (Optionally) Deploy, update, configure EE/ES AI/ML models, in Near-RT RIC via O1/O2 interface.
+➢ Provide optimization trigger, optimization targets and intent-based policies (e.g. set energy target to
+50% of peak power consumption) to Near-RT RIC via R1/O1 or A1 interface.
+
+2) Near-RT RIC
+➢ Collect configurations, performance indicators and measurement reports (e.g. cell load related
+information and traffic information, EE/EC measurement reports) from E2 Nodes.
+➢ (Optionally) Receive EE/ES AI/ML model for deployment via O1 or O2 interface.
+➢ Receive EE/ES related configuration management via O1 interface and/or policies via A1 interface
+for consideration during optimization.
+➢ Analyze the received data from E2 Nodes and perform AI/ML model inference to determine EE/ES.
+optimization (i.e. if carriers or cells are recommended to be switched off/on) considering the
+optimization targets/policies.
+➢ Provide policies or required information to E2 Node (O-CU) via E2 to trigger actions for EE/ES
+optimization.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21
+O-RAN.WG1.NESUC-R003-v01.00
+3) E2 Node
+➢ Report cell configuration, performance indicators and measurements reports (e.g. cell load related
+information and traffic information, EE/EC measurement reports) per cell/carrier via O1 interface to
+SMO and via E2 interface to Near-RT RIC.
+➢ Perform actions required for EE/ES optimization
+o e.g. check ongoing emergency calls and warning messages, perform some preparation
+actions for Off Switching (e.g., to enable, disable, modify Carrier Aggregation and/or Dual
+Connectivity, to trigger HO traffic and UEs from cells/carriers to other cells or carriers,
+informing neighbour nodes via X2/Xn interface etc.) as well as for On Switching (e.g., cell
+probing, informing neighbour nodes via X2/Xn interface etc.) and make final decision on
+switch off/on and notify Near-RT RIC via E2 about performed actions
+
+4) O-RU Node
+➢ Report EC and EE related information via Open FH M-Plane interface to O-DU or alternatively to
+SMO directly.
+➢ Support actions required to perform EE/ES optimization.
+o updated carrier configuration (i.e. activation, deactivation or sleep)
+5.2.2.3 Input/Output Data Requirements
+5.2.2.3.1 Summary
+Input Data
+1) E2 Node to SMO/Non-RT RIC (training) and Near-RT RIC (decision making/inference)
+➢ Carrier/cell characteristics
+➢ EE/EC measurement reports
+➢ Load statistics per cell and per carrier
+➢ UE mobility information including cell or beam level measurements (e.g. RSRP, RSRQ, SINR)
+➢ Energy Consumption
+
+2) O-RU to E2 Node
+➢ Power consumption metrics: Mean total/per carrier power consumption, mean total/per carrier transmit
+power
+
+Output Data
+1) Near-RT RIC to E2 Node
+➢ Carrier(s) and/or cell(s) recommended to be switched off/on
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.2.3.2 Detailed Input Requirements
+Initialization:
+Table 5.2.2.3-1: Initialization
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O1 SMO / Near-RT
+RIC
+Optimization target for
+Carrier/Cell Switch Off/On
+ manual or
+event
+triggered
+New
+E.g., (average or max) NG-RAN
+data Energy Efficiency
+bit/J  3GPP TS 28.554 [7] (Cl.
+6.7.1)
+E2, O1,
+R1
+E2 Node (O-
+DU) / Near-RT
+RIC / SMO /
+rApp
+Carrier/cell characteristics  - manual or
+event
+triggered
+(e.g., SMO
+feature
+activation, E2
+Node startup
+/ failure /
+reconfig.)
+New
+
+E.g., physical location, transmit
+direction, carrier frequency,
+coverage parameters, configured
+transmit power, beam width,
+coverage shape, tilt, azimuth,
+carrier-cell mapping, carrier-HW
+mapping
+  3GPP TS 28.541 [11]
+(Cl. 4.3.6, 4.3.38, 4.3.39,
+4.3.40, 4.3.74)
+O-RAN.WG5.O-DU-O1
+(Sec. 10), O-RAN-
+WG5.O-CU-O1 (Sec. 9)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23
+O-RAN.WG1.NESUC-R003-v01.00
+AI/ML Model Training:
+Table 5.2.2.3-2: AI/ML Model Training
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing Definitions
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL
+delivered from O-CU-UP to O-DU, per
+PLMN, per QoS level, per slice, per
+Interface (F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL
+delivered to O-CU-UP from O-DU, per
+PLMN, per QoS level, per slice, per
+Interface (F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+RSRQ measurement per SSB per cell dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+RSRP measurement per SSB per cell dBm (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+
+SINR measurement per SSB per cell dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+Energy consumption kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Power consumed by hardware
+component
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Transmit power  mW (non-real
+time for
+training)
+Measurement and
+reporting:
+O-RAN.WG4.MP
+(Sec. 10.2, B.1, B.2.1)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24
+O-RAN.WG1.NESUC-R003-v01.00
+Input Decision Making / AI/ML Inference:
+Table 5.2.2.3-3: Input Decision Making / AI/ML Inference
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+Data Volume in DL delivered from O-
+CU-UP to O-DU, per PLMN, per QoS
+level, per slice, per Interface (F1-U,
+Xn-U, X2-U). In case of split gNB
+architecture.
+Mbit ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+Reporting:
+O-RAN.WG3.E2SM-
+KPM
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+Data Volume in UL delivered to O-
+CU-UP from O-DU, per PLMN, per
+QoS level, per slice, per Interface (F1-
+U, Xn-U, X2-U). In case of split gNB
+architecture.
+Mbit ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+Reporting:
+O-RAN.WG3.E2SM-
+KPM
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+RSRQ measurement per SSB per cell dB ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+Reporting:
+O-RAN.WG3.E2SM-
+KPM
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+RSRP measurement based on SSB per
+UE
+dBm ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+Reporting:
+O-RAN.WG3.E2SM-
+KPM
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+
+SINR measurement based on SSB per
+UE
+dB ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+Reporting:
+O-RAN.WG3.E2SM-
+KPM
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+Energy consumption kWh ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+New reporting: E2
+O-FH (M-
+Plane)
+O-RU / O-DU Power consumed by hardware
+component
+W ~ per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O-FH (M-
+Plane)
+O-RU / O-DU Transmit power  mW ~ per N x
+100ms
+Measurement and
+reporting:
+O-RAN.WG4.MP
+(Sec. 10.2, B.1, B.2.1)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25
+O-RAN.WG1.NESUC-R003-v01.00
+5.2.2.3.3 Detailed Output Requirements
+Output Decision Making / AI/ML Inference:
+Table 5.2.2.3-4: Output Decision Making / AI/ML Inference
+Output Data
+Interface Source /
+Target
+Name/Description Units Config.
+Period
+Existing / New
+Definitions
+E2 Near-RT RIC /
+E2 Node (O-
+CU)
+Candidate carrier(s) / cells (s)
+recommended for energy saving to
+enter energySaving state (e.g., 3GPP
+TS 28.310 [8] Sec. 6.2.2)
+- > min  3GPP TS 28.541 [11]
+(Cl. 4.3.63)
+New configuration: E2
+Candidate carrier(s) / cell (s) for
+compensation (e.g., 3GPP TS 32.551
+[15] compensatingForEnergySaving,
+optional)
+- > min -
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+Confirmation (Success/Failure) - event
+triggered
+3GPP TS 28.310 [8] (Cl.
+6.2.2)
+O-FH (M-
+Plane)
+E2 Node (O-
+DU) / O-RU
+Updated carrier configuration (i.e.
+activation, deactivation, or sleep)
+- > min O-RAN.WG4.MP
+(Sec. 15.3.2)
+
+5.3 Impact Analysis on O-RAN Work Groups
+This is an initial impact analysis as part of the WG1 UCTG work on Carrier and Cell Switch Off/On use
+case. The intention is to estimate the expected standardization effort within the O-RAN work groups. It is up
+to the WGs to decide how Carrier and Cell Switch Off/On use case functionality should be specified in
+specifications of each WG.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 26
+O-RAN.WG1.NESUC-R003-v01.00
+
+# WGs/FGs  Spec. No Objective description
+1 WG1 (Use
+case)
+O-RAN.WG1.NES-USE-CASES-TR
+O-RAN.WG1.Use-Cases-Detailed-
+Specification
+Update WG1 NES use case analysis report and use-
+case detailed specification with Carrier and Cell
+Switch Off/On use case. No impact to existing
+architecture.
+2 WG2
+(Non-RT
+RIC, A1,
+R1)
+O-RAN.WG2.R1GAP
+O-RAN.WG2.R1UCR
+O-RAN.WG2.R1TD (TBD)
+Updates to R1 services and procedures for Carrier
+and Cell Switch Off/On use case
+O-RAN.WG2.Non-RT-RIC-ARCH No impact identified
+O-RAN.WG2.Use-Case-Requirements Specifying Carrier and Cell Switch Off/On use case
+& its requirements in WG2 UCR specification
+O-RAN.WG2.A1GAP
+O-RAN.WG2.A1TD
+Review and implement potential requirements for
+policy driven implementation 2nd deployment option
+of Carrier and Cell Switch Off/On use case captured
+in WG2 UCR document.
+3 WG3
+(Near-RT
+RIC, E2)
+O-RAN.WG3.UCR Specifying 2nd deployment option of Carrier and
+Cell Switch Off/On use case in use case section & its
+requirements in WG3 UCR specification
+O-RAN.WG3.RICARCH No impact identified
+O-RAN.WG3.E2GAP No impact identified
+O-RAN.WG3.E2AP No impact identified
+O-RAN.WG3.E2SM-RC or
+NEW: O-RAN.WG3.E2SM-CC
+Identify & specify RAN E2 actions necessary for 2nd
+deployment option of Carrier and Cell Switch
+Off/On use case through E2 Node
+O-RAN.WG3.E2SM-KPM Identify & specify RAN E2 measurement required
+analysis of ES & EC for 2nd deployment option of
+Carrier and Cell Switch Off/On use case through
+Near-RT RIC
+4 WG4
+(O-FH)
+O-RAN.WG4.MP Review and specify requirements for M-Plane.
+Identify and specify relevant impacts on M-Plane for
+both Hierarchical & hybrid model to accommodate
+management features requirements towards O-RU.
+Define O-RU Energy efficiency KPIs and counters.
+O-RAN-WG4.CUS Review and specify requirements for CUS-Plane.
+Identify and specify relevant impacts on CUS Plane
+and data model to support various Tx/Rx Array
+Carrier Off/On.
+5 WG5
+(O1)
+O-RAN.WG5.O-CU-O1
+O-RAN.WG5.MP
+Identify specific O-DU operational and data model
+aspects of the feature content including the SMO-O-
+DU SMO interface. Make appropriate changes to the
+O-DU data model and other WG5 specifications as
+needed.
+6 WG10 O-RAN.WG10.O1-Interface
+O-RAN.WG10.OAM-Architecture
+O-RAN.WG10.Information Model and
+Data Models
+Review, identify enhancements and update the
+relevant impacts on O1 Interface & IM/DM to
+support Carrier and Cell Switch Off/On use case.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 27
+O-RAN.WG1.NESUC-R003-v01.00
+5.4 Relation and Impact on 3GPP Specifications
+5.4.1 Relation to 3GPP RAN Specifications
+Specs Release Title Description
+TR
+36.927
+LTE
+Rel.10
+Study on Potential
+solutions for energy
+saving for E-UTRAN
+Study on energy saving for E-UTRAN.
+
+TS
+36.300
+and
+other
+specs
+LTE
+Rel.10
+E-UTRAN; Overall
+description; Stage 2
+Support of LTE energy saving by cell/carrier off/on switching.
+The switch-off decision might be taken by the capacity booster
+cell autonomously or may be centrally controlled by OAM. The
+eNB may initiate handover with appropriate root cause values
+and thereby inform its neighbour cells about the future switch
+off. The load of the neighbour cells may also be monitored by
+load information exchange over X2. Before switching off, all
+peer eNBs can be informed about the switch off over the X2
+interface. For the switch off a Deactivation Indication was
+added to the ENB CONFIGURATION UPDATE procedure.
+For switch on a CELL ACTIVATION REQUEST/RESPONSE
+procedure was introduced in LTE Rel.10. The autonomous
+switch on decision is more difficult to realize particularly for
+small cells. Even with high load on the coverage cell, it is not
+obvious if there are UEs in the vicinity of such small cells.
+TS
+36.300
+and
+other
+specs
+LTE
+Rel.11
+E-UTRAN; Overall
+description; Stage 2
+LTE Rel.11 defined respective S1 messages for Inter-RAT (i.e.
+GERAN, UMTS) support.
+TR
+36.887
+LTE
+Rel.12
+Study on energy
+saving enhancement
+for E-UTRAN
+Study on energy saving enhancements for E-UTRAN.
+
+TS
+36.300
+and
+other
+specs
+LTE
+Rel.15
+E-UTRAN; Overall
+description; Stage 2
+EN-DC CONFIGURATION UPDATE procedure was specified
+to support LTE-NR Dual Connectivity in the Non-Standalone
+Configurations.
+TS
+38.300
+and
+other
+specs
+5G
+Rel.15
+NR and NG-RAN
+Overall description;
+Stage-2
+Support of 5G energy saving by cell/carrier off/on switching.
+Similar functionality as defined for LTE. E-UTRA or NR cell
+providing additional capacity via single or dual connectivity.
+
+5.4.2 Ongoing Work in 3GPP Rel.18 RAN
+The following study is conducted in 3GPP Rel.18 in RAN. This includes:
+- Definition of a base station energy consumption model
+- Definition of an evaluation methodology and KPIs
+- Study and identify techniques on the gNB and UE side to improve network energy savings in terms of
+both BS transmission and reception
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 28
+O-RAN.WG1.NESUC-R003-v01.00
+Reference  Release Title Documentation and impact on
+Specifications
+FS_Netw_Energy_NR 5G Rel.18  Study on network
+energy savings for NR
+Results will be captured in 3GPP TR
+38.864 Study on network energy
+savings for NR.
+While 3GPP RAN WG1 is leading this study item, RAN WG3 will study aspects of information
+exchange/coordination over network interfaces such as X2/Xn. For this purpose, RAN WG3 also considers
+Enhanced Carrier/Cell Switch Off/On mechanisms.
+5.4.3 Impact on 3GPP RAN Specifications
+Non-RT or Near-RT RIC controlled Cell Switch Off/On is not considered to have any impact on 3GPP RAN
+specifications.
+5.4.4 Relation to 3GPP System Architecture Specifications
+Specs  Release Title Description
+TR
+36.927
+LTE
+Rel.10
+Study on Energy
+Savings Management
+Study on Energy Savings Management
+TS
+32.551
+and
+other
+specs
+LTE
+Rel.10
+Energy Saving
+Management (ESM);
+Concepts and
+requirements
+Concepts and requirements for ESM. According to 3GPP TS
+32.551, the energy saving procedure initiating capacity booster
+cell, to enter or exit “energySaving” state, should be able to
+initiate energy saving compensation activation and/or
+deactivation on one or multiple cells or network elements.
+3GPP TS 32.425 [13] defines the measurements and 3GPP TS
+32.451 [14] defines the KPIs.
+TR
+32.834
+LTE
+Rel.11
+Study on OAM aspects
+of inter-RAT Energy
+Saving
+Inter-RAT aspects of Energy Saving. The following RATs are
+considered in this study: GSM, UMTS, LTE, CDMA.
+TR
+23.866
+LTE
+Rel.12
+Study on System
+Enhancements for
+Energy Efficiency
+Study on System Enhancements for Energy Efficiency
+TR
+32.856
+5G
+Rel.15
+Study on OAM support
+for assessment of
+energy efficiency in
+mobile access
+networks
+Support for ETSI metrics and methods for energy efficiency
+assessment and related measurements. Principles for monitoring
+equipment power, energy and environmental parameters. 2G,
+3G and 4G have been covered.
+TS
+28.310
+and
+other
+specs
+5G
+Rel.16
+Energy efficiency of
+5G
+This TS defines solutions and requirements for
+- Data Volume collection Power,
+- Power, Energy and Environmental (PEE) measurement
+collection
+- Energy Saving use cases
+The Energy Saving use case defines the scenario of energy
+saving by switching off capacity booster cells when the traffic
+demand is low and re-activate them on a need basis. The energy
+saving consists of two scenarios where the capacity booster cell
+gNB is fully or partially overlaid by the candidate cell(s).
+The configuration of energy saving policies for these solutions
+is defined in 3GPP TS 28.541 [11]. The measurements related
+to data volume and PEE measurements are defined in 3GPP TS
+28.552 [12]. The Energy Efficiency related KPIs are defined in
+TS 28.554 [7].
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 29
+O-RAN.WG1.NESUC-R003-v01.00
+5.4.5 Ongoing Work in 3GPP Rel.18 System Architecture
+Energy saving compensation activation and deactivation procedures for LTE are defined in 3GPP TS 32.551
+[15] as:
+- Energy saving compensation activation: procedure to increase the coverage area for the candidate
+cell(s).
+- Energy saving compensation deactivation: procedure to decrease a previously increased coverage area.
+
+This procedure is not defined yet for energy saving procedures for 5G, and hence 3GPP TS 28.310 [8] needs
+to be enhanced to introduce this procedure for 5G networks. Related study and work items are existing.
+Reference  Release Title Documentation and impact on
+Specifications
+FS_EE5G_Ph2 5G Rel.18  Study on new aspects
+of EE for 5G networks
+Phase 2
+Results will be captured in 3GPP TR
+28.913 Study on new aspects of EE
+for 5G networks phase 2.
+EE5GPLUS_Ph2 5G Rel.18 Enhancements of EE
+for 5G Phase 2
+Specification enhancements are
+expected for the following 3GPP
+specifications: TS 28.310 [8], TS
+28.552 [12], TS 28.554 [7] and TS
+28.541 [11].
+
+5.4.6 Impact on 3GPP System Architecture Specifications
+Non-RT or Near-RT RIC controlled Cell Switch Off/On is not considered to have any impact on 3GPP
+System Architecture specifications.
+5.5 Gain Analysis
+An operator can expect strong energy savings, and thus OPEX savings, by using Carrier/Cell Switching in a
+network with multiple frequency layers. The exact power saving strongly depends on network deployment
+details, cell configuration (e.g., configured bandwidth, common channels etc.), used hardware, and network
+load. Multiple frequency layers may or may not use the same power amplifier in the RF module. Major
+power savings are naturally obtained when some power amplifiers can be switched off completely.
+Numerical analysis based on an estimated power saving per carrier / cell to be switched off might provide a
+good estimate of the expected savings. O-RU power consumption might be categorized into power
+consumption related to:
+1. user channels' load (e.g., traffic on uplink/downlink shared channels),
+2. common signals and channels' load (e.g., SSB transmissions, Reference Signals, broadcast channel,
+paging channel etc.),
+3. regular PA operational power (i.e., the required energy to power up the power amplifier),
+4. regular operational power (i.e., the required energy to power up the radio module).
+
+Power consumption related to (1), (2) and (3) scales with the number of transmission paths as illustrated in
+Figure 5.5-1.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 30
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 5.5-1: O-RU power saving for a 4TX4RX sector configuration
+Considering that the requested traffic (1) needs to be transmitted in one of the remaining carriers/cells and
+that regular operational power (4) will be required after carrier/cell switch off, the power savings of the
+Carrier/Cell Switch algorithm is mainly related to the power consumption of (2) and (3).
+The yearly energy savings might be calculated as follows:
+𝑌𝑒𝑎𝑟𝑙𝑦𝑃𝑜𝑤𝑒𝑟𝑆𝑎𝑣𝑖𝑛𝑔[𝑀𝑊ℎ] = 𝑂-𝑅𝑈 𝑃𝑜𝑤𝑒𝑟𝑆𝑎𝑣𝑖𝑛𝑔[𝑊]
+1.000.000 ∗ 𝑃𝑜𝑤𝑒𝑟𝑆𝑎𝑣𝑖𝑛𝑔𝐻𝑜𝑢𝑟𝑠[ℎ]
+𝑑𝑎𝑦 ∗ #𝑑𝑎𝑦𝑠 ∗ #𝑂-𝑅𝑈𝑠
+
+Two example calculations, simplifying the factors as cited above and ignoring deployment, cell
+configuration, hardware specifics and load dependencies, are provided in the table below:
+Table 5.5-1: Simplified power savings calculation examples
+Factor Value Value
+O-RU power savings during switch off 100 W 200 W
+Number of hours of switch off per day 2 4
+Number of O-RUs 10000 20000
+Yearly energy saving [MWh] 730 5840
+
+To be more specific considering deployment, cell configuration, antenna type, hardware and load
+dependencies of the O-RU power consumption, computational analysis results for two example scenarios are
+provided. The calculations are based on the load profile and the power consumption categorization of O-RU
+functional blocks as outlined in Annex B.
+Energy savings gain from Carrier and Cell Switch Off/On would be equivalent to power consumption of the
+O-RU hardware components that can be shut down or put into energy savings mode during low traffic load.
+As illustrated in Figure 5.5-2, major energy savings gain would be derived from shutting down RF
+Processing Unit and Digital Processing Unit (depending on the antenna configuration), while FH Processing
+Unit, Power Unit and other components would still be fully or partially functioning, and the power
+consumption would stay more or less consistent during the switching off period.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 31
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 5.5-2:  Energy savings for O-RU
+5.5.1 Cell and Carrier Switch Off/On Energy Saving for 4T4R O-RU
+The energy saving gain from Carrier and Cell Switch Off/On is analysed based on the system parameters in
+Table 5.5.1-1 and the example power profile considering power consumption from operational experience
+provided in Table 5.5.1-2.
+Table 5.5.1-1: O-RU Configuration for ES gain analysis
+No. of antennas 4T4R
+No. of layers 4
+Bandwidth 100 MHz
+Carrier frequency 3.5 GHz
+Tx power per antenna 30 W
+Technology 5G NR
+
+Table 5.5.1-2: Example power profile for 4T4R O-RU
+Operating Load (Traffic) Total O-
+RU (W)
+ORAN
+Fronthaul
+Processing
+Unit (W)
+Digital
+Processing Unit
+(W)
+RF
+Processing
+Unit (W)
+Power Unit &
+other
+components
+(W)
+Busy hour load 550 10 25 495 20
+Low load 200 10 25 145 20
+Sleep (Energy Savings State) 50 5~10 0~5 0~15 15~20
+Energy saving gain 150~180 0~5 20~25 130~145 0~5
+
+Compared to the low load scenario, energy savings of up to 150~180 W per O-RU can be achieved in the
+energy saving state. An example calculation for yearly energy saving potential considering a shutdown of
+10000 O-RUs during 3 hours per day is provided in Table 5.5.1-3.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 32
+O-RAN.WG1.NESUC-R003-v01.00
+Table 5.5.1-3: Power saving calculation example for 4T4R O-RU
+Factor Value
+O-RU power savings during switch off (low load) [W] 150~180
+Number of hours of switch off per day (50% of low load period) 3
+Number of O-RUs 10000
+Yearly energy saving [MWh] 1643~1971
+
+5.5.2 Cell and Carrier Switch Off/On Energy Saving for 64T64R O-RU
+The energy saving gain from Carrier and Cell Switch Off/On is analysed based on the system parameters in
+Table 5.5.2-1 and the example power profile considering power consumption from operational experience
+provided in Table 5.5.2-2.
+Table 5.5.2-1: O-RU Configuration for ES gain analysis
+No. of antennas 64T64R
+No. of layers 16
+Bandwidth 100 MHz
+Carrier frequency 3.5 GHz
+Tx power per antenna 30 W
+Technology 5G NR
+
+Table 5.5.2-2: Example power profile for 64T64R O-RU
+Operating Load (Traffic) Total O-
+RU (W)
+ORAN
+Fronthaul
+Processing Unit
+(W)
+Digital
+Processing
+Unit (W)
+RF
+Processing
+Unit (W)
+Power Supply &
+other
+components (W)
+Busy hour load 1100 50 200 800 50
+Low load 400 50 200 100 50
+Sleep (Energy Savings State) 60~140 30~50 0~20 0~20 30~50
+Energy saving gain 260~340 0~20 180~200 80~100 0~20
+
+Compared to the low load scenario, energy savings of 260-340 W per O-RU can be achieved in the energy
+saving state. Example calculations for yearly energy saving potential considering a shutdown of 10000 O-
+RUs during 3 hours per day are provided in Table 5.5.2-3.
+Table 5.5.2-3: Power saving calculation examples for 64T64R O-RU
+Factor Value
+O-RU power savings during switch off (low load) [W] 260~340
+Number of hours of switch off per day (50% of low load period) 3
+Number of O-Rus 10000
+Yearly energy saving [MWh] 2847~3723
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 33
+O-RAN.WG1.NESUC-R003-v01.00
+5.6 Feasibility Analysis
+No challenges concerning feasibility have been identified during the pre-normative phase.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 34
+O-RAN.WG1.NESUC-R003-v01.00
+6 RF Channel Reconfiguration
+6.1 Problem Statement, Solution and Value Proposition
+In mobile networks mMIMO antennas are used for beamforming techniques to enhance cell capacity and
+throughput. In order to achieve beamforming, O-RUs need to concentrate the power amplifiers at the radome
+by combining radiating elements. At low load, i.e., when the expected traffic volume or number of connected
+users are lower than the configured threshold, ES can be achieved by reducing the power consumption of O-
+RUs by switching off certain Tx/Rx arrays. For example, 32 out of 64 Tx/Rx Arrays of an O-RU can be
+switched off in a digital mMIMO architecture and correspondingly the number of spatial layers and SSBs
+can be reduced. The procedure (involvement of respective O-RAN interfaces) of the RF Channel
+Reconfiguration depends on the management architecture model (hybrid or hierarchical) and the deployment
+option. The reconfiguration decision can be made by an AI/ML model within the inference host deployed at
+the Non-RT RIC (denoted as deployment Option 1), or at the Near-RT RIC (denoted as deployment option
+2). Among others the AI/ML models may include prediction of future traffic, user mobility, and resource
+usage and may also predict expected energy efficiency enhancements, resource usage, and network
+performance for different ES optimization states.
+The main aim of RF Channel Reconfiguration is to perform O-RU Tx/Rx Array selection. However, Tx/Rx
+Array reselection may require modifying the maximum number of spatial streams, the number of SSB
+Beams or the O-RU Antenna transmit power. Hence the overall scope of RF Channel Reconfiguration
+includes the actions listed in Table 6.1-1.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 35
+O-RAN.WG1.NESUC-R003-v01.00
+Table 6.1-1: Actions in the context of RF Channel Reconfiguration
+Action Name Explanation Possible Implementation Method
+O-RU Tx/Rx Array
+selection
+O-RU Tx/Rx Array selection means
+switching off certain Tx/Rx Arrays or
+Array elements to reduce power
+consumption of O-RU.
+Reselecting Rx/Tx Arrays may impact
+cell coverage.
+- O-RU reports all supported Tx/Rx Array
+selections to O-DU or to SMO via Open
+FH M-Plane.
+- Based on traffic load and user distribution
+the Non-RT/Near RT RIC will optimize
+Tx/Rx Array selection.
+Modification of number
+of SU/MU MIMO spatial
+streams or data layers
+
+The maximum number of spatial
+streams may depend on the O-RU
+Tx/Rx Array selection, and it may be
+necessary to be modified along with a
+new Tx/Rx Array selection.
+A reduction of the number of spatial
+streams without Tx/Rx Array selection
+is not excluded as in certain scenarios
+the energy consumption of O-RU
+and/or O-DU may be reduced by
+turning off certain processing units of
+FPGA/GPUs, by running at a lower
+clock speed or turning off CPU/GPU
+cores along with reduced processing
+requirements.
+- O-RU may report the maximum number
+of supported spatial streams for each
+Tx/Rx Array selection. For example, 16
+spatial streams for 64 Tx/Rx and 8 spatial
+Layers for 32 Tx/Rx.
+- Based on the traffic load and the user
+distribution the O-RU will be instructed
+about the maximum number of spatial
+streams to be used. Hence, the O-RU
+and/or O-DU may be able turn off certain
+processing units that would be required to
+processing a higher number of spatial
+streams.
+Modification of the
+number of SSB beams
+
+The number of SSB beams may depend
+on the O-RU Tx/Rx Array selection
+and the number of spatial streams.
+Hence it may be necessary to adapt the
+number of SSB beams.
+
+- The number of SSB beams is controlled
+by the O-DU. Hence the O-DU can be
+instructed via Non-RT/Near-RT RIC to
+set the number of SSB beams based on
+Tx/Rx Array selection.
+Modify the O-RU
+Antenna Transmit power
+
+The maximum O-RU total transmit
+power may depend upon the O-RU
+Tx/Rx Array selection; hence it may
+need to be modified along with Tx/Rx
+Array selection to compensate for
+reduced coverage in the downlink.
+- The O-RU power is configured per Tx
+Array. Hence, the modification may not
+be required when O-RU Tx/Rx Array
+selection from 64 Tx/Rx to 32 Tx/Rx.
+However, if possible, O-RU Tx power
+can be increased to compensate for
+reduced coverage.
+6.2 Architecture/Deployment Options
+6.2.1 Option 1: Non-RT RIC Deployment
+In option 1, decision making, potentially including AI/ML Model Training and Inference, is done at the Non-
+RT RIC.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 36
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.1.1 Description and UML Diagram
+Table 6.2.1.1-1: RF Channel Reconfiguration: AI/ML inference via Non-RT RIC
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal
+Enable RF Channel Reconfiguration Energy Saving functions in the
+Network by means of configuration parameter change and actions
+controlled by Non-RT RIC to enable AI/ML-based solutions.
+
+Actors and Roles
+Non-RT RIC acting as Energy Saving decision making function.
+E2 Node and O-RU acting as configuration enforcement function
+
+Assumptions
+O1 interface connectivity is established between E2 Nodes and SMO.
+Open FH M -Plane interface is established between E2 Node and O -
+RU or between O-RU and SMO.
+Network is operational.
+
+Pre-conditions
+Operator has set the targets for Energy Saving functions in the Non -
+RT RIC (rApp).
+Capability of O -RU to support various RF Channel Reconfiguration
+actions.
+
+Begins when
+Operator enables the optimization functions for RF Channel
+Reconfiguration Energy Saving and E2 Node and O -RU become
+operational
+
+Steps 1.1, 1.2, 1.3,
+1.4 (M)
+Non-RT RIC initiates specific measurement data collection request
+through SMO via O1 towards E2 Node or via Open FH M-Plane directly
+towards O-RU for AI/ML model training for Energy Saving optimization
+
+Steps 2.1, 2.2, 2.3,
+2.4 (M)
+E2 Node and O -RU send the configured measurement data to SMO
+periodically or event based for Non -RT RIC processing. Non-RT RIC
+retrieves data through SMO from E2 Node and from O-RU.
+
+Step 3 (M) Non-RT RIC retrieves the collected measurement data for processing.
+Steps 4.1, 4.2, 4.3
+(M)
+Non-RT RIC trains the AI/ML models with the collected data. Trained
+AI/ML models are deployed and activated in the Non-RT RIC.
+
+Non-RT RIC constantly monitors performance and energy
+consumption of the E2 Node and the O -RU for inference, such as cell
+load related and traffic information, EE/EC measurement reports,
+geolocation information etc.
+
+Step 5 (M)
+Based on the AI/ML inference, the Non-RT RIC may request the SMO
+to configure E2 Node (O-DU) and execute RF Channel
+Reconfiguration for ES/EE optimization.
+
+Steps 6.1, 6.2, 6.3,
+6.4 (M)
+SMO instructs E2 Node via O1 to perform the received request(s) from
+Non-RT RIC
+i. O-RU Tx/Rx Array selection.
+ii. Modify the number of SU/MU MIMO spatial streams or data
+layers.
+iii. Modify the number of SSB beams.
+iv. Modify O-RU Antenna Transmit power.
+
+Step 7 (M)
+Non-RT RIC continuously monitors the performance of AI/ML model. If
+energy saving objectives a re not achieved, it may decide to initiate
+fallback mechanism, and/or AI/ML model update or retraining.
+
+Ends when If E2 Node becomes non-operational or when the operator disables the
+optimization functions for Energy Saving.
+Exceptions None
+Post Conditions
+Non-RT RIC continues closed loop monitoring of Energy Saving
+function for E2 Node and O-RU.
+E2 Node and O-RU operate using the newly deployed parameters/ and
+state.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 37
+O-RAN.WG1.NESUC-R003-v01.00
+@startuml
+skinparam defaultFontSize 12
+autonumber
+Box "Service Management & \n Orchestration Framework" #gold
+Participant “Collection & Control” as smo
+Participant " Non-RT RIC" as NRTRIC
+End box
+ Box "O-RAN Nodes" #lightpink
+ Participant  "Near-RT RIC" as RTRIC
+ Participant  "E2-Node" as E2NODES
+ Participant  "O-RU" as ORUs
+End box
+
+autonumber 1.1
+group Data Collection
+alt via O1
+smo -> E2NODES  : <<O1>> Data collection request for Energy Saving
+E2NODES -> ORUs  : <<FH>> Data collection request
+Else via OFH-MP
+smo -> E2NODES  : <<O1>> Data collection request for Energy Saving
+smo -> ORUs          : <<OFH-MP>>  Data collection request
+end
+
+autonumber 2.1
+alt Via O1
+ORUs -> E2NODES  : <<FH>> Measurement Data Collection
+E2NODES -> smo   : <<O1>> Measurement Collection for Energy Saving
+Else via OFH-MP
+ORUs -> smo  : <<FH>> Measurement Data Collection
+E2NODES -> smo   : <<O1>> Measurement Collection for Energy Saving
+End
+autonumber 3
+smo -> NRTRIC    : <<O1>> Data Retrieval
+end
+
+group Data Analysis Training and Inference
+autonumber 4.1
+  NRTRIC -> NRTRIC : AI/ML Model training
+  NRTRIC -> NRTRIC : Deploy & activate trained AI/ML Model for inferencing
+  NRTRIC -> NRTRIC : Monitoring & Analysis of Energy Efficiency \n & Consumption (E2
+Node & O-RU)
+autonumber 5
+group Actor Decision Making
+
+  NRTRIC -> smo : Request to prepare and execute RF Channel Reconfiguration
+\nenforecement for Energy saving
+autonumber 6.1
+
+smo -> E2NODES : <<O1>> RF Channel Reconfiguration enforecement for Energy saving
+E2NODES -> ORUs : <<FH>> Updated O-RU Configurations
+
+end
+autonumber 7
+  NRTRIC -> NRTRIC : Performance analysis of AI/ML model \n(with possible actions, e.g.
+fallback, re-training)
+end
+@enduml
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 38
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 6.2.1.1-1: RF Channel Reconfiguration flow diagram: AI/ML inference in Non-RT RIC
+6.2.1.2 O-RAN Entity Roles
+1) SMO (including Non-RT RIC)
+➢ Collect necessary cell configurations, performance indicators and measurement reports (e.g., cell
+load related and traffic information, EE/EC measurement reports, geolocation information) from E2
+Node and O-RU, for the purpose of training and inference of AI/ML models that assist in the EE/ES
+functions.
+➢ Trigger EE/ES AI/ML model training/retraining.
+➢ Deploy, update, and configure EE/ES AI/ML models
+➢ Analyze the data received from E2 Nodes and O-RU to determine RF Channel Reconfiguration
+actions for EE/ES, i.e., O-RU Tx/Rx Array selection, modification of the number of SSB beams,
+modification of the O-RU Antenna Transmit power, modification of the number of SU/MU MIMO
+spatial streams or data layers using AI/ML models.
+➢ Signal updated RF Channel Reconfiguration and execution of optimization actions to E2 Node via
+O1 Interface.
+
+2) E2 Node
+➢ Report necessary cell configurations, performance indicators, and measurement reports (e.g., cell
+load related and traffic information, EE/EC measurement reports) to SMO via O1 interface.
+➢ Perform actions required to perform RF Channel Reconfiguration (i.e., O-RU Tx/Rx Array selection,
+modification of the number of SSB beams, modification of the O-RU Antenna Transmit power,
+modification of the number of SU/MU MIMO data layers or spatial streams) as part of EE/ES
+optimization.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 39
+O-RAN.WG1.NESUC-R003-v01.00
+
+3) O-RU Node
+➢ Report EC and EE related information over Open FH M-Plane to O-DU or alternatively to SMO
+directly.
+➢ Perform actions required to be performed due to RF Channel Reconfiguration (i.e., O-RU Tx/Rx
+Array selection, modification of the number of SSB beams, modification of the O-RU Antenna
+Transmit power, modification of the number of SU/MU MIMO spatial streams or data layers) as part
+of EE/ES optimization.
+6.2.1.3 Input/Output Data Requirements
+6.2.1.3.1 Summary
+Input Data
+1) SMO and E2 Node
+➢ Load statistics per cell and per carrier, such as number of active users, average number of RRC
+connections, average number of scheduled active users per TTI, PRB utilization, DL/UL Cell/User
+throughput, PMI/CSI reports.
+➢ Latency statistics per cell (if URLLC slices are involved, latency is used in the EE definition, 3GPP
+TS 28.554 [7]).
+2) O-RU
+➢ Power consumption metrics: Mean total/per carrier power consumption, mean total/per carrier transmit
+power.
+➢ Information on supported Tx/Rx Array selections along with power consumption  (site/O-RU input
+power needed for certain EE KPIs)
+Output Data
+1) SMO to E2 Node
+➢ RF Channel Reconfiguration actions which can include,
+o O-RU Tx/Rx Array selection
+o Modify the number of SU/MU MIMO spatial streams or data layers
+o Modify the number of SSB beams
+o Modify O-RU Antenna Transmit power
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 40
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.1.3.2 Detailed Input Requirements
+Initialization:
+Table 6.2.1.3-1: Initialization
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+R1 SMO / rApp Optimization target for RF Channel
+Reconfiguration
+- manual or
+event triggered
+New
+E.g., (average or max) NG-RAN data
+Energy Efficiency
+bit/J  3GPP TS 28.554 [7]
+(Cl. 6.7.1)
+R1 SMO / rApp Maximum Initial Access Latency for
+given SSB Beam Configuration
+ms Initialization New: KPI metric
+input by the operator
+O1, R1 O-DU / SMO
+/ rApp
+Carrier/cell characteristics  - manual or
+event triggered
+(e.g., SMO
+feature
+activation, E2
+Node
+startup/failure/
+reconfig.)
+New
+
+E.g., physical location, transmit
+direction, carrier frequency, coverage
+parameters, configured transmit
+power, beam width, coverage shape,
+tilt, azimuth, carrier-cell mapping,
+carrier-HW mapping
+-  3GPP TS 28.541
+[11] (Cl. 4.3.6,
+4.3.38, 4.3.39,
+4.3.40, 4.3.74)
+O-RAN.WG5.O-
+DU-O1 (Sec. 10), O-
+RAN-WG5.O-CU-
+O1 (Sec. 9)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane), O1,
+R1
+O-RU / O-DU
+or
+O-RU / O-DU
+/ SMO / rApp
+Supported common beam
+configuration from O-RU per cell
+file Initialization O-RAN.WG5.MP
+(Sec. 8.1)
+O-FH (M-
+Plane)
+O-RU / O-DU Beamforming weights or attributes
+via YANG module per cell
+values
+in IE
+Initialization O-RAN.WG4.CUS
+(Sec. 12.4.2)
+R1, O1, O-
+FH (M-
+Plane)
+or
+O-FH (M-
+Plane)
+rApp / SMO /
+O-DU / O-RU
+or
+O-DU / O-RU
+Inferred SSB beam configuration in
+specified file per cell
+file Initialization O-RAN.WG4.CUS
+(Sec. 12.4.2)
+O1, R1 O-DU / SMO
+/ rApp
+Supported SSB and CSI-RS TRS
+configurations per cell
+- Initialization 3GPP TS 38.331
+[16] (Sec. 6.3.2)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 41
+O-RAN.WG1.NESUC-R003-v01.00
+O-FH (M-
+Plane), O1,
+R1
+O-RU / O-DU
+/ SMO / rApp
+O-RU reports all offered Tx/Rx
+Arrays
+file Initialization New Definition
+required in O-
+RAN.WG5.MP
+o-ran-uplane-
+conf.yang module
+o-ran-
+beamforming.yang
+module
+O-FH (M-
+Plane)
+O-RU / O-DU  O-RU reports all offered Tx/Rx
+Arrays
+values
+in IE
+Initialization New Definition
+required in O-
+RAN.WG4.MP
+o-ran-uplane-
+conf.yang module
+o-ran-
+beamforming.yang
+module
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 42
+O-RAN.WG1.NESUC-R003-v01.00
+AI/ML Model Training:
+Table 6.2.1.3-2: AI/ML Model Training
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O1, R1
+
+E2 Node (O-
+CU) / SMO /
+rApp
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL
+delivered from O-CU-UP to O-DU,
+per PLMN, per QoS level, per slice,
+per Interface (F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+O1, R1
+
+E2 Node (O-
+CU) / SMO /
+rApp
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL
+delivered to O-CU-UP from O-DU,
+per PLMN, per QoS level, per slice,
+per Interface (F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+O1, R1
+
+E2 Node (O-
+CU) / SMO
+/ rApp
+Number of active UEs in NG-RAN
+(Number of RRC_CONECTED
+UEs) per cell
+Integer (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Sec. 5.1.1.23, A7,
+A.60)
+O1, R1
+
+E2 Node (O-
+CU) / SMO /
+rApp
+RSRQ measurement per SSB per cell dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+O1, R1 E2 Node (O-
+CU) / SMO /
+rApp
+RSRP measurement per SSB per cell  dBm (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1
+
+E2 Node (O-
+CU) / SMO /
+rApp
+SINR measurement per SSB per cell  dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1
+
+E2 Node (O-
+CU) / SMO /
+rApp
+Energy consumption  kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Power consumed by O-RU or its
+hardware components
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O1, R1 E2 Node (O-
+DU) / SMO /
+rApp
+Over the air transmit power by O-RU
+as calculated in O-DU
+Note: This measurement is required
+to calculate energy efficiency of O-
+RU.
+W (non-real
+time for
+training)
+New Measurement and
+New Reporting
+required in O-
+RAN.WG5.MP
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 43
+O-RAN.WG1.NESUC-R003-v01.00
+Input Decision Making / AI/ML Inference:
+Table 6.2.1.3-3: Input Decision Making / AI/ML Inference
+Input Data
+Interface Source / Target Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL
+delivered from O-CU-UP to O-DU,
+per PLMN, per QoS level, per slice,
+per Interface (F1-U, Xn-U, X2-U))
+Mbit > min  Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL
+delivered to O-CU-UP from O-DU,
+per PLMN, per QoS level, per slice,
+per Interface (F1-U, Xn-U, X2-U))
+Mbit > min  Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+Number of active UEs in NG-RAN
+(Number of RRC_CONECTED UEs)
+per cell
+Integer > min Measurement:
+3GPP TS 28.552 [12]
+(Sec. 5.1.1.23, A.7,
+A.60)
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+RSRQ measurement per SSB per cell dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+RSRP measurement per SSB per cell  dBm > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+SINR measurement per SSB per cell  dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1
+
+E2 Node (O-CU)
+/ SMO / rApp
+Energy consumption  kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU /
+SMO / rApp
+Power consumed by O-RU or its
+hardware components
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O1, R1 E2 Node (O-DU)
+/ SMO / rApp
+Over the air transmit power by O-RU
+as calculated in O-DU
+Note: This measurement is required
+to calculate energy efficiency of O-
+RU.
+W (non-real
+time for
+training)
+New Measurement and
+New Reporting
+required in O-
+RAN.WG5.MP
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 44
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.1.3.3 Detailed Output Requirements
+Output Decision Making / AI/ML Inference:
+Table 6.2.1.3-4: Output Decision Making / AI/ML Inference
+Output Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O-FH (M-
+Plane)
+
+O-DU / O-RU Candidate O-RU’s appropriate array
+selection
+- > min O-RAN.WG4.MP
+o-ran-uplane-conf.yang
+Maximum number of Max SU/MU
+MIMO spatial streams or data layers
+- > min New Definition required
+in O-RAN.WG4.MP
+Recommended O-RU Antenna
+Transmit power
+W > min O-RAN.WG4.MP
+urn:o-ran:uplane-conf
+Module
+gain
+R1, O1
+
+rApp / SMO
+/ O-DU
+Candidate O-RU’s appropriate array
+selection
+- > min New Definition required
+in WG2 R1 and O-
+RAN.WG5.O-DU-O1
+Maximum number of Max SU/MU
+MIMO spatial streams or data layers
+- > min New Definition required
+in O-RAN.WG4.MP
+Inferred O-RU SS Burst Set (SS Block
+Number and SS Burst Periodicity) and
+CSI-RS TRS Configuration
+- Initialization 3GPP TS 38.331 [16]
+IE:
+ServingCellConfigCom
+mon
+Recommended O-RU Antenna
+Transmit power
+W > min O-RAN.WG4.MP
+urn:o-ran:uplane-conf
+Module
+gain
+O1, R1 E2 Node (O-
+DU) / SMO
+/ rApp
+Confirmation (Success/Failure) - event
+triggered
+New
+
+6.2.2 Option 2: Near-RT RIC Deployment
+In option 2, decision making, potentially using AI/ML Model Inference, is done at Near-RT RIC. While
+AI/ML Model training might be hosted in the Non-RT or in the Near-RT RIC, the description below is based
+on AI/ML Model Training in the Non-RT RIC.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 45
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.2.1 Description and UML Diagram
+Table 6.2.2.1-1: RF Channel Reconfiguration: AI/ML inference via Near-RT RIC
+Use Case Stage Evolution / Specification
+<<Uses>>
+Related
+use
+Goal
+Enable RF Channel Reconfiguration Energy Saving functions in the Network
+by means of configuration parameter change and actions controlled by Near-
+RT RIC and allow for AI/ML-based solutions.
+
+Actors and Roles
+Near-RT RIC acting as Energy Saving decision making function.
+E2 Node and O-RU acting as configuration enforcement function.
+SMO/Non-RT RIC acting as policy maker or trigger for ES optimization in
+Near-RT RIC.
+
+Assumptions
+O1 interface connectivity is established between E2 Node, Near-RT RIC, and
+SMO.
+E2 interface connectivity is established between E2 Node and Near-RT RIC.
+A1 interface is established between Non-RT RIC and Near-RT RIC.
+Open FH M -Plane interface is established between E2 Node and O -RU or
+between O-RU and SMO.
+Network is operational.
+
+Pre-conditions
+Operator has set the targets for the Energy Saving function in the Non -RT
+RIC (rApp).
+Capability of O-RU for various RF Channel Reconfiguration actions.
+
+Begins when  Operator enables the optimization functions for RF Channel Reconfiguration
+Energy Saving and E2 Node and O-RU become operational.
+Steps 1.1,1.2, 1.3
+(M)
+SMO initiates specific measurement data collection request towards E2
+Node and O-RU for AI/ML model training for Energy Saving optimization.
+Steps 2.1, 2.2, 2.3,
+2.4 (M)
+E2 Node and O -RU send the configured measurement data to SMO
+periodically or event based for Non-RT RIC processing.
+Step 3 (M) Non-RT RIC retrieves the collected measurement data for processing.
+Steps 4.1, 4.2, 4.3
+(M)
+Non-RT RIC trains the AI/ML models with the collected data. Trained AI/ML
+models are deployed and activated in Near-RT RIC through SMO over O1 or
+O2 Interface.
+Non-RT RIC constantly monitors performance and energy consumption of
+the E2 Node and the O-RU for inference, such as cell load related and traffic
+information, EE/EC measurement reports, geolocation information etc.
+
+Steps 5.1, 5.2 (M)
+SMO may trigger RF Channel Reconfiguration in the Near -RT RIC via O1
+interface or optionally Non -RT RIC  may provide p olicies via A1 interface
+guiding the Near-RT RIC RF Channel Reconfiguration EE/ES function.
+
+Steps 6.1, 6.2, 6.3,
+6.4, 6.5, 6.6 (M)
+Based on the AI/ML inference in Near -RT RIC, considering optimization
+policies, the Near-RT RIC may request the E2 Node to prepare and execute
+RF Channel Reconfiguration.
+
+E2 Node may request O -RU to prepare and execute RF Channel
+Reconfiguration changes such as,
+i. O-RU Tx/Rx Array selection
+ii. Modification of the number of SU/MU MIMO spatial streams or
+data layers.
+iii. Modification of the number of SSB beams.
+iv. Modification of the O-RU Antenna Transmit power.
+
+Steps 7.1, 7.2 (M) Based on performance analysis of AI/ML model, Non -RT RIC may update
+AIML model in Near-RT RIC.
+Ends when E2 Node becomes non -operational or when the operator disables the
+optimization functions for Energy Saving.
+Exceptions None
+Post Conditions
+Non-RT RIC continues closed loop monitoring of Energy Saving function for
+E2 Node and O-RU.
+E2 Node and O -RU operate using the newly deployed parameters/models
+and state.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 46
+O-RAN.WG1.NESUC-R003-v01.00
+@startuml
+skin rose
+skinparam defaultFontSize 15
+autonumber
+Box "Service Management & \n Orchestration Framework" #gold
+  Participant “Collection & Control” as smo
+  Participant " Non-RT RIC" as NRTRIC
+End box
+Box "O-RAN Nodes" #lightpink
+ Participant  "Near-RT RIC" as RTRIC
+ Participant  "E2-Nodes" as E2NODES
+ Participant  "O-RUs" as ORUs
+End box
+autonumber 1.1
+group Data Collection
+alt via O1
+smo -> E2NODES  : <<O1>> Data collection request for Energy Saving
+E2NODES -> ORUs  : <<FH>> Data collection request
+Else via OFH-MP
+smo -> ORUs          : <<OFH-MP>>  Data collection request
+end
+autonumber 2.1
+alt Via O1
+ORUs -> E2NODES  : <<FH>> Measurement Data Collection
+E2NODES -> smo   : <<O1>> Measurement Collection for Energy Saving
+Else via OFH-MP
+ORUs -> smo  : <<FH>> Measurement Data Collection
+E2NODES -> smo   : <<O1>> Measurement Collection for Energy Saving
+End
+autonumber 3
+smo -> NRTRIC    : <<O1>> Data Retrieval
+end
+autonumber 4.1
+group AI/ML workflow
+     NRTRIC -> NRTRIC  : AI/ML Model training
+ NRTRIC -> NRTRIC  : Monitoring & Analysis of Energy Efficicincy \n & Consumption (E2
+Nodes & O-RU)(s
+ NRTRIC -> RTRIC   : <<O1>> or <<O2>> Deploy AI/ML model
+end
+autonumber 5.1
+group Optimization Trigger and Policy
+alt via O1
+          smo -> RTRIC : <<O1>> Optimization Trigger/Target
+else via A1
+         NRTRIC --> RTRIC : <<A1>> Intent based Policy
+end
+autonumber 6.1
+group Actor Data Collection & Decision Making
+RTRIC -> E2NODES  : <<E2>> Data collection request for Energy Saving
+E2NODES -> ORUs  : <<FH>> Data collection request for Energy Saving
+ORUs -> E2NODES  : <<FH>> Measurement Data Collection for Energy Saving
+E2NODES -> RTRIC   : <<E2>> Measurement Data Collection for Energy Saving
+RTRIC -> RTRIC: AI/ML model inference
+RTRIC -> E2NODES: <<E2>> RF Channel Reconfiguration \nenforecement for Energy saving
+E2NODES -> ORUs: <<FH>> Updated O-RU Configurations
+autonumber 6.1
+group AI/ML workflow
+NRTRIC -> NRTRIC : Performance analysis of AI/ML model \n(with possible actions, e.g.
+fallback, re-training)
+NRTRIC -> RTRIC      : <<O1>> or <<O2>> Update AI/ML model
+
+end
+@enduml
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 47
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 6.2.2.1-1: RF Channel Reconfiguration flow diagram: AI/ML inference in Near-RT RIC
+
+6.2.2.2 O-RAN Entity Roles
+1) SMO (Including Non-RT RIC)
+➢ Collect necessary cell configurations, performance indicators and measurement reports (e.g., cell
+load related and traffic information, EE/EC measurement reports, geolocation information) from E2
+Node and O-RU, for the purpose of training AI/ML models that assist in the EE/ES functions.
+➢ Trigger and perform EE/ES AI/ML model training/retraining.
+➢ Analyze the data received from E2 Node and O-RU to trigger optimization for RF Channel
+Reconfiguration.
+➢ Provide optimization trigger, optimization targets, and A1 policies (e.g., change of Tx/Rx Array
+Selection based on 50 % peak power consumptions) to Near-RT RIC via O1 or A1 interface.
+
+2) Near-RT RIC
+➢ Collect necessary cell configurations, performance indicators and measurement reports (e.g., cell
+load related and traffic information, EE/EC measurement reports) from E2 Nodes and O-RU.
+➢ Receive EE/ES AI/ML model for deployment via O1 or O2.
+➢ Receive EE/ES related configuration management via O1 interface and/or policies via A1 interface
+for consideration during optimization.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 48
+O-RAN.WG1.NESUC-R003-v01.00
+➢ Analyze the data received from E2 Node and perform AI/ML model inference to determine RF
+Channel Reconfiguration actions for EE/ES (e.g., O-RU Tx/Rx Array Selection, modification of the
+number of SSB beams, modification of the O-RU Antenna Transmit power, modification of the
+number of SU/MU MIMO spatial streams or data layers) to be performed considering the
+optimization targets/policies.
+➢ Provide policies and/or required information over E2 interface to trigger actions for EE/ES
+optimization.
+
+3) E2 Node
+➢ Report necessary cell configurations, performance indicators and measurement reports (e.g., cell
+load related and traffic information, EE/EC measurement reports) to SMO via O1 interface and to
+Near-RT RIC via E2 or O1 Interface.
+➢ Perform O-RU Tx/Rx Array Selection, modification of the number of SSB beams, modification of
+the O-RU Antenna Transmit power, modification of the number of SU/MU MIMO spatial streams or
+data layers as part of RF Channel Reconfiguration actions for EE/ES optimization.
+
+4) O-RU
+➢ Report EC and EE related information over Open FH M-Plane interface to O-DU or alternatively to
+SMO directly.
+➢ Perform actions required to perform O-RU RF Channel Reconfiguration as part of EE/ES
+optimization.
+➢ Perform actions such as O-RU Tx/Rx Array Selection, modification of the number of SSB beams,
+modification of the O-RU Antenna Transmit power, modification of the number of SU/MU MIMO
+spatial streams or data layers as part of RF Channel Reconfiguration actions for EE/ES optimization.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 49
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.2.3 Input/Output Data Requirements
+6.2.2.3.1 Summary
+Input Data
+1) SMO and E2 Node
+➢ Load statistics per cell and per carrier, such as number of active users, average number of RRC
+connections, average number of scheduled active users per TTI, PRB utilization, DL/UL Cell/User
+throughput, PMI/CSI reports.
+➢ Latency statistics per cell (if URLLC slices are involved, latency is used in the EE definition, 3GPP
+TS 28.554 [7]).
+2) O-RU
+➢ Power consumption metrics: Mean total/per carrier power consumption, mean total/per carrier transmit
+power.
+➢ Information of O-RU for supported Tx/Rx Array selection along with power consumption (site/O-RU
+input power needed for certain EE KPIs).
+Output Data
+1) Non-RT RIC to Near RT RIC
+➢ O1 Configuration (i.e., ES optimization trigger/target) OR
+➢ A1 Policy for ES optimization
+
+2) Near-RT RIC to E2 Node to O-RU
+➢ RF Channel Reconfiguration actions which can include,
+o O-RU Tx/Rx Array selection
+o Modification of the number of SU/MU MIMO spatial streams or data layers
+o Modification of the number of SSB beams
+o Modification of the O-RU Antenna Transmit power
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 50
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.2.3.2 Detailed Input Requirements
+Initialization:
+Table 6.2.2.3-1: Initialization
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O1 SMO / Near-RT
+RIC
+EE Optimization target for RF
+Channel Re-configuration
+ manual or
+event triggered
+New
+E.g., (average or max) NG-RAN data
+Energy Efficiency
+bit/J  3GPP TS 28.554 [7]
+(Cl. 6.7.1)
+O1 SMO / Near-RT
+RIC
+Maximum Initial Access Latency for
+given SSB Beam Configuration
+ms  Initialization  New: KPI metric
+input by the operator
+E2, O1,
+R1
+E2 Node (O-
+DU) / Near-RT
+RIC / SMO
+/ rApp
+Carrier/cell characteristics  - manual or
+event triggered
+(e.g., SMO
+feature
+activation, E2
+Node
+startup/failure/
+reconfig.)
+New
+E.g., physical location, transmit
+direction, carrier frequency, coverage
+parameters, configured transmit
+power, beam width, coverage shape,
+tilt, azimuth, carrier-cell mapping,
+carrier-HW mapping
+-  3GPP TS 28.541
+[11] (Cl. 4.3.6,
+4.3.38, 4.3.39,
+4.3.40, 4.3.74)
+O-FH (M-
+Plane)
+O-RU / O-DU
+
+Supported common beam
+configuration from O-RU per cell
+file  Initialization  O-RAN.WG5.MP
+(Chapter 8)
+E2 O-DU / Near-
+RT RIC
+Supported SSB and CSI-RS TRS
+configurations per cell
+-  Initialization  3GPP TS 38.331
+[16]  (Sec. 6.3.2)
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU /
+SMO / rApp
+O-RU reports all offered Tx/Rx
+Arrays
+file  Initialization  New Definition
+required in O-
+RAN.WG5.MP
+o-ran-uplane-
+conf.yang module
+o-ran-
+beamforming.yang
+module
+O-FH (M-
+Plane)
+O-RU / O-DU  O-RU reports all offered Tx/Rx
+Arrays
+values
+in IE
+Initialization  New Definition
+required in O-
+RAN.WG4.MP
+o-ran-uplane-
+conf.yang module
+o-ran-
+beamforming.yang
+module
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 51
+O-RAN.WG1.NESUC-R003-v01.00
+AI/ML Model Training:
+Table 6.2.2.3-2: AI/ML Model Training
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing/New
+Definitions
+O1, R1 E2 Node (O-
+CU) / SMO
+/ rApp
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL delivered
+from O-CU-UP to O-DU, per PLMN,
+per QoS level, per slice, per Interface
+(F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+ Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+O1, R1 E2 Node (O-
+CU) / SMO
+/ rApp
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL delivered
+to O-CU-UP from O-DU, per PLMN,
+per QoS level, per slice, per Interface
+(F1-U, Xn-U, X2-U))
+Mbit (non-real
+time for
+training)
+ Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+O1, R1 E2 Node (O-
+CU) / SMO
+ / rApp
+Number of active UEs in NG-RAN
+(Number of RRC_CONECTED UEs)
+per cell
+Integer (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Sec. 5.1.1.23, A.7,
+A.60)
+O1, R1 E2 Node (O-
+CU) / SMO
+/ rApp
+RSRQ measurement per SSB per cell dB (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+O1, R1 E2 Node (O-
+CU) / SMO
+/ rApp
+RSRP measurement per SSB per cell  dBm (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+O1, R1 E2 Node (O-
+CU) / SMO
+/ rApp
+SINR measurement per SSB per cell  dB > min Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+O1, R1 E2 Node (O-
+DU) / SMO
+/ rApp
+Energy consumption  kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane),
+O1, R1
+O-RU / O-DU
+or
+O-RU / O-DU
+/ SMO / rApp
+Power consumed by O-RU or its
+hardware components
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+O1, R1 E2 Node (O-
+DU) / SMO
+/ rApp
+Over the air Transmit power by O-RU
+Note: This measurement is required to
+calculate energy efficiency of O-RU.
+W (non-real
+time for
+training)
+New Measurement and
+New Reporting
+required in O-
+RAN.WG5.MP
+O1, R1 E2 Node (O-
+CU) / SMO
+ / rApp
+Number of active UEs in NG-RAN
+(Number of RRC_CONECTED UEs)
+per cell
+Integer (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Sec. 5.1.1.23, A.7,
+A.60)
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 52
+O-RAN.WG1.NESUC-R003-v01.00
+Input Decision Making / AI/ML Inference:
+Table 6.2.2.3-3: Input Decision Making / AI/ML Inference
+Input Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+DL PDCP SDU Data Volume per
+interface (Data Volume in DL
+delivered from O-CU-UP to O-DU, per
+PLMN, per QoS level, per slice, per
+Interface (F1-U, Xn-U, X2-U))
+Mbit per N x
+100ms
+ Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.3)
+
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+UL PDCP SDU Data Volume per
+interface (Data Volume in UL
+delivered to O-CU-UP from O-DU, per
+PLMN, per QoS level, per slice, per
+Interface (F1-U, Xn-U, X2-U))
+Mbit per N x
+100ms
+ Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.3.6.2.4)
+
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+Number of active UEs in NG-RAN
+(Number of RRC_CONECTED UEs)
+per cell
+Integer per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Sec. 5.1.1.23, A.7,
+A.60)
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+PRACH correlation power for every
+received PRACH corresponding to
+each active SSB Beam Index
+dBm per N x
+100ms
+New Measurement and
+New Reporting: The
+measurement at O-DU
+may be delivered
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+RSRQ measurement per SSB per cell dB per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.31)
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+RSRP measurement per SSB per cell  dBm per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.22)
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+SINR measurement per SSB per cell  dB per N x
+100ms
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.32)
+E2 E2 Node (O-
+CU) / Near-RT
+RIC
+Energy consumption  kWh (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.3)
+O-FH (M-
+Plane)
+or
+O-FH (M-
+Plane), E2
+O-RU / O-DU
+or
+O-RU / O-DU /
+Near-RT RIC
+Power consumed by O-RU or its
+hardware components
+W (non-real
+time for
+training)
+Measurement:
+3GPP TS 28.552 [12]
+(Cl. 5.1.1.19.2)
+Reporting:
+O-RAN.WG4.MP
+(Sec. B.1, B.5)
+E2  E2 Node (O-
+DU) / Near-RT
+RIC
+Over the air Transmit power by O-RU
+Note: This measurement is required to
+calculate energy efficiency of O-RU.
+W (non-real
+time for
+training)
+New Measurement and
+New Reporting
+required in O-
+RAN.WG5.MP
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 53
+O-RAN.WG1.NESUC-R003-v01.00
+6.2.2.3.3 Detailed Output Requirements
+Output Decision Making / AI/ML Inference:
+Table 6.2.2.3-4: Output Decision Making / AI/ML Inference
+Output Data
+Interface Source /
+Target
+Name/Description Units Reporting
+Period
+Existing / New
+Definitions
+O-FH (M-
+Plane)
+
+O-DU / O-RU Candidate O-RU’s appropriate Array
+selection
+- > min O-RAN.WG4.MP
+o-ran-uplane-conf.yang
+Maximum number of Max SU/MU
+MIMO spatial streams or data layers
+- > min New Definition required
+in O-RAN.WG4.MP
+Recommended O-RU Antenna
+Transmit power
+- > min O-RAN.WG4.MP
+urn:o-ran:uplane-conf
+Module
+gain
+E2
+
+Near-RT RIC /
+O-DU
+Candidate O-RU’s appropriate Array
+selection
+- > min New Definition required
+in WG2 R1 and O-
+RAN.WG5.O-DU-O1
+Maximum number of Max SU/MU
+MIMO spatial streams or data layers
+- > min New Definition required
+in O-RAN.WG4.MP
+Inferred O-RU SS Burst Set (SS Block
+Number and SS Burst Periodicity) and
+CSI-RS TRS Configuration
+- Initialization 3GPP TS 38.331 [16]
+IE:
+ServingCellConfigCom
+mon
+Recommended O-RU Antenna
+Transmit power
+- > min O-RAN.WG4.MP
+urn:o-ran:uplane-conf
+Module
+gain
+E2 E2 Node (O-
+DU) / Near-RT
+RIC
+Confirmation (Success/Failure) - event
+triggered
+New
+
+6.3 Impact Analysis on O-RAN Work Groups
+This is an initial impact analysis as part of the WG1 UCTG work on RF Channel Reconfiguration use case.
+The intention is to estimate the expected standardization effort within the O-RAN work groups. It is up to the
+WGs to decide how RF Channel Reconfiguration functionality should be specified in specifications of each
+WG.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 54
+O-RAN.WG1.NESUC-R003-v01.00
+# WGs/FGs  Spec. No Objective description
+1 WG1 (Use
+case)
+O-RAN.WG1.NES-USE-CASES-TR
+O-RAN.WG1.Use-Cases-Detailed-
+Specification
+Update WG1 NES use case analysis report and use-
+case detailed specification with RF Channel
+Reconfiguration use case. No impact to existing
+architecture
+2 WG2
+(Non-RT
+RIC, A1,
+R1)
+O-RAN.WG2.R1GAP
+O-RAN.WG2.R1UCR
+O-RAN.WG2.R1TD (TBD)
+Updates to R1 services and procedures for Energy
+saving work item
+O-RAN.WG2.Non-RT-RIC-ARCH Reviewing procedures to implement ES use cases
+and generate corresponding A1 policies / updates of
+O1 & O2-related services via R1 Interface, if any.
+O-RAN.WG2.Use-Case-Requirements Specifying ES UC2 in Use case section & its
+requirements to UCR specification
+O-RAN.WG2.A1GAP
+O-RAN.WG2.A1TD
+Reviewing requirement for policy driven
+implementation 2nd deployment option of ES UC2
+captured in document.
+3 WG3
+(Near-RT
+RIC, E2)
+O-RAN.WG3.UCR Specifying ES UC2 in Use case section & its
+requirements to UCR specification
+O-RAN.WG3.RICARCH No impact identified
+O-RAN.WG3.E2GAP No impact identified
+O-RAN.WG3.E2AP No impact identified
+O-RAN.WG3.E2SM-RC or
+NEW: O-RAN.WG3.E2SM-CC
+Identify & specify RAN E2 actions necessary for RF
+Channel reconfigurations specially modifying
+mMIMO layer, Power, Tx/Rx Array selections,
+number of SSB Beams through E2 Node towards O-
+RU.
+O-RAN.WG3.E2SM-KPM Identify & specify RAN E2 measurement required
+analysis of ES & EC for RF Channel
+Reconfiguration optimization through Near-RT RIC
+4 WG4
+(O-FH)
+Impact
+O-RAN.WG4.MP Identify the relevant impacts on M-Plane for both
+Hierarchical & hybrid model to accommodate
+management features requirements towards O-RU.
+Define O-RU Energy efficiency KPIs and counters.
+O-RAN-WG4.CUS Identify the relevant impacts on CUS Plane and data
+model to support various Tx/Rx Array selections.
+5 WG5
+(O1)
+Impact
+O-RAN.WG5.O-CU-O1
+O-RAN.WG5.MP
+Identify specific O-DU operational and data model
+aspects of the feature content including the SMO-O-
+DU SMO interface. Make appropriate changes to the
+O-DU data model and other WG5 specifications as
+needed.
+6 WG7 - WG7 need to provide reference architecture of O-
+RU which supports Tx/Rx Array selection.
+Study energy savings gains from Tx/Rx array
+selection including limiting maximum number of
+layers.
+7 WG10 O-RAN.WG10.O1-Interface
+O-RAN.WG10.OAM-Architecture
+O-RAN.WG10.Information Model and
+Data Models
+Identify the relevant impacts on O1 Interface to
+support above mentioned use cases & IM/DM to
+capture requirements for use cases.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 55
+O-RAN.WG1.NESUC-R003-v01.00
+6.4 Relation and Impact on 3GPP Specifications
+3GPP RAN does a Rel.18 study on network energy savings for NR (i.e. FS_Netw_Energy_NR, see Sec.
+5.4.2 for details). Within this study 3GPP RAN WGs consider related techniques such as RU Tx/Rx array
+selection, modification of number of SSB beams, adaptation of RU transmit power etc.
+6.5 Gain Analysis
+The potential of energy savings from RF Channel Reconfiguration is dependent upon several factors such as
+network deployment, traffic pattern/load, user distribution, antenna type and specific O-RU architecture etc.
+Computational analysis results for two example scenarios, one for 4T4R O-RU and one for 64T64R O-RU,
+are provided below. The calculations are based on the load profile and the power consumption categorization
+of O-RU functional blocks as outlined in Annex B.
+Energy savings gain from RF Channel Reconfiguration would be equivalent to power consumption of the O-
+RU hardware components that can be shut down or put into energy savings mode when the number of active
+antennas is reduced. As illustrated in Figure 6.5-1, energy savings gain would mostly be derived from partial
+shutdown of the RF Processing Unit and Digital Processing Unit (depending on the antenna configuration),
+while other functional modules such as O-RAN Fronthaul Processing Unit, Power Supply Unit and some
+other components would still be fully or partially functioning, and the power consumptions would be more or
+less consistent irrespective of the number of active antennas.
+
+Figure 6.5-1:  Energy savings for RF Channels
+6.5.1 RF Channel Reconfiguration ES Gain Analysis for 4T4R O-RU
+When the traffic load is low, a 4T4R O-RU might be scaled down to 2T2R such that some part of the RF
+components in the O-RU might be switched off to save energy. When scaling down from 4T4R to 2T2R, RF
+Processing Unit for the two RF channels to be switched off might be shut down as illustrated in Figure 6.5.1-
+1.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 56
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure 6.5.1-1: O-RU power saving for RF Channel Reconfiguration
+
+The energy saving gain from reducing the number of RF channels from 4T4R to 2T2R is analysed based on
+the system parameters in Table 6.5.1-1 and the example O-RU power profile considering power consumption
+from operational experience provided in Table 6.5.1-2.
+Table 6.5.1-1: O-RU Configuration for ES gain analysis
+No. of antennas 4T4R
+No. of layers 4
+Bandwidth 100 MHz
+Carrier frequency 3.5 GHz
+Tx power per array element 30 W
+Technology 5G NR
+
+Table 6.5.1-2: Example power profile for 4T4R O-RU
+Operating Load
+(Traffic)
+Configuration  Total O-
+RU (W)
+ORAN
+Fronthaul
+Processing
+Unit (W)
+Digital
+Processing
+Unit (W)
+RF
+Processing
+Unit (W)
+Power Unit
+& other
+components
+(W)
+Busy hour Load 4T4R 550 10 25 495 20
+Low load 4T4R 200 10 25 145 20
+Low load 2T2R
+RF Channel
+Reconfiguration
+ES Mode
+120 8 20 75 17
+Maximum energy
+saving gain
+2T2R vs. 4T4R
+(low load)
+80 2 5 70 3
+
+Compared to the low load scenario, a maximum energy savings of up to 80 W per O-RU can be achieved.
+Achievable energy savings might be lower and might vary in practice. Besides an impact on receive signal
+quality and spectral efficiency, also coverage and beam characteristics will be affected. A lower spectral
+efficiency may for instance increase overall transmission time of the active Ues when transmitting a packet.
+An example calculation for yearly energy saving potential considering a shutdown of 10000 O-Rus during 3
+hours per day is provided in Table 6.5.1-3.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 57
+O-RAN.WG1.NESUC-R003-v01.00
+Table 6.5.1-3: Power saving calculation example for 4T4R O-RU
+Factor Value
+RU power savings during RF channel switch off (low load) [W] 80
+Number of hours of switch off per day (50% of low load period) 3
+Number of O-RUs 10000
+Yearly energy saving [MWh] 876
+
+6.5.2 RF Channel Reconfiguration ES Gain Analysis for 64T64R O-RU
+The energy saving gain from RF Channel Reconfiguration of a 64T64R O-RU to 32T32R is analysed based
+on the system parameters in Table 6.5.2-1 and the example O-RU power profile considering power
+consumption from operational experience provided in Table 6.5.2-2.
+Table 6.5.2-1: O-RU Configuration for ES gain analysis
+ Normal Mode RF Channel Reconfiguration ES
+Configuration 64T64R 32T32R
+No. of layers 16 8
+Bandwidth 100 MHz 100 MHz
+Carrier frequency 3.5 GHz 3.5 GHz
+Tx power per array element 3 W 3 W
+
+Table 6.5.2-2: Example power profile for 64T64R O-RU
+Operating
+Load
+(Traffic)
+O-RU RF
+Channel
+Configuration
+Total O-RU
+Power
+Consumption
+(W)
+ORAN
+Fronthaul
+Processing
+Unit (W)
+Digital
+Processing
+Unit (W)
+RF
+Processing
+Unit (W)
+Power Supply
+& other
+components (W)
+Busy hour
+load 64T64R 1120 50 200 800 70
+Low load 64T64R 520 50 200 200 70
+Low load
+32T32R
+RF Channel
+Reconfiguration
+ES Mode
+290 35 100 100 55
+Maximum
+energy
+ saving gain
+64T64R vs.
+32T32R
+(low load)
+230 15 100 100 15
+
+Compared to the low load scenario, a maximum energy saving gain of up to 230 W per O-RU can be
+achieved. As stated before, the achievable energy savings might be lower and might vary in practice.
+An example calculation for yearly energy saving potential considering a shutdown of 10000 O-RUs during 3
+hours per day is provided in Table 6.5.2-3.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 58
+O-RAN.WG1.NESUC-R003-v01.00
+Table 6.5.2-3: Power saving calculation example for 64T64R O-RU
+Factor Value
+RU power savings during RF channel switch off (low load) [W] 230
+Number of hours of switch off per day (50% of low load period) 3
+Number of O-RUs 10000
+Yearly energy saving [MWh] 2519
+
+6.6 Feasibility Analysis
+6.6.1 Continuous operation during RF Channel Reconfiguration
+Changing configuration of O-RU such as shutting down 32 TRX of the 64TRX for the purpose of energy
+savings may impact the existing users if it requires full or partial reset of O-RU, hence care should be
+exercised on how the reconfiguration of antenna array is performed.
+6.6.2 Impact on Coverage
+The coverage during TRX switch should be maintained as much as possible. A reduction of transceiver
+chains may impact the number of transmitted SSB beams, the beam shapes, as well as the overall transmit
+power, affecting the various downlink physical channels. A limited coverage might result in reduced user
+throughput, radio link failures, beam failures, and call drops.
+6.6.3 Impact and Relation to UE specific Base Station Algorithms
+A TRX switch might impact the cell coverage and the beam characteristics. This sudden change in radio
+channel characteristics might affect UE specific base station algorithms (e.g., inner and outer loop link
+adaptation, power control, beam selection, adaptive MIMO, channel quality reporting etc.) and may result in
+a transitory phase until transmission can be continued or is stabilized.
+It is up to the proprietary scheduler algorithm to handle such events most efficiently. Scheduling (e.g. user
+selection, resource allocation), adaptive MIMO (e.g. MIMO mode, spatial streams and layers) and link
+adaptation (e.g. Coding/Modulation Scheme, transmit power) will be adjusted instantaneously every
+scheduling instance and transmission time interval by the base station without time constrained external
+control.
+6.6.4 Limited O-RU / O-DU Capabilities
+The capabilities of the O-RU in terms of configurable antenna arrays, transition times, as well as the
+capabilities of the O-DU scheduling respective antenna arrays with the various MIMO transmission modes
+may be limited. Hence, respective capabilities are required to be known. The capabilities between the
+different array configurations may differ significantly in terms of supported SU/MU MIMO modes as well as
+in terms of supported MIMO layers, streams etc.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 59
+O-RAN.WG1.NESUC-R003-v01.00
+7 Summary and Conclusion
+In the O-RAN WG1 UCTG Energy Saving pre-normative phase, Network Energy Saving proposals have
+been analyzed, including Carrier and Cell Switch Off/On and RF Channel Reconfiguration. This Technical
+Report presents the results of the pre-normative phase Network Energy Saving work item.
+Carrier and Cell Switch Off/On is a technique which enables turning off cells/carriers in case there is no
+load/UEs in the respective cell/carrier, and the neighboring cells/carriers can take over the expected
+additional load. The algorithm to trigger off/on switching may be hosted in the Non-RT RIC or in the Near-
+RT RIC. Performance, load, resource utilization, and energy/power consumption related KPIs are forwarded
+to the RIC from the E2 Nodes and O-RUs, and the RIC-based applications determine recommendations for
+cells/carriers to be switched off (energySavingState). Ultimately, the switch-off operations are performed by
+the E2 Node (O-CU) since additional critical operations are required which are handled by the O-CU. While
+for the Non-RT RIC deployment all input / output parameters are existing, enhancements to the E2 interface
+are required when the algorithm is hosted by the Near-RT RIC. Numerical analysis shows a high potential of
+this energy saving technique for overall Network Energy Saving. No challenges on feasibility have been
+identified. Carrier and Cell Switch Off/On is suggested for normative standardization with the foreseen
+impact on O-RAN WGs as outlined in Section 5.3.
+RF Channel Reconfiguration is a technique which enables O-RU to be requested to perform Tx/Rx Array
+selection. At low load, i.e., when the expected traffic volume or number of connected users are lower than
+the configured threshold, the power consumption of O-RUs can be reduced by switching off certain Tx/Rx
+arrays. For example, 32 out of 64 Tx/Rx Arrays of an O-RU can be switched off in a digital mMIMO
+architecture. The algorithm to trigger RF Channel Reconfiguration may be hosted in the Non-RT RIC or in
+the Near-RT RIC. Respective KPIs are collected by the Near-RT/non-RT RIC from the E2 Nodes and O-
+RUs, to be used by the xApps/rApps to determine recommendations for RF Channel Reconfiguration to be
+executed by the E2 Nodes. Numerical analysis shows a large potential of this energy saving technique for
+overall Network Energy Saving. Some feasibility aspects are listed in Section 6.6 which should be
+considered during normative phases in relevant WGs. RF Channel Reconfiguration is suggested for
+normative standardization with the foreseen impact on O-RAN WGs as outlined in Section 6.3.
+Implementation of NES features should ensure stable and conflict-free network operation. Ideas on design
+principles for NES applications facilitating appropriate conflict mitigation are outlined in Annex A.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 60
+O-RAN.WG1.NESUC-R003-v01.00
+Annex A (Informative):
+Design Principles for NES Features
+Efficient and stable utilization of NES features requires an intelligent automation and optimization
+framework, leveraging on collected KPIs and data analytics with AI/ML algorithms. The SMO, the Non-RT
+RIC and the Near-RT RIC have an essential role in orchestrating energy saving mechanisms across the
+overall RAN infrastructure. Network operators should be able to control each NES feature at SMO level, for
+instance by scheduling the activation and deactivation of such features over pre-defined time periods.
+Intelligent management and orchestration of O-CU, O-DU and O-Cloud resources are required. For example,
+optimized traffic steering will allow for a dynamic adaptation of active hardware resources.
+NES features will differ in their algorithmic solutions with respect to the considered scales, both temporal
+and spatial. In order to harmonize different features, first a concise scale evaluation is required.
+The higher the number of different NES features being deployed in a radio network, the higher the
+propability of conflicts between actions initiated by individual NES solutions. These kinds of conflicts can
+be minimized or avoided by either by a respective conflict coordination entity controlling the actions of each
+NES function during activation, or by an appropriate design of the NES functions facilitating conflict free
+coexistence, e.g. by deploying NES solutions with diverging time scales.
+Currently rApp conflict management is not specified in O-RAN. Therefore, it may be investigated whether
+the xApp conflict mitigation approach could be expanded to apply for rApps as well. Furthermore, definition
+of rules for conflict mitigation – to be derived from the design guidelines – is essential.
+Scales of Energy Saving Algorithms
+Three different scales of energy saving algorithms are identified:
+1. Decoupled case
+In this case locality in time and (network) space is assumed which leads to local decision-making. Stability
+of operation is ensured by appropriately chosen hysteresis values. Decoupled NES features are investigated
+with respect to their potential of being overruled by non-local optimization algorithms. Example use cases
+are carrier and cell switch on/off and RF channel re-configuration.
+2. Non-locality in time
+Such an algorithm requires a robust forecast. Traffic load is considered being the principal steering basis for
+this kind of NES features. A generic traffic forecast with statistical guarantees as a generally available
+feature is essential. This information should be available in the SMO, and not in a dedicated rApp/xApp. An
+example use case would be switching off network entities during the night.
+3. Non-locality in space
+Earlier research showed the energy saving potential of nearest-neighbour handover algorythms in order to
+shut off specific cells. Coverage and capacity distinction will assure MNO’s legal obligations and product
+considerations.
+Solution approach
+Temporal and spatial scales of NES solutions need to be specified by App vendors. Concurrent update
+intervals in capturing the respective data lead to placing the respective Apps in the Non-RT RIC or the Near-
+RT RIC. App “twins” are possible.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 61
+O-RAN.WG1.NESUC-R003-v01.00
+Detecting and Gauging Potential Conflicts
+In order to achieve scale-separation and conflict-free optimization hierarchies, NES features have to be
+charted and given a measure for their potential to figure in non-local optimization strategies. This measure
+derives from nearest-neighbour interaction of the feature and HW-induced hysteresis requirements.
+Decoupled NES features are investigated with respect to their potential of being overruled by non-local
+optimization algorithms (see above).
+Potential conflict and instability cases are for instance switching oscillations, SON-like conflicts between
+different AI/ML procedures for NES features, or SON-like conflicts between NES features and other use
+cases (e.g. QoE Optimization, Traffic Steering, Massive MIMO Beamforming Optimization, …).
+Design Guidelines
+Stability of network operation is key and to be considered first in place. Thus, non-local NES features with
+inherent instability risks according to the above analysis are to be deprioritized. To that end, proposed Apps
+are to be evaluated with regard to operational destabilization, and appropriate measures are to be derived.
+Secondly the outcome, i.e. the potential for optimization, is to be taken into account. Off-line studies equip
+MNOs with aggregate estimates of NES effects within the representative time and space intervals. An NES
+feature with a higher potential of energy savings should overrule those with lower energy saving ability.
+Appropriate harmonization between different Apps is essential. MNOs may derive criteria for rApps/xApps
+in order to ensure conflict-free energy saving hierarchies which App vendors are encouraged to comply to.
+Prior study work regarding conflict resolution in SON can be used to harmonize AI/ML Apps with different
+cost functions (use cases) but overlapping or identical action spaces.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 62
+O-RAN.WG1.NESUC-R003-v01.00
+Annex B (Informative):
+Load profile and O-RU functional blocks
+Generally, it is up to the operator to define a load distribution profile reflecting the situation in the network.
+For the calculation of the average power/energy consumption, weighting factors based on a daily (24 hours)
+load distribution profile given in Table B-1 as described in ETSI ES 202 706-1 [10] has been used.
+Table B-1: Load level durations for daily average calculation
+  Low load Medium load Busy hour load
+Duration/day 6 hours 10 hours 8 hours
+
+In Figure B-1 through B-4 as described in ORAN.WG7.OMAC-HAR [17], high-level functional block
+diagrams for an 4T4R/8T8R and mMIMO O-RUs are shown, depicting the major HW/SW components.
+Accordingly, the power consumption can be roughly categorized into the following parts:
+1. Digital Processing Unit
+2. RF Processing Unit
+3. FH Processing Unit
+4. Power Unit & Other Components
+
+Figure B-1: Generic O-RU7-2x Functional Module Diagram of 4T4R/8T8R
+
+Figure B-2: mMIMO [NxM]T[NxM]R O-RU High Level System Architecture #1
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 63
+O-RAN.WG1.NESUC-R003-v01.00
+
+Figure B-3: mMIMO [NxM]T[NxM]R O-RU High Level System Architecture #2
+
+Figure B-4: mMIMO [NxM]T[NxM]R O-RU High Level System Architecture #3
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 64
+O-RAN.WG1.NESUC-R003-v01.00
+Revision history
+Date Revision Description
+2022.06.13 00.00.01
+
+Skeleton provided by editors
+2022.06.17 00.00.02
+
+Agreed CR captured:
+- NOK-2022.06.15-ORAN-CR-0001-UseCase1_Cell-Carrier-
+Switch_Description_v01.docx
+- RMI-2022.06.16-WG1-UCTG-NES-TR-CR-0001-Add KPIs in Objective-V01.docx
+2022.07.25 00.00.03
+
+TR template change
+Agreed CR captured:
+- NOK-2022.06.23-WG1-UCTG-NES-TR-CR-0003-Objectives_Section_v03.docx
+- NOK-2022.06.15-ORAN-CR-0001-UseCase1_Cell-Carrier-
+Switch_Description_v03.docx
+2022.08.01 00.00.04
+
+Agreed CR captured:
+- DT-2022.07.19-WG1-UCTG-NES-TR-CR-0003-Objectives-and-
+Requirements_Section_v04.docx
+- NOK-2022.06.15-ORAN-CR-0001-UseCase1_Cell-Carrier-
+Switch_Description_v04.docx
+- RMI-2022.07.20-ORAN-CR-0001-UseCase2_RF Channel Reconfiguration
+Description_v07.docx
+2022.08.17 00.00.05              “W       G    ”    “W    G    ”
+Agreed CR captured:
+- VIA-2022.08.04-ORAN-CR-0001-UseCase4_ProbState_Cloud Resource_v04.docx
+2022.08.26 00.00.06 Agreed CR captured:
+- NOK-2022.07.04-ORAN-CR-0002-UseCase1_Cell-Carrier-
+Switch_DeploymentOption1_InputOutputData_v03.docx
+- NOK-2022.08.04-ORAN-CR-0003-UseCase1_Cell-Carrier-
+Switch_DeploymentOption2_InputOutputData_v01.docx
+2022.08.31 00.00.07 Agreed CR captured:
+- DT-2022.08.22-WG1-UCTG-NES-TR-CR-0001-Definitions_Rev3.docx
+- NOK-2022.08.04-ORAN-CR-0003-UseCase1_Cell-Carrier-
+Switch_DeploymentOption2_InputOutputData_v02.docx
+- NOK-2022.08.23-ORAN-CR-0006-UseCase1_ImpactAnalysis_v01.docx
+- NOK-2022.08.23-ORAN-CR-0005-
+UseCase2_RFchannelconfiguration_ImpactAnalysis_correction_v01.docx
+2022.10.03 00.00.08 Agreed CR captured:
+- NOK-2022.09.08-UCTG-NES-TR-CR-0007-UC1_Cell-Carrier-Switch_3GPP-Relation-
+Impact_v03.docx
+2022.10.04 00.00.09 Agreed CR captured:
+- NOK-2022.09.28-ORAN-CR-0010-UseCase1_Cell-Carrier-
+Switch_DeploymentOption1_InputOutputData_v01.docx
+- NOK-2022.09.28-ORAN-CR-0011-UseCase1_Cell-Carrier-
+Switch_DeploymentOption2_InputOutputData_v01.docx
+- NOK-2022.09.26-ORAN-CR-0013-UseCase1_Cell-Carrier-
+Switch_ConclusionSection_v02.docx
+2022.10.11 00.01.01 Agreed CR captured:
+- VIA-2022.10.04-ORAN-CR-0015-Editorial Corrections_v02.docx
+- DT-2022.10.06-ORAN-CR-0019-Summary&Conclusion_v02.docx
+- VIA-2022.10.06-ORAN-CR-0024-Phase 1 scope clarification_v02.docx
+- DT-2022.10.10-ORAN-CR-0025-scope clarification v01.docx
+- NOK-2022.09.29-ORAN-CR-0012-UseCase1_Cell-Carrier-
+Switch_AnalysisSection_v02.docx
+- VIA-2022.10.04-ORAN-CR-0021-UC1 3GPP impact_v01.docx
+- VIA-2022.10.04-ORAN-CR-0023-UC2 Conclusion_v02.docx
+- DT-2022.10.06-WG1-UCTG-NES-TR-CR-0020-Design Principles for NES Features
+v02.docx
+Changed to v00.01.xx series for Phase 1 publication with removal of UC#3 and UC#4.
+
+________________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 65
+O-RAN.WG1.NESUC-R003-v01.00
+2022.10.20 00.01.02 Agreed CR captured:
+- VIA-2022.10.12-ORAN-CR-0028-Editorial Corrections for Phase 1_v01.docx
+- NOK-2022.10.12-ORAN-CR-0026-UC1 3GPP impact_v01.docx
+- RMI.AO-2022.10.11-WG1-UCTG-NES-TR-CR-0027-Gain Analysis for use cases 1
+and 2_v03.docx
+- NOK-2022.10.12-ORAN-CR-0027-UC2 3GPP impact_v02.docx
+- RMI-2022.10.07-ORAN-CR-0007-UseCase2_RF Channel Reconfiguration_Input
+Output Data_v07.docx
+- NOK-2022.10.12-ORAN-CR-0030-UC2 FeasibilityAnalysis_v04.docx
+2022.10.25 00.01.03 Agreed CR captured:
+- VIA.AO-2022.10.21-ORAN-CR-0031-Further Editorial Corrections Part 1 for Phase
+1_v03.docx
+Editorial corrections
+Revision history corrected
+Clean version for WG1 approval
+2022.11.18 00.01.04 Captured WG1 review comments
+- Table 6.1-1: Corrected “changing the O-                    ” to “ -RU Tx/Rx Array
+         ”
+- Tables 5.2.1.3-2, 5.2.1.3-3, 5.2.2.3-2, 6.2.1.3-1, 6.2.1.3-2, 6.2.1.3-3, 6.2.2.3-2, 6.2.2.3-
+3: Corrected with e.g. “O-FH (M-Plane) or O-FH (M-              ” and “ -RU / O-DU
+or O-RU / O-               ”, i.e. missing O-DU parts filled.
+- Sec 5.2.1.3.1, 6.2.1.3.1:           “Near-                 “ to “   ”           ”
+-                    “
+Energy Saving use       ” in Chapter 1.
+- Removed WG names from Sec. 2.1.
+- Removed Adopter License Agreement from Annex
+2022.11.19 01.00 Clean version for TSC approval and publication
+
+History
+Date Revision Description

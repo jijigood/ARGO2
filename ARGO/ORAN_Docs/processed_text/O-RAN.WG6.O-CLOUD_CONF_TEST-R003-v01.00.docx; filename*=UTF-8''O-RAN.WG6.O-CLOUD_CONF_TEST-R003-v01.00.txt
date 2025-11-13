@@ -1,0 +1,1896 @@
+O-RAN.WG6.O-CLOUD_CONF_Test-R003-v01.00
+
+                            O-RAN.WG6.O-CLOUD_CONF_Test-R003-v01.00
+
+Technical Specification
+
+O-RAN Working Group 6
+
+(Cloudification and Orchestration Work Group)
+
+ O-Cloud Conformance Test Specification
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+List of Figures	4
+
+Foreword	5
+
+Modal verbs terminology	5
+
+Introduction	5
+
+1	Scope	6
+
+2	References	6
+
+2.1	Normative references	6
+
+2.2	Informative references	7
+
+3	Definition of terms, symbols and abbreviations	8
+
+3.1	Terms	8
+
+3.2	Abbreviations	8
+
+4	Testing methodology	10
+
+4.1	System under test	10
+
+4.2	Test method	11
+
+4.2.1	Testing procedure	11
+
+4.2.2	Statistics and analysis of key indicators	11
+
+5	O-Cloud Notification API Test	11
+
+5.1	General	11
+
+5.2	Test Configuration	12
+
+5.2.1	System Under Test requirements	12
+
+5.2.2	Test Tools and Simulators capabilities	12
+
+5.3	Test cases	13
+
+5.3.1	Create a subscription resource	13
+
+5.3.2	Get a list of subscription resources	14
+
+5.3.3	Get Detail of individual subscription resource	14
+
+5.3.4	Delete individual subscription resources	15
+
+5.3.5	Event notification and Notification sanity check	16
+
+5.3.6	Event pull status notification	17
+
+6	AAL Test	17
+
+7	O2 Test	18
+
+7.1	General	18
+
+7.2	Test Configuration	18
+
+7.2.1	System Under Test requirements	18
+
+7.2.2	Test Tools capabilities	18
+
+7.3	O2 IMS Test	18
+
+7.3.1	O-Cloud succeeds to deliver O-Cloud Available Notification to SMO.	18
+
+7.3.2	SMO succeeds to query inventory with correct token	19
+
+7.3.3	SMO succeeds to subscribe for O2ims inventory changes notification and succeeds to receive notifications.	21
+
+7.3.4	SMO succeeds to create alarmSubscription, receive alarm notification, and query alarm list.	22
+
+7.3.5	Verify general aspects of O2ims API.	23
+
+7.3.6	SMO gets 405 while sending O2ims APIs with unsupported method.	25
+
+7.3.7	SMO gets 400/405 while issuing O2ims APIs with incorrect data.	26
+
+7.3.8	SMO gets security error response while issuing APIs with incorrect token.	27
+
+7.3.9	SMO gets client error response while issuing requests with incorrect APIs	28
+
+7.3.10	SMO succeeds to get O2dms (in Kubernetes native API Profile) access information.	29
+
+7.3.11	SMO gets  406/415 when issuing APIs with junk/unsupported data.	29
+
+7.3.12	SMO gets 404 when issuing APIs with wrong data.	30
+
+7.4	O2 DMS Test	31
+
+7.4.1	Overview	31
+
+7.4.2	O2 DMS ETSI NFV Profile Test	31
+
+8	Synchronization Test	33
+
+8.1	General	33
+
+8.2	Test Configuration	33
+
+8.2.1	System Under Test requirements	33
+
+8.2.2	Test Tools and Simulators capabilities	33
+
+8.3	Test Cases	34
+
+8.3.1	Synchronization Test LLS-C1	34
+
+8.3.2	Synchronization Test LLS-C3	36
+
+Annex A (normative): Checklist for Cases applies to O-Cloud technologies	39
+
+A.1	O-Cloud technologies	39
+
+A.2	Cloud Technology Applicability of test cases	39
+
+A.3 Case Traceability	41
+
+History	45
+
+List of Figures
+
+	Figure 4.11: Decoupling and Illustration of the O-Cloud Concept	7
+
+	Figure 4.12: Architecture component requirements for the cloud platform	8
+
+	Figure 5.21: Configuration of O-Cloud notification API test	9
+
+Figure 8.3-1: Time Sync Architecture for LLS-C1 ……..………………………………………………………………………………… 29
+
+Figure 8.3-2: Time Sync Architecture for LLS-C3 ………………………………………………………………………………………...30
+
+Foreword
+
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+
+Modal verbs terminology
+
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+
+Introduction
+
+This document specifies the O-Cloud test specification to guide O-Cloud products conforming to the O-RAN standard, including the Notification API, AAL, O2 and Synchronization.
+
+Scope
+
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+
+version xx.yy.zz
+
+where:
+
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+
+The present document specifies a test specification for test and validation of the O-Cloud.  This document will specify the testing methodology and test cases, for O-Cloud entities including Notification API, AAL, O2 and Synchronization.
+
+References
+
+Normative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are necessary for the application of the present document.
+
+ [1] 	O-RAN.WG6.ORCH-USE-CASES: “Cloudification and Orchestration Use Cases and Requirements for O-RAN Virtualized RAN”.
+
+[2]		O-RAN.WG6.O-Cloud Notification API-v02.01: “O-Cloud Notification API Specification for Event Consumers”.
+
+[3] 	O-RAN.WG4.CONF.0-v05.00: “O-RAN Fronthaul Working Group Conformance Test Specification”.
+
+[4]		O-RAN.WG4.IOT.0-v04.00: “O-RAN Fronthaul Working Group Fronthaul Interoperability Test Specification (IOT)”.
+
+[5] 	TIFG O-RAN.TIFG.E2ETSTFWK.0-v01.00, “O-RAN Test and Integration Focus Group End-to-End System Testing Framework Specification”
+
+[6]	TIFG O-RAN.TIFG.E2E-Test.0-v02.00: “O-RAN ALLIANCE Test and Integration Focus Group End-to-end Test Specification”
+
+[7]	ETSI ES 203 539 V1.1.1 (2019-06): “Environmental Engineering (EE); Measurement method for energy efficiency of Network Functions Virtualisation (NFV) in laboratory environment”
+
+[8]	ETSI GS NFV-TST 009 V3.4.1 (2020-12): “Network Functions Virtualisation (NFV) Release 3; Testing; Specification of Networking Benchmarks and Measurement Methods for NFVI”
+
+[9]	O-RAN. WG4.CUS.0-v08.00: “O-RAN Working Group 4 (Open Fronthaul Interfaces WG) Control, User and Synchronization Plane Specification”.
+
+[10]	O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE: "O-RAN Working Group 6; O2dms Interface Specification: Profile based on ETSI NFV Protocol and Data Models"
+
+[11]	ETSI GS NFV-SOL 003 V3.6.1: "Network Functions Virtualisation (NFV) Release 3; Protocols and Data Models; RESTful protocols specification for the Or-Vnfm Reference Point".
+
+[12]	ETSI GS NFV-TST 010 V3.6.1: “Network Functions Virtualisation (NFV) Release 3; Testing; API Conformance Testing Specification”
+
+	[13]	 O-RAN.WG6.O2IMS-INTERFACE: “O-RAN Working Group 6 O2ims Interface Specification”
+
+Informative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+
+[i.1]	3GPP TR 21.905, Vocabulary for 3GPP Specifications.
+
+[i.2]	O-RAN.WG6 CAD: “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”.
+
+[i.3]	O-RAN.WG6.CLOUD-REF-v02.00: “Cloud Platform Reference Designs”.
+
+[i.4]	O-RAN.WG6.CLOUD-REF-B-v01.01: “Cloud Platform Reference Design for Deployment Scenario B”.
+
+Definition of terms, symbols and abbreviations
+
+Terms
+
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [i.1] and the following apply. A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 [i.1].
+
+O-Cloud                   This refers to a collection of O-Cloud Resource Pools at one or more location and the software to manage Nodes and Deployments hosted on them.  An O-Cloud will include functionality to support both Deployment-plane and Management services. The O-Cloud provides a single logical reference point for all O-Cloud Resource Pools within the O-Cloud boundary.
+
+O-CU                         O-RAN Centralized Unit – a logical node hosting PDCP, RRC, SDAP and other control
+
+functions.
+
+O-DU                    	O-RAN Distributed Unit–a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional split.
+
+O-RU                        O-RAN Radio Unit–a logical node hosting Low-PHY layer and RF processing based on a lower layer functional split.  This is similar to 3GPP’s “TRP” or “RRH”, but more specific in including the Low-PHY layer (FFT/iFFT, PRACH extraction).
+
+Abbreviations
+
+For the purposes of this document, the abbreviations given in 3GPP TR 21.905 [i.1] and the following apply.
+
+An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [i.1].
+
+3GPP	Third Generation Partnership Project
+
+AAL	Acceleration Abstraction Layer
+
+API	Application Programming Interface
+
+CNF	Cloud-Native Network Function
+
+CNI	Container Networking Interface
+
+CPU	Central Processing Unit
+
+CU	Centralized Unit as defined by 3GPP
+
+DPDK	Data Plan Development Kit
+
+DU	Distributed Unit as defined by 3GPP
+
+EC                         Event Producer
+
+EP                         Event Consumer
+
+FFT	Fast Fourier Transform
+
+HW	Hardware
+
+IMS	Infrastructure Management Services
+
+IRQ	Interrupt ReQuest
+
+NF	Network Function
+
+NFVI	Network Function Virtualization Infrastructure
+
+NUMA	Non-Uniform Memory Access
+
+O-Cloud	O-RAN Cloud Platform
+
+O-CU	O-RAN Centralized Unit
+
+O-DU	O-RAN Distributed Unit
+
+O-RU	O-RAN Radio Unit
+
+OS                         Operating System
+
+PTP	Precision Time Protocol
+
+RAN	Radio Access Network
+
+RIC	RAN Intelligent Controller
+
+SMO	Service Management and Orchestration
+
+SR-IOV	Single Root Input/ Output Virtualization
+
+SUT	System Under Test
+
+TS	Technical Specification
+
+vCPU	Virtual CPU
+
+VM	Virtual Machine
+
+VNF	Virtualized Network Function
+
+WG	Working Group
+
+Testing methodology
+
+	System under test
+
+Figure 4.11: Decoupling and Illustration of the O-Cloud Concept
+
+SUT refers to the O-Cloud platform, which includes O-Cloud defined in [i.2] except hardware part. The main architecture components for the O-Cloud platform software can be found in Figure 4.12.
+
+Figure 4.12: The overview of O-Cloud test
+
+For the Cloud platform, different technologies may be used by cloud vendors, as [i.2] says, such as:
+
+VMs only,
+
+Containers only,
+
+Containers in VMs,
+
+both VMs and Containers, OR
+
+other new technologies
+
+so, the O-Cloud should be tested exactly based on the technology used.
+
+Cases applied to each technology are listed in the Annex A.
+
+SUT is identified by an implementation of the function under test producing or consuming the API Under Test (AUT) e.g. in the case of the O2DMS interface the function under test is O-Cloud implementation.
+
+The function is tested in isolation with respect to SMO, O-RAN Network Functions and O-Cloud, to guarantee that the outcomes of the conformance tests are not result of interoperability issues with other components.
+
+Test method
+
+Testing procedure
+
+The SUT and the test tool are set up and connected to the device in strict accordance with the preset conditions of each test case in the specification, and the test steps in the test case are performed step by step. Tester should record in detail the important test information during and after the test, and compare and analyze with the expected results. Each test case is independent of each other.
+
+Statistics and analysis of key indicators
+
+The test is performed based on the preset conditions and procedure in the test case. The expected test result is used as the standard to determine whether the test succeeds. If the test result is consistent with the expected result, the test is regarded as passing. Tester may record test result, such as throughput, latency, and device volume.
+
+O-Cloud Notification API Test
+
+General
+
+O-Cloud provides a Notification Framework, it acts as the event producer and exposes APIs to event consumers. The APIs enable the consumers to subscribe event notifications, delete subscriptions, get a list of subscriptions and detail of a subscription, notification to event consumers by pull or push mode [i.1].
+
+Event consumers can be applications (e.g. O-DU) or other entities (e.g. SMO).
+
+Refer to [6], this section describes the test cases for O-Cloud Notification APIs.
+
+Test Configuration
+
+System Under Test requirements
+
+The SUT for the O-Cloud Notification API is the O-Cloud, which provides an O-Cloud notification event producer(EP). This allows Event consumers (EC, such as O-DU or CNF) to subscribe event notifications, delete subscriptions, get a list of subscriptions or detail of a subscription, and receive events/status from cloud infrastructures. Notification to event consumers by pull or push mode.
+
+The test functions are the tools which simulate the workloads (applications running in the cloud) or other entities out of the cloud interested in the events.
+
+Figure 5.21: Configuration of O-Cloud Notification API test
+
+Test Tools and Simulators capabilities
+
+A summary of the recommended testing tools and simulators for functional testing is shown as following.
+
+Postman: Postman is an interface testing tool. Postman is equivalent to a client, which can simulate various HTTP requests initiated by users, send the request data to the server, and obtain the corresponding response results, so as to verify whether the result data in the response matches the expected value. It is mainly used to simulate various HTTP requests (e.g. Get/POST/delete/put). The difference between Postman and browsers is that some browsers can't output Json format, while Postman is more intuitive about the results returned by the interface. In the following test, Postman act as the event consumer, and it can also be configured to received notification from the event producer.
+
+Curl: Curl is a command-line tool for transferring data specified with URL syntax.  It can be used as the event consumer.
+
+HTTPie: HTTPie is a command-line HTTP client with an intuitive interface, support for JSON, syntax highlighting, download functionality (like wGET), plugin support, and more. HTTPie consists of a simple HTTP command that is easy to debug and interact with HTTP servers, RESTful apis, and Web Services. It can be used as the event consumer.
+
+Test cases
+
+Create a subscription resource
+
+Test Purpose
+
+The purpose of this test case is to verify the capability to create a subscription of event notifications.
+
+This test case is conditional, if the SUT (O-Cloud) claims to support O-Cloud Notification API, it shall support at least pull mode notification or push mode; for push mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification Create subscription request.
+
+The Test Simulator has the functionality to initiate Create subscription request.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload) has started.
+
+The SUT (O-Cloud) has the Notification service ready and available to receive subscription request from the Test Simulator.
+
+Procedure
+
+Step 1. Send an HTTP2 POST request from Test Simulator to SUT with the correct URI format as specified in “O-Cloud Notification API” [6] clause 4.1.2 containing the JSON format Subscriptioninfo as specified in “O-Cloud Notification API” [6] clause 7.1.1.1 as the message body. The message shall include an event notification request, endpointUri and ResourceAddress.
+
+Step 2. At the Test Simulator the received HTTP2 response is recorded.
+
+Expected Results
+
+The test is considered passed if
+
+The return code is “201 OK”, with Response message body content that contains a Subscriptioninfo, when the subscription request is correct and processed by the EP.
+
+The return code is “400 Bad request”, without message body, when the subscription request is not correct.
+
+The return code is “404 Not found”, without message body, when the subscription resource is not available.
+
+The return code is “409 Conflict”, without message body, when the subscription resource already exists.
+
+Get a list of subscription resources
+
+Test Purpose
+
+The purpose of this test case is to verify the capability to query the list of subscriptions for event notifications from event consumers.
+
+This test case is conditional: if the SUT (O-Cloud) claims to support O-Cloud Notification API, it shall support at least pull mode notification or push mode; for push mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification subscription resources create and query requests.
+
+The Test Simulator has the functionality to initiate Query subscription resources request.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload has started.
+
+The SUT (O-Cloud) has the Notification service ready and available to receive subscription resources query request from the Test Simulator.
+
+Procedure
+
+Step 1. Send an HTTP2 GET request from Test Simulator to SUT with the correct URI format as specified in “O-Cloud Notification API” [6] clause 4.1.2.
+
+Step 2. At the Test Simulator the received HTTP2 response is recorded.
+
+Expected Results
+
+The test is considered passed if
+
+The return code is “200 OK”, with Response message body content containing an array of Subscriptioninfo.
+
+The return code is “400 Bad request”, without message body, when the query request is not correct.
+
+Get Detail of individual subscription resource
+
+Test Purpose
+
+The purpose of this test case is to verify the capability to query the detail of a subscription from event consumers.
+
+This test case is mandatory if the SUT (O-Cloud) claims to support O-Cloud Notification API, it shall support at least pull mode notification or push mode; for push mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification subscription resources create (Chapter 7.3) and query request, and supports query to an individual subscription resource.
+
+The Test Simulator has the functionality to initiate subscription query request.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload) has started.
+
+The SUT (O-Cloud) has the Notification service ready and available to receive query request from the Test Simulator.
+
+Procedure
+
+Step 1. Send an HTTP2 POST request from Test Simulator to SUT with the correct URI format as specified in “O-Cloud Notification API” [6] clause 4.1.3.
+
+Step 2. At the Test Simulator the received HTTP2 response is recorded.
+
+Expected Results
+
+The test is considered passed if
+
+The return code is “200 OK”, with Response message body content containing a Subscriptioninfo.
+
+The return code is “404 Not found”, without message body, when the subscription resource is not available (not created).
+
+Delete individual subscription resources
+
+Test Purpose
+
+The purpose of this test case is to verify the capability to delete a subscription of event notifications.
+
+This test case is mandatory if the SUT (O-Cloud) claims to support O-Cloud Notification API, it shall support at least pull mode notification or push mode; for push mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification resources create (Chapter 7.3) and query request, and supports delete an individual subscription resource request.
+
+The Test Simulator has the functionality to initiate delete a subscription resource.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload) has started.
+
+The SUT (O-Cloud) has the Notification service ready and available to receive delete request from the Test Simulator.
+
+Procedure
+
+Step 1. Send an HTTP2 DELETE request from Test Simulator to SUT with the correct URI format as specified in “O-Cloud Notification API” [6] clause 4.1.3.
+
+Step 2. At the Test Simulator the received HTTP2 response is recorded.
+
+Expected Results
+
+The test is considered passed if
+
+The return code is “204 DELETE”.
+
+Event notification and Notification sanity check
+
+Test Purpose
+
+The purpose of this test case is to verify the capability of event notification to an event consumer.
+
+This test case is conditional. If the SUT (O-Cloud) claims to support O-Cloud Notification API, it shall support at least pull mode notification or push mode; for push mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification subscription and query (Chapter 7.3 and 7.4).
+
+The Test Simulator has the functionality to receive the event notification.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload) has started.
+
+The SUT (O-Cloud) has the Notification service ready and has accepted subscription request from the Test Simulator.
+
+The resources state change or event can be tracked by SUT(O-Cloud).
+
+Procedure
+
+Step 1. Send an HTTP2 POST request from SUT to the Test Simulator with the EC’s URI format as specified in “O-Cloud Notification API” [6] clause 5.1.1 containing the JSON format Event as specified in “O-Cloud Notification API” [6] clause 7.2 as the message body.
+
+Step 2. At the SUT the received HTTP2 response is recorded.
+
+Expected results
+
+The test is considered passed if
+
+The return code is “204 Success”.
+
+The return code is “400 Bad Request”, without message body, when the request is not correct.
+
+The return code is “404 Not Found”, without message body, when the URI is not available.
+
+The return code is “408 Request Timeout”, without message body, when the subscription resource is already existing. (Not applicable for sanity check)
+
+Event pull status notification
+
+Test Purpose
+
+The purpose of this test case is to verify the capability of pulling of the event from an event consumer.
+
+This test case is conditional if the SUT (O-Cloud) claims to support O-Cloud Notification API. it shall support at least pull mode notification or push mode; for pull mode, this case applies.
+
+Test Entrance Criteria
+
+The SUT supports the O-Cloud Event Notification subscription and pull request (Chapter 7.3).
+
+The Test Simulator has the functionality to initiate pull request to the resource status.
+
+Initial conditions
+
+The simulator (acting as SMO or a workload) has started.
+
+The SUT (O-Cloud) has the Notification service ready and has accept the subscription request from the Test Simulator.
+
+Procedure
+
+Step 1. Send an HTTP2 GET request from Test Simulator to SUT with the correct URI format as specified in “O-Cloud Notification API” [6] clause 6.1.1.
+
+Step 2. At the Test Simulator the received HTTP2 response is recorded.
+
+Expected results
+
+The test is considered passed if
+
+The return code is “200 OK”.
+
+The return code is “404 Not Found”, when event notification resource is not available on this node.
+
+AAL Test
+
+This is FFS.
+
+O2 Test
+
+General
+
+The O2 Test validates that the O-Cloud exposes O2 interfaces which should be fully compliant to latest published O2 Interface Specifications.
+
+Test Configuration
+
+System Under Test requirements
+
+The SUT for O2 Test is an O-Cloud with O2 Services to expose O-RAN O2 interfaces toward SMO.
+
+Test Tools capabilities
+
+A summary of the tools for functional testing is show as below:
+
+Test Tool: The entity to simulate SMO to issue O2 API request towards the O-Cloud, e.g., A set of test scripts implemented by Robot Framework which execute Test Cases specified in the O2 Test section.
+
+Tool simulates SMO to expose API endpoints for O-Clouds to deliver Notifications from O-Cloud to SMO, e.g., An instance of mock server with provisions to accept API calls from O-Cloud upon notification delivery. As below example endpoints include:
+
+O-Cloud registration API Endpoint:
+
+${SMO_ENDPOINT}/mock_smo/v1/O-cloud_observer
+
+O-Cloud Inventory Changes Notification API Endpoint: ${SMO_ENDPOINT}/mock_smo/v1/o2ims_inventory_observer
+
+O-Cloud Alarm Changes Notification API Endpoint:
+
+${SMO_ENDPOINT}/mock_smo/v1/o2ims_alarm_observer
+
+O2 IMS Test
+
+O-Cloud succeeds to deliver O-Cloud Available Notification to SMO.
+
+Test Purpose
+
+The purpose of this test case is to verify O-Cloud can deliver O-Cloud Available Notification to SMO successfully.
+
+Initial conditions
+
+The Test Tool is running and exposing valid endpoint for O-Cloud to deliver O-Cloud Available notification.
+
+Procedure
+
+Step 1. Bring up O-Cloud with O2 IMS service by provisioning valid API endpoint of Test Tool, for   example: ${SMO_ENDPOINT}/mock_smo/v1/O-cloud_observer and globalO-cloudId assigned for this O-Cloud;
+
+ Step 2. Check if Test Tool received valid O-Cloud Available Notification from O-Cloud via the SMO endpoint.
+
+Expected Results
+
+The test is considered passed if
+
+Step1. O-Cloud with O2 Service finished deployment.
+
+Step2. The Test Tool O-Cloud registration Endpoint receives notification, for example:
+
+${SMO_ENDPOINT}/mock_smo/v1/O-cloud_observer received O-Cloud Available Notification from O2 IMS services with content compliant to [13] section ‘3.6.5.1.1 O-Cloud Available Notification Description’.
+
+SMO succeeds to query inventory with correct token
+
+Test Purpose
+
+The purpose of this test case is to verify SMO succeeds to query O-Cloud O2ims inventory resources after O-Cloud succeeds in delivering O-Cloud Available notification to SMO.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool queries O-Cloud detail via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1.
+
+ Step 2. With valid ${O2ims-api-token}, Test Tool queries resource type list without filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes.
+
+ Step 3. With valid ${O2ims-api-token}, Test Tool queries resource type list with filter (e.g., filter by resource type with name: pserver) via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(eq,name,pserver)
+
+Step 4. With valid ${O2ims-api-token}, Test Tool to query resource type list with selector (e.g., all_fields) via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?all_fields
+
+Step 5. With valid ${O2ims-api-token}, Test Tool queries resource type detail with a valid ${resource_type_id} via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes/${resource_type_id}
+
+Step 6. With valid ${O2ims-api-token}, Test Tool queries Resource Pool list without filter via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools
+
+Step 7. With valid ${O2ims-api-token}, Test Tool queries Resource Pool list with filter (e.g., filter by a valid ${resourcePoolId}) via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools?filter=(eq,resourcePoolId,${resourcePoolId})
+
+Step 8. With valid ${O2ims-api-token}, Test Tool queries Resource Pool list with selector via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools?all_fields
+
+Step 9. With valid ${O2ims-api-token}, Test Tool queries Resource Pool detail via API:
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}
+
+Step 10. With valid ${O2ims-api-token}, Test Tool queries Resource list of a Resource Pool without filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources
+
+Step 11. With valid ${O2ims-api-token}, Test Tool queries Resource list of a Resource Pool with filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?filter=(eq,resourceTypeId,${resourceTypeId})
+
+Step 12. With valid ${O2ims-api-token}, Test Tool to query Resource list of a Resource Pool with selector via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?all_fields
+
+Step 13. With valid ${O2ims-api-token}, Test Tool queries Resource detail via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources/${resourceId}
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.6 Type: CloudInfo’.
+
+Step 2 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.2 Type: ResourceTypeInfo’.
+
+Step 3 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.2 Type: ResourceTypeInfo’.
+
+Step 4 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.2 Type: ResourceTypeInfo’.
+
+Step 5 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.2 Type: ResourceTypeInfo’.
+
+Step 6 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.3 Type: ResourcePoolInfo’.
+
+Step 7 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.3 Type: ResourcePoolInfo’.
+
+Step 8 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.3 Type: ResourcePoolInfo’.
+
+Step 9 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.3 Type: ResourcePoolInfo’.
+
+Step 10 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.4 ResourceInfo’.
+
+Step 11 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.4 ResourceInfo’.
+
+Step 12 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.4 ResourceInfo’.
+
+Step 13 API response status code should be 200, and response data is compliant to [13] section ‘3.2.6.2.4 ResourceInfo’.
+
+SMO succeeds to subscribe for O2ims inventory changes notification and succeeds to receive notifications.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available Notification to SMO, SMO succeeds to subscribe to O-Cloud O2ims inventory changes notification, and SMO succeeds to receive notification when o2ims inventory changes.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool create a subscription via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions, the call back field as example:
+
+${SMO_ENDPOINT}/mock_smo/v1/o2ims_inventory_observer
+
+Step 2. With valid ${O2ims-api-token}, Test Tool queries subscription list without filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions
+
+Step 3. With valid ${O2ims-api-token}, Test Tool queries subscription list with filter (e.g., filter by a valid ${subscriptionId}) via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions?filter=(eq,subscriptionId,${subscriptionId})
+
+Step 4. With valid ${O2ims-api-token}, Test Tool queries a subscription detail via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions/${subscriptionId}
+
+Step 5. Trigger O2IMS inventory changes from O-Cloud side and observe the Test Tool receiving notification of this O2IMS inventory change.
+
+Step 6. With valid ${O2ims-api-token}, Test Tool delete a subscription via API: DELETE ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions/${subscriptionId}
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 201, and response data is compliant to [13] section ‘3.2.4.11.3.1-2 InventorySubscriptionInfo’.
+
+Step 2 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.11.3.2 GET’
+
+Step 3 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.11.3.2 GET’
+
+Step 4 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.12.2 Resource definition’
+
+Step 5 Test Tool O-Cloud Inventory changes Notification API Endpoint, for example:
+
+${SMO_ENDPOINT}/mock_smo/v1/o2ims_inventory_observer
+
+received the notification upon o2ims inventory change, and response data is compliant to [13] section ‘3.2.5.1.1 Inventory Change Notification Description’
+
+Step6. API response status should be 200. And response data is compliant to [13] section ‘3.2.4.12.3.5 DELETE’.
+
+SMO succeeds to create alarmSubscription, receive alarm notification, and query alarm list.
+
+Test Purpose
+
+After O-Cloud succeeds deliver O-Cloud Available notification to SMO, SMO succeeds to subscribe for notification of alarm changes notification, and SMO succeeds to query alarm list and detail.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool creates an alarmSubscription for receiving alarm changes notification via API: POST ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions, the call back field as example:
+
+     ${SMO_ENDPOINT}/mock_smo/v1/o2ims_alarm_observer
+
+Step 2. With valid ${O2ims-api-token}, Test Tool queries alarmSubscription list via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions
+
+Step 3. With valid ${O2ims-api-token}, Test Tool queries alarmSubscription details with alarmSubscriptionId via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions/${alarmSubscriptionId}
+
+Step 4. Trigger alarm change on O-Cloud side.
+
+Step 5. With valid ${O2ims-api-token}, Test Tool queries alarm list via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarms
+
+Step 6. With valid ${O2ims-api-token}, Test Tool queries alarm list with filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarms?filter=(eq,resourceTypeId,${resourceTypeId})
+
+Step 7. With valid ${O2ims-api-token}, Test Tool queries alarm list with selector via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarms?all_fields
+
+Step 8. With valid ${O2ims-api-token}, Test Tool queries alarm detail with alarmEventRecordId via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarms/${alarmEventRecordId}
+
+Step 9. With valid ${O2ims-api-token}, Test Tool deletes alarmSubscription with alarmSubscriptionId via API: DELETE
+
+ ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions/${alarmSubscriptionId}
+
+Step 10. Trigger alarm change on O-Cloud side.
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 201, and response data is compliant to [13] section ‘3.3.4.4.3.1 POST’.
+
+Step 2 API response status code should be 200, and response data is compliant to [13] section ‘3.3.4.4.3.2 GET’.
+
+Step 3 API response status code should be 200, and response data is compliant to [13] section ‘3.3.4.4.3.2 GET’.
+
+Step 4 Test Tool O-Cloud Alarm Changes Notification API Endpoint, for example:
+
+${SMO_ENDPOINT}/mock_smo/v1/o2ims_alarm_observer
+
+succeeds receiving alarm change notification, and alarm change notification data is compliant to [13] section ‘3.3.5.1.1 Alarm Change Notification Description’.
+
+Step 5 API response status code should be 200, and response data is compliant to [13] section ‘3.3.4.2.3.2 GET’.
+
+Step 6 API response status code should be 200, and response data is compliant to [13] section ‘3.3.6.2.2 Type: AlarmEventRecord’.
+
+Step 7 API response status code should be 200, and response data is compliant to [13] section ‘3.3.6.2.2 Type: AlarmEventRecord’.
+
+Step 8 API response status code should be 200, and response data is compliant to [13] section ‘3.3.6.2.2 Type: AlarmEventRecord’.
+
+Step 9 API response status code should be 200, and response data is compliant to [13] section ‘3.3.4.5.3.5 Delete’.
+
+Step 10 Observe the Test Tool does not receive alarm change notification anymore.
+
+Verify general aspects of O2ims API.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO succeeds to issue API requests complying to '3.1.2 URI structure and supported content formats.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool queries ApiVersionInformation of o2ims infrastructureInventory services via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/api_versions
+
+Step 2. With valid ${O2ims-api-token}, Test Tool queries ApiVersionInformation of o2ims infrastructureMonitoring service via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/api_versions
+
+Step 3. With valid ${O2ims-api-token}, Test Tool queries Resources with nextpage_opaque_marker via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?nextpage_opaque_marker=2
+
+Step 4. With valid ${O2ims-api-token}, Test Tool queries resource with filter with below APIs
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?filter=(eq,resourceId,${resourceId})
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?filter=(neq,resourceId,${resourceId})
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(cont,description,Ethernet)
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(ncont,description,Ethernet)
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(in,name,pserver,pserver_if,pserver_mem)
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(nin,name,pserver,pserver_if,pserver_mem)
+
+Step 5. With valid ${O2ims-api-token}, Test Tool queries resources with attribute selector via API: GET
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?all_fields
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?fields=extensions
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?exclude_fields=extensions
+
+ ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?exclude_default
+
+Expected Results
+
+The test is considered passed if
+
+Step 1. API response status code should be 200, and response data is compliant to [13] section ‘3.1.6.1.6 Type: ApiVersionInformation’.
+
+Step 2. API response status code should be 200, and response data is compliant to [13] section ‘3.1.6.1.6 Type: ApiVersionInformation’.
+
+Step 3. API response status code should be 200, and response data is compliant to [13] section ‘3.1.6.2.2 Simple Data Types’.
+
+Step 4. API response status code should be 200, and response data is compliant to [13] section ‘3.1.4.3 Handling of large query results’.
+
+Step 5. API response status code should be 200, and response data is compliant to [13] section ‘3.1.4.3 Handling of large query results’.
+
+SMO gets 405 while sending O2ims APIs with unsupported method.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets 405 responses while issuing API requests with unsupported method.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate resourceTypes via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes
+
+Step 2. With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate resourcePool via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools
+
+Step 3.  With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate resource via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources
+
+Step 4. With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate DeploymentManager via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers
+
+Step 5.  With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate O-cloud via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/
+
+Step 6.  With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate Inventory Subscription via API: PATCH ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions
+
+Step 7.  With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate Alarm via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/alarms
+
+Step 8. With valid ${O2ims-api-token}, Test Tool issues API request with unsupported method to operate Alarm Subscription via API: PATCH ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.2.3.1, 3.2.4.2.3.3, 3.2.4.2.3.4, 3.2.4.2.3.5.’.
+
+Step 2 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.3.3.1, 3.2.4.3.3.3, 3.2.4.3.3.4, 3.2.4.3.3.5’.
+
+Step 3 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.4.3.1, 3.2.4.4.3.3, 3.2.4.4.3.4, 3.2.4.4.3.5’.
+
+Step 4 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.5.3.1, 3.2.4.5.3.3, 3.2.4.5.3.4, 3.2.4.5.3.5’.
+
+Step 5 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.6.3.1, 3.2.4.6.3.3, 3.2.4.6.3.4, 3.2.4.6.3.5’.
+
+Step 6 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.7.3.1, 3.2.4.7.3.3, 3.2.4.7.3.4, 3.2.4.7.3.5’.
+
+Step 7 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.8.3.1, 3.2.4.8.3.3, 3.2.4.8.3.4, 3.2.4.8.3.5’.
+
+Step 8 API response status code should be 405, and response data is compliant to [13] section ‘3.2.4.9.3.1, 3.2.4.9.3.3, 3.2.4.9.3.4, 3.2.4.9.3.5’.
+
+SMO gets 400/405 while issuing O2ims APIs with incorrect data.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets 400/405 response with Problem Details while issuing o2ims API requests with incorrect data.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate resourceTypes via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourceTypes?filter=(eq,WrongAttrName,anyvalue)
+
+Step 2. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate resourcePool via API: GETo2ims-infrastructureInventory/v1/resourcePools?filter=(eq,WrongAttrName,anyvalue)
+
+Step 3. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate resource via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/resourcePools/${resourcePoolId}/resources?filter=(eq,WrongAttrName,anyvalue)
+
+Step 4. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate DeploymentManager via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers?filter=(eq,WrongAttrName,anyvalue)
+
+Step 5. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate O-cloud via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/?fields=(O-cloudId,WrongAttrName)
+
+Step 6. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate Inventory Subscription via API: GET/o2ims/infrastructureInventory/v1/subscriptions?fields=(SubscriptionId,WrongAttrName)
+
+Step 7. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate Alarm via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarms?fields=(AlarmId,WrongAttrName)
+
+Step 8. With valid ${O2ims-api-token}, Test Tool issues API request with incorrect data to operate Alarm Subscription via API: GET ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions?fields=(AlarmId,WrongAttrName)
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 400, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+Step 2 API response status code should be 400, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+Step 3 API response status code should be 400, and response data is compliant to [13] section ‘3.6.7.3 Application errors’.
+
+Step 4 API response status code should be 405, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors, 3.6.7.3 Application errors’.
+
+Step 5 API response status code should be 405, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors ,3.6.7.3 Application errors’.
+
+Step 6 API response status code should be 405, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors ,3.6.7.3 Application errors’.
+
+Step 7 API response status code should be 405, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors, 3.6.7.3 Application errors’.
+
+Step 8 API response status code should be 405, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors ,3.6.7.3 Application errors’.
+
+SMO gets security error response while issuing APIs with incorrect token.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets error response while issuing API requests with incorrect token data.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with invalid ${O2ims-api-token}.
+
+Procedure
+
+Step 1. With invalid ${O2ims-api-token}, Test Tool issues API request without Authorization Bearer Token Header via API: GET  ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/
+
+Step 2. With invalid ${O2ims-api-token}, Test Tool issues API request with Authorization Bearer Token Header and invalid token via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/
+
+Step 3. With invalid ${O2ims-api-token}, Test Tool issues API request with Authorization Bearer Token Header and valid token via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 API response status code should be 401, and response data is compliant to [13] section ‘3.1.7.1 Introduction’.
+
+Step 2 API response status code should be 401, and response data is compliant to [13] section ‘3.1.7.1 Introduction’.
+
+Step 3 API response status code should be 200, and response data is compliant to [13] section ‘3.1.7.1 Introduction’.
+
+SMO gets client error response while issuing requests with incorrect APIs
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets correct error response while issuing request with incorrect APIs.
+
+Initial conditions
+
+The Test Tool has started.
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool queries API with wrong port via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers
+
+Step 2. With valid ${O2ims-api-token}, Test Tool queries API with wrong URL via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagersWrongURL
+
+Step 3. With valid ${O2ims-api-token}, Test Tool queries API with wrong api version via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v2/deploymentManagers
+
+Step 4. With valid ${O2ims-api-token}, Test Tool queries API with wrong deploymentManagerID via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/wrongDeploymentManagerID
+
+Expected Results
+
+The test is considered passed if
+
+Step 1 With valid ${O2ims-api-token}, Test Tool does not receive API response.
+
+Step 2 API response status code should be 404, and response data is compliant to [13] section ‘3.6.7.1 General, 3.6.7.3 Application errors’’.
+
+Step 3 API response status code should be 404, and response data is compliant to [13] section ‘3.6.7.1 General, 3.6.7.3 Application errors’’.
+
+Step 4 API response status code should be 404, and response data is compliant to [13] section ‘3.6.7.1 General, 3.6.7.3 Application errors’’.
+
+SMO succeeds to get O2dms (in Kubernetes native API Profile) access information.
+
+Test Purpose
+
+The purpose of this test case is to verify SMO succeeds to query deploymentManager to extract O2dms access information after O-Cloud succeeds to deliver O-Cloud Available notification to SMO.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool queries deploymentManager list without filter via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers
+
+Step 2. With valid ${O2ims-api-token}, Test Tool queries deploymentManager list with filter (e.g., filter by a valid ${deploymentManagerId}) via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers?filter=(eq, deploymentManagerId, ${deploymentManagerId})
+
+Step 3. With valid ${O2ims-api-token}, Test Tool queries a deploymentManager detail via API: GET ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/deploymentManagers/${deploymentManagerId}
+
+Step 4. Extract ${k8s_cluster_api_endpoint} from response data of step3, Test Tool queries Kubernetes resources with access credentials from a deploymentManager with Kubernetes API: GET ${k8s_cluster_api_endpoint}/api/v1/namespaces
+
+Expected Results
+
+The test is considered passed if:
+
+Step 1 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.9.2 Resource Definition, 3.2.4.8.3.2 Get, 3.2.4.8.2 DeploymentManagerInfo’.
+
+Step 2 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.8.3.2 Get and 3.2.4.8.2 DeploymentManagerInfo’.
+
+Step 3 API response status code should be 200, and response data is compliant to [13] section ‘3.2.4.8.3.2 Get and 3.2.6.2.5 DeploymentManagerInfo’.
+
+Step 4 API response status code should be 200, and response data contains correct Kubernetes resources information.
+
+SMO gets  406/415 when issuing APIs with junk/unsupported data.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets 406/415 response with Problem Details when issuing o2ims API requests with junk/unsupported data.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-Cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool issues API request with junk data to create inventory subscription via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions
+
+Step 2. With valid ${O2ims-api-token}, Test Tool issues API request with unsupported data, such as xml, to create inventory subscription via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions
+
+Step 3. With valid ${O2ims-api-token}, Test Tool issues API request with junk data to create alarm subscription via API: POST ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions
+
+Step 4. With valid ${O2ims-api-token}, Test Tool issues API request with supported data, such as xml to create alarm subscription via API: POST ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/alarmSubscriptions
+
+Expected Results
+
+The test is considered passed if:
+
+Step 1 API response status code should be 406, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+Step 2 API response status code should be 415, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors, 3.6.7.3 Application errors’.
+
+Step 3 API response status code should be 406, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+Step 4 API response status code should be 415, and response data is compliant to [13] section ‘3.6.7.2 Protocol errors, 3.6.7.3 Application errors’.
+
+SMO gets 404 when issuing APIs with wrong data.
+
+Test Purpose
+
+The purpose of this test case is to verify that after O-Cloud succeeds to deliver O-Cloud Available notification to SMO, SMO gets 404 response with Problem Details when issuing o2ims API requests with wrong data.
+
+Initial conditions
+
+The Test Tool received O-Cloud Available Notification from O-Cloud.
+
+Test Tool is provided with ${O2ims-endpoint} by extracting it from O-cloud Available Notification.
+
+Test Tool is provided with valid ${O2ims-api-token} (by extracting it from O-Cloud Available Notification or some other way).
+
+Procedure
+
+Step 1. With valid ${O2ims-api-token}, Test Tool issues API request with wrong subscriptionId to delete inventory subscription via API: DELETE ${O2ims-endpoint}/o2ims-infrastructureInventory/v1/subscriptions/${subscriptionId}
+
+Step 2. With valid ${O2ims-api-token}, Test Tool issues API request with wrong alarmSubscriptionId, to delete alarm subscription via API: DELETE ${O2ims-endpoint}/o2ims-infrastructureMonitoring/v1/alarmSubscriptions/${alarmSubscriptionId
+
+Expected Results
+
+The test is considered passed if:
+
+Step 1 API response status code should be 404, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+Step 2 API response status code should be 404, and response data is compliant to [13] section ‘3.1.5 Error reporting and 3.6.7.2 Protocol errors’.
+
+O2 DMS Test
+
+Overview
+
+Regarding the O-RAN O2dms interface, the present document version specifies the testing of the following profile specification(s):
+
+ETSI NFV Protocol specified by O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10]
+
+O2 DMS ETSI NFV Profile Test
+
+For the API conformance testing of APIs specified in O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], the following items shall apply for each test case define in each sub-clause
+
+The generic test description shall follow the provisions defined in clause 4.5 of ETSI GS NFV-TST 010 [12].
+
+The test suite for the O2DMS ETSI NFV profile API produced by the O-Cloud DMS as specified in the O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10] shall follow the provisions in Annex E and Annex F of ETSI GS NFV-TST 010 [12].
+
+NOTE: O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10] is a profiling spec of ETSI GS NFV-SOL 003 [11]. ETSI GS NFV-TST 010 [12] is a test spec for ETSI NFV specifications which includes ETSI GS NFV-SOL 003 [11]as test target.
+
+Test configuration
+
+For the O2 DMS ETSI NFV Profile test, the test configuration of O-Cloud DMS as producer of VNFM-defined APIs, shall follow the provisions specified in clause 4.3.1 and c4.3.3 of ETSI GS NFV-TST 010 [12], and AUT is O-Cloud DMS.
+
+Test case for Service operations
+
+Instantiate NF Deployment test case
+
+In order to test Instantiate NF Deployment specified in clause 2.4.2.1 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], following test specified in Annex F.7 of ETSI GS NFV-TST 010 [12] shall be followed:
+
+Test ID 7.3.1.22.1 “Create VNF Instance workflow”
+
+Test ID 7.3.1.26.1 “VNF Instantiation workflow”
+
+Test ID 7.3.1.12.2 “Get Individual VNF LCM Operation occurrences”
+
+Terminate NF Deployment test case
+
+In order to test Terminate NF Deployment specified in clause 2.4.2.2 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], following tests specified in Annex F.7 of ETSI GS NFV-TST 010 [12] shall be followed:
+
+Test ID 7.3.1.33.1 “Terminate a VNF Instance”
+
+Test ID 7.3.1.23.1 “Delete VNF Instance workflow”
+
+Test ID 7.3.1.12.2 “Get Individual VNF LCM Operation occurrences”
+
+Query NF Deployment test case
+
+In order to test Query NF Deployment specified in clause 2.4.2.3 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], following tests specified in Annex F.7 of ETSI GS NFV-TST 010 [12] shall be followed:
+
+Test ID 7.3.1.1.2 “GET information about multiple VNF instances”
+
+Test ID 7.3.1.2.2 “Get Information about an individual VNF Instance”
+
+Test case for O2dms_DeploymentLifecycle Service API
+
+VNF instances REST resource test case
+
+In order to test VNF instances REST resource specified in clause 3.2.4.2 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], test suite for “VNFInstances" specified in Annex F.7 7.3.1.1 of ETSI GS NFV-TST 010 [12] shall be followed.
+
+Individual VNF instance REST resource test case
+
+In order to test Individual VNF instance REST resource specified in clause 3.2.4.3 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], test suite for “IndividualVNFInstance" specified in Annex F.7 7.3.1.2 of ETSI GS NFV-TST 010 [12] shall be followed.
+
+Instantiate VNF task REST resource test case
+
+In order to test Instantiate VNF task REST resource specified in clause 3.2.4.4 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], test suite for “InstantiateVNFTask" specified in Annex F.7 7.3.1.3 of ETSI GS NFV-TST 010 [12] shall be followed.
+
+Terminate VNF task REST resource test case
+
+In order to test Terminate VNF task REST resource specified in clause 3.2.4.5 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], test suite for “TerminateVNFTask" specified in Annex F.7 7.3.1.7 of ETSI GS NFV-TST 010 [12] shall be followed.
+
+Notification test case
+
+In order to test Notifications issued on the O2dms_DeploymentLifecycle Service API specified in clause 3.2.5 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [10], test suite for “Notifications" specified in Annex F.7 7.3.1.34 of ETSI GS NFV-TST 010 [12] shall be followed.
+
+Synchronization Test
+
+General
+
+Time and frequency synchronization can be distributed to the O-DU and O-RU from the same source using different methods. The O-DU is a workload of O-Cloud, so O-Cloud should have the synchronization capability.
+
+The Synchronization Test validates that O-Cloud should be fully complaint to latest published version of [9].
+
+Test Configuration
+
+System Under Test requirements
+
+The SUT of Synchronization test is the O-Cloud Node, which host controller functions, as described in section 5.5 of [i.2].
+
+Test Tools and Simulators capabilities
+
+There is no special configuration for Synchronization Test.
+
+Test Cases
+
+Synchronization Test LLS-C1
+
+Figure 8.3-1 Time Sync Architecture for LLS-C1
+
+Test Purpose
+
+The purpose of this test case is to verify that the O-Cloud can support LLS-C1.
+
+The synchronization of the O-Cloud to Primary Reference Time Clock (e.g. GM) is not in the scope of this document.
+
+Initial conditions
+
+The O-Cloud is configured to support LLS-C1.
+
+Procedure
+
+Step 1. Configure the O-Cloud Node as a PTP Master towards the fronthaul interface, the following configuration PTP is allowed:
+
+Network Transport – L2, UDPv4, UDPv6
+
+Delay Measurement Mechanism – E2E
+
+Time Stamping - hardware
+
+Expected Results
+
+Check that PTP configuration shows the following:
+
+delay_mechanism E2E
+
+time_stamping hardware
+
+network_transport L2 or UDPv4/UDPv6
+
+Use ‘pmc’ commands to observe that the portState shows ‘MASTER’
+
+For example:
+
+sudo pmc -u -b 0 -f /etc/ptpinstance/ptp4l.conf 'GET PORT_DATA_SET'
+
+sending: GET PORT_DATA_SET
+
+	507c6f.fffe.0b8738-1 seq 0 RESPONSE MANAGEMENT PORT_DATA_SET
+
+		portIdentity            507c6f.fffe.0b8738-1
+
+		portState               MASTER
+
+		logMinDelayReqInterval  -4
+
+		peerMeanPathDelay       0
+
+		logAnnounceInterval     -3
+
+		announceReceiptTimeout  3
+
+		logSyncInterval         -4
+
+		delayMechanism          1
+
+		logMinPdelayReqInterval 0
+
+		versionNumber           2
+
+Check that phc2sys is running on the O-Cloud Node and is synchronizing the System Clock.
+
+ For example:
+
+ps -elf |grep phc2sys
+
+4 S root       67226       1  0 -11   - -   962 -      Feb20 ?        00:00:03 /usr/sbin/phc2sys -f /etc/linuxptp/ptpinstance/phc2sys-phc2sys-inst1.conf -a -r -R 2 -u 600
+
+Make sure ‘-a’ and ‘-r’ options are specified
+
+Synchronization Test LLS-C3
+
+Figure 8.3-2 Time Sync Architecture for LLS-C3
+
+Test Purpose
+
+The purpose of this test case is to verify that the O-Cloud can support LLS-C3.
+
+Initial conditions
+
+The O-Cloud is configured to support LLS-C3.
+
+Procedure
+
+Step 1. Configure the O-Cloud Node as a PTP Slave towards the fronthaul interface, the following configuration PTP is allowed:
+
+Network Transport – L2, UDPv4, UDPv6
+
+Delay Measurement Mechanism – E2E
+
+Time Stamping - hardware
+
+Expected Results
+
+The test is considered passed if
+
+Check that PTP configuration shows the following:
+
+delay_mechanism E2E
+
+time_stamping hardware
+
+network_transport L2 or UDPv4/UDPv6
+
+Use ‘pmc’ commands to observe that the portState shows ‘SAVE’
+
+For example:
+
+sudo pmc -u -b 0 -f /etc/ptpinstance/ptp4l.conf 'GET PORT_DATA_SET'
+
+sending: GET PORT_DATA_SET
+
+	507c6f.fffe.0b8738-1 seq 0 RESPONSE MANAGEMENT PORT_DATA_SET
+
+		portIdentity            507c6f.fffe.0b8738-1
+
+		portState               SALVE
+
+		logMinDelayReqInterval  -4
+
+		peerMeanPathDelay       0
+
+		logAnnounceInterval     -3
+
+		announceReceiptTimeout  3
+
+		logSyncInterval         -4
+
+		delayMechanism          1
+
+		logMinPdelayReqInterval 0
+
+		versionNumber           2
+
+Check that the slave reports the time offset calculated from the master. For example, ptp4l output:
+
+2022-09-06T08:03:01.000 controller-0 ptp4l: info [580909.748] ptp-inst1 rms 5 max 15 freq +0 +/-  19 delay   472 +/-   1
+
+Check that phc2sys is running on the O-Cloud Node and is synchronizing the System Clock.
+
+For example:
+
+ ps -elf |grep phc2sys
+
+4 S root       67226       1  0 -11   - -   962 -      Feb20 ?        00:00:03 /usr/sbin/phc2sys -f /etc/linuxptp/ptpinstance/phc2sys-phc2sys-inst1.conf -a -r -R 2 -u 600
+
+Make sure ‘-a’ and ‘-r’ options are specified
+
+Annex A (normative):
+Checklist for Cases applies to O-Cloud technologies
+
+ Here give lists of cases applied to each O-Cloud technology,
+
+A.1	O-Cloud technologies
+
+This specification covers following O-Cloud technologies:
+
+VMs only
+
+Containers only
+
+Containers in VMs
+
+A.2	Cloud Technology Applicability of test cases
+
+Cases marked with Y apply to the corresponding cloud technologies should be executed.
+
+Test
+
+Case Title
+
+VMs only
+
+Containers only
+
+Containers in VMs
+
+O-Cloud Notification API Test
+
+Create a subscription resource
+
+Y
+
+Y
+
+Y
+
+Get a list of subscription resources
+
+Y
+
+Y
+
+Y
+
+Get Detail of individual subscription resource
+
+Y
+
+Y
+
+Y
+
+Delete individual subscription resources
+
+Y
+
+Y
+
+Y
+
+Event notification and Notification sanity check
+
+Y
+
+Y
+
+Y
+
+Event pull status notification
+
+Y
+
+Y
+
+Y
+
+Synchronization Test
+
+Synchronization Test LLS-C1
+
+Y
+
+Y
+
+Y
+
+Synchronization Test LLS-C3
+
+Y
+
+Y
+
+Y
+
+O2 Test: O2 IMS Test
+
+O-Cloud succeeds to deliver O-Cloud Available notification to SMO via valid endpoint.
+
+Y
+
+Y
+
+SMO succeeds to query inventory with O2ims APIs and correct token
+
+Y
+
+Y
+
+SMO succeeds to subscribe for O2ims inventory changes notification and succeeds to receive notifications.
+
+Y
+
+Y
+
+SMO succeeds to get O2dms (in Kubernetes native API Profile) access information.
+
+Y
+
+Y
+
+SMO succeeds to create alarmSubscription, receive alarm notification, and query alarm list.
+
+Y
+
+Y
+
+Verify general aspects of O2ims API.
+
+Y
+
+Y
+
+SMO gets 405 when sending O2ims APIs with unsupported method.
+
+Y
+
+Y
+
+SMO gets 400/405 when issuing O2ims APIs with incorrect data.
+
+Y
+
+Y
+
+SMO getssecurity error response when issuing APIs with incorrect token.
+
+Y
+
+Y
+
+SMO geta client error response when issuing requests with incorrect APIs.
+
+Y
+
+Y
+
+SMO gets 406/415 when issuing APIs with junk/unsupported data.
+
+Y
+
+Y
+
+SMO gets 404 when issuing APIs with wrong data.
+
+Y
+
+Y
+
+O2Test: O2 DMS ETSI NFV Profile Test
+
+Instantiate NF Deployment test case
+
+Y
+
+N
+
+Y
+
+Terminate NF Deployment test case
+
+Y
+
+N
+
+Y
+
+ Query NF Deployment test case
+
+Y
+
+N
+
+Y
+
+VNF instances REST resource test case
+
+Y
+
+N
+
+Y
+
+Individual VNF instance REST resource test case
+
+Y
+
+N
+
+Y
+
+Instantiate VNF task REST resource test case
+
+Y
+
+N
+
+Y
+
+Terminate VNF task REST resource test case
+
+Y
+
+N
+
+Y
+
+Notification test case
+
+Y
+
+N
+
+Y
+
+A.3 Case Traceability
+
+Test
+
+Test case
+
+Reference
+
+Requirement
+
+O-Cloud Notification API Test
+
+Create a subscription resource
+
+[6] O-Cloud Notification API-v03.00
+
+4.1.2.1
+
+Get a list of subscription resources
+
+[6] O-Cloud Notification API-v03.00
+
+4.1.2.2
+
+Get Detail of individual subscription resource
+
+[6] O-Cloud Notification API-v03.00
+
+4.1.3.2
+
+Delete individual subscription resources
+
+[6] O-Cloud Notification API-v03.00
+
+4.1.3.1
+
+Event notification and Notification sanity check
+
+[6] O-Cloud Notification API-v03.00
+
+5.1.1
+
+Event pull status notification
+
+[6] O-Cloud Notification API-v03.00
+
+6.1.1
+
+Synchronization Test
+
+Synchronization Test LLS-C1
+
+[i.2]O-RAN.WG6.CAD-v04.00: “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”.
+
+5.5.1.2
+
+Synchronization Test LLS-C3
+
+[i.2]O-RAN.WG6.CAD-v04.00: “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”.
+
+5.5.1.1
+
+O2 Test: O2 IMS Test
+
+O-Cloud succeeds to deliver O-Cloud Available notification to SMO via valid endpoint.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-GEN6; REQ-ORC-GEN7; REQ-ORC-GEN8; REQ-ORC-GEN9; REQ-ORC-O2-3; REQ-ORC-O2-4;
+
+REQ-ORC-O2-5; REQ-ORC-O2-6
+
+SMO succeeds to query inventory with O2ims APIs and correct token.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-GEN10; REQ-ORC-GEN11; REQ-ORC-GEN12; REQ-ORC-GEN13; REQ-ORC-O2-7; REQ-ORC-O2-8
+
+SMO succeeds to subscribe for O2ims inventory changes notification and succeeds to receive notifications.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-GEN10; REQ-ORC-GEN11; REQ-ORC-GEN12; REQ-ORC-GEN13; REQ-ORC-O2-7; REQ-ORC-O2-8
+
+SMO succeeds to get O2dms (in Kubernetes native API Profile) access information.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-GEN6; REQ-ORC-GEN7; REQ-ORC-GEN8; REQ-ORC-GEN9; REQ-ORC-O2-3; REQ-ORC-O2-4; REQ-ORC-O2-5; REQ-ORC-O2-6
+
+SMO succeeds to create alarmSubscription, receive alarm notification, and query alarm list.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-21, REQ-ORC-O2-22, REQ-ORC-O2-16,
+
+REQ-ORC-O2-23, REQ-ORC-O2-24, REQ-ORC-O2-15
+
+Verify general aspects of O2ims API.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-19, REQ-ORC-O2-20
+
+SMO gets 405 when sending O2ims APIs with unsupported method.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-50, REQ-ORC-O2-51
+
+SMO gets 400/405 when issuing O2ims APIs with incorrect data.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-19, REQ-ORC-O2-20
+
+SMO gets security error response when issuing APIs with incorrect token.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-19, REQ-ORC-O2-20
+
+SMO gets client error response when issuing requests with incorrect APIs.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-19, REQ-ORC-O2-20
+
+SMO gets 406/415 when issuing APIs with junk/unsupported data.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-GEN6; REQ-ORC-GEN7; REQ-ORC-GEN8; REQ-ORC-GEN9; REQ-ORC-O2-3; REQ-ORC-O2-4;
+
+REQ-ORC-O2-5; REQ-ORC-O2-6
+
+SMO gets 404 when issuing APIs with wrong data.
+
+O-RAN-WG6.ORCH-USE-CASES-R003-v06.00
+
+REQ-ORC-O2-21, REQ-ORC-O2-22, REQ-ORC-O2-16,
+
+REQ-ORC-O2-23, REQ-ORC-O2-24, REQ-ORC-O2-15
+
+O2Test: O2 DMS ETSI NFV Profile Test
+
+Instantiate NF Deployment test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+2.4.2.1
+
+Terminate NF Deployment test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+2.4.2.2
+
+ Query NF Deployment test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+2.4.2.3
+
+VNF instances REST resource test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+3.2.4.2
+
+Individual VNF instance REST resource test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+3.2.4.3
+
+Instantiate VNF task REST resource test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+3.2.4.4
+
+Terminate VNF task REST resource test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+3.2.4.5
+
+Notification test case
+
+[10] O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE-v01.00
+
+3.2.5
+
+History
+
+Date
+
+Revision
+
+Description
+
+	________________________________________________________________________________________________© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.	20

@@ -1,0 +1,161 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+启动参数:
+  模式: small
+  难度: hard
+  GPU: [0, 1]
+  种子: 42
+
+
+================================================================================
+实验1: 检索成本影响 - 7B优化版本
+================================================================================
+运行模式: 小规模测试模式 (10题, 快速验证逻辑)
+LLM模型: Qwen2.5-7B-Instruct (优化版)
+嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+问题难度: HARD
+问题数量: 10
+c_r采样点: 5个
+================================================================================
+
+GPU配置:
+  可用GPU: 8张
+  使用GPU: [0, 1] (7B模型需要2张GPU)
+    GPU 0: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 1: NVIDIA GeForce RTX 3060 (12.6GB)
+  剩余GPU: [2, 3, 4, 5, 6, 7] (可用于其他任务)
+
+加载ORAN-Bench-13K数据集...
+Loaded ORAN-Bench-13K:
+  Easy: 1139 questions
+  Medium: 9570 questions
+  Hard: 3243 questions
+  Total: 13952 questions
+✓ 加载了 10 道 HARD 问题
+
+加载嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+✓ 嵌入模型加载成功 (GPU 0)
+
+================================================================================
+预计算问题embeddings (优化检索性能)...
+================================================================================
+
+✓ 预计算完成!
+  - 问题数: 10
+  - 耗时: 0.4秒 (0.0分钟)
+  - 平均: 37.5ms/问题
+  - 内存占用: ~0.01 MB
+================================================================================
+
+连接Chroma数据库: /data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store
+✓ Chroma集合加载成功 (文档数: 436279)
+
+加载LLM模型: /data/user/huangxiaolin/ARGO/RAG_Models/models/qwen2.5-7b-instruct
+  使用 2 张GPU加载7B模型...
+  优化策略: device_map='auto', torch_dtype=bfloat16, 降低GPU通信开销
+  显存限制: GPU0=10GB, GPU1=11GB
+  加载模型中...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:01<00:03,  1.28s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:02<00:02,  1.23s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:03<00:01,  1.20s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:04<00:00,  1.14s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:04<00:00,  1.17s/it]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+
+  ✓ 模型加载完成!
+  模型层分配:
+    0: 13层
+    1: 19层
+
+  GPU显存占用:
+    GPU 0: 6.78GB/12.6GB (已分配), 6.81GB (已保留)
+    GPU 1: 8.55GB/12.6GB (已分配), 8.57GB (已保留)
+
+  优化特性:
+    ✓ 精度: bfloat16 (降低显存50%)
+    ✓ 分布: 自动分配到2张GPU
+    ✓ 通信: 最小化跨GPU数据传输
+    ✓ 缓存: 启用KV缓存加速推理
+
+================================================================================
+初始化完成!
+================================================================================
+
+
+================================================================================
+开始实验 - 检索成本影响
+================================================================================
+运行模式: 小规模测试模式 (10题, 快速验证逻辑)
+c_r范围: 0.020 ~ 0.200 (扫描 5 个点)
+c_p固定: 0.020
+问题数量: 10
+策略数量: 4 (ARGO, Always-Retrieve, Always-Reason, Random)
+总评估次数: 5 × 4策略 × 10题 = 200
+================================================================================
+
+
+[1/5] c_r = 0.0200 (1.0x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.020)... θ_cont=0.920, θ*=1.000
+
+  评估 10 道问题...
+    进度: 10/10
+  ARGO                : Accuracy=80.0%, Quality=0.800, Cost=0.092, Retrievals=4.6
+  Always-Retrieve     : Accuracy=80.0%, Quality=0.800, Cost=0.106, Retrievals=5.3
+  Always-Reason       : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Random              : Accuracy=80.0%, Quality=0.800, Cost=0.164, Retrievals=4.0
+
+[2/5] c_r = 0.0650 (3.2x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.065)... θ_cont=0.080, θ*=1.000
+
+  评估 10 道问题...
+    进度: 10/10
+  ARGO                : Accuracy=90.0%, Quality=0.900, Cost=0.285, Retrievals=1.3
+  Always-Retrieve     : Accuracy=80.0%, Quality=0.800, Cost=0.344, Retrievals=5.3
+  Always-Reason       : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Random              : Accuracy=80.0%, Quality=0.800, Cost=0.353, Retrievals=4.1
+
+[3/5] c_r = 0.1100 (5.5x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.110)... θ_cont=0.000, θ*=1.000
+
+  评估 10 道问题...
+    进度: 10/10
+  ARGO                : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Always-Retrieve     : Accuracy=80.0%, Quality=0.800, Cost=0.528, Retrievals=4.8
+  Always-Reason       : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Random              : Accuracy=90.0%, Quality=0.900, Cost=0.469, Retrievals=3.5
+
+[4/5] c_r = 0.1550 (7.8x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.155)... θ_cont=0.000, θ*=1.000
+
+  评估 10 道问题...
+    进度: 10/10
+  ARGO                : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Always-Retrieve     : Accuracy=80.0%, Quality=0.800, Cost=0.744, Retrievals=4.8
+  Always-Reason       : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Random              : Accuracy=80.0%, Quality=0.800, Cost=0.698, Retrievals=4.1
+
+[5/5] c_r = 0.2000 (10.0x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.200)... θ_cont=0.000, θ*=1.000
+
+  评估 10 道问题...
+    进度: 10/10
+  ARGO                : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Always-Retrieve     : Accuracy=80.0%, Quality=0.800, Cost=1.040, Retrievals=5.2
+  Always-Reason       : Accuracy=90.0%, Quality=0.900, Cost=0.260, Retrievals=0.0
+  Random              : Accuracy=100.0%, Quality=1.000, Cost=0.800, Retrievals=3.5
+
+================================================================================
+实验完成!
+================================================================================
+
+✓ 结果已保存: draw_figs/data/exp1_real_cost_impact_small_20251103_093429.json
+✓ 图表已保存: figs/exp1_graph1A_cost_vs_accuracy_small.png
+✓ 图表已保存: figs/exp1_graph1B_cost_vs_retrievals_small.png
+✓ 图表已保存: figs/exp1_supplementary_cost_vs_total_small.png
+
+实验1完成!
+
+使用提示:
+  当前是小规模测试模式，如果运行成功，请使用以下命令运行完整实验:
+  python Exp_real_cost_impact_v2.py --mode full --difficulty hard --gpus 0,1

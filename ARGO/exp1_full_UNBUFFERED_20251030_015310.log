@@ -1,0 +1,133 @@
+nohup: ignoring input
+========================================
+实验1: 检索成本影响 - 完整实验
+========================================
+
+📊 实验配置:
+   - 问题数量: ~12K题
+   - c_r采样点: 10个
+   - 难度: Hard
+   - GPU: 0,1,2,3,4,5,6,7 (8张 - 全部)
+   - 预计运行时间: 8-24小时
+
+开始时间: 2025-10-30 01:53:10
+========================================
+
+
+启动参数:
+  模式: full
+  难度: hard
+  GPU: [0, 1, 2, 3, 4, 5, 6, 7]
+  种子: 42
+
+
+================================================================================
+实验1: 检索成本影响 (真实LLM版本 - 修正版)
+================================================================================
+运行模式: 完整实验模式 (全部数据)
+LLM模型: /data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct
+嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+问题难度: HARD
+问题数量: 全部 (~12K)
+c_r采样点: 10个
+================================================================================
+
+GPU配置:
+  可用GPU: 8张
+  使用GPU: [0, 1, 2, 3, 4, 5, 6, 7]
+    GPU 0: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 1: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 2: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 3: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 4: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 5: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 6: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 7: NVIDIA GeForce RTX 3060 (12.6GB)
+
+加载ORAN-Bench-13K数据集...
+Loaded ORAN-Bench-13K:
+  Easy: 1139 questions
+  Medium: 9570 questions
+  Hard: 3243 questions
+  Total: 13952 questions
+✓ 加载了 3243 道 HARD 问题
+
+加载嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+✓ 嵌入模型加载成功 (GPU 0)
+
+连接Chroma数据库: /data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store
+✓ Chroma集合加载成功 (文档数: 436279)
+
+加载LLM模型: /data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct
+  使用 8 张GPU加载模型...
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█▎        | 1/8 [00:01<00:09,  1.37s/it]Loading checkpoint shards:  25%|██▌       | 2/8 [00:02<00:08,  1.38s/it]Loading checkpoint shards:  38%|███▊      | 3/8 [00:04<00:07,  1.55s/it]Loading checkpoint shards:  50%|█████     | 4/8 [00:06<00:06,  1.63s/it]Loading checkpoint shards:  62%|██████▎   | 5/8 [00:08<00:05,  1.68s/it]Loading checkpoint shards:  75%|███████▌  | 6/8 [00:09<00:03,  1.71s/it]Loading checkpoint shards:  88%|████████▊ | 7/8 [00:11<00:01,  1.73s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:12<00:00,  1.38s/it]Loading checkpoint shards: 100%|██████████| 8/8 [00:12<00:00,  1.52s/it]
+✓ LLM模型加载成功
+  Device map: {'model.embed_tokens': 0, 'model.layers.0': 0, 'model.layers.1': 0, 'model.layers.2': 1, 'model.layers.3': 1, 'model.layers.4': 1, 'model.layers.5': 1, 'model.layers.6': 1, 'model.layers.7': 1, 'model.layers.8': 1, 'model.layers.9': 2, 'model.layers.10': 2, 'model.layers.11': 2, 'model.layers.12': 2, 'model.layers.13': 2, 'model.layers.14': 2, 'model.layers.15': 2, 'model.layers.16': 3, 'model.layers.17': 3, 'model.layers.18': 3, 'model.layers.19': 3, 'model.layers.20': 3, 'model.layers.21': 3, 'model.layers.22': 3, 'model.layers.23': 4, 'model.layers.24': 4, 'model.layers.25': 4, 'model.layers.26': 4, 'model.layers.27': 4, 'model.layers.28': 4, 'model.layers.29': 4, 'model.layers.30': 5, 'model.layers.31': 5, 'model.layers.32': 5, 'model.layers.33': 5, 'model.layers.34': 5, 'model.layers.35': 5, 'model.layers.36': 5, 'model.layers.37': 6, 'model.layers.38': 6, 'model.layers.39': 6, 'model.layers.40': 6, 'model.layers.41': 6, 'model.layers.42': 6, 'model.layers.43': 6, 'model.layers.44': 7, 'model.layers.45': 7, 'model.layers.46': 7, 'model.layers.47': 7, 'model.norm': 7, 'model.rotary_emb': 7, 'lm_head': 7}
+
+================================================================================
+初始化完成!
+================================================================================
+
+
+================================================================================
+开始实验 - 检索成本影响
+================================================================================
+运行模式: 完整实验模式 (全部数据)
+c_r范围: 0.020 ~ 0.200 (扫描 10 个点)
+c_p固定: 0.020
+问题数量: 3243
+策略数量: 4 (ARGO, Always-Retrieve, Always-Reason, Random)
+总评估次数: 10 × 4策略 × 3243题 = 129720
+================================================================================
+
+
+[1/10] c_r = 0.0200 (1.0x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.020)... θ_cont=0.920, θ*=1.000
+
+  评估 3243 道问题...
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+    进度: 10/3243
+    进度: 20/3243
+    进度: 30/3243
+    进度: 40/3243
+    进度: 50/3243
+    进度: 60/3243
+    进度: 70/3243
+    进度: 80/3243
+    进度: 90/3243
+Traceback (most recent call last):
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 781, in <module>
+    main()
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 762, in main
+    results = experiment.run_experiment(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 581, in run_experiment
+    results = self.evaluate_all_policies(c_r, theta_cont, theta_star)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 530, in evaluate_all_policies
+    result = self.simulate_argo_policy(question, theta_cont, theta_star, c_r)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 369, in simulate_argo_policy
+    final_answer, _ = self.generate_answer(question, context)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 277, in generate_answer
+    prompt = self._create_prompt(question, context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_real_cost_impact_v2.py", line 315, in _create_prompt
+    1. {question['options'][0]}
+        ~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+========================================
+完整实验完成!
+========================================
+结束时间: 2025-10-30 02:58:34
+运行时间: 1小时 5分钟
+
+结果文件:
+  - 数据: draw_figs/data/exp1_real_cost_impact_full_*.json
+  - 图表: figs/exp1_graph1A_cost_vs_accuracy_full.png
+  - 图表: figs/exp1_graph1B_cost_vs_retrievals_full.png
+

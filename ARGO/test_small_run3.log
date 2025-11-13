@@ -1,0 +1,119 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+
+启动参数:
+  模式: small
+  难度: hard
+  GPU: [0, 1]
+  种子: 42
+
+
+================================================================================
+实验1: 检索成本影响 - 7B优化版本
+================================================================================
+运行模式: 小规模测试模式 (10题, 快速验证逻辑)
+LLM模型: Qwen2.5-7B-Instruct (优化版)
+嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+问题难度: HARD
+问题数量: 10
+c_r采样点: 5个
+================================================================================
+
+GPU配置:
+  可用GPU: 8张
+  使用GPU: [0, 1] (7B模型需要2张GPU)
+    GPU 0: NVIDIA GeForce RTX 3060 (12.6GB)
+    GPU 1: NVIDIA GeForce RTX 3060 (12.6GB)
+  剩余GPU: [2, 3, 4, 5, 6, 7] (可用于其他任务)
+
+加载ORAN-Bench-13K数据集...
+Loaded ORAN-Bench-13K:
+  Easy: 1139 questions
+  Medium: 9570 questions
+  Hard: 3243 questions
+  Total: 13952 questions
+✓ 加载了 10 道 HARD 问题
+
+加载嵌入模型: /data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2
+✓ 嵌入模型加载成功 (GPU 0)
+
+================================================================================
+预计算问题embeddings (优化检索性能)...
+================================================================================
+
+✓ 预计算完成!
+  - 问题数: 10
+  - 耗时: 0.4秒 (0.0分钟)
+  - 平均: 37.6ms/问题
+  - 内存占用: ~0.01 MB
+================================================================================
+
+连接Chroma数据库: /data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store
+✓ Chroma集合加载成功 (文档数: 436279)
+
+加载LLM模型: /data/user/huangxiaolin/ARGO/RAG_Models/models/qwen2.5-7b-instruct
+  使用 2 张GPU加载7B模型...
+  优化策略: device_map='auto', torch_dtype=bfloat16, 降低GPU通信开销
+  显存限制: GPU0=10GB, GPU1=11GB
+  加载模型中...
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:14<00:44, 14.69s/it]Loading checkpoint shards:  50%|█████     | 2/4 [00:29<00:29, 14.54s/it]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:42<00:14, 14.11s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:55<00:00, 13.52s/it]Loading checkpoint shards: 100%|██████████| 4/4 [00:55<00:00, 13.83s/it]
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+
+  ✓ 模型加载完成!
+  模型层分配:
+    0: 13层
+    1: 19层
+
+  GPU显存占用:
+    GPU 0: 6.78GB/12.6GB (已分配), 6.81GB (已保留)
+    GPU 1: 8.55GB/12.6GB (已分配), 8.57GB (已保留)
+
+  优化特性:
+    ✓ 精度: bfloat16 (降低显存50%)
+    ✓ 分布: 自动分配到2张GPU
+    ✓ 通信: 最小化跨GPU数据传输
+    ✓ 缓存: 启用KV缓存加速推理
+
+================================================================================
+初始化完成!
+================================================================================
+
+
+================================================================================
+开始实验 - 检索成本影响
+================================================================================
+运行模式: 小规模测试模式 (10题, 快速验证逻辑)
+c_r范围: 0.020 ~ 0.200 (扫描 5 个点)
+c_p固定: 0.020
+问题数量: 10
+策略数量: 4 (ARGO, Always-Retrieve, Always-Reason, Random)
+总评估次数: 5 × 4策略 × 10题 = 200
+================================================================================
+
+
+[1/5] c_r = 0.0200 (1.0x c_p)
+--------------------------------------------------------------------------------
+  求解MDP (c_r=0.020)... θ_cont=0.920, θ*=1.000
+
+  评估 10 道问题...
+Traceback (most recent call last):
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 1088, in <module>
+    main()
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 1069, in main
+    results = experiment.run_experiment(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 888, in run_experiment
+    results = self.evaluate_all_policies(c_r, theta_cont, theta_star)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 837, in evaluate_all_policies
+    result = self.simulate_argo_policy(question, theta_cont, theta_star, c_r)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 572, in simulate_argo_policy
+    sub_query = self.decompose_query(
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 462, in decompose_query
+    history_summary = "\n".join([f"Q: {q}\nA: {r[:100]}..." for q, r in history[-2:]])  # 最近2步
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/user/huangxiaolin/ARGO2/ARGO/Exp_7B_optimized_full.py", line 462, in <listcomp>
+    history_summary = "\n".join([f"Q: {q}\nA: {r[:100]}..." for q, r in history[-2:]])  # 最近2步
+                                               ~^^^^^^
+TypeError: 'int' object is not subscriptable

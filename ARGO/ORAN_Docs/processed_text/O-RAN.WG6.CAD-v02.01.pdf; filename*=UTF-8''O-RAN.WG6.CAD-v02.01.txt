@@ -1,0 +1,2575 @@
+O-RAN.WG6.CAD-v02.01
+  Technical Report
+Cloud Architecture and Deployment Scenarios
+ for O-RAN Virtualized RAN
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the
+previous requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN
+Adopter License Agreement to access and use Final Specifications shall no longer apply or be
+required for these Final Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is
+prohibited, save that you may print or download extracts of the material on this site for your
+personal use, or copy the material on this site for the purpose of sending to individual third
+parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of
+the material and that you inform the third party that these conditions apply to them and that they
+must comply with them.
+
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+                                                           O-RAN.WG6.CAD-v02.01
+                                                                                                                Technical Report
+
+Cloud Architecture and Deployment Scenarios
+ for O-RAN Virtualized RAN
+
+Prepared by the O-RAN Alliance e.V. Copyright © 2020 by the O-RAN Alliance e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving,
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter
+License Agreement contained in Annex ZZZ of this specification. All other rights reserved.
+1
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+2
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Revision History 2
+Date Revision Company Description
+2019.01.18 V0000.00 AT&T, Orange,
+Lenovo, …
+Template with initial scenarios.
+2019.01.29 V00.00.01 Editor (AT&T) Updates to terminology, miscellaneous other updates
+2019.02.07 V00.00.02 Editor (AT&T)  More definitions in 2.1, New Sec 4 on Overall Architecture,
+expansion/ updates of sec 5 Profiles, added Sec 6 OAM
+placeholder.
+2019.03.18 V00.00.03 Editor (AT&T) Many additions in content and section structure.
+2019.04.01 V00.00.04 Editor (AT&T) Some restructuring and combining of early sections, and more
+discussion on scope and context.  Addition of implementation
+consideration section, including performance.  Added optional
+Fronthaul GW. Provided framework discussion in each
+scenario’s subsection.  Other updates.
+2019.04.10 V00.00.05 Aricent, Red Hat,
+KDDI, Ciena
+Updates to include comments before April 11 review.
+Comments from RaviKanth (Aricent), Pasi (Red Hat), Shinobu
+(KDDI), and Lyndon (Ciena).
+2019.04.15 V00.00.06 Editor (AT&T) Updates to include some updates from comments from April 11
+review.
+2019.04.24 V00.00.07 Editor (AT&T) Updates of diagrams to address comments, additional figures on
+scope, and other changes to address April 11 review comments.
+2019.05.01 V00.00.08 KDDI Updates to diagrams for Scenarios A and B.  Modifications per
+KDDI regarding C.2.
+2019.05.12 V00.00.09 KDDI, Red Hat,
+Editor (AT&T)
+Updates based on meeting discussions, subsection additions
+based on proposals.
+2019.05.15 V00.00.10 Editor (AT&T) Clean-up in preparation of creating a baseline document –
+marking of many comments as done, adding editor notes where
+needed, and other clarifications.
+2019.05.20 V00.00.11 Editor (AT&T) Continued clean-up in preparation of a baseline.
+2019.05.29 V00.00.12 Editor (AT&T) Continued clean-up in preparation of a baseline.
+2019.06.04 V00.00.13 Wind River, China
+Mobile
+Major additions to the Cloud requirements in section 5.4 and
+Appendix B by Wind River, plus updates to the Fronthaul
+section from China Mobile. Various additional minor updates.
+2019.06.13 V00.01.00 Editor (AT&T) This is the same as V00.00.13, but with renumbering to indicate
+this is the initial baseline for comment, V00.01.00
+2019.06.14  V00.01.01 Wind River, AT&T This includes updates from CRs discussed and agreed to on the
+June 13 call:
+ Wind River contributions on adding a figure for NUMA
+illustration and a major enhancement of Sec 9.1 on cache
+ AT&T contribution to add material on centralization of O-
+DU/O-CU resources, to Sections 5.1 and 6.2
+ Update of figures to address Open Fronthaul comments
+(discussed June 6)
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+3
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+2019.07.05 V00.01.02 Editor (AT&T),
+based on meeting
+discussion
+Updates to address several CRs:
+ Multiple editorial items:
+o Draft text to address 5G/4G scope in Sec 1.2 – further
+discussion via separate CR
+o Statement in 5.2 about performance to focus on delay
+o Statement in 5.7 about transport
+o 5.8; update of Figure 13 to indicate cloud locations.
+Added MEC text that to address MEC comment
+during call.
+o Delay and loss table updates in 6, and statement in
+5.2
+ Former 9.1 and 9.3 sections of Appendix B (on cache and
+storage details) will be transferred to Tong’s document
+(Reference Design).
+ Update the O-DU pooling analysis in Section 5.1.3.
+2019.07.18 V00.01.03 AT&T, Red Hat,
+TIM, Intel,
+Ericsson
+Updates to address multiple CRs, through July 18:
+ Address NSA aspects in scope
+ Addition of 5.3 (Acceleration)
+ Removal of Scale up/down appendix, and note for future
+study
+ Update of delay figure in 5.2.
+ Update of Figure 4
+ Replacement of Zbox concept with O-Cloud, and all
+related updates.
+2019.08.02 V00.01.04 AT&T, Wind
+River, Red Hat
+Updates to address multiple CRs, discussed on Aug 1:
+ Update Section 5.6, merge in sec 7, explain some
+fundamental operations concepts.
+ Update the sync section to point to work in other WGs,
+and say that text will wait until CAD version 2.
+ Update the delay section (5.2.1)
+ Remove notes that refer to items that will not receive
+contributions in version 1.  Remove comments that are no
+longer relevant.
+ Remove Appendix A
+2019.08.09 V00.01.05 Red Hat, TIM, DT,
+Editor (AT&T)
+Updates to address multiple CRs and DT review comments,
+discussed on Aug 8.
+ Update 5.2.1 to address non-optimal fronthaul, and to
+correct some equations
+ Update 5.6 to add a figure showing the O1* interface
+ Addressed a range of comments by DT, some editorial,
+some more involved.
+2019.08.16 V00.01.06 Ericsson, Wind
+River, AT&T
+Updates to address multiple CRs and DT review comments,
+discussed on Aug 15.
+ Updates to address Ericsson’s comments
+ Update to address DT’s request to define vO-DU tile
+ Update of the Cloud Considerations section (5.4), mostly
+for restructuring to remove duplication, but to also add
+material for VMs or Containers where necessary to
+provide balanced coverage.
+ Additional updates:  Many resolved and obsolete Word
+comments have been removed in anticipation of
+finalization.
+ References to documents that are not finalized have been
+removed.
+2019.08.23 V00.01.07 AT&T Updates to reflect:
+ Updates of the O-DU pooling section based on Aug 20
+discussion
+ Management section updates are to address comments
+made on Aug 15 discussion, particularly regarding the use
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+4
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+of the term domain manager and its role in an ME, and the
+location of O1 terminations
+ Edits to remove references to O-RAN WGs, and make
+updates of the revision history.
+ Addition of standard O-RAN Annex ZZZ
+2019.08.26 V00.01.08 Editor (AT&T)  Clean up of references and cross references to them
+ Removed Word comments
+ Removed cardinality questions in Scenarios A (removed
+6.1.1) and Scenario B
+2019.08.26 V00.01.09 Editor (AT&T) Final minor comments during Aug 27 WG6 call, in preparation
+for vote.
+2019.10.01 V01.00.00 Editor (AT&T) Update of Annex ZZZ, page footers, and addition of title page
+disclaimer.
+2020.01.17 V01.00.01 Editor (AT&T) Merged the following CRs, but with
+ ATT-2019-11-19 CADS-C CR ATT-CAD-010
+acceleration 01.00.00
+ WRS 2019-12-04 CAD-C 01.00.00 rev 1
+2020.02.09 V01.00.02 Editor (AT&T) Simplified 5.6.
+ Removed 5.6.1, 5.6.2 – replaced it with pointers to O1,
+and O2 specification.
+ Incorporated NVD comments on 5.3 and 5.4 addressing
+inline acceleration as an option
+2020.03.03 V01.00.03 Editor (AT&T)  Updated 4, 4.1 to reflect the latest O-RAN architecture
+ Incorporated comments on 5.6 to include O1, O2
+references.
+ Updated 4.3 with O-Cloud description and definitions
+of key components of O-Cloud
+ Updated 5.3, Figure 15 to reflect O-Cloud reference
+figure in 4.3
+2020.03.09 V01.00.04 Orange  Various minor editorial modifications, take them as
+suggestions for better readability…
+2020.03.10 V01.05 Editor (AT&T)  Incorporated Ericsson comments provided on v01.00.02
+ Updated 1.1 to include O-RAN Architecture description
+ Added definitions for O-RAN Physical NF, O-RAN
+Cloudified NF
+2020.03.14 V01.06 AT&T, Orange Minor editorial modifications, make this version ready
+for WG6 internal review and voting
+2020.03.20 V02.00 AT&T, Orange Minor editorial, make this version ready for TSC
+review and voting
+2020.07.04 V02.01 AT&T Incorporated the following CRs:
+ TIM.AO-2020.05.18-WG6-CR-0001-CADS Scenario B
+Extension-v05
+ WRS-2020-04-24 CAD-v02.00 CR for PTP
+Notifications v05
+2020.07.06 V02.01 AT&T Added architecture of O-Cloud Resource Pool
+2020.07.14 V02.01 AT&T Addressed minor editorial comments received, making it ready
+for TSC review and voting
+  3
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+5
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Table of Contents 4
+Revision History ................................................................................................................................................. 2 5
+Table of Contents ............................................................................................................................................... 5 6
+Table of Figures .................................................................................................................................................. 6 7
+Table of Tables ................................................................................................................................................... 7 8
+1 Scope ........................................................................................................................................................ 8 9
+1.1 Context; Relationship to Other O-RAN Work ................................................................................................... 8 10
+1.2 Objectives .......................................................................................................................................................... 8 11
+2 References .............................................................................................................................................. 10 12
+3 Definitions and Abbreviations ............................................................................................................... 11 13
+3.1 Definitions ....................................................................................................................................................... 11 14
+3.2 Abbreviations ................................................................................................................................................... 12 15
+4 Overall Architecture ............................................................................................................................... 14 16
+4.1 O-RAN Functions Definitions ......................................................................................................................... 14 17
+4.2 Degree of Openness ......................................................................................................................................... 15 18
+4.3 Decoupling of Hardware and Software ............................................................................................................ 15 19
+ The O-Cloud............................................................................................................................................... 16 20
+ Key O-Cloud Concepts .............................................................................................................................. 17 21
+5 Deployment Scenarios:  Common Considerations ................................................................................. 19 22
+5.1 Mapping Logical Functionality to Physical Implementations ......................................................................... 19 23
+ Technical Constraints that Affect Hardware Implementations................................................................... 19 24
+ Service Requirements that Affect Implementation Design ........................................................................ 20 25
+ Rationalization of Centralizing O-DU Functionality ................................................................................. 20 26
+5.2 Performance Aspects ....................................................................................................................................... 23 27
+ User Plane Delay ........................................................................................................................................ 23 28
+5.3 Hardware Acceleration and Acceleration Abstraction Layer (AAL) ............................................................... 26 29
+ Accelerator Deployment Model ................................................................................................................. 27 30
+ Acceleration Abstraction Layer (AAL) Interface ....................................................................................... 27 31
+ Accelerator Management and Orchestration Considerations ..................................................................... 28 32
+5.4 Cloud Considerations ....................................................................................................................................... 28 33
+ Networking requirements ........................................................................................................................... 28 34
+5.4.1.1 Support for Multiple Networking Interfaces ................................................................................... 28 35
+5.4.1.2 Support for High Performance N-S Data Plane .............................................................................. 28 36
+5.4.1.3 Support for High-Performance E-W Data Plane ............................................................................. 29 37
+5.4.1.4 Support for Service Function Chaining .......................................................................................... 30 38
+ Assignment of Acceleration Resources ...................................................................................................... 30 39
+ Real-time / General Performance Feature Requirements ........................................................................... 30 40
+5.4.3.1 Host Linux OS ................................................................................................................................ 30 41
+5.4.3.1.1 Support for Pre-emptive Scheduling .................................................................................. 30 42
+5.4.3.2 Support for Node Feature Discovery .............................................................................................. 30 43
+5.4.3.3 Support for CPU Affinity and Isolation .......................................................................................... 30 44
+5.4.3.4 Support for Dynamic HugePages Allocation .................................................................................. 31 45
+5.4.3.5 Support for Topology Manager ...................................................................................................... 31 46
+5.4.3.6 Support for Scale In/Out ................................................................................................................. 32 47
+5.4.3.7 Support for Device Plugin .............................................................................................................. 32 48
+5.4.3.8 Support for Direct IRQ Assignment ............................................................................................... 32 49
+5.4.3.9 Support for No Over Commit CPU ................................................................................................ 33 50
+5.4.3.10 Support for Specifying CPU Model ................................................................................................ 33 51
+ Storage Requirements ................................................................................................................................ 33 52
+ Notification Subscription Framework ........................................................................................................ 33 53
+5.4.5.1 O-Cloud Notification Subscription Requirements .......................................................................... 33 54
+5.5 Sync Architecture ............................................................................................................................................ 34 55
+ Cloud Platform Time Synchronization Architecture .................................................................................. 34 56
+5.5.1.1 Edge Cloud Site Level – LLS-C3 Synchronization Topology ........................................................ 34 57
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+6
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.5.1.1.1 LLS-C3 Synchronization Topology Edge Site Time Synchronization Architecture .......... 35 58
+5.5.1.1.2 LLS-C3 Synchronization Topology Edge Site Requirements ............................................ 36 59
+ 5.5.1.1.2.1  Software ................................................................................................................. 36 60
+ 5.5.1.1.2.2  Hardware ................................................................................................................ 36 61
+ Loss of Synchronization Notification ......................................................................................................... 36 62
+5.6 Operations and Maintenance Considerations ................................................................................................... 37 63
+5.7 Transport Network Architecture ...................................................................................................................... 38 64
+ Fronthaul Gateways ................................................................................................................................... 38 65
+5.8 Overview of Deployment Scenarios ................................................................................................................ 38 66
+6 Deployment Scenarios and Implementation Considerations .................................................................. 39 67
+6.1 Scenario A ....................................................................................................................................................... 40 68
+ Key Use Cases and Drivers ........................................................................................................................ 40 69
+6.2 Scenario B ........................................................................................................................................................ 40 70
+ Key Use Cases and Drivers ........................................................................................................................ 41 71
+6.3 Scenario C ........................................................................................................................................................ 42 72
+ Key Use Cases and Drivers ........................................................................................................................ 42 73
+ Scenario C.1, and Use Case and Drivers .................................................................................................... 43 74
+ Scenario C.2, and Use Case and Drivers .................................................................................................... 44 75
+6.4 Scenario D ....................................................................................................................................................... 45 76
+6.5 Scenario E ........................................................................................................................................................ 46 77
+ Key Use Cases and Drivers ........................................................................................................................ 46 78
+6.6 Scenario F ........................................................................................................................................................ 46 79
+ Key Use Cases and Drivers ........................................................................................................................ 46 80
+6.7 Scenarios of Initial Interest .............................................................................................................................. 47 81
+7 Appendix A (informative):  Extensions to Current Deployment Scenarios to Include NSA ................. 47 82
+7.1 Scenario A ....................................................................................................................................................... 47 83
+7.2 Scenario B ........................................................................................................................................................ 47 84
+7.3 Scenario C ........................................................................................................................................................ 48 85
+7.4 Scenario C.2 ..................................................................................................................................................... 48 86
+7.5 Scenario D ....................................................................................................................................................... 48 87
+Annex ZZZ:  O-RAN Adopter License Agreement ......................................................................................... 49 88
+ 89
+Table of Figures  90
+Figure 1:  Relationship of this Document to Scenario Documents and O-RAN Management Documents ........................ 8 91
+Figure 2:  Major Components Related to the Orchestration and Cloudification Effort ...................................................... 9 92
+Figure 3:  Different Clouds/ Sites ..................................................................................................................................... 10 93
+Figure 4: High Level Architecture of O-RAN .................................................................................................................. 14 94
+Figure 5:  Logical Architecture of O-RAN ....................................................................................................................... 14 95
+Figure 6:  Decoupling, and Illustration of the O-Cloud Concept ...................................................................................... 15 96
+Figure 7:  Relationship between RAN Functions and Demands on Cloud Infrastructure and Hardware  ......................... 16 97
+Figure 8: Key Components Involved in/with an O-Cloud ................................................................................................ 17 98
+Figure 9: O-Cloud Node Roles and Deployment Examples ............................................................................................. 18 99
+Figure 10: Edge O-Cloud Architecture (Hub) .................................................................................................................. 18 100
+Figure 11: Edge O-Cloud Architecture (Single server) .................................................................................................... 19 101
+Figure 12:  Simple Centralization of O-DU Resources .................................................................................................... 21 102
+Figure 13:  Pooling of Centralized O-DU Resources........................................................................................................ 21 103
+Figure 14:  Comparison of Merit of Centralization Options vs. Number of Cell Sites in a Pool  ...................................... 22 104
+Figure 15:  Major User Plane Latency Components, by 5G Service Slice and Function Placement ................................ 24 105
+Figure 16: Hardware Abstraction Considerations ............................................................................................................. 27 106
+Figure 17: Accelerator APIs/Libraries in Container and Virtual Machine Implementations  ............................................ 27 107
+Figure 18:  Illustration of the Network Interfaces Attached to a Pod, as Provisioned by Multus CNI  ............................. 28 108
+Figure 19:  Illustration of the Userspace CNI Plugin ........................................................................................................ 29 109
+Figure 20:  Example Illustration of Two NUMA Regions ............................................................................................... 32 110
+Figure 21: O-Cloud Notification Framework Architecture .............................................................................................. 34 111
+Figure 22: Edge Cloud Site Time Sync Architecture for LLS-C3 .................................................................................... 35 112
+Figure 23: Hyperconverged Edge Cloud Time Sync Architecture for LLS-C3 ................................................................ 35 113
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+7
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Figure 24: O-vDU Subscribes to PTP Notification .......................................................................................................... 37 114
+Figure 25:  High-Level Comparison of Scenarios ............................................................................................................ 39 115
+Figure 26:  Scenario A ...................................................................................................................................................... 40 116
+Figure 27:  Scenario B – NR Stand-alone ......................................................................................................................... 40 117
+Figure 28: Scenario B – MR-DC (inter-RAT NR and E-UTRA) regardless of the Core Network type (either EPC or 118
+5GC) ................................................................................................................................................................................. 41 119
+Figure 29:  Scenario C ...................................................................................................................................................... 42 120
+Figure 30:  Treatment of Network Slices:  MEC for URLLC at Edge Cloud, Centralized Control, Single vO -DU ........ 43 121
+Figure 31:  Scenario C.1 ................................................................................................................................................... 43 122
+Figure 32:  Treatment of Network Slice: MEC for URLLC at Edge Cloud, Separate vO-DUs ....................................... 44 123
+Figure 33:  Single O-RU Being Shared by More than One Operator ............................................................................... 45 124
+Figure 34:  Scenario C.2 ................................................................................................................................................... 45 125
+Figure 35:  Scenario D ...................................................................................................................................................... 45 126
+Figure 36:  Scenario E ...................................................................................................................................................... 46 127
+Figure 37:  Scenario F ....................................................................................................................................................... 46 128
+Figure 38:  Scenario A, Including NSA ............................................................................................................................ 47 129
+Figure 39:  Scenario C, Including NSA ............................................................................................................................ 48 130
+Figure 40:  Scenario C.2, Including NSA ......................................................................................................................... 48 131
+Figure 41:  Scenario D, Including NSA ............................................................................................................................ 48 132
+Table of Tables 133
+Table 1:  Service Delay Constraints and Major Delay Contributors ................................................................................. 24 134
+Table 2:  Cardinality and Delay Performance for Scenario B........................................................................................... 42 135
+Table 3:  Cardinality and Delay Performance for Scenario C........................................................................................... 42 136
+Table 4:  Cardinality and Delay Performance for Scenario C.1........................................................................................ 43 137
+ 138
+139
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+8
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+1 Scope  140
+This Technical Report has been produced by the O-RAN Alliance. 141
+The contents of the present document are subject to continuing work within O-RAN and may change following formal 142
+O-RAN approval. Should O-RAN modify the contents of the present document, it will be re-released by O-RAN with an 143
+identifying change of release date and an increase in version number as follows:  144
+Version x.y.z 145
+where: 146
+x the first digit  is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 147
+etc. (the initial approved document will have x=01). 148
+y the second digit is incremented when editorial only changes have been incorporated in the document. 149
+z the third digit included only in working versions of the document indicating incremental changes during the 150
+editing process. 151
+1.1 Context; Relationship to Other O-RAN Work 152
+This document introduces and examines different scenarios and use cases for O -RAN deployments of Network 153
+Functionality into Cloud Platforms , O -RAN Cloudified NFs  and O-RAN Physical NFs .  D eployment scenarios are 154
+associated with meeting customer and service requirements, while considering technological constraints and the need to 155
+create cost-effective solutions. It will also reference management considerations covered in more depth elsewhere.  156
+The following O-RAN documents will be referenced (see Section 5.6): 157
+ OAM architecture specification [8] 158
+ OAM interface specification (O1) [9] 159
+ O-RAN Architecture Description [10] 160
+The details of implementing each identified scenario will be covered in separate Scenario documents, shown in green in 161
+Figure 1.   162
+ 163
+Figure 1:  Relationship of this Document to Scenario Documents and O-RAN Management Documents 164
+This document also draws on some other work from other O-RAN working groups, as well as sources from other industry 165
+bodies.   166
+1.2 Objectives  167
+The O-RAN Alliance seeks to improve RAN flexibility and deployment velocity, while at the same time reducing the 168
+capital and operating costs through the adoption of cloud architec tures. The structure of the Orchestration and 169
+Cloudification work is shown graphically below.  This document focuses on the Cloudification deployment aspects as 170
+indicated.  171
+Scenario
+Reference
+Design
+…
+Cloud Architecture
+and Deployment
+Scenarios
+OAM
+Architecture
+OAM Interface
+Specification
+Management
+documents
+Scenario
+Reference
+Design
+Scenario
+Reference
+Design
+O-RAN
+Architecture
+Description
+Architecture
+documents
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+9
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Editor’s note: O-RU cloudification and O-RU AAL are future study items.  172
+  173
+Figure 2:  Major Components Related to the Orchestration and Cloudification Effort 174
+A key principle is the decoupling of RAN hardware and software for all components including near-RT RIC, O-CU (O-175
+CU-CP and O -CU-UP), O -DU, and O -RU, and th e deployment of software components on commodity server 176
+architectures supplemented with programmable accelerators where necessary.  177
+Key characteristics of cloud architectures which we will reference in this document are:  178
+a) Decoupling of hardware from software.  This aims to improve flexibility and choice for operators by decoupling 179
+selection and deployment of hardware infrastructure from software selection,  180
+b) Standardization of hardware specifications across software implementations , to simplify ph ysical deployment 181
+and maintenance.  This aims to promote the availability of a multitude of software implementation choices for a 182
+given hardware configuration.   183
+c) Sharing of hardware.  This aims to promote the availability of a multitude of hardware implementation choices 184
+for a given software implementation. 185
+d) Flexible instantiation and lifecycle management through orchestration automation.   This aims to reduce 186
+deployment and ongoing maintenance costs by promoting simplification and automation throughout the 187
+hardware and software lifecycle through common chassis specifications and standardized orchestration 188
+interfaces.   189
+This document will define various deployment scenarios that can be supported by the O -RAN specifications and are of 190
+either current or relative ly near -term interest.  Each scenario is identified by a specific grouping of functionality a t 191
+different key locations (Cell Site, Edge Cloud, and Regional C loud, which will be defined shortly), and an identification 192
+of whether functionality  at a given loc ation is provided by a n O-RAN Physical NF based solution where software and 193
+hardware are tightly integrated and sharing a single identity, or by a cloud architecture that meets the above requirements. 194
+The scope of this work clearly includes supporting all 5G technologies, i.e. E-UTRA and NR with both EPC-based Non-195
+Standalone (NSA) and 5GC architectures. This implies that cloud/orchestration aspects of NSA (E -UTRA) are also 196
+supported. However, this version primarily addresses 5G SA deployments. 197
+This technical report examines the constraints that drive a specific solution, and discuss the hierarchical properties of each 198
+solution, including a rough scale of the size of each cloud and a sense of the number of sub clouds expected to be served 199
+by a higher cloud.  Figure 3 shows as example of how multiple cell sites feed into a smaller number of Edge Clouds, and 200
+how in turn multiple Edge Clouds feed into a Regional Cloud.  For a given scenario, the Logical Functions are distributed 201
+in a certain way among each type of cloud, and the “cardinality” of the different functions will be discussed.   202
+This has implications on the processing power needed in each type of cloud, as well as implications on the environmental 203
+requirements.  This document will also discuss considerations of hardware chassis and components that are reasonable in 204
+each scenario, and the implications of managing such a cloud.   205
+ 206
+Orchestration
+S/W
+H/W
+Cloud stack  ( Containers/VMs, OS, Cloud Mgmt. )
+O-CU O-DU O-RU
+Centralized CU/DU
+(C-RAN)
+CU/DU split Distributed
+CU/DU
+(D-RAN)
+Blackbox
+BBU
+Multitude of deployment
+models: CloudRAN,
+CU-DU split,
+dRAN on whitebox or DC
+All RAN modulesFlexible
+Orch.
+Inventory,
+Discovery,
+Registration
+Policy,
+Metrics
+Support 10,000s
+of distributed
+cloud sites
+Multitude of silicon
+accelerators
+Common LCM
+mechanisms
+across VNF &
+PNFs
+ASIC
+Cloudification
+AAL AAL AAL
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+10
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 207
+Figure 3:  Different Clouds/ Sites 208
+Additional major areas for this document are listed below:   209
+ Mapping of logical functions to physical elements and locations, and implications of that mapping. 210
+ High-level assessment of critical performance requirements, and how that influences architecture. 211
+ Processor and accelerator options (e.g., x86, FPGA, GPU ).  In order to determine whether a Network Function 212
+is a candidate for openness, there need s to be the possibility to have m ultiple suppliers of software for given 213
+hardware, and multiple sources of required chip/accelerators.   214
+ The Hardware Abstraction Layer, aka “Acceleration Abstraction L ayer” needs to be addressed in light of 215
+various hardware options that could be used. 216
+ Cloud infrastructure makeup.  This includes considerations such as: 217
+ Deployments are allowed to use VMs, Containers in VMs, or just Containers.  218
+ Multiple Operating Systems are expected to be supported; e.g., open source Ubuntu, CentOS Linux , or 219
+Yocto Linux-based distributions, or selected proprietary OSs.   220
+ Management of a cloudified RAN introduces some new management considerations, because the mapping 221
+between Network Functionality and cloud platforms can be done in multiple ways, depending on the scenario 222
+that is chosen.  Thus, management of aspects that ar e related to platform aspects rather than RAN functional 223
+aspects need to be designed with flexibility in mind from the start.  For example, logging of physical functions, 224
+scale out actions, and survivability considerations are affected.   225
+ These management considerations are introduced in this document, but management documents will 226
+address the solutions. 227
+ The transport layer will be discussed, but only to the extent that it affects the architecture and design of the 228
+network.  For example, the chosen L1 technology may affect the performance of transport.  As another example, 229
+the use of a Fronthaul Gateway will affect economics as well as the placement options of certain Network 230
+Functions.  And of course, t he existence of L2 switches in a cloud platform deploym ent will be required for 231
+efficient use of server resources. 232
+Additional areas could be considered in the future.   233
+2 References 234
+The following documents contain provisions which, through reference in this text, constitute provisions of this report. 235
+[1] 3GPP TS 38.470, NG-RAN; F1 general aspects and principles (Release 15). 236
+[2] 3GPP TR 21.905, Vocabulary for 3GPP Specifications. 237
+[3] eCPRI Interface Specification V1.2, Common Public Radio Interface:  eCPRI Interface Specification. 238
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+11
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+[4] eCPRI Transport Network V1.2, Requirements Specification, Common Public Radio Interface:  239
+Requirements for the eCPRI Transport Network. 240
+[5] IEEE Std 802.1CM-2018,  Time-Sensitive Networking for Fronthaul.  241
+[6] ITU-T Technical Report, GSTR-TN5G - Transport network support of IMT-2020/5G.  242
+[7] O-RAN WG4, Control, User and Synchronization Plane Specification, Technical Specification.  See 243
+https://www.o-ran.org/specifications. 244
+[8] O-RAN WG1, Operations and Maintenance Architecture – v03.00, Technical Specification.  See 245
+https://www.o-ran.org/specifications. 246
+[9] O-RAN WG1, Operations and Maintenance Interface Specification – v3.0, Technical Specification.  See 247
+https://www.o-ran.org/specifications.  248
+[10] O-RAN WG1, O-RAN Architecture Description – v02.00, Technical Specification. See https://www.o-249
+ran.org/specifications.  250
+[11] 3GPP TS 28.622, Telecommunication management; Generic Network Resource Model (NRM) Integration 251
+Reference Point (IRP); Information Service (IS). 252
+[12] O-RAN WG6, Cloud Platform Reference Design for Deployment Scenario B, Technical Specification.  See 253
+https://www.o-ran.org/specifications. 254
+3 Definitions and Abbreviations 255
+3.1 Definitions 256
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [2] and the following apply. 257
+A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP 258
+TR 21.905 [2].  259
+Cell Site This refers to the  location of Radio Unit s (RUs); e.g., placed on same structure as the Radio 260
+Unit or at the base.  The Cell Site in general will support multiple sectors  and hence multiple 261
+O-RUs. 262
+Edge Cloud This is a location that supports virtualized RAN functions for multiple Cell Sites, and provides 263
+centralization of functions for those sites and associated economies of scale.  An Edge Cloud 264
+might serve a large physical area or a relatively small one close to its cell sites, depending on 265
+the Operator’s use case.  However, the sites served by the Edge Cloud must be near enough to 266
+the O-RUs to meet the network latency requirements of the O-DU functions. 267
+F1 Interface  The open interface between O-CU and O-DU in this document is the same as that defined by 268
+the CU and DU split in 3GPP TS 38.473.  It consists of an F1-u part and an F1-c part. 269
+Managed Element  The definition of a Managed Element (ME) is given in 3GPP TS 28.622 [11] section 270
+4.3.3.  The ME supports communication over management interface(s) to the manager for 271
+purposes of control and monitoring.  272
+Managed Function  The definition of a Managed Function (MF) is given in 3GPP TS 28.622 [11] section 4.3.4.  An 273
+MF instance is managed using the management interfa ce(s) exposed by its containing ME 274
+instance. 275
+Network Function The near-RT RIC, O -CU-CP, O -CU-UP, O -DU, and O -RU logical functions that can be 276
+provided either by virtualized or non-virtualized methods.  277
+Regional Cloud This is a location that supports virtualized RAN functions for many Cell Sites in multiple Edge 278
+Clouds, and provides high centralization of functionality. The sites served by the Regional 279
+Cloud must be near enough to the O-DUs to meet the network latency requirements of the O-280
+CU and near-RT RIC.  281
+O-Cloud This refers to a collection of O-Cloud Resource Pools at one or more location and the software 282
+to manage Nodes and Deployments hosted on them.  An O-Cloud will include functionality to 283
+support both Deployment-plane and Management services . The O -Cloud provides a single 284
+logical reference point for all O-Cloud Resource Pools within the O-Cloud boundary. 285
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+12
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+O-RAN Physical NF  A RAN NF software deployed on tightly integrated hardware sharing a single Manage d 286
+Element identity. 287
+O-RAN Cloudified NF  A RAN NF software deployed on an O -Cloud with its own Managed Element identity , i.e., 288
+separate from the identity of the O-Cloud. 289
+3.2 Abbreviations 290
+For the purposes of this document, the abbreviations given in 3GPP TR  21.905 [2] and the following apply.  291
+An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 292
+3GPP TR 21.905 [2]. 293
+3GPP Third Generation Partnership Project 294
+5G Fifth-Generation Mobile Communications 295
+AAL Acceleration Abstraction Layer 296
+API Application Programming Interface 297
+ASIC Application-Specific Integrated Circuit  298
+BBU BaseBand Unit 299
+BS Base Station 300
+CI Cloud Infrastructure 301
+CoMP   Co-Ordinated Multi-Point transmission/reception 302
+CNF Cloud-Native Network Function  303
+CNI Container Networking Interface 304
+CPU Central Processing Unit 305
+CR Cell Radius 306
+CU Centralized Unit as defined by 3GPP 307
+DFT Discrete Fourier Transform 308
+DL Downlink 309
+DPDK Data Plan Development Kit  310
+DMS Deployment Management Services 311
+DU Distributed Unit as defined by 3GPP 312
+eMBB enhanced Mobile BroadBand 313
+EPC Evolved Packet Core 314
+E-UTRA Evolved UMTS Terrestrial Radio Access 315
+FCAPS Fault Configuration Accounting Performance Security  316
+FEC  Forward Error Correction 317
+FFT Fast Fourier Transform 318
+FH Fronthaul 319
+FH GW Fronthaul Gateway 320
+FPGA Field Programmable Gate Array 321
+GNSS Global Navigation Satellite System 322
+GPP General Purpose Processor 323
+GPS Global Positioning System 324
+GPU Graphics Processing Unit  325
+HARQ Hybrid Automatic Repeat ReQuest 326
+HW Hardware 327
+IEEE Institute of Electrical and Electronics Engineers 328
+IM Information Modelling, or Information Model 329
+IMS Infrastructure Management Services 330
+IRQ Interrupt ReQuest  331
+ISA Instruction Set Architecture 332
+ISD Inter-Site Distance 333
+ITU International Telecommunications Union 334
+KPI Key Performance Indicator 335
+LCM Life Cycle Management 336
+LDPC  Low-Density Parity-Check 337
+LLS Lower Layer Split   338
+LTE Long Term Evolution 339
+LVM Logic Volume Manager 340
+MEC Mobile Edge Computing 341
+mMTC massive Machine Type Communications 342
+MNO Mobile Network Operator 343
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+13
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+NF Network Function 344
+NFD Node Feature Discovery 345
+NFVI Network Function Virtualization Infrastructure 346
+NIC Network Interface Card 347
+NMS Network Management System  348
+NR  New Radio 349
+NSA Non-Standalone 350
+NTP Network Time Protocol 351
+NUMA Non-Uniform Memory Access  352
+NVMe Non-Volatile Memory Express 353
+O-Cloud O-RAN Cloud Platform 354
+OCP  Open Compute Project 355
+O-CU O-RAN Central Unit  356
+O-CU-CP O-CU Control Plane 357
+O-CU-UP O-CU User Plane 358
+O-DU O-RAN Distributed Unit (uses Lower-level Split) 359
+O-RU O-RAN Radio Unit 360
+OTII Open Telecom IT Infrastructure 361
+OWD One-Way Delay 362
+PCI Peripheral Component Interconnect 363
+PNF Physical Network Function 364
+PoE Power over Ethernet 365
+PoP Point of Presence 366
+PRTC Primary Reference Time Clock 367
+PTP Precision Time Protocol 368
+QoS  Quality of Service  369
+RAN Radio Access Network 370
+RAT Radio Access Technology 371
+RIC RAN Intelligent Controller  372
+RT Real Time 373
+RTT Round Trip Time 374
+RU Radio Unit  375
+SA Standalone 376
+SFC Service Function Chaining  377
+SMO Service Management and Orchestration 378
+SMP Symmetric MultiProcessing 379
+SoC System on Chip 380
+SR-IOV Single Root Input/ Output Virtualization 381
+SW Software 382
+TCO Total Cost of Ownership 383
+TNE Transport Network Element 384
+TR Technical Report 385
+TRP Transmission Reception Point 386
+TS Technical Specification 387
+TSC (T-TSC) Telecom Slave Clock 388
+Tx Transmitter 389
+UE User Equipment 390
+UL Uplink 391
+UMTS Universal Mobile Telecommunications System 392
+UP User Plane 393
+UPF User Plane Function 394
+URLLC Ultra-Reliable Low-Latency Communications 395
+vCPU virtual CPU 396
+VIM Virtualized Infrastructure Manager 397
+VM Virtual Machine  398
+VNF Virtualized Network Function 399
+vO-CU Virtualized O-RAN Central Unit  400
+vO-CU-CP Virtualized O-CU Control Plane 401
+vO-CU-UP Virtualized O-CU User Plane 402
+vO-DU Virtualized O-RAN Distributed Unit 403
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+14
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+4  Overall Architecture  404
+This section address es the overall architecture in terms of the Network Functions and infrastructure (O-RAN Physical 405
+NFs, servers, and clouds) that are in scope. Figure 4 provides a high-level view of the O-RAN architecture as depicted in 406
+[10].  407
+ 408
+Figure 4: High Level Architecture of O-RAN 409
+4.1 O-RAN Functions Definitions 410
+This section reviews key O-RAN functions definitions in O-RAN.  411
+ The O-DU/ O-RU split is defined as using Option 7-2x.  See [7].  412
+ The O-CU/ O-DU split is defined as using the CU/ DU split F1 as defined in 3GPP TS 38.470 [1].    413
+This document assumes these two splits.  414
+Figure 5 shows the logical architecture of O-RAN (as depicted in [10]) with O-Cloud platform at the bottom, where any 415
+given O-RAN function could be supported by O-Cloud, depending on the deployment scenario.  For example, the figure 416
+here illustrates a case where the O-RU is implemented as an O -RAN Physical NF, and the other functions within the 417
+dashed line are supported by O-Cloud.   418
+ 419
+Figure 5:  Logical Architecture of O-RAN 420
+OFH CUS-Plane
+F1-c
+A1
+F1-u
+E1
+E2
+Service Management and Orchestration Framework
+Non-Real Time RIC
+Near-Real Time RAN
+Intelligent Controller (RIC)
+O-DU
+NG-c
+NG-u
+X2-c
+Xn-u
+O-Cloud
+O2
+E2
+E2
+E2
+X2-u
+Xn-c
+O-CU-CP
+O-CU-UP
+O-eNB
+O1
+O-RU
+O1
+OFH M-Plane
+Open
+Fronthaul
+M-Plane
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+15
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+4.2 Degree of Openness 421
+In theory, every architecture component could be open in every sense imaginable, but in practice it is likely that different 422
+components will have varying degrees of openness due to economic and other implementation considerations.  Some 423
+factors are significantly affected by the deployment scenario; for example, what might be viable in an indoor deployment 424
+might not be viable in an outdoor deployment.   425
+Increasing degrees of openness for a n O-RAN Physical Network Function or O-RAN Cloudified Network Function(s) 426
+are: 427
+A. Interfaces among Network Functions are open; e.g., E2, F1, and Open Fronthaul are used. Therefore, Network 428
+Functions in different O-RAN Physical NFs/clouds from different vendors can interconnect. 429
+B. In addition to having open c onnections as described above , the chassis of servers in a cloud are open and can 430
+accept blades/sleds from multiple vendors.  However, the blades/sleds have RAN software that is not decoupled 431
+from the hardware. 432
+C. In addition to having open connections and an open chassis, a specific blade/sled uses software that is decoupled 433
+from the hardware.  In this scenario, the software could be from one supplier, the blade/sled could be from another, 434
+and the chassis could be from another.   435
+Categories A and B have O-RAN Physical NFs/clouds, while Category C is an open solution that we are calling a n O-436
+Cloud, and is subject to the cloudification discussion and requirements. 437
+In this document, the degree of openness for each O-RAN Physical NF/cloud can vary by scenario. The question of which 438
+Network Functions should be split vs. combined, and the degree of openness in e ach one, is addressed in the discussion 439
+of scenarios.  440
+4.3 Decoupling of Hardware and Software  441
+Editor’s note: O-RU AAL is a future study item.  442
+There are three layers that we must consider when we discuss decoupling of hardware and software:  443
+ The hardware layer, shown at the bottom in Figure 6.  (In the case of a VM deployment, this maps basically to 444
+the ETSI NFVI hardware sub-layer.) 445
+ A middle layer that includes Cloud Stack functions as well as Acceleration Abstraction Layer functions.  (In the 446
+case of a VM deployment, these map to the ETSI NFVI virtualization sub-layer + VIM.) 447
+ A top layer that supports the virtual RAN functions.  448
+Each layer can come from a different supplier.  The first aspect of decoupling has to do with ensuring that a Cloud Stack 449
+can work on multiple suppliers’ hardware; i.e., it does not require vendor-specific hardware.   450
+The second aspect of decoupling has to do with ensuring that a Cloud Platform can support RAN virtualized functions 451
+from multiple RAN software suppliers.  If this is possible, then we say that the Cloud Platform (which includes the 452
+hardware that it runs on) is an O-RAN Cloud Platform, or “O-Cloud”.  See Figure 6 below.   453
+ 454
+Figure 6:  Decoupling, and Illustration of the O-Cloud Concept 455
+Cloud stack  ( Containers/VMs, OS, Cloud Mgmt. )
+O-CU O-DU O-RU
+ASIC Hardware
+O-Cloud
+AAL AAL AAL
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+16
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ The O-Cloud  456
+The general definition of the O-Cloud Cloud Platform includes the following characteristics: 457
+1. The Cloud Platform is a set of hardware and software components that provide cloud computing capabilities to 458
+execute RAN network functions. 459
+2. The Cloud Platform hardware include s compute, networking and storage components, and may also include 460
+various acceleration technologies required by the RAN network functions to meet their performance objectives.  461
+3. The Cloud Platform software exposes open and well-defined APIs that enable the management of the entire life 462
+cycle for network functions.  463
+4. The Cloud Platform software is decoupled from the Cloud Platform hardware (i.e., it can typically be sourced 464
+from different vendors). 465
+The management aspects of the O -Cloud platform are discussed in 5.6. The scope of this document includes listing 466
+specific requirements of the Cloud Platform to support execution of the various O-RAN Network Functions. 467
+An example of a Cloud Platform is an OpenStack and/or a Kubernetes deployment on a set of COTS servers (including 468
+FPGA and GPU cards), interconnected by a spine/leaf networking fabric.  469
+There is an important int erplay between specific virtualized RAN functions and the hardware that is needed to meet 470
+performance requirements and to support the functionality economically.  Therefore, a hardware/ cloud platform 471
+combination that can support, say, a vO -CU function might not be appropriate to adequately support a vO-DU function.  472
+When RAN functions are combined in different ways in each specific deployment scenario, these aspects must be 473
+considered. 474
+Below is a high -level conceptual example of how different accelerators,  along with their associated cloud capabilities, 475
+can be required for different RAN functions.  Although we do not specify any particular hardware requirement or cloud 476
+capability here, we can note some general themes.  For example, any RAN function that involves real-time movement of 477
+user traffic will require the cloud platform to control for delay and jitter, which may in turn require features such as real -478
+time OSs, avoidance of frequent interrupts, CPU pinning, etc.   479
+ 480
+Figure 7:  Relationship between RAN Functions and Demands on Cloud Infrastructure and Hardware  481
+Please note that any cloud that has features required for a given function (e.g., for O -DU) can also support functions that 482
+do not require such features.  For example, a cloud that can support O-DU can also support functions such as O-CU-CP.  483
+ 484
+ 485
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+17
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Key O-Cloud Concepts  486
+Figure 8 illustrates key components of an O-Cloud and its management. 487
+ 488
+Figure 8: Key Components Involved in/with an O-Cloud 489
+Key terms in this figure are defined below: 490
+ An O-Cloud instance refers to a collection of O-Cloud Resource Pools at one or more location and the software 491
+to manage Nodes and Deployments hosted on them.  An O -Cloud will include functionali ty to support both 492
+Deployment-plane (aka. user-plane) and Management services. The O-Cloud provides a single logical reference 493
+point for all O-Cloud Resource Pools within the O-Cloud boundary. 494
+ An O-Cloud Resource Pool is a collection of O-Clouds nodes with homogeneous profiles in one location which 495
+can be used for either Management services or Deployment Plane functions. The allocation of NF deployment 496
+to a resource pool is determined by the SMO. 497
+ An O-Cloud Node is a collection of CPUs, Mem, Storage, NICs, Accelerators, BIOSes, BMCs, etc., and can be 498
+thought of as a server. Each O-Cloud Node will support one or more “roles”, see next. 499
+ O-Cloud Node Role refers to the functionalities that a given node may support. These include Compute, Storage, 500
+Networking for the Deployment -plane (i.e., user -plane related functions such as the  O-RAN NF ), they may 501
+include optional acceleration functions, and they may also include the appropriate Management services. 502
+ O-Cloud Deployment Plane is a logical construct representing the O -Cloud Nodes across the Resource Pools 503
+which are used to create NF Deployments. 504
+ An O-Cloud NF Deployment  is a deployment of a cloud native Network Function (all or partial), resources 505
+shared within a NF Function, or resource shared across network functions. The NF Deployment configures and 506
+assembles user-plane resources required for the cloud native construct used to establish the NF Deployment and 507
+manage its life cycle from creation to deletion. 508
+ The O2 Interface is a collection of services and their associated interfaces that are provided by the O -Cloud 509
+platform to the SMO. The services are categorized into two logical groups: (i) Infrastructure Management 510
+Services (IMS), which include the subset of O2 functions that are responsible for deploying and managing cloud 511
+infrastructure. (ii) Deployment Management Services (DMS), which include the subset of O2 functions that 512
+are responsible for managing the lifecycle of virtualized/containerized deployments on the cloud infrastructure.  513
+The O2 services and their associated interfaces shall be specified in the upcoming O2 specification. Any 514
+definitions of SMO functional elements needed to consume these services shall be described in OAM 515
+architecture. 516
+ 517
+Figure 9 illustrates several deployment examples to show the different O-Cloud Node Roles. Note that the O-Cloud Node 518
+Roles and the O-Cloud Node names are mentioned here as examples and are neither exhaustive nor standardized.  519
+Service Management & Orchestration Framework
+Compute Svc
+Storage Svc
+Compute Svc
+Storage Svc
+Distributed across locations
+O-Cloud
+Resource Pool2
+O-Cloud
+Resource Pool3
+O-Cloud
+Resource Pool1
+Compute Svc, w Accel
+O2
+O-Cloud Resource Pooln
+O-cloud instance
+O-cloud node
+O2
+NF DeploymentNF DeploymentNF Deployment
+Infrastructure Management Services (Logical & Distributed) *
+Deployment Management Services (Logical & Distributed) *
+Deployment Plane (Logical)
+O-Cloud instance
+* Services are optional on all resource pools
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+18
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+  520
+Figure 9: O-Cloud Node Roles and Deployment Examples 521
+An O -Cloud Resource Pool comprises of  one or more O-Cloud nodes, each with one or more network cards and 522
+optionally, one or more accelerator cards.  If the Resource Pool contains multiple compute nodes, it may also include an 523
+O-Cloud Switch Fabric consisting of leaf and spine switches that interconnect the O-Cloud nodes. The Switch Fabric may 524
+provide connectivity between the servers , to the O-RU through an O-RAN 7.2x compliant Fronthaul transport and to a 525
+regional O-Cloud through a Backhaul or Midhaul transport. The Switch Fabric may also be shared across multiple O -526
+Cloud Resource Pools or across multiple O-Cloud instances (via separate network domains). The O-Cloud Switch Fabric 527
+is managed by the Infrastructure Management Services (I MS) described earlier. Figure 10 shows the architecture of an 528
+O-Cloud Resource Pool configured as a hub, comprising of multiple servers.  529
+ 530
+ 531
+Figure 10: Edge O-Cloud Architecture (Hub) 532
+An O-Cloud Resource Pool may also comprise of a single server without any associated Switch Fabric, e.g., infrastructure 533
+deployed at a cell site. In such a scenario where a Switch Fabric is not present, the Compute Fabric may be directly 534
+connected to the O -RU through an O-RAN compliant front haul connection.  Figure 11 shows the architecture of an O-535
+Cloud Resource Pool in such a configuration without the O-Cloud Switch Fabric.  536
+ 537
+O-Cloud Node
+[role: control | storage | compute | ..]
+Depending on its role, different
+cloud services run on the node:
+Control Svc Compute Svc Storage Svc
+Some deployment examples:
+O-Cloud Control Node
+Control Svc
+O-Cloud Compute Node
+Compute Svc
+O-Cloud Storage Node
+Storage Svc
+Control Svc
+O-Cloud Control and Storage Node
+Storage Svc
+O-Cloud Compute and Storage Node
+Compute Svc Storage Svc
+O-Cloud all-in-one Node
+Compute Svc Storage Svc Control Svc
+O-RU: PHY-low/RF
+SMO
+ServerServerServer
+Leaf Leaf Leaf
+O-Cloud
+Compute
+Fabric
+O-Cloud
+Switch Fabric
+Spine (opt)
+O-RAN
+7.2x FH
+xNFxNF
+Deployments
+nRT-RIC,
+vO-CU, vO-DUxNF xNFxNF xNF
+Edge O-Cloud Resource Pool
+Regional O-Cloud
+(optional)
+Fronthaul
+transport
+O1
+Backhaul or
+midhaul
+transport
+O2
+IMS DMS
+Time source (GNSS)
+AccAcc NIC NICNIC
+AAL
+Server Server Server
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+19
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 538
+Figure 11: Edge O-Cloud Architecture (Single server) 539
+The requirements on the O -Cloud Switch Fabric such as clock/sync requirements, latency and jitter recommendations 540
+shall be described in a future version of this document. We note that the architecture of a regional cloud may be similar 541
+to that of an edge cloud but may not include some requirements such as time source.  542
+ 543
+5  Deployment Scenarios:  Common Considerations 544
+In any implementation of logical network functionality, decisions need to be made regarding which logical functions are 545
+mapped to which Cloud Platforms, and therefore which functions are to be co-located with other logical functions .  In 546
+this document we do not prescribe one specific implementation, but we do understand that in order to establish agreements 547
+and requirements, the manner in which the Network Functions are mapped to the same or different Cloud Platforms must 548
+be considered.   549
+We refer to each specific mapping as a “deployment scenario”.  In this section, we examine the deployment scenarios that 550
+are receiving the most consideration.  Then we will select the one or ones that should be the focus of initial scenario 551
+reference design efforts. 552
+5.1 Mapping Logical Functionality to Physical Implementations 553
+There are many aspects that need to be considered when deciding to implement logical function s in distinct O-Clouds.  554
+Some aspects have to do with f undamental technical constraints  and economic considerations , while others have to do 555
+with the nature of the services that are being offered.   556
+ Technical Constraints that Affect Hardware Implementations   557
+Below are some factors that will affect the cost of implementations, and can drive a carrier to require  separation of or 558
+combining of different logical functions.   559
+ Environment:  Equipment may be deployed in indoor controlled environments (e.g., Central Offices), semi -560
+controlled environments (e.g., cabinets with fans and heaters), and exposed environments ( e.g., Radio Units on 561
+a tower).  In general, the less controlled the environment, the more difficult and expensive  the equipment will 562
+be.  The required temperature range is a key design factor, and can drive higher power requirements.   563
+ Dimensions:  The physical dimensions can also drive deployment constraints – e.g., the need to fit into a tight 564
+cabinet, or to be placed safely on a tower or pole.   565
+ Transport technology:   The transport technology used for Fronthaul , Midhaul, and Backhaul is often fiber, 566
+which has an extremely low and acceptable loss rate.  However, there are options  other than fiber, in particular 567
+SMO
+O-Cloud
+Compute
+Fabric
+xNFxNF
+Deployments
+nRT-RIC,
+vO-CU, vO-DUxNF xNFxNF xNF
+Regional O-Cloud
+(optional)
+Fronthaul
+transport
+O1
+Backhaul or
+midhaul
+transport
+O2
+IMS DMS
+O-RU: PHY-low/RF
+O-RAN
+7.2x FH
+Acc NIC
+AAL
+O-RU: PHY-low/RF
+Acc NIC
+O-RU: PHY-low/RF
+Acc NIC
+O-Cloud Resource Pool A O-Cloud Resource Pool B
+Server Server Server
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+20
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+wireless/ microwave, where the potential for data loss must be considered.  This will be discussed further  in the 568
+next section. 569
+ Acceleration Hardwa re:  The need for acceleration hardware can be driven by the need to meet basic 570
+performance requirements, but can also be tied to some of the above considerations.  For example, a hardware 571
+acceleration chip (COTS or proprietary) can result in lower power use, less generated heat, and smaller physical 572
+dimensions than if acceleration is not used.  On the other hand, some types of hardware acceleration chips might 573
+not be “hardened” (i.e., they might only operate properly in a restricted environment), and could require a more 574
+controlled environment such as in a central office. 575
+The acceleration hardware most often referred to includes: 576
+ Field Programmable Gate Arrays (FPGAs) 577
+ Graphical Processing Units (GPUs) 578
+ System on Chip (SoC) 579
+ Standardized H ardware:  Use of standardized hardware designs and standardized form factors  can have 580
+advantages such as helping to reduce operations complexity, e.g., when an operator makes periodic technology 581
+upgrades of selected components.  An example would be to use an Open Compute Project (OCP)  or Open 582
+Telecom IT Infrastructure (OTII) –based design.   583
+ Service Requirements that Affect Implementation Design  584
+RANs can serve a wide range of services and customer  requirements, and each market can drive some unique  585
+requirements.  Some examples are below. 586
+ Indoor or outdoor deployment:  Indoor deployments (e.g., in a public venue like a sports stadium, train station, 587
+shopping mall, etc.) often enjoy a controlled environment for all elements, including the Radio Units.  This can 588
+improve the economics of some indoor deployment scenarios.  The distance between Network Functions tends 589
+to be much lower, and the devices that support O -RU functionality may be much easier and ch eaper to install 590
+and maintain. This can affect the density of certain deployments, and the frequency that certain scenarios are 591
+deployed.   592
+ Bands supported, and Macro cell vs. Small cell :  The choice of bands (e.g., Sub-6 GHz vs. mmWave) might 593
+be driven by whether the target customers are mobile vs. fixed, and whether a clear line of sight to the customer 594
+is available or is needed. The bands to be supported  will of course affect O-RU design.  In addition, b ecause 595
+mmWave carriers can support much higher channel width (e.g., 400 MHz vs. 20 MHz), mmWave deployments 596
+can require a great deal more O -DU and O -CU processing power.   And of course the operations costs of  597
+deploying Macro cells vs. Small cells differ in other ways.   598
+ Performance r equirements of the Application / Network Slice:   Ultimately, user applications drive 599
+performance requirements, and RANs are expected to support a very wide range of applications.  For example, 600
+the delay requirements to support a  Connected Car application using Ultra Reliable Low Latency 601
+Communications (URLLC) will be more demanding than the delay requirements for other types of applications.  602
+In our discussion of 5G, we can start by considering requirements separately for URLLC, enhanced Mobile 603
+Broadband (eMBB), and massive Machine Type Communications (mMTC). 604
+The consideration of performance requirements is a primary one, and is the subject of Section 5.2.  605
+ Rationalization of Centralizing O-DU Functionality 606
+Almost all Scenarios to be discussed in this document involve a degree of centralization of O -DU.  In this section it is  607
+assumed that O-DU resources for a set of O-RUs are centralized at the same location.   608
+Editor’s Note:  While most Scenarios also centralize O-CU-CP, O-CU-UP, and near-RT RIC in one form or another, 609
+the benefits of centralizing them are not discussed in this section.  610
+Managing O-DU in equipment at individual cell sites (via on-site BBUs today) has multiple challenges, including: 611
+ If changes are needed at a site (e.g., adding radio carriers), then adding equipment is a coarse -grained activity – 612
+i.e., one cannot generally just add “another 1/5 of a box”, if that is all that is needed.  Adding the minimum 613
+increment of additional capacity might result in poor utilization and thereby prevent expansion at that site.   614
+ Cell sites are in many separate locations, and each requires  establishment and maintenance of an acceptable 615
+environment for the equipment.  In turn this requires separate visits for any physical operations.  616
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+21
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Micro sites tend to have much lower average utilization than macro sites, but each can experience considerabl e 617
+peaks. 618
+ “Planned obsolescence” occurs, due to ongoing evolution of smartphone capabilities and throughput 619
+improvements, as well as introduction of new features and services.  It is common practice today to upgrade 620
+(“forklift replace”) BBUs every 36-60 months. 621
+These factors motivate the centralization of resources where possible.  For the O-DU function, we can think of two types 622
+of centralization: simple centralization and pooled centralization.   623
+If the equipment uses O -DU centralization in an Edge Cloud, at any given hour an O-RU will be using a single specific 624
+O-DU resource that is assigned to it (e.g. via Kubernetes).  On a broad time scale, traffic from any cell site can be rehomed, 625
+without any physical work, to use other/additional resources that are a vailable at that Edge Cloud location.  This would 626
+likely be done infrequently; e.g., about as often as cell sites are expanded.   627
+Centralization can have some additional benefits, such as only having to maintain a single large controlled environment 628
+for many cell sites rather than creating and maintaining many distributed locations that might be less controlled (e.g., 629
+outside cabinets or huts).  Capacity can be added at the central site and assigned to cell sites as needed.  Note that simple 630
+centralization still assigns each O-RU to a single O-DU resource1, as shown below, and that traffic from one O-RU is not 631
+split into subsets that could be assigned to different O -DUs.  Also note that a Fronthaul (FH) Gateway ( GW) may exist 632
+between the cell site and the centralized resources, not only to improve economics but also to enable traffic re -routing 633
+when desired.  634
+ 635
+Figure 12:  Simple Centralization of O-DU Resources 636
+By comparison, with pooled centralization, traffic from an O-RU (or subsets of the O-RU’s traffic) can be assigned more 637
+dynamically to any of several shared O-DU resources.  So if one cell site is mostly idle and another experiences high 638
+traffic demand, the traffic can be routed to the appropriate O-DU resources in the shared pool.  The total resources of this 639
+shared pool can be smaller than resources of distributed locations, because the peak of the sum of the traffic will be 640
+markedly lower than the sum of the individual cell site traffic peaks.   641
+ 642
+Figure 13:  Pooling of Centralized O-DU Resources 643
+We note that being able to share O -DU resources somewhat dynamically is expected to be a solvable problem, although 644
+we understand that it is by no means a trivial problem.  There are management considerations, among others.  There may 645
+
+1 In this figure, each O-DU block can be thought of as a unit of server resources that includes a hardware accelerator, a GPP, memory and any other
+associated hardware.
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+22
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+be incremental steps toward true shared pooling, where rehoming of O -RUs to different O-DUs can be performed more 646
+dynamically, based on traffic conditions. 647
+It is noted that O-DU centralization benefits the most dense networks where several cell sites are within the O -RU to O-648
+DU latency limits.  Sparsely populated areas most probably will be addressed by vO -CU centralization only.   649
+Figure 14 shows the results of an analysis of a simulated greenfield deployment as an attempt to visualize the relative 650
+merit of simple centralization of O -DU (“oDU”) vs. pooled centralization of O -DU (“poDU”) vs. legacy DU (“BBU”), 651
+plotted against the realizable Cell Site pool size.  652
+ 653
+Figure 14:  Comparison of Merit of Centralization Options vs. Number of Cell Sites in a Pool 654
+An often-used measure is related to the power required to support a given number of carrier MHz.  The lower the power 655
+used per carrier, the more efficient is the implementation.  In Figure 14, the values of each curve are normalized to the 656
+metric of Watts/MHz for distributed legacy BBUs, normalized to equal 1.  Please note that in this diagram, a lower value 657
+is better.  The following assumptions apply to the figure:   658
+ A legacy BBU processes X MHz (for carriers) and consumes Y watts.  For example, a specific BBU might 659
+process 1600 MHz and consume 160 watts.  660
+ N legacy BBUs will process N x X  MHz and consume N x Y watts and have a merit figure of 1, per 661
+normalization.  If a given site requires less than X MHz, it will still be necessary to deploy an X MHz BBU.  For 662
+example, we may need only 480 MHz but still deploy a 1600 MHz BBU.  663
+ Simple Centralization (the “oDU” line):  In this case, active TRPs are statically mapped to specific VMs and 664
+vO-DU tiles2.  Fewer vO-DU tiles are required to support the same number of  TRPs, because MHz per site is 665
+not a constant. 666
+ Independent of resources to support active user traffic, a fixed power level is required to power Ethernet 667
+“frontplane” switches and hardware to support management and orchestration processes. 668
+ In a pool, processing capacity will be added over time as required. 669
+ Due to mobility traffic behavior, tiles will not be fully utilized, although centralization of resources will 670
+improve utilization when compared with a legacy BBU approach.   671
+
+2 A “vO-DU tile” refers to a chip or System on Chip (SoC) that provides hardware acceleration for math-intensive functionality such as that required
+for Digital Signal Processing.  With the Option 7.2x split, acceleration of Forward Error Correction (FEC) functionality is required (FEC is
+optional for e.g. low band.), and other functionality could be considered for acceleration if desired.
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+23
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Centralization with more dynamic pooling (the “poDU” line): In addition to active load balancing,  individual 672
+traffic flows (which can last from a few hundreds of msecs  to several seconds) will be  routed to the least used  673
+tile, further optimizing (reducing) vO-DU tile requirements.   674
+ As in the simple centralization approach above, there is a fixed power level required for hardware that 675
+supports switching, management and orchestration processes. 676
+As a final note, any form of centralization requires efficient transport between the O-RU and the O-DU resources.  When 677
+O-RU functionality is distributed over a relatively large area (e.g., not concentrated in a single large building), the 678
+existence of a Fronthaul Gateway is a key enabler.   679
+5.2 Performance Aspects 680
+Performance requirements drive architectural and design considerations.   Performance can include attributes such as 681
+delay, packet loss, transmission loss, and delay variation (aka “jitter”).   682
+Editor’s Note:  While all aspects are of interest, delay has the largest impact on network desi gn and will be the 683
+focus of this version.  Future versions can address other performance aspects if desired and is FFS.   684
+ User Plane Delay 685
+This section discusses the framework for discussing delay of user-plane packets3, and also general delay numbers that it 686
+can be agreed that apply across all scenarios.  Details relevant to a specific Scenario will be discussed  in each Scenario’s 687
+subsection, as applicable. The purpose of these high -level targets is to act as a baseline for allocating the total latency 688
+budget to subsystems that are on the path of each constraint, as required for system engineering and dimensioning 689
+calculations, and to assess the impact on the function placement within the specific  network site tiers.   690
+The goal is to establish reasonable maximum delay targets, as well as to identify and document the major infrastructure 691
+as well as O -RAN NF-specific delay contributing components. For each service or element, minimum delay should be 692
+considered to be zero. The implication of this is that any of the elements can be moved towards the Cell Site (e.g. in a 693
+fully distributed Cloud RAN configuration, all of O-CU-UP, O-DU and O-RU would be distributed to Cell Site).  694
+In real network deployments, the expectation is that, depending on the operator-specific implementation constraints such 695
+as location and fiber availability, deployment area density, etc., deployments result in anything between the fully 696
+distributed and maximally centralized configuration. Even on one op erator’s network, it is common that there are many 697
+different sizes of Edge Cloud instances, and combinations of Centralized and Distributed architectures in same network 698
+are also common (e.g. network operator may choose to centralize the deployments on den se Metro areas to the extent 699
+possible and distribute the configurations on suburban/rural areas with larger cell sizes / cell density that do not translat e 700
+to pooling benefits from more centralized architecture). However, the maximum centralization within the constraints of 701
+latencies that can be tolerable is useful for establishing the basis for dimensioning of the maximum sizes, especially for 702
+the Edge and Regional cloud PoPs. Figure 15 below illustrates the relationship among some key delay parameters.   703
+
+3 Delay of control plane or OAM traffic is not considered in this section.
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+24
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 704
+Figure 15:  Major User Plane Latency Components, by 5G Service Slice and Function Placement  705
+Please note the following: 706
+ NOTE 1: If the T2 or/and T3 transport network(s) is/are Packet Transport Network(s), then time allocation for 707
+the transport network elements  processing and queuing delays will require some portion of maximum latency 708
+allocation, and will require reduction of the maximum area accordingly. 709
+ NOTE 2: Site Internal / fabric networks are not shown for clarity, but need some latency allocation (effecti vely 710
+extensions or part of transport delays; per PoP tier designations TE1, TE2, TE3 and TC). 711
+ NOTE 3: To maximize the potential for resource pooling benefits, minimize network function redundancy cost, 712
+and minimize the amount of hardware / power in progres sively more distributed sites (towards UEs), target 713
+design should attempt to maximize the distances and therefore latencies available for transport networks within 714
+the service- and RAN-specific time constraints, especially for TT1. 715
+ NOTE 4: UPF, like EC /MEC, is outside of the scope of O -RAN, so UPF shown as  a “black box” to illustrate 716
+where it needs to be placed in context of specific services to be able to ta ke advantage of the RAN service -717
+specific latency improvements. 718
+Figure 15 represents User Equipment locations on the right, and network tiers towards the left, with increasing latency 719
+and increasing maximum area covered per tier towards the left. These Mobile Network Operator’s (MNO’s) Edge tiers 720
+are nominated as Cell Site, Edg e Cloud, and Regional Cloud, with one additional tier nominated as Core Cloud in the 721
+figure. 722
+The summary of the associated latency constraints as well as major latency contributing components as depicted in Figure 723
+15 above is given in Table 1, below. 724
+Table 1:  Service Delay Constraints and Major Delay Contributors 725
+RAN Service-Specific User Plane Delay Constraints
+Identifier Brief Description
+Max. OWD
+(ms)
+Max. RTT
+(ms)
+URLLC Ultra-Reliable Low Latency Communications (3GPP) 0.5 1
+URLLC Ultra-Reliable Low Latency Communications (ITU) 1 2
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+25
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+eMBB enhanced Mobile Broadband 4 8
+mMTC massive Machine Type Communications 15 30
+Transport Specific Delay Components
+TAIR Transport propagation delay over air interface
+TE1 Cell Site Switch/Router delay
+TT1 Transport delay between Cell Site and Edge Cloud 0.1 0.2
+TE2 Edge Cloud Site Fabric delay
+TT2 Transport delay between Edge and Regional Cloud 1 2
+TE3 Regional Cloud Site Fabric delay
+TT3 Transport delay between Regional  and Core Cloud 10 20
+TC Core Cloud Site Fabric delay
+Network Function Specific Delay Components
+TUE Delay Through the UE SW and HW stack
+TRU Delay Through the O-RU User Plane
+TDU Delay Through the O-DU User Plane
+TCU-UP Delay Through the O-CU User Plane
+ 726
+The transport network delays are specified as maximums, and link speeds are considered to be symmetric for all 727
+components with exception of the air interface (TAIR).  For the S-Plane services utilizing PTP protocol, it is a requirement 728
+that the link lengths, link speeds and forward-reverse path routing for PTP are all symmetric. 729
+Radios (O-RUs) are always located in the Cell Site tier, while O-DU can be located “up to” Edge Cloud tier. It is possible 730
+to move any of the user plane NF instances closer towards the cell site,  as implicitly they would be inside the target 731
+maximum delay, but it is not necessarily possible to move them further away from the Cell Sites while remaining within 732
+the RAN internal and/or RAN service-specific timing constraints.  A common expected deployment case is one where O-733
+DU instances are moved towards or even to the Cell Site and O -RUs (e.g. in Distributed Cloud-RAN configurations), or 734
+in situations where the Edge Cloud needs to be located closer to the Cell Site due to fiber and/or location availa bility, or 735
+other constraints. While this is expected to work well from the delay constraints perspective,  the centralization and 736
+pooling-related benefits will be potentially reduced or even eliminated in the context of such deployment scenarios.  737
+The maximum transport network latency between the site hosting O -DU(s) and sites hosting associated O -RU(s) is 738
+primarily determined by the RAN internal processes time constraints (such as HARQ loop, scheduling, etc., time-sensitive 739
+operations). For the pur poses of this document, we use 100us latency, which is commonly used as a target maximum 740
+latency for this transport segment in related industry specifications for user -plane, specifically “High100” on E -CPRI 741
+transport requirements [4] section 4.1.1, as well as “Fronthaul” latency requirement in ITU technical report GSTR-TN5G 742
+[6], section 7 -2, and IEEE Std 802.1CM -2018 [5], section 6.3.3.1.  Based on the 5us/km fiber propagation delay, this 743
+implies that in a 2D Manhattan tessellation model, which is a common simple topology model for dense urban area fiber 744
+routing, the maximum area that can be covered from a single Edge Cloud tier site hosting O-DUs is up to a 400km2  area 745
+of Cell Sites and associated RUs .  Based on the radio inter -site distances, number of bands and other radio network 746
+dimensioning specific parameters, this can be used to estimate the maximum number of Cell Sites and cell sect ors that 747
+can be covered from single Edge Cloud tier location, as well as maximum number of UEs in this coverage area. 748
+The maximum transport network latencies towards the entities located at higher tiers are constrained by the lower of F1 749
+interface latency (max 10 ms as per GSTR -TN5G [6], section 7.2), or alternatively service -specific latency constraints, 750
+for the edge -located services that are positione d to take advantage of improved latencies.   For eMBB, UE -CU latency 751
+target is 4m s one -way delay, while for the U RLLC it is 0.5ms as per 3GPP (or 1ms as per ITU requirements). The 752
+placement of the O-CU-UP as well as associated UPF, to be able to provide URLLC services would have to be at most at 753
+the Edge Cloud tier to satisfy the service latency constraint. For the eMBB service s with 4ms OWD target, it is possible 754
+to locate O-CU-UP and UPF on next higher latency location tier, i.e. Regional Cloud tier. Note that while not shown i n 755
+the picture, Edge compute / Multi-Access Edge Compute (MEC) services for a given RAN service type are expected to 756
+be collocated with the associated UPF function to take advantage of the associated service latency reduction potential.  757
+For the services that do not have specific low-latency targets, the associated O-CU-UP and UPF can be located on higher 758
+tier, similar to deployments in typical LTE network designs. This is designated as Core Cloud tier in the example in Figure 759
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+26
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+15 above.  For eMBB services, if there are no local service instances in the Edge or Regional clouds to take advantage of 760
+the 4ms OWD enabled by eMBB service defini tion, but the associated services are provided from either core clouds, 761
+external networks or from other Edge Cloud / RAN instances (in case of user -to-user traffic), the associated non -762
+constrained (i.e. over 4ms from subscriber) eMBB O -CU-UP and UPF instan ces can be located in Core Cloud sites 763
+without perceivable impact to the service user, as in such cases the transport and/or service-specific latencies are dominant 764
+latency components.  765
+The intent of this section is not to micromanage the latency budget, b ut to rather establish a reasonable baseline for 766
+dimensioning purposes, particularly to provide basic assessment to enable sizing of the cloud tiers wi thin the context of 767
+the service-specific constraints and transport allocations. As such, we get the follo wing “allowances” for the aggregate 768
+unspecified elements: 769
+ URLLC3GPP: 0.5ms - 0.1ms (TT1) = 0.4ms  ≥ TUE + TAIR + TE1 + TRU + 2(TE2) + TDU + TCU-UP 770
+ URLLCITU: 1ms - 0.1ms (TT1) = 0.9ms  ≥ TUE + TAIR + TE1 + TRU + 2(TE2) + TDU + TCU-UP 771
+ eMBB: 4ms - 0.1ms (TT1) - 1ms (TT2) = 2.9ms ≥ TUE + TAIR + TE1 + TRU + 2(TE2) + TDU + TE3 + TCU-UP 772
+ mMTC15: 15ms - 0.1ms (TT1) - 1ms (TT2) - 10ms (TT3) = 3.9ms ≥ TUE + TAIR + TE1 + TRU + 2(TE2) + TDU + TE3 + 773
+TCU-UP + TC 774
+ 775
+If required, we may provide more specific allocations in later versions of the document, as we gain more implementation 776
+experience and associated test data, but at this stage it is considered to be premature to do so. It should also be noted tha t 777
+the URLLC specification is still work i n progress at this stage in  3GPP, so likely first implementations will focus on 778
+eMBB service, which leaves 2.9ms for combined O-RAN NFs, air interface, UE and cloud fabric latencies. 779
+It is possible that network queuing delays may be the dominant delay contributor for some service classes. However, these 780
+delay components should be understood to be  in context of the most latency -sensitive services, particularly on RU -DU 781
+interfaces, and relevant to the system level dimensioning. It is expected that if we will have multiple QoS classes, then 782
+the delay and loss parameters are specified on per-class basis, but such specification is outside of scope of this section.  783
+The delay components in this section are based on presently supported O -RAN splits, i.e. 3GPP reference split 784
+configurations 7-2 & 8 for the RU-DU split (as defined in O-RAN), and 3GPP split 2 for F1 (as defined in O-RAN) and 785
+associated transport allocations, and constraints are based on the 5G service requirements from ITU & 3GPP.  786
+Other extensions have been approved and included in version 2.0 of the O-RAN Fronthaul specification [7], which allow 787
+for so called “non -ideal” Fronthaul. It should be noted that while they allow s ubstantially larger delays (e.g. 10 ms FH 788
+splits have been described and implemented outside of O-RAN), they cannot be considered for all possible 5G use cases, 789
+as for example it is clearly impossible to meet the 5G service -specification requirements over such large delay values 790
+over the FH for URLLC or even 4 ms eMBB services. In addition, in specific scenarios (e.g. high -speed users), adding 791
+latency to the fronthaul interface can result in reduced performance, and lower potential benefits, e.g. in Co -Ordinated 792
+Multi-Point (CoMP) mechanisms. 793
+5.3 Hardware Acceleration and Acceleration Abstraction Layer 794
+(AAL) 795
+As stated in Section 4.3.2, an O-Cloud Node is a collection of CPUs, Memory, Storage, NICs, BIOSes, BMCs, etc., and 796
+may include hardware accelerators to offload computational-intense functions with the aim of optimizing the performance 797
+of the O-RAN Cloudified NF (e.g., O-RU, O-DU, O-CU-CP, O-CU-UP, near-RT RIC).  There are many different types 798
+of hardware accelerators, such as FPGA, ASIC, DSP, GPU, and many different types of acceleration functions, such as 799
+Low-Density Parity -Check (LDPC) , Forward Error Correction (FEC) , end-to-end high -PHY for O -DU, security 800
+algorithms for O -CU, and Artificial Intelligence for RIC .  The combination of hardware accelerator and acceleration 801
+function, and indeed the option to use hardware acceleration, is the vendor’s choice; however , all types of hardware 802
+acceleration on the cloud platform should ensure the decoupling of software from hardware. This decoupling implies the 803
+following key objectives:  804
+ Multiple vendors of hardware GPP CPUs and accelerators (e.g., FGPA, ASIC, DSP, or GPU) can be used in O-805
+Cloud platforms (including agreed -upon Acceleration Abstraction Layer as defined in an upcoming 806
+specification) from multiple vendors, which in turn can support the software providing RAN functionality.  807
+ A given hardware and cloud platform shall support RAN software (including near-RT RIC, O-CU-CP, O-CU-808
+UP, O-DU, and possibly O-RU functionality in the future) from multiple vendors.  809
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+27
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+There are different concepts that should be considered for the hardware acceleration abstraction layer on the cloud 810
+platform; these are usually the following:  811
+ Accelerator Deployment Model  812
+ Acceleration Abstraction Layer (AAL) Interface (i.e., the APIs used by the NFs)  813
+ 814
+Figure 16: Hardware Abstraction Considerations 815
+ Accelerator Deployment Model  816
+Figure 16 above presents two common hardware accelerator deployment models  as examples : an abstracted 817
+implementation utilizing a vhost_user and virtIO type deployment, and a pass -through model using SR -IOV. While the 818
+abstracted model allows a full decoupling of the Network Function (NF) from the hardware accelerator, this model may 819
+not suit real-time latency sensitive NFs such as the O-DU. For better acceleration capabilities, SR-IOV pass through may 820
+be required, as it is supported in both VM and container environments.  821
+ Acceleration Abstraction Layer (AAL) Interface 822
+To allow multiple NF vendors to utilize a given accelerator through its Acceleration Abstraction Layer (AAL) interface, 823
+the a ccelerators must provide an open -sourced API.  Likewise, this API shall allow NFs applications to discover , 824
+configure, select and use (one or more) acceleration functions provided by a given accelerator on the cloud platform . 825
+Moreover, this API shall also support different offload architectures including look aside , inline and any combination of 826
+both. Examples of open APIs include DPDK’s CryptoDev, EthDev, EventDev, and Base Band Device (BBDEV).  827
+When delivering an NF to an Operator, it is assumed that the supplier of that Network Function will provide not only the 828
+Network Function, but it will also package the appropriate Accelerator Driver (possibly provided by a 3rd party) and will 829
+indicate the corresponding AAL profile needed in the Operator’s O -Cloud. Figure 17 illustrates this for both Container 830
+and Virtual Machine (VM) deployments.  831
+  832
+Figure 17: Accelerator APIs/Libraries in Container and Virtual Machine Implementations 833
+O-Cloud instance
+Compute Svc, with Acceleration
+Host OS Acc. Driver
+Virtual Machine NF Application
+API –U
+Guest OS
+O-RAN
+Network Functions in a
+Virtual Machine
+Deployment
+Management Services
+Infrastructure Management
+Services Acc. Mgmt.
+Acc. Driver
+e.g., AAL FEC profile
+APIs/Libraries
+O-Cloud Node
+O-Cloud instance
+Deployment
+Management Services
+Compute Svc, with Acceleration
+Infrastructure Management
+Services Acc. Mgmt.
+Host OS
+Acc. Driver
+e.g., AAL FEC profile
+NF Application
+APIs/Libraries
+Acc. Driver
+O-RAN
+Network Functions in a
+Container
+O-Cloud Node
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+28
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Accelerator Management and Orchestration Considerations 834
+Note that Figure 17 shows the APIs/Libraries as used by the NF application running in a Container or a VM, but there are 835
+several entities that require management. Accordingly, the figure also shows the Accelerator Management and 836
+Accelerator Driver in the O -Cloud.  As will be discussed in Section 5.6, these entities ( in addition to  any hardware 837
+accelerator considerations) will be managed via O2, specifically the Infrastructure Management Services.  Figure 17 also 838
+shows that the Accelerator Driver (e.g., the PMD driver) needs to be supported both by the O-Cloud Platform, by the 839
+Guest OS in case of VMs, and by the NF packaged into a container.   840
+In general, t he hardware accelerators shall be capable of being managed and orchestrated. In particular, hardware 841
+accelerators shall support feature discovery and life cycle management.  Existing Open Source solutions may be leveraged 842
+for both VMs and containers as defined in an upcomingO2 specification.  Examples include OpenStack Nova and Cyborg, 843
+while in Kubernetes we can leverage the device plugin framework for vendors to advertise their device and associated 844
+resources for the accelerator management.   845
+5.4 Cloud Considerations 846
+In this section we talk about the list of cloud platform capabilities which is expected to be provided by the cloud platform 847
+to be able to support the deployment of the scenarios which are covered by this document.   848
+It is assumed that some or all deployment scenarios may be using VM orchestrated/managed by OpenStack and / or 849
+Container managed/orchestrated by Kubernetes, and therefore this section will cover both options. 850
+The discussion in most sub-sections of this section is structured into (up to) three parts:  (1) Common, (2) Container 851
+only, and (3) VM only.  852
+ Networking requirements 853
+A Cloud Platform should have the ability to support high performance N – S and E – W networking, with high throughput 854
+and low latency.  855
+5.4.1.1 Support for Multiple Networking Interfaces 856
+Common:  In the different scenarios, near -RT RIC, vO -CU, and vO -DU all depend on having su pport for multiple 857
+network interfaces. The Cloud Platform is required to support the ability to assign multiple networking interfaces to a 858
+single container or VM instance, so that the cloud platform could support successful deployment for the different 859
+scenarios.  860
+Container-only:  For example, the cloud platform can achieve this by supporting the implementation of Multus Container 861
+Networking Interface (CNI) Plugin. For more details, please see https://github.com/intel/multus-cni. 862
+ 863
+Figure 18:  Illustration of the Network Interfaces Attached to a Pod, as Provisioned by Multus CNI  864
+VM-only:  OpenStack provides the Neutron component for networking. For more details, please see 865
+https://docs.openstack.org/neutron/stein/  866
+5.4.1.2 Support for High Performance N-S Data Plane 867
+Common:  The Fronthaul connection between the O -RU/RU and vO -DU requires high performance a nd low latency. 868
+This means handling packets at high speed and low latency. As per the different scenarios covered in this document, 869
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+29
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+multiple vO-DUs may be running on the same physical cloud platform, which will result in the need for sharing the same 870
+physical networking interface with multiple functions. Typically, the SR-IOV networking interface is used for this. 871
+The cloud platform will need to provide support for assigning SR -IOV networking interfaces to a container or VM 872
+instance, so the instance can use the network interface (physical function or virtual function) directly without using a 873
+virtual switch.  874
+If only one container needs to use the networking interface, the PCI pass -through network interface can provide high 875
+performance and low latency without using a virtual switch. 876
+In general, the following two items are needed for high performance N-S data throughput: 877
+ Support for SR-IOV; i.e., the ability to assign SR-IOV NIC interfaces to the containers/ VMs 878
+ Support for PCI pass-through for direct access to the NIC by the container/ VM  879
+Container-only:  When containers are used, the cloud platform can achieve this by supporting the implementation of SR-880
+IOV Network device plugin for Kubernetes. For more details, please refer to https://github.com/intel/sriov-network-881
+device-plugin  882
+VM-only: OpenStack provides the Neutron component for networking. For more details, please see 883
+https://docs.openstack.org/neutron/stein/admin/config-sriov.html . 884
+5.4.1.3 Support for High-Performance E-W Data Plane 885
+Common:  High-performance E-W data plane throughput is a requirement for the implementation of the different near -886
+RT RIC, vO-CU, and vO-DU scenarios which are covered in this document.  887
+One of commonly used options for E-W high-performance data plane is the use of a virtual switch which provides basic 888
+communication capability for instances deployed at either the same machine or different machines. It provides L2 and L3 889
+network functions.  890
+To get the high performance required, one of the options  is to use a Data Plan Development Kit (DPDK) -based virtual 891
+switch.  Using this method, the packets will not go into Linux kernel space networking, and instead will implement 892
+userspace networking which will improve the throughput and latency. To support this, the container or VM instance will 893
+need to use DPDK to accelerate packet handling.  894
+The cloud platform will need to provide the mechanism  to support the implementation of userspace networking for 895
+container(s) / VM(s). 896
+Container-only:  As an example, the  cloud platform can achieve this by supporting implementation of Userspace CNI 897
+Plugin. For more details, please refer to https://github.com/intel/userspace-cni-network-plugin. 898
+ 899
+Figure 19:  Illustration of the Userspace CNI Plugin 900
+VM-only:  OVS DPDK is an example of a Host userspace virtual switch and could provide high performance L2/L3 901
+packet receive and transmit.   902
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+30
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.4.1.4 Support for Service Function Chaining  903
+Common:  Support for a Service Function Chaining  (SFC) capability requires the ability to create a service function 904
+chain between multiple VMs or containers. In the virtualization environment, multiple instances will usually be deployed, 905
+and being able to efficiently connect the instances to provide service will be a fundamental requirement.  906
+The ability to dynamically configure traffic flow will provide flexibility to Operators.  When the service requirement or 907
+flow direction needs to be changed, the Service Function Chaining capability can be used to easily implement it instead 908
+of having to restart and reconfigure the services, networking configuration and Containers/VMs.  909
+Container-only: An example of SFC functionality is found at: https://networkservicemesh.io/ 910
+VM only:  The OpenStack Neutron SFC and OpenFlow -based SFC are examples of solutions that can implement the 911
+Service Function Chaining capability. 912
+ Assignment of Acceleration Resources 913
+Common:  For both container and VM solutions, specific devices such as accelerator (e.g., FPGA, GPU) may be needed. 914
+In this case, the cloud platform needs to be able to assign the specified device to container instance or VM instance.  915
+For example, some L1 protocols require an FFT algorithm (to compute the DFT) that could be implemented in an FPGA 916
+or GPU, and the vO-DU would need the PCI Pass-Through to assign the accelerator device to the vO-DU for access and 917
+use. 918
+ Real-time / General Performance Feature Requirements 919
+5.4.3.1 Host Linux OS 920
+5.4.3.1.1 Support for Pre-emptive Scheduling  921
+Support may be required to support Pre-emptive Scheduling (real time Linux uses the preempt_rt patch). Generally, 922
+without real time features, it is very difficult for an application to get det erministic response times for events, interrupts 923
+and other reasons4. In addition, during the housekeeping processes in Linux system, the application also cannot guarantee 924
+the running time (CPU cycle), so from the wireless application design perspective, it needs the real time feature. In 925
+addition, to support the requireme nts of high throughput, multiple accesses and low latency, some wireless applications 926
+need the priority-based OS environment.  927
+5.4.3.2 Support for Node Feature Discovery 928
+Common:  Automated and dynamic placement of Cloud-Native Network Functions (CNFs) / microservices and VMs is 929
+needed, based on the hardware requirements imposed on the vO -DU, vO-CU and near-RT RIC functions.  This requires 930
+the cloud platform to support the ability to discover the hardware capabilities on each node and advertise it via labels vs. 931
+nodes, and allows O-RAN Cloudified NFs’  descriptions to have hardware requirements via labels. This mechanism is 932
+also known as Node Feature Discovery (NFD). 933
+Container-only:  For example, the cloud platform can achieve this by supporting implementation of NFD for Kubernetes. 934
+For more details, please see https://github.com/kubernetes-sigs/node-feature-discovery. 935
+VM-only:  VMs can use OpenStack mechanisms.  For example, the OpenStack Nova f ilter, host aggregates and 936
+availability zones can be used to implement the same function. 937
+5.4.3.3 Support for CPU Affinity and Isolation 938
+Common:  The vO-DU, vO-CU and even the near-RT RIC are performance sensitive and require the ability to consume 939
+a large amount of CPU cycles to work correctly.  They depend on the ability of the cloud platform to provide a mechanism 940
+to guarantee performance determinism even when there are noisy neighbors.  941
+
+4 Other options include things such as Linux signal, softwareirq, and perhaps using a common process. Because the pre-emptive kernel could
+interrupt the low priority process and occupy the CPU, it will get more chance to run the high priority process. Then through proper application
+design, it will have guaranteed time/resource and can have deterministic performance.
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+31
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Container-only:  This requires the cloud platform to support using affinity  and isolation of cores, so high performance 942
+Kubernetes Pod cores also can be dedicated to specified tasks.  For example, the cloud platform can achieve this by 943
+implementing CPU Manager for Kubernetes. For more details, please refer to https://github.com/intel/CPU-Manager-for-944
+Kubernetes . 945
+VM-only:  For example the modern Linux operating system uses the Symmetric MultiProcessing (SMP) mode, so the 946
+system process and application will be located at different CPU cores. To run the VM and guarantee the VM performance, 947
+the capability to assign the specific CPU cores to a VM is the way to do that. And at the same time, CPU isolation will 948
+reduce the inter-core affinity.  Please refer to https://docs.openstack.org/senlin/pike/scenarios/affinity.html 949
+5.4.3.4 Support for Dynamic HugePages Allocation 950
+Common:  When an application requires high performance and performance determinism, the reduction of paging is very 951
+helpful. vO-DU, vO-CU and even near -RT RIC can require performance determinism. The cloud platform needs to be 952
+able to support the ability to provide this mechanism to applications that require it.  953
+This requires the cloud platform to support ability to dynamically allocate the necessary amount of the faster memory 954
+(a.k.a. HugePages) to the container or VM as necessary, and also to relinquish this memory allocation in the event of 955
+unexpected termination.  956
+Container-only:  For example, the cloud platform can achieve this by supporting implementation of Manage HugePages 957
+in Kubernetes. For more details please refer to https://kubernetes.io/docs/tasks/manage-hugepages/scheduling-958
+hugepages/ . 959
+VM-only:  For example, the OpenStack Nova flavor setting can be used to configure the HugePage size for a VM instance.  960
+See https://docs.openstack.org/nova/pike/admin/huge-pages.html  961
+5.4.3.5 Support for Topology Manager 962
+Common:  Some of the cloud infrastructure which is targeted in the scenarios in this document may have servers which 963
+utilize a multiple-socket configuration which comes with multiple memory regions. Each core5 is connected to a memory 964
+region. While each CPU on one socket can access the memory region of the CPUs on another socket of the same board, 965
+the access time is significantly slower when crossing socket boundaries, and this will affect performance significantly.  966
+The configuration of hardware with multiple memory regions is also known as Non -Uniform Memory Access (NUMA) 967
+regions. To support automated and dynamic placement of CNFs/microservices or VMs based on cloud infrastructure that 968
+has multiple NUMA regions and guarantee the response time of the application (especially for vO-DU), it is critical to be 969
+able to ensure that all the containers/VMs are associated with  core(s) which are connected to the same NUMA region. In 970
+addition, if the application relies on access to hardware accelerators and/or I/O which uses memory as a way to interact 971
+with the application, it is also critical that those also use the same NUMA region that the application uses. 972
+The cloud platform will need to provide the mechanism to enable managing the NUMA topology to ensure the placement 973
+of specified containers/VMs on cores which are on the same NUMA region, as well as making sure that the devices which 974
+the application uses are also connected to the same NUMA region.  975
+
+5 In this document, we use the terms core and socket in the following way.  A socket, or more precisely the multichip platform that fits into a server
+socket, contains multiple cores, each of which is a separate CPU.  Each core in a socket has some dedicated memory, and also some shared
+memory among other cores of the same socket, which are within the same NUMA zone.
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+32
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 976
+Figure 20:  Example Illustration of Two NUMA Regions 977
+5.4.3.6 Support for Scale In/Out 978
+Common:  The act of scaling in/out of containers/ VMs can be based on triggers such as CPU load, network load, and 979
+storage consumption. The network service usually is not just a single container or VM, and in order to leverage the 980
+container/ VM benefit, the netwo rk service usually will have multiple containers/ VMs. But if demand is changing 981
+dynamically, especially for the O -CU, the service needs to be scaled in/out according to service requirements such as 982
+subscriber quantity.  983
+For example, when the number of subscribers increases, the system needs to start more container/ VM instances to ensure 984
+the service quality. From the cloud platform perspective, it could monitor the CPU load; if the load reaches a level such 985
+as 80%, it needs to scale out. If the CPU load drops 40%, it could then scale in. 986
+Different services can scale in/out depending on different criteria, such as the CPU load, network load and storage 987
+consumption.  Support for scale in/out can be helpful in implementing on-demand services.  988
+Editor’s Note:  Support for scale up/down is not discussed at this time, but may be revisited in the future.   989
+5.4.3.7 Support for Device Plugin 990
+Common:  For vO-DU, vO-CU and near-RT RIC applications, hardware accelerators such as SmartNICs, FPGAs and 991
+GPUs may be required to meet  performance objectives that can’t be met by using software only implementations.  In 992
+other cases, such accelerators can be useful as an option to reduce the consumption of CPU cycles to achieve better cost 993
+efficiency. 994
+The cloud platform will need to provi de the mechanism to support those accelerators. This in turn requires support the 995
+ability to discover, advertise, schedule and manage devices such as SR-IOV, GPU, and FPGA.   996
+Container-only:  For example, the cloud platform can achieve this by supporting i mplementation of Device Plugins in 997
+Kubernetes. For more details please check: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-998
+net/device-plugins/. 999
+VM-only:  The PCI passthrough feature in OpenStack allows full access and direct control of a physical PCI device in 1000
+guests. This mechanism is generic for any kind of PCI device, and runs with a Network Interface Card (NIC), Graphics 1001
+Processing Unit (GPU), or any other devices that can be attached to a PCI bus.  Correct driver installation is the only 1002
+requirement for the guest to properly use the devices. 1003
+Some PCI devices provide Single Root I/O Virtualization and Sharing (SR -IOV) capabilities. When SR-IOV is used, a 1004
+physical device is virtualized and appears as multiple PCI devices. Virtual PCI devices are assigned to the same or 1005
+different guests. In the case of PCI passthrough, the full physical device is assigned to only one guest and cannot be shared. 1006
+See https://wiki.openstack.org/wiki/Cyborg 1007
+5.4.3.8 Support for Direct IRQ Assignment 1008
+VM-only:  The general -purpose platform has many devices that will generate the IRQ to the system. To  develop a 1009
+performance-sensitive application, inclusion of low-latency and deterministic timing features, and assigning the IRQ to a 1010
+specific CPU core, will reduce the impact of housekeeping processes and decrease the response time to desired IRQs.  1011
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+33
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.4.3.9 Support for No Over Commit CPU 1012
+VM-only:  The “No Over Commit CPU” VM creation option is able to guarantee VM performance with a “dedicated 1013
+CPU” model. 1014
+In traditional telecom equipment design, this will maintain the level of CPU utilization to avoid burst and cong estion 1015
+situations. In a virtualization environment, performance-sensitive applications such as vO-DU, vO-CU, and near-RT RIC 1016
+will need the platform to provide a mechanism to secure the CPU resource.  1017
+5.4.3.10 Support for Specifying CPU Model 1018
+VM-only:  OpenStack can use the CPU model setting to configure the vCPU for a VM.  For example, QEMU allows the 1019
+CPU options to be “Nehalem”, “Westmere”, “SandyBridge” or “IvyBridge”, or alternatively it could be configured as 1020
+“host-passthrough”. This allows VMs to leverage advan ced features of selected CPU architectures. For the vO -CU and 1021
+vO-DU design and implementation, there will be some algorithm and computing functions that can leverage host CPU 1022
+instructions to realize some benefits such as performance. The cloud platform needs to provide this capability to VMs.  1023
+ Storage Requirements 1024
+The storage requirements are the same for both VM and Container based implementations.  1025
+For O-RAN components, the O-RAN Cloudified NF needs storage for the image and for the O-RAN Cloudified NF itself.  1026
+It should support different scale , e.g., for a Regional Cloud vs. an Edge Cloud.  The cloud platform need s to support a 1027
+large-scale storage solution with redundancy, medium and small -scale storage solution s for two or  more servers, and a 1028
+very small-scale solution for a single server.  1029
+ Notification Subscription Framework 1030
+Applications should have the ability to retrieve notifications that are necessary for their functionality. For example, O -1031
+vDU needs to know that the node that it starts on has a PTP clock in sync with the master clock.  1032
+Rationale – Application functionality often relies on but is not limited to O-Cloud platform HW resources such as FPGA, 1033
+GPU, PHC. Hence, these application(s) should have the ability to select the resources that will provide them notifications 1034
+about the status of these resources, initial state and changing state. This requires the applications to use a privilege mode  1035
+in order to access the O -Cloud platform drivers and retrieve the status . However, in a Cloud Native envi ronment, 1036
+applications should not have a privilege mode for accessing the O -Cloud resources. This framework allows applications 1037
+to subscribe for their necessary  notifications without claiming a privilege mode and comply with O -Cloud Native 1038
+requirements.    1039
+5.4.5.1 O-Cloud Notification Subscription Requirements 1040
+Tracking function: 1041
+• tracks for resource(s) state of relevant data (for example, change in class of a master clock)    1042
+• tracking function can be configured with tracking frequency per the resource being tracked (default value will 1043
+be defined) 1044
+Registration function: 1045
+• allows application(s) and/or SMO (or other entities) to query for the resources that provide notifications  1046
+• allows application(s) and/or SMO (or other entities) to subscribe to receiving notifications from the selected 1047
+resource(s) 1048
+• allows application(s) and/or SMO (or other entities) to subscribe to pulling notifications/data from the selected 1049
+resource(s) 1050
+• allows application(s) and/or SMO (or other entities) to unsubscribe to notification(s) which  were previously 1051
+subscribed to for either receiving or pulling notifications 1052
+• The registration function updates the notification function about the state of the subscription and its request type 1053
+(receiving or pulling notifications) 1054
+Notification function: 1055
+• used by the tracking function to message registered listeners of the resource state and/or its relevant data  1056
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+34
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+• pulls the tracking function per the application and/or SMO request  1057
+• as soon as an application and/or SMO registers it receives a notification of the resource(s) status it is subscribed 1058
+to 1059
+Figure 21 illustrates the architecture for implementing a framework for notification subscription. This diagram shows the 1060
+functionally and interaction from a logical perspective , however, where these functions reside or how they are 1061
+implemented is not in scope of this document and will be described by Cloud  Platform Reference Design [12].  1062
+ 1063
+Figure 21: O-Cloud Notification Framework Architecture 1064
+5.5 Sync Architecture 1065
+Synchronization mechanisms and options are receiving significant attention in the industry.   1066
+Editor’s Note:  O-RAN W orking Groups 4 and 5 are addressing some aspects of synchronization, and more 1067
+discussion of Sync is expected in future versions of this document.   1068
+Version 2 of the Control, User and Synchronization  (CUS) Plane Specification [7] discusses, in chapter 9.2.2, “Clock 1069
+Model and Synchronization Topology”, four topology configuration options Lower Layer Split Control Plane 1 – 4 (LLS-1070
+C1 – LLS-C4) that are required to support different O-RAN deployment scenarios.  Configuration LLS-C3 is seen as the 1071
+most likely initial option for deployment and is discussed below.  This section will provide a summary of what is required 1072
+to support the LLS-C3 synchronization topology from the cloud platform perspective. 1073
+Note that in  chapter 6 “Deployment Scenarios and Implementation Considerations” of this document , we call the site 1074
+which runs the O -vDU the “Edge Cloud”, while the Control, User and Synchronization (CUS) Plane Specification [7] 1075
+calls it the “Central Site”.  However, the meaning is the same. 1076
+ Cloud Platform Time Synchronization Architecture 1077
+The Time Sync deployment architecture which is described below relies on usage of Precision Time Protocol (PTP) IEEE 1078
+1588-2008 (a.k.a. IEEE 1588 Version 2) to synchronize clocks throughout the Edge Cloud site.  1079
+For LLS-C3 in the CUS specification [7], vO-DU may act Telecom Slave Clock (T -TSC) and select the time source the 1080
+same SyncE and PTP distribution from fronthaul as O -RU.  For vO -DU, only the ITU -T G.8275.2 type T -TSC will be 1081
+addressed; others are For Further Study. 1082
+5.5.1.1 Edge Cloud Site Level – LLS-C3 Synchronization Topology 1083
+This section outlines what the time synchronization architecture  should be  from the cloud platform perspective , and 1084
+identifies requirements that the Cloud Platform and Edge Site need to support in order to support the O-RAN deployment 1085
+scenarios that use the LLS-C3 synchronization topology described in CUS specification [7]. 1086
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+35
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.5.1.1.1 LLS-C3 Synchronization Topology Edge Site Time Synchronization Architecture 1087
+The deployment architecture at the Edge Cloud site level includes: 1088
+ Primary Reference Time Clock (PRTC)-traceable time source (i.e., Grandmaster Clocks):  1089
+o External precision time source for the PTP networks, usually based on Global Navigation S atellite 1090
+System/Global Positioning System (GNSS/GPS) 1091
+ Compute Nodes:  1092
+o Compute Nodes synchronize their clocks to a Grandmaster Clock via the Fronthaul Network 1093
+ Controller Nodes: 1094
+o Controller Nodes synchronize their clocks to the Network Time Protocol (NTP) via the Management 1095
+Network 1096
+ 1097
+Figure 22 illustrates the relationship of these entities where the Controller functions are hosted on separate nodes from 1098
+the Co mpute nodes.  Figure 23 illustrates the relationships where each Compute node also includes the Controller 1099
+functions (i.e., the hyperconverged case). 1100
+  1101
+  1102
+Figure 22: Edge Cloud Site Time Sync Architecture for LLS-C3 1103
+  1104
+Figure 23: Hyperconverged Edge Cloud Time Sync Architecture for LLS-C3 1105
+O-Cloud
+Compute
+Node
+O-Cloud
+Management
+(OCM)
+compute-0
+S
+compute-1 compute-N
+S
+controller-0 controller-N
+Management Network
+S
+Fronthaul Network
+Data Network
+Cell Site (O-RU) Cell Site(O-RU) … Cell Site (O-RU)
+MasterM
+SlaveS
+Clock Source
+M
+Grandmaster
+Clock(s)
+T-BC
+PTP Switch
+…
+PTP
+NTP
+Management Network
+…
+S S S
+O-Cloud
+Hyperconverged
+compute-0
+S
+controller-0
+Fronthaul Network
+Data Network
+Cell Site (O-RU) Cell Site (O-RU) … Cell Site (O-RU)
+MasterM
+SlaveS
+Clock Source
+M
+Grandmaster
+Clock(s)
+T-BC
+PTP Switch
+PTP
+Management Network
+compute-1
+S
+Controller-1
+.
+S S S
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+36
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.5.1.1.2 LLS-C3 Synchronization Topology Edge Site Requirements 1106
+To support time synchronization at the Edge site, the cloud platform (O -Cloud) used at the Edge site needs to support 1107
+implementation of the PTP IEEE 1588-2008 (a.k.a. IEEE 1588 Version 2) standard. The following software and hardware 1108
+capabilities are required: 1109
+5.5.1.1.2.1 Software 1110
+Support for PTP will be needed in all the Edge Site O-Cloud nodes that support compute roles and will run vO-DU service 1111
+operating as a Slave Clock. The following PTP configuration options should be provided:  1112
+o Network Transport – G.8275.1 sync over Ethernet (Layer 2) 1113
+o Delay Measurement Mechanism – utilize E2E or P2P to measure the delay 1114
+o Time Stamping – support for hardware time stamping 1115
+ 1116
+For example: in the case when an O-Cloud is based on  the Linux OS , this will require support for Linux  PTP ( see 1117
+http://linuxptp.sourceforge.net) with the following: 1118
+o ptp4l – implementation of PTP (Ordinary Clock, Boundary Clock), HW / SW timestamping, Delay request -1119
+response / Peer delay mechanism, and IEEE 802.3 (Ethernet) / UDP IPv4 / UDP IPv6 network transport 1120
+o phc2sys – Synchronization of two clocks, PHC and system clock (Linux clock) when using HW timestamping  1121
+ 1122
+5.5.1.1.2.2 Hardware  1123
+Use of High speed, low latency Network Interface Card (NIC) with support for PTP Hardware  Clock (PHC) subsystem 1124
+for the data interface (fronthaul) on all the compute node(s) that will run the O -vDU function. 1125
+ Loss of Synchronization Notification 1126
+Applications that rely on a Precision Time Protocol for synchronization (such as O -vDU but not limited to) should have 1127
+the ability to retrieve the relevant data that can indicate the status of the PHC clock related to the worker node that the 1128
+application is running on (for example a source clock class). Once an application subscribes to PTP notifications  it 1129
+receives the initial data which shows the PHC synchronization state and it will receive notifications when there is a state  1130
+change to the sync status and/or per request for notification (pull), please refer to the notification subscription framework 1131
+(section 5.4.5) how to subscribe for a PTP Notification.   1132
+Rationale - The CUS specification [2] section 9.4.2, specifies various behaviors related to the state of the  O-vDU and O-1133
+RU time synchronization.  1134
+• For example, if an O -vDU transits to the FREERUN state, because the synchronizing network delivers 1135
+unacceptable synchronization quality, the O -vDU shall disable RF transmission on all connected O -RUs, and 1136
+keep it turned off until synchronization is reacquired again.  1137
+It should be noted that since O-vDU may need to take an action upon the synchronization notification (see example above) 1138
+it is required to handle these notifications at the scope of the edge cloud (at the site location where the O-vDU is running) 1139
+for two main reasons: ensuring that the O -vDU receives the notifications regardless of the communication state of its 1140
+backhaul link and reducing the round trip delay for notifying the O-vDU. 1141
+Figure 24 illustrates an O-vDU subscribes to retrieve PTP Notification based on the subscription framework described at 1142
+section 5.4.5.  1143
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+37
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 1144
+Figure 24: O-vDU Subscribes to PTP Notification 1145
+ 1146
+5.6 Operations and Maintenance Considerations 1147
+Management of cloudified RAN  Network Functions  introduces some new management considerations, because the 1148
+mapping between Network Functionality and physical hardware can be done in multiple ways, depending on the Scenario 1149
+that is chosen.  Thus, management of aspects that are related to physical aspect s rather than logical aspects need to be 1150
+designed with flexibility in mind from the start.  For example, logging of physical functions, scale out actions, and 1151
+survivability considerations are affected.   1152
+The O-RAN Alliance has defined key fundamentals of the OAM framework (see [8] and [9], and refer to Figure 1). Given 1153
+the number of deployment scenario options and possible variations of O -RAN Managed Functions (MFs) being mapped 1154
+into Managed Elements (MEs) in different ways, it is important for all MEs to support a consistent level of visibility and 1155
+control of their contained Managed Functions to the Service Management & Orchestration Framework.  This consistency 1156
+will be enabled by support of the common OAM Interface Specification [9] for Fault Configuration Accounting 1157
+Performance Security (FCAPS) and Life Cycle Management (LCM) functionality, and a common Information Modelling 1158
+Framework that will provide underlying information models used for the MEs and MFs in a particular deployment.  1159
+ The O1 Interface 1160
+As described in [8], t he O1 is an interface between management entities in Service Management and Orchestration 1161
+Framework and O-RAN managed elements, for operation and management, by which FCAPS management, Software 1162
+management, File management shall be achieved.  1163
+ The O2 Interface 1164
+The O2 Interface is a collection of services and their associated interfaces that are provided by the O -Cloud platform to 1165
+the SMO.  The services are categorized into two logical groups: 1166
+• Infrastructure Management Services: which include the subset of O2 functions that are responsible for 1167
+deploying and managing cloud infrastructure. 1168
+• Deployment Management Services:  which include the subset of O2 functions that are responsible for 1169
+managing the lifecycle of virtualized/containerized deployments on the cloud infrastructure. 1170
+The O2 services and their associated interfaces shall be specified in the  upcoming O2 specification. Any definitions of 1171
+SMO functional elements needed to consume these services shall be described in OAM architecture.  O2 interface would 1172
+also address the management of hardware acceleration and supporting software in the O-Cloud platform. 1173
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+38
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+5.7 Transport Network Architecture 1174
+While a Transport Network is a necessary foundation upon which to build any O -RAN deployment, a great many of the 1175
+aspects of transport do not have to be addressed or specified in O -RAN Alliance documents.  For example, any location 1176
+with cloud servers will be connected by layer 2 or layer 3 switches, but we do not need to specify much if anything about 1177
+them in this document.   1178
+The transport media used, particularly for fronthaul, can have an effect on aspects such as performance.  However, in the 1179
+current version of this document we have been assuming that fiber transport is used.   1180
+Editor’s Note:  Other transport technologies (e.g., microwave) are also possible, and could be addressed at a later 1181
+date.  1182
+That said, the use of an (optional) Fronthaul Gateway (FH GW) will have noteworthy effects on any O-RAN deployment 1183
+that uses it. 1184
+ Fronthaul Gateways 1185
+In the deployment scenarios that follow, when the O-DU and O-RU functions are not implemented in the same physical 1186
+node, a Fronthaul Gateway is shown as an optional element between them.  A Fronthaul Gateway can be motivated by 1187
+different factors depending on a carrier’s deployment, and may perform different functions.   1188
+The O-RAN Alliance does not currently have a single definition of a Fronthaul Gateway, and this document does not 1189
+attempt to define one.  However, the Fronthaul Gateway is include d in the diagrams as an optional implementation to 1190
+acknowledge the fact that carriers are considering Fronthaul Gateways in their plans. Below are some examples of the 1191
+functionality that could be provided: 1192
+ A FH GW can convert CPRI connections to the node supporting the O-RU function to eCPRI connections to the 1193
+node that provides O-DU functionality.   1194
+ Note that when there is no FH GW, it is assumed that the Open Fronthaul interface between the O-RU and 1195
+O-DU uses Option 7-2, as mentioned earlier in Section 4.1.  When there is a FH GW, it may have an Option 1196
+7-2 interface to both the O -DU and the O -RU, but it is also possible for the FH GW to have a different 1197
+interface to the O-RU/RU; for example, where CPRI is supported.   1198
+ A FH GW can support the aggregation of fiber pairs. 1199
+ A FH GW must support the following forwarding functions: 1200
+ Downlink:  Transport the traffic from O-DU to each O-RU (and cascading FH GW, if present) 1201
+ Uplink:  Summation of traffic from O-RUs 1202
+ A FH GW can provide power to the NEs supporting the O -RU function, e.g. via Power over Ethernet (PoE) or 1203
+hybrid cable/fibers 1204
+5.8 Overview of Deployment Scenarios 1205
+The description of logical functionality in O -RAN includes the definition of key interfaces E2, F1, and Open Fronthaul.  1206
+However, as noted earlier, this does not mean that each Network Function block must be implemented in a separate O-1207
+RAN Physical NF/O-RAN Cloudified NF.  Multiple logical functions can be implemented in a single O-RAN Physical 1208
+NF/O-RAN Cloudified NF (for example O-DU and O-RU may be packaged as a single appliance).  1209
+We assume that when Network Functions are implemented as different O-RAN Physical NFs/O-RAN Cloudified NFs, 1210
+the interfaces between them must conform to the O -RAN specifications.  However, when multiple Network Functions 1211
+are implemented by a single O-RAN Physical NF/O-RAN Cloudified NF , it is up to the operator to decide whether to 1212
+enforce the O-RAN interfaces between the embedded Network Functions .  However, note that the OAM requirements 1213
+for each separate Network Function will still need to be met.   1214
+The current deployment scenarios for discussion are summarized in the figure below.  This incl udes options that are 1215
+deployable in both the short and long term.  Each will be discussed in some detail in the following sections, followed by 1216
+a summary of which one or ones are candidates for initial focus. Please note that, to help ease the high-level depiction of 1217
+functionality, a single O-CU box is shown with an F1 interface, but in detailed discussions of specific scenarios, this will 1218
+need to be discussed properly as composed of an O-CU-CP function with an  F1-c interface and an O -CU-UP function 1219
+with an F1-u interface.  Furthermore, there would in general be an unequal number of O-CU-CP and O-CU-UP instances.   1220
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+39
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Figure 25 below shows the Network F unctions at the top, and each identified scenario shows how these Network 1221
+Functions are deployed as O-RAN Physical NFs or as O-RAN Cloudified NFs running on an O-RAN compliant O-Cloud.  1222
+The term O-Cloud is defined in Section 4.  Please note that the requirements  for an O-Cloud are driven by the Network 1223
+Functions that need to be supported by th e hardware, so for instance an O-Cloud that supports an O-RU function would 1224
+be different from an O-Cloud that supports O-CU functionality.   1225
+Finally, note that in the high-level figure below, the User Plane (UP) traffic is shown being delivered to the UPF.  As will 1226
+be discussed, in specific scenarios it is sometimes possible for UP traffic to be delivered to edge applications that are 1227
+supported by Mobile Edge Computing (MEC).  However, note that the specification of MEC itself is out of scope of this 1228
+document. 1229
+Note that vendors are not required to support all scenarios – it is a business decision to be made by each vendor.  Similarly, 1230
+each operator will decide which scenarios it wishes to deploy.   1231
+ 1232
+ 1233
+Figure 25:  High-Level Comparison of Scenarios 1234
+Each scenario is discussed in the next section.   1235
+ 1236
+6 Deployment Scenarios and Implementation 1237
+Considerations 1238
+This section reviews each of the deployment scenarios in turn.  For a given scenario, the requirements that apply to the 1239
+O-RAN Physical NFs, O-RAN Cloudified NFs or O-Cloud platforms may become more specific and unique, while many 1240
+of the logical Network Function requirements will remain the same.   1241
+Please note that in all of the scenario figures of this section, the interfaces ar e logical interfaces (e.g., F1, E2, etc.) .  This 1242
+has a couple of implications.  First, the two functions on each side of an interface could be on different devices separated 1243
+by physical transport connections (e.g., fiber or Ethernet transport connections),  could be on different devices within the 1244
+same cloud platform, or could even exist within the same server.  Second, the functions on each side of an interface could 1245
+be from the same vendor or different vendors.  1246
+In addition, please note that all User Plane  interfaces are shown with a solid lines, and all Control Plane interfaces use 1247
+dashed lines.  1248
+Key
+O-Cloud
+Network Functions
+(e.g., O-CU + O-DU)
+O-RAN Physical NF
+Could be 100% O-RAN Physical NF
+(potentially in an open chassis).  Uses
+Open interfaces.
+“O-Cloud” indicates that an O-RAN
+Cloud Platform is used to support
+the RAN functions.  This will use
+hardware accelerator add-ons as
+required by each RAN function, and
+the software stack is decoupled
+from the hardware. Each O-Cloud
+uses open interfaces.
+O-Cloud
+Open
+fronthaul
+O-RU
+Near-RT
+RIC
+O-CU O-DU
+Scenario A O-RAN
+Physical NF
+O-CloudScenario B
+O-RAN
+Physical NF
+O-CloudScenario C O-RAN
+Physical NF
+Scenario D O-RAN
+Physical NF
+O-CloudScenario C.1 &  C.2
+O-Cloud
+O-Cloud
+O-Cloud O-RAN
+Physical NF
+O-CloudScenario E O-Cloud
+O-Cloud
+E2
+F1, E2
+Open FH
+O-RAN
+Physical NF
+O-CloudScenario F O-Cloud O-Cloud
+E2 F1
+E2
+UPF
+Edge Cloud Cell Site
+Edge Cloud Cell SiteRegional Cloud
+Edge Cloud Cell SiteRegional Cloud
+Edge Cloud Cell SiteRegional Cloud
+Edge Location Cell SiteRegional Cloud
+Cell SiteRegional Cloud
+Edge Cloud Cell SiteRegional Cloud
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+40
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Editor’s note: The terms vO-CU and vO-DU represent virtualized or containerized O-CU and O-DU, and are used 1249
+interchangeably with O-CU and O-DU in these scenarios (with the exception when the O-DU is explicitly stated 1250
+as a non-virtualized O-DU). 1251
+ 1252
+6.1 Scenario A  1253
+In this scenario, the near -RT RIC, O -CU, and O -DU functions are all virtualized on the same cloud platform, and 1254
+interfaces between those functions are within the same cloud platform.    1255
+This scenario supports deployments in dense urban areas with an abundance of fronthaul capacity that allows BBU  1256
+functionality to be pooled in a central location with sufficiently low latency to meet the O -DU latency requirements . 1257
+Therefore, it does not attempt to centralize the near -RT RIC more than  the limit that O -DU functionality can be 1258
+centralized.  1259
+ 1260
+Figure 26:  Scenario A 1261
+Also please note that if the optional FH GW is present, the interface between it and the Radio Unit might not meet the O-1262
+RAN Fronthaul requirements (e.g., it might be an Option 8 interface), in which case the Ra dio Unit could be referred to 1263
+as an “RU”, not an “O-RU”.  However, if FH GWs are defined to support an interface such as Option 8, it could be argued 1264
+that the O-RU definition at that time will support Option 8.   1265
+ Key Use Cases and Drivers 1266
+Editor’s Note:  This section is FFS.  1267
+6.2 Scenario B 1268
+In this scenario, the near -RT RIC Network Function is virtualized on a Regional Cloud Platform, and the O -CU and O-1269
+DU functions are virtualized on an Edge Cloud hardware platform that in general will be at a different location.  The 1270
+interface between the Near-RT RIC network function and the O-CU/O-DU network functions is E2.  Interfaces between 1271
+the O-CU and O-DU Network Functions are within the same Cloud Platform.  1272
+ 1273
+Figure 27:  Scenario B – NR Stand-alone 1274
+O-RU
+(/RU)
+Near-RT
+RIC
+Open chassis and
+blade spec
+Cloud
+Platform
+Cell siteRegional cloud
+Cloud Platform
+E2
+1:L
+Edge cloud
+UPF,
+MEC
+vO-CU vO-DU
+Open chassis and
+blade spec
+E2
+F1
+Open
+fronthaul
+1:N
+GW
+(Opt)
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+41
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+This scenario addresses deployments in locations with limited remote fronthaul capacity and O-RUs spread out in an area 1275
+that limits the number of O-RUs that can be supported by pooled vO-CU/vO-DU functionality while still meeting the O-1276
+DU latency requirements.  The use of a FH G W in the architecture allows significant savings in providing transport 1277
+between the O-RU and vO-DU functionality. 1278
+ 1279
+Figure 28: Scenario B – MR-DC (inter-RAT NR and E-UTRA) regardless of the Core Network type (either EPC 1280
+or 5GC) 1281
+An Alternative to NR Standalone scenario B is given by the MR -DC (inter-RAT NR/E-UTRA) scenarios which extend 1282
+requirements on the cloud platform to additionally support E-UTRA network functions (subscript E)  and required 1283
+interfaces Xn, open fronthaul and W 1. The W1 interface, defined in 3GPP TS 37.470, only applies to E -UTRA nodes 1284
+connected to 5G Core Network, i.e. ng-eNB as defined in 3GPP TS 38.300 and TS 38.401. Moreover, the foreseen MR -1285
+DC (inter-RAT NR/E-UTRA) scenarios also include the EPC -connected E-UTRA-NR Dual Connectivity (EN -DC) by 1286
+properly replacing the Xn interface with the X2 interface interconnecting E-UTRA nodes (eNBs) and NR ones (en-gNBs), 1287
+with the possibility to exploit vO-CU/vO-DU functional split only for the en-gNBs6.  1288
+As discussed earlier in Section 5.1.3, the O-CU and O-DU functions can be virtualized using either simple centralization 1289
+or pooled centralization.  The desire is to h ave support for pooled centralization, although we need to understand what 1290
+needs to be developed to enable such sharing.  Perhaps pooling will be a later feature, but any initial solution should not 1291
+preclude a future path to a pooled solution.    1292
+ Key Use Cases and Drivers 1293
+In this case, there are multiple O -RUs distributed in an area served by a centralized vO-DU functionality that can meet 1294
+the latency requirements.  Depending on the concentration of the O -RUs, N could vary, but in general is expected to be  1295
+engineered to support < 64 TRPs per O-DU.7  The near-RT RIC is centralized further to allow for optimization based on 1296
+a more global view (e.g., a single large metropolitan area), and to reduce the number of separate near -RT RIC instances 1297
+that need to be managed.   1298
+The driving use case for this is to support an outdoor deployment of  a mix of Small Cells and Macro cells in a relatively 1299
+dense urban setting.  This can support mmWave as well as Sub-6 deployments. 1300
+In this scenario, a given “virtual BBU” supports  both vO-CU and vO -DU functions, and  can connect many O-RUs.  1301
+Current studies show that savings  from pooling are significant but level off  once more than 64 Transmission Reception 1302
+Points (TRPs) are pooled.  This would imply N would be around 32-64. This deployment should support tens of thousands 1303
+of O-RUs per near-RT RIC, so L could easily exceed 100.   1304
+Below is a summary of the cardinality requirements assumed for this scenario.  1305
+
+6 O-eNB vO-CUE/vO-DUE split (foreseen in 3GPP), is pending O-RAN architecture alignment in wg1.
+7 It is assumed that one O-RU is associated with one TRP.  For example, if a cell site has three sectors, then each sector would have at least one TRP
+and hence at least three O-RUs.
+Near-RT
+RIC
+Open chassis and
+blade spec
+Cloud
+Platform
+Cell siteRegional cloud
+Cloud Platform
+E2
+1:L
+Edge cloud
+vO-CUN vO-DUN
+E2
+F1
+Open
+fronthaul
+1:N
+GW
+(Opt)
+Open chassis and
+blade spec
+Xn
+E2
+Open
+fronthaul
+GW
+(Opt)
+1:N
+(*) for ng-eNB only
+vO-DUE
+W1(*)
+vO-CUE
+O-eNB
+O-RUN
+(/RUN)
+O-RUE
+(/RUE)
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+42
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+  Table 2:  Cardinality and Delay Performance for Scenario B 1306
+
+Attribute RIC – O-CU O-CU – O-DU O-DU – O-RU/RU
+
+Example Cardinality L = 100+ M=1 N = 1-64
+6.3 Scenario C 1307
+In this scenario, the near -RT RIC and O -CU Network Functions are virtualized on a Regional Cloud Platform with a 1308
+general server hardware platform, and the O-DU Network Functions are virtualized on an Edge Cloud hardware platform 1309
+that is expected to include significant hardware accelerator capabilities.  Interfaces between the near-RT RIC and the O-1310
+CU network functions are within the same Cloud Platform.  The interface between the Regional Cloud and the Edge cloud 1311
+is F1, and an E2 interface from the near-RT RIC to the O-DU must also be supported.  1312
+ 1313
+Figure 29:  Scenario C 1314
+This scenario is to support deployments in locations with limited remote Fronthaul capacity and O -RUs spread out in an 1315
+area that limits the number of O -RUs that can be pooled while still meeting the O -DU latency requirements.  The O-CU 1316
+Network Function is further pooled to increase t he efficiency of the hardware platform which it shares with the near-RT 1317
+RIC Network Function.   1318
+However, note that if a service type has tighter O-CU delay requirements than other services, then that may either severely 1319
+limit the number of O -RUs supported by the Regional cloud, or a method will be needed to separate the processing of 1320
+such services.  This will be discussed further in the following C.1 and C.2 Scenarios.   1321
+The use of a FH GW in the architecture allows significant savings in providing transpor t between the O-RU and vO-DU 1322
+functionality.   1323
+ Key Use Cases and Drivers 1324
+In this case, there are multiple O -RUs distributed in an area where each O -RU can meet the latency requir ement for the 1325
+pooled vO-DU function.  The near -RT RIC and O -CU Network Functions are further centralized to realize additional 1326
+efficiencies.   1327
+A use case for this is to support an outdoor deployment of a mix of Small Cells and Macro cells in a relatively dense 1328
+urban setting.  This can support mmWave as well as Sub-6 deployments. 1329
+In this scenario, as in Scenario B, the Edge Cloud is expected to support roughly 32 -64 O-RUs. This deployment should 1330
+support tens of thousands of O-RUs per near-RT RIC.  1331
+Below is a summary of the cardinality and the distance/delay requirements assumed for this scenario.   1332
+Table 3:  Cardinality and Delay Performance for Scenario C   1333
+
+Attribute RIC – O-CU O-CU – O-DU O-DU – O-RU/RU
+
+Example Cardinality L= 1 M=100+  N=Roughly 32-64
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+43
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Scenario C.1, and Use Case and Drivers 1334
+This is a variation of Scenario C, driven by the fact that different types of traffic (network slices) have different latency  1335
+requirements.  In particular, URLLC has more demanding user -plane latency requirements, and Figure 30 below shows 1336
+how the vO-CU User P art (vO-CU-UP) could be terminated in different places for different network  slices.  Below, 1337
+network slice 3 is terminated in the Edge Cloud.  This scenario is also suitable in case there isn’t enough space or power 1338
+supply to install all vO-CUs and vO-DUs in one Edge Cloud site.  1339
+ 1340
+Figure 30:  Treatment of Network Slices:  MEC for URLLC at Edge Cloud, Centralized Control, Single vO-DU 1341
+In Scenario C.1, all O -CU control is placed in the Regional Cloud, and there is a single vO -DU for all Network Slices.  1342
+Only the plac ement of the vO -CU-CP differs, depending on the network slice.  Below is the diagram of this scenario, 1343
+using the common diagram conventions of all scenarios.  1344
+ 1345
+Figure 31:  Scenario C.1 1346
+Below is a summary of the cardinality and the  distance/delay requirements assumed for this scenario. The URLLC user 1347
+plane requirements are what drive the placement of the vO-CU-UP function to be in the Edge cloud.   1348
+Table 4:  Cardinality and Delay Performance for Scenario C.1 1349
+
+Attribute RIC – O-CU O-CU – O-DU O-DU – O-RU/RU
+
+Example Cardinality L= 1 M=320 N=100
+Delay Max
+1-way (distance)    mMTC NA 625 μs (125 km) 100 μs (20 km)
+   eMBB NA 625 μs (125 km) 100 μs (20 km)
+   URLLC (user/control) NA 100 μs (20 km)/625 μs (125
+km)
+100 μs (20 km)
+ 1350
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+44
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ Scenario C.2, and Use Case and Drivers 1351
+This is a second variation of Scenario C, which utilizes the same method of placing some vO-CU user plane functionality 1352
+in the Edge Cloud, and some in the Regional Cloud.  However, instead of having one vO-DU for all network slices, there 1353
+are different vO-DU instances in the Edge Cloud.  1354
+It is driven by factors including the following two use cases: 1355
+ One driver is RAN (O-RU) sharing among operators. In this use case, any operator  can flexibly launch vO-CU 1356
+and vO-DU instances at Edge or Regional Cloud site.  For example, as shown in Figure 32, Operator #1 wants 1357
+to launch the vO-CU1 instance in the Regional Cloud, and the vO-DU1 instance at subtending Edge Cloud sites. 1358
+On the other hand, O perator #2 wants to install both the vO-CU2 and vO-DU2 instances at the same Regional 1359
+Cloud site.  Note that both operators will share the O-RU).  1360
+ Another driver is that, even within a single operator, that operator can customize scheduler functions depending 1361
+on the network slice types, and can place the vO-CU and vO-DU instances depending on the network slice types. 1362
+For example, an operator may launch both vO-CU and vO-DU at the edge cloud site (see Operator #2 below) to 1363
+provide a URLLC service.   1364
+ 1365
+Figure 32:  Treatment of Network Slice: MEC for URLLC at Edge Cloud, Separate vO-DUs 1366
+The multi-Operator use case has the following pros and cons: 1367
+Pros: 1368
+ O-RU sharing can reduce TCO 1369
+ Flexible CU/DU location allows deployments to consider not only service requirements but also limitation s of 1370
+space or power in each site 1371
+Cons: 1372
+ Allowing multiple operators to share O -RU resources is expected to require changes to the Open Fronthaul 1373
+interface (especially the handshake among more than one vO-DU and a given O-RU).   1374
+ This change seems likely to ha ve M-plane specification impact .  Therefore, this approach would n eed O-RAN 1375
+buy-in and approval.   1376
+Figure 33 below illustrates how different Component Carriers can be allocated to different operators, at the same O -RU 1377
+at the same time.  Note that some updates of not only M -plane but also CUS-plane specifications will be required when 1378
+considering frequency resource sharing among DUs. 1379
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+45
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 1380
+Figure 33:  Single O-RU Being Shared by More than One Operator 1381
+The diagram of how Network Functions map to Networks Elements for Scenario C.2 is shown below.  1382
+ 1383
+Figure 34:  Scenario C.2 1384
+The performance requirements are the same as those discussed earlier for Scenario C.1 in Section 6.3.2. 1385
+6.4 Scenario D  1386
+This scenario is a variation on Scenario C , but in this case the O-DU functionality is supported by a n O-RAN Physical 1387
+NF rather than an O-Cloud.  1388
+The general assumption is that Scenario D has the same use cases and performance requirements as Scenario C, and the 1389
+primary difference is in the business decision of how the O-RAN Physical NF based solution compares with the O-RAN 1390
+compliant O-Cloud solution.  Implementation considerations (discussed in Section 5.1) could lead a carrier to decide that 1391
+an acceptable O-Cloud solution is not available in a deployment’s timeframe.   1392
+ 1393
+Figure 35:  Scenario D 1394
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+46
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+6.5 Scenario E  1395
+In contrast to Scenario D, this scenario assumes that not only can the O -DU be virtualized as in Scenario C, but that the 1396
+O-RU can also be successfully virtualized.  Furthermore, the O -RU and O -DU would be implemented in the same O-1397
+Cloud, which has acceleration hardware required by both the O-RU and O-DU.   1398
+Note, this seems to be a future scenario, and is not part of our initial focus.   1399
+ 1400
+Figure 36:  Scenario E 1401
+ Key Use Cases and Drivers 1402
+Because the O -DU and O -RU are implemented in the same O-Cloud in this Scenario , it seems that the O -DU 1403
+implementation must  meet the environmental and accessibility requirements typically associated with an O -RU.  1404
+Therefore, an indoor use case seems most appropriate.  1405
+6.6 Scenario F  1406
+This is a variation on Scenario E in which the O-DU and O-RU are both virtualized, but in different O-Clouds. This means 1407
+that: 1408
+ The O-DU function can be placed in a more convenient location in terms of accessibility for maintenance and 1409
+upgrades. 1410
+ The O-DU function can be placed in an environment that is semi -controlled or controlled, which reduce s some 1411
+of the implementation complexity.  1412
+ 1413
+ 1414
+Figure 37:  Scenario F 1415
+ Key Use Cases and Drivers 1416
+Because this assumes that the O-RU is virtualized, this is a future use case. 1417
+This use case seems to be better suited for outdoor deployments (e.g., pole mounted) than Scenario E. 1418
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+47
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+6.7 Scenarios of Initial Interest 1419
+More scenarios have been identified than can be addressed in the initial release of this document.  Scenario B has been 1420
+selected as the one to address initially, and to be the subject of detailed treatment in a Scenario document (refer back to 1421
+Figure 1).  Other scenarios are expected to be addressed in later work.   1422
+ 1423
+7 Appendix A (informative):  Extensions to Current 1424
+Deployment Scenarios to Include NSA 1425
+In this appendix, some extensions to (some of) the current deployment scenarios are proposed with the aim of introducing 1426
+Non-Standalone (NSA) in the pictures, consistently with the scope O -RAN cloud architecture. These extensions will be 1427
+the basis of the discussion for next version of the present document. In the following charts the subscript ‘N’ is indicating 1428
+blocks related to NR, while the subscript ‘E’ is indicating blocks related to E-UTRA.8  For E-UTRA, the W1 interface is 1429
+indicated. Its definition is ongoing in a 3GPP work item. 1430
+7.1 Scenario A 1431
+ 1432
+Figure 38:  Scenario A, Including NSA 1433
+7.2 Scenario B 1434
+Editor’s Note: Scenario B, Including NSA has been incorporated into 6.2.  1435
+
+8 No UPF or MEC blocks are explicitly indicated in the figures of this appendix, as the focus of this appendix is on the radio part.
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+48
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+7.3 Scenario C 1436
+ 1437
+Figure 39:  Scenario C, Including NSA 1438
+7.4 Scenario C.2 1439
+The scenario addresses both the single and multi-operator cases. To reduce the complexity in the figure the multi operator 1440
+case is considered, so no X2/Xn interface is present between CUN1 and CUE2 or between CUE1 and CUN2. 1441
+ 1442
+Figure 40:  Scenario C.2, Including NSA 1443
+7.5 Scenario D 1444
+ 1445
+Figure 41:  Scenario D, Including NSA  1446
+
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+49
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Annex ZZZ:  O-RAN Adopter License Agreement 1447
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER AGREES TO 1448
+THE TERMS OF THIS AGREEMENT.   1449
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and 1450
+the entity that downloads, uses or otherwise accesses any O -RAN Specification, including its Affiliates (the 1451
+“Adopter”). 1452
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 1453
+SECTION 1:  DEFINITIONS 1454
+ 1455
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common 1456
+control with another entity, so long as such control exists.  For the purpose of this Sectio n, “Control” 1457
+means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 1458
+ 1459
+1.2 “Compliant Portion” means only those specific portions of products (hardware, software or 1460
+combinations thereof) that implement any O-RAN Specification. 1461
+ 1462
+1.3  “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, 1463
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 1464
+ 1465
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance 1466
+that does not add any significant new features or functionality and remains interoperable with the prior 1467
+version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates. 1468
+ 1469
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, 1470
+other than design patents and design registrations, throughout the world, which (i) are owned or 1471
+otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, 1472
+Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the 1473
+right to grant a license without the payment of consideration to a third party; and (iii) are necessarily 1474
+infringed by implementation of a Final Specification (without considering any Contributions not included 1475
+in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not 1476
+commercial) grounds, taking into account normal technica l practice and the state of the art generally 1477
+available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 1478
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, 1479
+use or operate an implementation which complies with a Final Specification without infringing that claim. 1480
+For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by 1481
+technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary 1482
+Claims. 1483
+ 1484
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 1485
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include 1486
+in their license a term allowing the licensor to suspend the license against a licensee who brings a patent 1487
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of 1488
+their Affiliates. 1489
+ 1490
+SECTION 2: COPYRIGHT LICENSE 1491
+ 1492
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a 1493
+nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use 1494
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+50
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified 1495
+or unmodified way, solely in furtherance of implementations of an O-RAN Specification. 1496
+ 1497
+2.2 Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in  a 1498
+separate written agreement with O-RAN Alliance. 1499
+ 1500
+SECTION 3: FRAND LICENSE 1501
+ 1502
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based 1503
+on a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non-Discriminatory 1504
+(FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, 1505
+irrevocable (but subject to Defensive S uspension), non -sublicensable, worldwide license under their 1506
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 1507
+Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a 1508
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or 1509
+(b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic 1510
+Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the 1511
+distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed 1512
+Compliant Portions. 1513
+ 1514
+3.2  Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 1515
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims 1516
+to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor 1517
+or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 1518
+ 1519
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent 1520
+License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates 1521
+under FRAND terms and conditions with or without compensation (royalties) a nonexclusive, non -1522
+transferable, irrevocable (but subject to Defensive Suspension),  non-sublicensable,  worldwide license 1523
+under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise 1524
+distribute Compliant Portions; provided, however, that such license will not extend: (a) to any part or 1525
+function of a product in which a Compliant Portion is incorporated that is not itself part of the Compliant 1526
+Portion; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is 1527
+not making a reciprocal grant to Adopter, as set fo rth in Section 3.1.  For the avoidance of doubt, the 1528
+foregoing license includes the distribution by the Members’, Contributors’, Academic Contributors’, 1529
+Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic 1530
+Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Portions. 1531
+ 1532
+SECTION 4:  TERM AND TERMINATION 1533
+ 1534
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 1535
+ 1536
+4.2 O-RAN Alliance on behalf of its Members, Contribu tors and Academic Contributors may terminate 1537
+this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of 1538
+curing such breach within thirty (30) days after being given notice specifying the breach. 1539
+ 1540
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement.  Under 1541
+surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to 1542
+entities who become Adopters after the date of terminat ion; and (b) for future versions of O -RAN 1543
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+51
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+Specifications that are backwards compatible with the version that was current as of the date of 1544
+termination. 1545
+ 1546
+SECTION 5: CONFIDENTIALITY 1547
+ 1548
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-1549
+RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less 1550
+than reasonable care.  Any disclosure by Adopter to its Affiliates, contractors and consultants should be 1551
+subject to an obligation  of confidentiality at least as restrictive as those contained in this Section.  The 1552
+foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without 1553
+any limitation on use or disclosure prior to disclosure; (2) publ icly available through no fault of Adopter; 1554
+(3) rightfully received without a duty of confidentiality; (4) disclosed by O -RAN Alliance or a Member, 1555
+Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; 1556
+(5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 1557
+governmental body, or as required by law, provided that Adopter provides reasonable prior written notice 1558
+to O-RAN Alliance, and cooperates with O -RAN Alliance and/or the applicable Member, Contributor or 1559
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with 1560
+O-RAN Alliance’s prior written approval.  1561
+ 1562
+SECTION 6:  INDEMNIFICATION 1563
+ 1564
+Adopter shall indemnify, defend, a nd hold harmless the O -RAN Alliance, its Members, Contributors or 1565
+Academic Contributors, and their employees, and agents and their respective successors, heirs and 1566
+assigns (the “ Indemnitees”), against any liability, damage, loss, or expense (including reasonable 1567
+attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with 1568
+any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the 1569
+licensed O -RAN Specifications or Adopter’s c ommercialization of products that comply with O -RAN 1570
+Specifications. 1571
+ 1572
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY 1573
+ 1574
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 1575
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LI ABLE TO ANY OTHER PARTY OR 1576
+THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES 1577
+RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE 1578
+WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND W HETHER OR NOT SUCH PARTY 1579
+HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 1580
+ 1581
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 1582
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O -RAN ALLIANCE AND THE MEMBERS, 1583
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF 1584
+MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY 1585
+PARTICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O -RAN 1586
+SPECIFICATIONS. 1587
+ 1588
+SECTION 8:  ASSIGNMENT 1589
+ 1590
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make 1591
+any grants or other sublicenses to this Agreement, except as expressly authorized hereunder , without 1592
+having first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in 1593
+O-RAN Alliance’s sole discretion.  O-RAN Alliance may freely assign this Agreement. 1594
+ 1595
+                                                                                                                      O-RAN.WG6.CAD-v02.01 TR
+
+52
+Copyright © 2020 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.
+ 1596
+ 1597
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS 1598
+ 1599
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors  (including 1600
+future Members, Contributors and Academic Contributors ) are entitled to rights as a third -party 1601
+beneficiary under this Agreement, including as licensees under Section 3. 1602
+ 1603
+SECTION 10:  BINDING ON AFFILIATES 1604
+ 1605
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 1606
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are 1607
+applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 1608
+ 1609
+SECTION 11:  GENERAL 1610
+ 1611
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law 1612
+provisions.   1613
+ 1614
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and 1615
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties,  1616
+whether written or oral, relating to the subject matter of this Agreement. 1617
+ 1618
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules 1619
+and regulations with respect to its and its Affiliates’ performance under this Agreement, including without 1620
+limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter 1621
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 1622
+ 1623
+By execution hereof, no form of any partnership, joint venture or other special relationship is created 1624
+between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.  Except as 1625
+expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of 1626
+Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. 1627
+ 1628
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held 1629
+to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions 1630
+will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and 1631
+restrictions of this Agreement will remain in full force and effect. 1632
+ 1633
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of 1634
+any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or 1635
+otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ 1636
+or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any 1637
+other instance; rather the same shall be and remain in full force and effect. 1638
+ 1639

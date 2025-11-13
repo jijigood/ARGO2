@@ -1,0 +1,4569 @@
+O-RAN.WG3.UCR-R003-v04.00
+
+		O-RAN.WG3.UCR-R003-v04.00
+
+Technical Specification
+
+O-RAN Work Group 3
+
+Near-Real-time RAN Intelligent Controller
+
+Use Cases and Requirements
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+	Foreword	4
+
+	Chapter 1 Introduction	5
+
+		1.1	Scope	5
+
+		1.2	References	5
+
+		1.3	Definitions and Abbreviations	6
+
+		1.3.1	Definitions	6
+
+		1.3.2	Abbreviations	8
+
+	Chapter 2 Objective	9
+
+	Chapter 3 Use cases	10
+
+		3.1	Use case 1: Traffic Steering	10
+
+		3.1.1	Background and goal of the use case	10
+
+		3.1.2	Entities/resources involved in the use case	10
+
+		3.1.3	Solutions	11
+
+		3.1.4	Required data	15
+
+		3.2	Use case 2: QoS Based Resource Optimization	17
+
+		3.2.1	Background and goal of the use case	17
+
+		3.2.2	Entities/resources involved in the use case	17
+
+		3.2.3	Solutions	18
+
+		3.2.4	Required data	20
+
+		3.3	Use case 3: RAN Slice SLA Assurance	24
+
+		3.3.1	Background and goal of the use case	24
+
+		3.3.2	Entities/resources involved in the use case	26
+
+		3.3.3	Solutions	27
+
+		3.3.4	Required data	29
+
+		3.4	Use case 4: Massive MIMO Optimization	32
+
+		3.4.1	Background and goal of the use case	32
+
+		3.4.2	Entities/resources involved in the use case	32
+
+		3.4.3	Solutions	33
+
+		3.4.4	Required data	47
+
+		3.5	Use case 5: QoE Optimization	49
+
+		3.5.1	Background and goal of the use case	49
+
+		3.5.2	Entities/resources involved in the use case	50
+
+		3.5.3	Solutions	50
+
+		3.5.4	Required data	54
+
+		3.5.5	RAN analytics information exposed by Near-RT RIC	56
+
+		3.6	Use case 6: Network Energy Saving	56
+
+		3.6.1	Carrier and Cell Switch Off/On	57
+
+	Chapter 4 Requirements	63
+
+		4.1	Functional requirements	63
+
+		4.1.1	Near-RT RIC generic functional requirements	63
+
+		4.1.2	E2 Interface functional requirements	63
+
+		4.1.3	RAI Exposure Interface functional requirements	69
+
+		4.2	Non-functional requirements	70
+
+		4.2.1	Near-RT RIC non-functional requirements	70
+
+		4.2.2	E2 Interface non-functional requirements	70
+
+	Annex A (informative): Example Use Cases	71
+
+		A.1	Example Use Cases for RAN Slice SLA Assurance	71
+
+		A.1.1	Downlink and Uplink Throughput Per Slice	71
+
+	A.1.2 Guaranteed Downlink and Uplink Throughput Per Slice	72
+
+	Annex (informative): Revision history	73
+
+	Annex (informative): History	74
+
+Foreword
+
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+
+version xx.yy.zz
+
+where:
+
+xx:	the first digit-group is incremented for all changes of substance, i.e., technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+
+Introduction
+
+1.1	Scope
+
+The current document describes the initial use cases that have been approved within O-RAN WG3. The purpose of the use cases is to help identify requirements for O-RAN defined interfaces and functions, specifically Near-RT RIC functions and E2 interface, eventually leading to formal drafting of interface specifications. For each use case, the document describes the motivation, resources, steps involved, and data requirements. Finally, the requirements section details the functional and non-functional requirements derived from these use cases.
+
+1.2	References
+
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+
+-	References are either specific (identified by date of publication, edition number, version number, etc.) or nonspecific.
+
+-	For a specific reference, subsequent revisions do not apply.
+
+-	For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 16.
+
+3GPP TR 21.905: “Vocabulary for 3GPP Specifications”
+
+3GPP TS 22.261: “Service Requirements for the 5G System”, Release 16, October 2020
+
+3GPP TS 23.203: “Policy and Control Control Architecture”, Release 16, December 2019
+
+3GPP TS 23.501: “System Architecture for the 5G System (5GS)”, Release 16, September 2020
+
+3GPP TS 28.530: “3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; Management and orchestration; Concepts, use cases and requirements”, Release 16, December 2020
+
+3GPP TS 28.541: “Management and orchestration; 5G Network Resource Model (NRM); Stage 2 and stage 3”, Release 16, November 2020
+
+3GPP TS 28.552: “Technical Specification Group Services and System Aspects; Management and orchestration; 5G performance measurements”, Release 16, September 2020
+
+3GPP TS 32.425: “Telecommunication management; Performance Management (PM); Performance measurements Evolved Universal Terrestrial Radio Access Network (E-UTRAN), Release 16, January 2020
+
+3GPP TS 36.300: “Evolved Universal Terrestrial Radio Access (E-UTRA) and Evolved Universal Terrestrial Radio Access Network (E-UTRAN); Overall description; Stage 2”, Release 16, October 2020
+
+3GPP TS 36.314: “Evolved Universal Terrestrial Radio Access (E-UTRA); Layer 2 – Measurements”, Release 16, July 2020
+
+3GPP TS 36.321: “Evolved Universal Terrestrial Radio Access (E-UTRA); Medium Access Control (MAC) protocol specification”, Release 16, October 2020
+
+3GPP TS 36.331: “Evolved Universal Terrestrial Radio Access (E-UTRA); Radio Resource Control (RRC); Protocol specification”, Release 16, October 2020
+
+3GPP TS 36.423: “Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 Application Protocol (X2AP)”, Release 16, October 2020
+
+3GPP TS 37.340: “NR; Multi-connectivity; Overall description; Stage-2”, Release 16, October 2020
+
+3GPP TS 38.300: “NR and NG-RAN Overall Description”, Release 16, October 2020
+
+3GPP TS 38.214: “NR; Physical Layer Procedures for Data”, Release 16, October 2020
+
+3GPP TS 38.314: “NR; Layer 2 measurements”, Release 16, October 2020
+
+3GPP TS 38.321: “NR; Medium Access Control (MAC) protocol specification”, Release 16, October 2020
+
+3GPP TS 38.331: “NR; Radio Resource Control (RRC); Protocol specification”, Release 16, October 2020
+
+3GPP TS 38.423: “NG-RAN; Xn Application Protocol (XnAP)”, Release 16, October 2020
+
+3GPP TS 38.463: “NG-RAN; E1 Application Protocol (E1AP)”, Release 16, October 2020
+
+3GPP TS 38.473: “NG-RAN; F1 Application Protocol (F1AP)”, Release 16, October 2020
+
+GSMA: “Generic Network Slice Template Version 4.0”, November 2020
+
+O-RAN.WG1.Use-Cases-Detailed-Specification-v05.00, “O-RAN Working Group 1, Use Cases Detailed Specification v8.0”
+
+O-RAN.WG2.A1AP, “O-RAN Working Group 2, O-RAN A1 interface: Application Protocol”
+
+O-RAN.WG3.E2SM-v02.00; “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 Service Model (E2SM)”.
+
+O-RAN.WG1.mMIMO-Use-Cases-TR-v01.00, "O-RAN Working Group 1, Massive MIMO Use Cases Technical Report".
+
+3GPP TS 38.133: "NR; Requirements for support of radio resource management", Release 16, April 2022
+
+3GPP TS 38.215: “NR; Physical layer measurements”, Release 16, April 2022
+
+O-RAN.WG2.UCR, "O-RAN Working Group 2, Non-RT RIC & A1 Interface: Use Cases and Requirements"
+
+O-RAN.WG2.AIML, “O-RAN Working Group 2, AI/ML workflow description and requirements”
+
+O-RAN.WG1.O-RAN-Architecture-Description-v06.00, “O-RAN Architecture Description”
+
+3GPP TR 23.700-40 Study on enhancement of network slicing; Phase 2, March 2021
+
+3GPP TS 23.501 System architecture for the 5G System (5GS); Stage 2 Release 17 March 2021
+
+ORAN-WG1.Use Cases Detailed Specification R003 v11.00
+
+ORAN-WG1.Use Cases Energy Saving Technical Report R003 v02.00
+
+3GPP TR 28.813: Study on new aspects of Energy Efficiency (EE) for 5G, Release 17, December 2021
+
+3GPP TS 28.310: "Management and orchestration; Energy efficiency of 5G", Release 18, March 2023
+
+1.3	Definitions and Abbreviations
+
+1.3.1	Definitions
+
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 [1].
+
+A1 policy: Type of declarative policies expressed using formal statements that enable the non-RT RIC function in the SMO to guide the near-RT RIC function, and hence the RAN, towards better fulfilment of the RAN intent.
+
+A1 Enrichment information: Information utilized by near-RT RIC that is collected or derived at SMO/non-RT RIC either from non-network data sources or from network functions themselves.
+
+A1-Policy Based Traffic Steering Process Mode: An operational mode in which the Near-RT RIC is configured through A1 Policy to use Traffic Steering Actions to ensure a more specific notion of network performance (for example, applying to smaller groups of E2 Nodes and UEs in the RAN) than that which it ensures in the Background Traffic Steering.
+
+Background Traffic Steering Processing Mode: An operational mode in which the Near-RT RIC is configured through O1 to use Traffic Steering Actions to ensure a general background network performance which applies broadly across E2 Nodes and UEs in the RAN.
+
+Baseline RAN Behavior: The default RAN behavior as configured at the E2 Nodes by SMO
+
+E2:  Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, one or more O-DUs, and one or more O-eNBs.
+
+E2 Node: a logical node terminating E2 interface. In this version of the specification, O-RAN nodes terminating E2 interface are:
+
+-	for NR access: O-CU-CP, O-CU-UP, O-DU or any combination;
+
+-	for E-UTRA access: O-eNB.
+
+FCAPS: Fault, Configuration, Accounting, Performance, Security.
+
+Intents: A declarative policy to steer or guide the behavior of RAN functions, allowing the RAN function to calculate the optimal result to achieve stated objective.
+
+Non-RT RIC (O-RAN non-real-time RAN Intelligent Controller): a logical function that enables non-real-time control and optimization of RAN elements and resources, AI/ML workflow including model training and updates, and policy-based guidance of applications/features in Near-RT RIC.
+
+Near-RT RIC (O-RAN near-real-time RAN Intelligent Controller): a logical function that enables near-real-time control and optimization of RAN elements and resources via fine-grained (e.g., UE basis, Cell basis) data collection and actions over E2 interface.
+
+O-CU (O-RAN Central Unit): a logical node hosting RRC, SDAP and PDCP protocols
+
+O-CU-CP (O-RAN Central Unit – Control Plane): a logical node hosting the RRC and the control plane part of the PDCP protocol
+
+O-CU-UP (O-RAN Central Unit – User Plane): a logical node hosting the user plane part of the PDCP protocol and the SDAP protocol
+
+O-DU (O-RAN Distributed Unit): a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional split.
+
+O-eNB (O-RAN eNB): an eNB or ng-eNB that supports E2 interface.
+
+O-RU (O-RAN Radio Unit): a logical node hosting Low-PHY layer and RF processing based on a lower layer functional split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH extraction).
+
+O1: Interface between orchestration & management entities (Orchestration/NMS) and O-RAN managed elements, for operation and management, by which FCAPS management, Software management, File management and other similar functions shall be achieved.
+
+RAN UE Group: Aggregations of UEs whose grouping is set in the E2 nodes through E2 procedures also based on the scope of A1 policies.  These groups can then be the target of E2 CONTROL or POLICY messages.
+
+Traffic Steering Action: The use of a mechanism to alter RAN behavior. Such actions include E2 procedures such as CONTROL and POLICY.
+
+Traffic Steering Inner Loop: The part of the Traffic Steering processing, triggered by the arrival of periodic TS related KPM (Key Performance Measurement) from E2 Node, which includes UE grouping, setting additional data collection from the RAN, as well as selection and execution of one or more optimization actions to enforce Traffic Steering policies.
+
+Traffic Steering Outer Loop: The part of the Traffic Steering processing, triggered by the Near-RT RIC setting up or updating Traffic Steering aware resource optimization procedure based on information from A1 Policy setup or update, A1 Enrichment Information (EI) and/or outcome of Near-RT RIC evaluation, which includes the initial configuration (preconditions) and injection of related A1 policies, Triggering conditions for TS changes.
+
+Traffic Steering Processing Mode: An operational mode in which either the RAN or the Near-RT RIC is configured to ensure a particular network performance.  This performance includes such aspects as cell load and throughput, and it can apply differently to different E2 nodes and UEs.  Throughout this process, Traffic Steering Actions are used to fulfill the requirements of this configuration.
+
+Traffic Steering Target: The intended performance result that is desired from the network, which is configured to Near-RT RIC over O1.
+
+1.3.2	Abbreviations
+
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+
+KPI	Key Performance Indicator
+
+KQI	Key Quality Indicator
+
+MBB	Mobile BroadBand
+
+SMO	Service Management and Orchestration
+
+Objective
+
+This document provides O-RAN WG3 Near-RT RIC Use Cases and Requirements, including E2 interface.
+
+Use cases
+
+3.1	Use case 1: Traffic Steering
+
+This use case provides the motivation, description, and requirements for near RT RIC and E2 interface to support Traffic Steering, whose end-to-end requirements are defined in [23].
+
+3.1.1	Background and goal of the use case
+
+The rapid traffic growth and multiple frequency bands utilized in a commercial network make it challenging to steer the traffic in a balanced distribution. Typical controls are limited to adjusting the cell reselection and handover parameters; and modifying load calculations and cell priorities.
+
+The goal of Near-RT RIC Traffic Steering is to interpret the Policies received over A1 and to determine the optimum changes it can make towards achieving those goals. It may also leverage the A1 enrichment information.  Traffic Steering may reuse mechanisms provided by other use cases to effect the changes necessary to achieve its goals.
+
+More specifically, Near-RT RIC triggers E2 procedure and related control/policies so as to obtain network performance that would fulfill the criteria identified in the A1 policies.
+
+3.1.2	Entities/resources involved in the use case
+
+OAM Functions in SMO domain:
+
+Collect necessary measurement metrics from network level measurement report and enrichment data (may acquire data from application) for constructing/training relevant AI/ML models
+
+Deploy or update, configure the relevant TS optimization AI/ML models to Near-RT RIC via O1.
+
+Non-RT RIC in SMO domain:
+
+Send A1 policies and receive policy feedback to/from Near-RT RIC to drive resource optimization at RAN level.
+
+E.g., TS targets as defined in [25]
+
+Near-RT RIC:
+
+Supports update of AI/ML models from SMO.
+
+Supports inference, such as traffic prediction, using AI/ML models from Non-RT RIC based on network data, e.g. measurement reports from E2 Node.
+
+Supports interpretation and execution of A1 policies from Non-RT RIC.
+
+Sends TS resource optimization related policies and commands to E2 Node to influence RRM behavior.
+
+Sends the relevant A1 policy feedback to Non-RT RIC for potential policy update.
+
+Sends the relevant O1 performance data to OAM Functions; these may be used by Non-RT RIC for potential policy update
+
+E2 Node:
+
+Supports reporting of UE context, network measurements, and UE measurements to Near-RT RIC over E2 interface.
+
+Executes policies and commands received from Near-RT RIC over E2 interface
+
+Supports network and UE performance report to OAM Functions in SMO domain over O1 interface.
+
+3.1.3	Solutions
+
+In this section the possible processing modes of Traffic Steering are described. Figure 3.1.3-1 shows three general Traffic Steering processing modes and the transitions between them.
+
+These modes represent the way the Near-RT RIC (or RAN) operates on a given group of UEs, and not the operation of any component as a whole.  As such, the Near-RT RIC, could be operating in both modes 1 and 2 concurrently for different sets of UEs.  For example, the transition from Mode 0 or 1 to 2 occurs only for a group of UE defined by the A1 policy Scope. At the same time, other UE groups may still be handled in Mode 0 and/or 1.
+
+A1-P Delete Policy
+
+A1-P Delete Policy
+
+TS Mode 2:
+
+A1 Policy based Near-RT RIC Processing
+
+TS Mode 0:
+
+Baseline
+
+TS Mode 1:
+
+Background Near-RT RIC Processing
+
+O1 configuration
+
+removal
+
+O1 configuration
+
+from SMO
+
+A1-P Create Policy
+
+from Non-RT RIC
+
+A1-P Create Policy
+
+from Non-RT RIC
+
+A1-P Delete Policy
+
+A1-P Delete Policy
+
+TS Mode 2:
+
+A1 Policy based Near-RT RIC Processing
+
+TS Mode 0:
+
+Baseline
+
+TS Mode 1:
+
+Background Near-RT RIC Processing
+
+O1 configuration
+
+removal
+
+O1 configuration
+
+from SMO
+
+A1-P Create Policy
+
+from Non-RT RIC
+
+A1-P Create Policy
+
+from Non-RT RIC
+
+Figure 3.1.3-1: Traffic Steering Processing Modes
+
+The three processing modes are described in more detail below:
+
+“Baseline” Traffic Steering Behavior: OAM Functions in SMO domain uses O1 configuration on one or more E2 node to set up a desired baseline behavior.  This also sets up baseline Performance Monitoring of E2 Node by the SMO. In this mode, Near-RT RIC is not involved.
+
+“Background” Near-RT RIC Processing: OAM Functions in SMO domain uses O1 configuration of near-RT RIC to set up a desired “background near-RT RIC behavior”.  In this mode the near-RT RIC sets up E2 mechanisms to monitor E2 Node and uses Traffic Steering related E2 mechanisms to achieve the desired background behavior of the set of E2 Nodes connected to the near-RT RIC.
+
+“A1-Policy based” Near-RT RIC Processing: This mode may be entered from either Mode 0 or Mode 1.  Non-RT RIC in SMO domain uses A1-P to specify an A1 guided behavior for a targeted subset of E2 Nodes or UEs. If entering this from Mode 1, this will have the effect of modifying the existing near-RT RIC “background” behavior to include a more specific A1 guided behavior.  In this mode, the near-RT RIC may either set up or modify E2 mechanisms used to monitor E2 Nodes and will use Traffic Steering related E2 mechanisms to obtain the desired behavior of some targeted sub-set of E2 Nodes or UEs.  This mode terminates when the corresponding A1-P Policy Delete message is received from Non-RT RIC in SMO domain and the system returns to either Mode 0 or Mode 1, depending on whether or not OAM Functions in SMO domain had previously configured the optional Near-RT RIC “background” role (Mode 1).
+
+Note 1: Processing Mode 0 is strictly not in scope for WG3.  It is described here for completeness and to clearly state what is the starting point prior to the WG2 and WG3 defined mechanisms.
+
+Processing Mode 2 contain an ‘outer loop’ and an ‘inner loop’.  In the inner loop, a number of different “E2 mechanism” may be used (Policy, Report/Control or Insert/Control) towards a number of different targets RAN functions in order to either exercise existing RAN mechanisms or modifying their ongoing behavior.  The appropriate mechanism and target RAN Function would depend upon the RAN Function capabilities to support a given E2 mechanism, the A1-P scope and policy, the O1 configuration of the RIC and the performance observed through E2 monitoring.
+
+3.1.3.1 Near-RT RIC A1-Policy Based Traffic Steering
+
+Table 3.1.3.1-1: Near RT RIC A1-Policy Based Traffic Steering
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Drive traffic management in RAN in accordance with defined intents, policies, and enrichment information from the Non-RT RIC using A1 interface
+
+Actors and Roles
+
+OAM Functions in SMO domain: Performance data and training data collection, AI Model management
+
+Non-RT RIC in SMO domain: Creates and updates A1 policies, AI model training targeting to TS optimization
+
+Near-RT RIC: Enforces A1 policies and generates RIC CONTROL and/or POLICY
+
+E2 Node: RIC CONTROL and POLICY execution and RIC REPORT creation
+
+Refer to 3.1.2 for more details.
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+A1, O1 and E2 interface connectivity is established.
+
+A1 Policy scope defined
+
+Pre-conditions
+
+Network is operational with default configuration.
+
+OAM Functions have configured a baseline measurement configuration and the Non-RT RIC has access to this data
+
+(optional) OAM Functions have configured Traffic Steering targets in near-RT RIC through O1 interface
+
+OAM Functions have configured baseline traffic steering parameters in E2 Node(s) through O1 interface
+
+(optional) Near-RT RIC has access to the necessary data related to traffic steering from the E2 node by means of a RIC Report procedure
+
+Non-RT RIC analyzes the historical data from RAN for training the relevant AI/ML models to be deployed or updated in the near-RT RIC, as well as AI/ML models required for non-real-time optimization of configuration and policies.
+
+ Begins when
+
+Non-RT RIC and/or Near-RT RIC perform data evaluation, determine that TS-aware optimization is required to be initiated or updated and establishes target(s).
+
+Step 1 (O)
+
+(Start of Outer loop control)
+
+Non-RT RIC evaluates the collected data and A1 policy feedback, if required, and generates or updates the appropriate TS-aware resource optimization policy, such as TS targets, and sends it to Near-RT RIC via A1 interface.
+
+Step 2 (O)
+
+Non-RT RIC sends optional traffic steering related A1 Enrichment Information
+
+Step 3 (M)
+
+Based on received A1 policy and/or A1-EI from Non-RT RIC or internal trigger and/or internal evaluation and trigger, Near-RT RIC sets up or updates the TS-aware resource optimization procedure.
+
+Step 4 (M)
+
+Near-RT RIC subscribes to a UE context information and measurement metrics via E2 interface.
+
+Step 5 (M)
+
+(Start of Inner loop control)
+
+E2 Nodes report the UE context information and E2 measurements via RIC REPORT periodically or event-triggered.
+
+Step 6 (M)
+
+Near-RT RIC evaluates the performance data from E2 Nodes (including performance data from different E2 Nodes for the same UE) and finds the performance is out of TS targets which are indicated in the A1 policy and/or internal near-RT RIC TS targets.
+
+Step 7 (M)
+
+Based on the UE context information, E2 measurement metrics (RIC REPORT), and A1 policy, Near-RT RIC may generate new or modify the existing E2 policies and sends them to E2 Nodes. Near-RT RIC may also generate control command(s) and send them to E2 Node(s) to trigger re-allocation of radio resources so that TS indicators can move back to the limits outlined in the A1 policies.
+
+E2 node functions target of E2 policy and control commands may be:
+
+E-UTRAN-NR Dual Connectivity
+
+Carrier Aggregation
+
+Connected mode mobility
+
+Idle Mode Mobility
+
+Step 4 to Step 7 may repeat. (End of Inner loop control)
+
+Step 8 (O)
+
+If required, Near-RT RIC sends information to the SMO domain using A1 policy feedback and/or O1-PM.  The Non-RT RIC may use this information and information collected from E2 Nodes using O1-PM as policy feedback to assess the performance of TS optimization function in Near-RT RIC, or to assess the outcome of the applied A1 policies. Subsequently, an A1 policy can be updated.
+
+In parallel, the Near-RT RIC may use available information to assess the performance of TS optimization function in Near-RT RIC, and/or to assess the outcome of the applied A1 policies. Subsequently, Near-RT RIC TS optimization targets can be updated
+
+Step 1 to Step 8 may repeat (End of Outer loop control)
+
+Ends when
+
+Non-RT RIC decides to delete TS-aware resource optimization policy and sends the related message or following internal trigger, the Near-RT RIC terminates the TS-aware resource optimization procedure.
+
+Exceptions
+
+None
+
+Post Conditions
+
+Non-RT RIC continues to collect and monitor TS related measurement data from E2 Node.
+
+Near-RT RIC continues to collect and monitor TS related measurement data from E2 Node.
+
+Traceability
+
+REQ-Near-RT-RIC-TS-FUN1, REQ-Near-RT-RIC-TS-FUN2, REQ-E2-TS-FUN1, REQ-E2-TS-FUN2, REQ-E2-TS-FUN3, REQ-E2-TS-FUN4, REQ-E2-TS-FUN5, REQ-E2-TS-FUN6, REQ-E2-TS-FUN7, REQ-E2-TS-FUN8, REQ-E2-TS-FUN9, REQ-E2-TS-FUN10
+
+@startuml
+
+skinparam ParticipantPadding 4
+
+skinparam BoxPadding 8
+
+skinparam defaultFontSize 12
+
+Box “Service Management and Orchestration” #gold
+
+    Participant OAM as “OAM Functions”
+
+    Participant non as “Non-RT RIC”
+
+End box
+
+Box “O-RAN” #lightpink
+
+   Participant near as “Near-RT RIC”
+
+   Participant ran as “E2 Node”
+
+End box
+
+OAM <-> ran : <<O1>> RAN Data & Configuration collection
+
+near <-> ran : <<E2>> RAN Data & Configuration collection
+
+OAM -> non: TS Performance information
+
+non-->non: (Mode 2) Collected Data Evaluation TS target generation
+
+near-->near: (Mode 1) Collected Data Evaluation TS target generation
+
+group OUTER LOOP CONTROL
+
+   non --> near : 1:(opt.) <<A1>> A1 policy setup or update
+
+   non --> near: 2: (opt.) <<A1-EI>> Traffic steering related A1 Enrichment Information
+
+   near -> near : 3: TS optimization set-up or update
+
+   near -> ran : 4: <<E2>> RIC SUBSCRIPTION REQUEST(UE context & Measurement Metrics)
+
+   group INNER LOOP CONTROL
+
+      ran -> near: 5: <<E2>> RIC INDICATION (UE context & E2 measurement metrics)
+
+      near -> near: 6: TS performance does not fulfill A1 policy requirements
+
+      near --> ran : 7: (opt.) <<E2>> RIC SUBSCRIPTION REQUEST(REPORT or INSERT [UE measurements & E2-node state])
+
+      near <-- ran : (opt.) <<E2>> RIC INDICATION
+
+      near --> ran : (opt.) <<E2>> RIC CONTROL REQUEST(TS optimization control parameters)
+
+      near --> ran : (opt.) <<E2>> (opt.) RIC SUBSCRIPTION REQUEST(TS optimization POLICY)
+
+   end
+
+   OAM <-- near: (opt.) <<O1>> TS Performance information
+
+   OAM -> non: TS Performance information
+
+   non <-- near: (opt.) <<A1>> TS Performance information
+
+   non -> non: TS Optimization Performance Evaluation
+
+   near -> near: TS Optimization Performance Evaluation
+
+end
+
+non --> near: (opt.) <<A1>> A1 policy delete
+
+near -> near: TS optimization stopped
+
+near-> ran: <<E2>> RIC SUBSCRIPTION DELETE
+
+@enduml
+
+Figure 3.1.3.1-1: The overall procedure for Near RT RIC A1-Policy based Traffic Steering Use Case
+
+3.1.4	Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the Traffic Steering use case. The requirements are specified in Section 4.
+
+3.1.4.1 Control over E2
+
+Mobility Control: serving cell can be chosen based on the resource status and QoS of the UE(s) targeted by an A1 Traffic steering policy. Moreover, load balancing can be achieved to improve the overall network performance. The following procedures can be used for Traffic Steering:
+
+Handover from the source cell to the target cell
+
+Configuration/reconfiguration of handover restriction list
+
+Configuration of idle mode mobility parameters
+
+Enable, disable, or modify CA (3GPP TS 38.300[15], 3GPP TS 36.300[9], 3GPP TS 38.473[22], 3GPP TS 38.331[19], 3GPP TS 36.331[12] )
+
+Enable, disable, or modify Dual Connectivity (3GPP TS 38.300[15], 3GPP TS 36.300[9], 3GPP TS 37.340[14], 3GPP TS 38.473[22], 3GPP TS 38.331[19], 3GPP TS 36.331[12] )
+
+Both RIC POLICY and RIC CONTROL can be used.
+
+3.1.4.2	UE Context Information from E2 Nodes
+
+The followings are examples of UE context information identified as required:
+
+UE ID (as defined in [24])
+
+Slice level: S-NSSAI
+
+DRB level: e.g., established DRB ID, mapping with QoS flows, etc.
+
+QoS related: e.g., E-RAB Level QoS Parameters (4G, NSA) or QoS Flow Level QoS Parameters (NG-RAN).
+
+UE capabilities: CA and DC capabilities
+
+For example, UE ID, S-NSSAI, DRB ID, or QCI/5QI can be used to derive the QoS requirements and the resource occupation; the UE capabilities may be required to select the appropriate RRM action (e.g. CA/DC configuration).
+
+3.1.4.3 Measurements from E2 Nodes
+
+	The E2 measurements are necessary for inference and prediction in the Near-RT RIC as the driver for decisions in addition to KPMs. For the Traffic Steering use case, the Near-RT RIC can translate an A1 policy (relatively static targets) into a flexible selection of controls over E2 (e.g., handover control, DC, CA, idle mode mobility) by taking into account the RAN resource utilization, cell level and the UE level performance, the radio conditions, etc.
+
+	The following lists the examples of measurement information identified as required:
+
+Table 3.1.4.3-1: Measurements from E2 Nodes
+
+Cell/SSB area related measurements
+
+DL/UL Total PRB Usage, Distribution of DL/UL Total PRB Usage, DL/UL GBR PRB Usage, DL/UL non-GBR PRB Usage, RRC Connection Number, Available RRC Connection Capacity Value, Mean and Maximum Number of Active UEs per DRB in the DL/UL, DL/UL Scheduling PDCCH CCE Usage, DL/UL Composite Available Capacity, DL/UL Cell PDCP SDU Data Volume (including secondary RAT usage for EN-DC/MR-DC), Handover success ratio
+
+DL/UL SSB Area Total PRB Usage, DL/UL SSB Area GBR PRB Usage, DL/UL SSB Area non-GBR PRB Usage, SSB Area Capacity Value
+
+DL/UL PRB usage per QCI, DL/UL PRB usage per 5QI, DL/UL PRB usage per slice, Slice Available Capacity Value
+
+Ref. 3GPP 32.425[8], 3GPP 28.552[7], 3GPP 36.314[10], 3GPP 38.314[17], 3GPP 38.423[20], 3GPP 38.463[21] and 3GPP 38.473[22]
+
+E2-node user plane measurements per-UE / UE group
+
+Average DL/UL throughput
+
+DL/UL PRB usage
+
+DL/UL Scheduled IP throughput
+
+Buffer Status Information (e.g. UL BSR)
+
+Ref. 3GPP 32.425[8], 3GPP 28.552[7], 3GPP 36.314[10], 3GPP 38.314[17], 3GPP 38.423[20], 3GPP 38.473[22], 3GPP 38.463[21], 3GPP 36.321[11], 3GPP 38.321[18]
+
+UE L1/L2/L3 measurements
+
+RSRP and RSRQ measurements
+
+SINR measurements
+
+CQI/MCS measurements
+
+Location and Velocity measurements
+
+Ref. 3GPP TS 36.331[12], 3GPP TS 38.331[19]
+
+3.1.4.4 E2 node Configuration
+
+Cell level configuration parameters, such as PCI, neighbor relations and related offsets etc. are needed at Near-RT RIC in order to e.g., configure UE measurements monitor cell level performance and manage mobility control (handover and cell reselection) according to the network topology and the related E2 parameters.
+
+3.2	Use case 2: QoS Based Resource Optimization
+
+This use case provides the background and motivation for the O-RAN architecture to support near real-time QoS aware resource optimization.
+
+Based on the end-to-end requirements for the QoS based resource optimization use case defined in [23] section 3.8, some high-level functional descriptions, and requirements over Near-RT RIC and E2 interface are introduced.
+
+3.2.1	Background and goal of the use case
+
+The network must offer means to prioritize resources while preserving the required QoS properties, e.g., reliability, latency, bandwidth requirements, as specified in 3GPP TS 23.203 [3]. Current RAN network coverage and capacity depends on rigorous planning and configuration. However, due to varying nature of traffic demands and radio channels as well as multiple services to co-exist, it is hard to satisfy all QoS requirements simultaneously.
+
+In summary, it is important for an E2 Node to achieve QoS targets as smoothly as possible. The QoS aware resource optimization should provide a refined granularity of radio resource allocation based on varying radio conditions and traffics in order to meet the diverse requirements of reliability, latency, and bandwidth simultaneously. In addition, it should coordinate allocation of radio resources for co-existing multiple services, which may have different priorities, to achieve the optimal utilization of radio resources.
+
+In case when the network performance data is observed outside the boundary of the defined QoS targets, the Near-RT RIC should be able to trigger re-allocation of radio resources so that the QoS indicators can move back within limits outlined in the A1 policies.
+
+3.2.2	Entities/resources involved in the use case
+
+OAM Functions in SMO domain:
+
+Collect necessary measurement metrics from network level measurement report and enrichment data (may acquire data from application) for constructing/training relevant AI/ML models
+
+Deploy or update, configure the relevant QoS optimization AI/ML models to Near-RT RIC via O1.
+
+Non-RT RIC in SMO domain:
+
+Send A1 policies to and receive policy feedback from Near-RT RIC to drive resource optimization at RAN level.
+
+E.g. QoS targets defined in TS 23.203 [3], such as GFBR, MFBR, Priority Level, PDB.
+
+See WG2 A1AP specification [25] for more information.
+
+Near-RT RIC:
+
+Support update of AI/ML models from SMO.
+
+Support inference, such as QoS prediction, using AI/ML models from Non-RT RIC based on network data, e.g. measurement reports from E2 Node.
+
+Support interpretation and execution of A1 policies from Non-RT RIC.
+
+Sending QoS resource optimization related policies and commands to E2 Node to influence RRM behavior.
+
+Sending the relevant A1 policy feedback to Non-RT RIC for potential policy update.
+
+Sending the relevant O1 performance data to OAM Functions, may be used by Non-RT RIC for potential policy update
+
+E2 Node:
+
+Support reporting of UE context, network measurements, and UE measurements to Near-RT RIC over E2 interface.
+
+Executes policies and commands received from Near-RT RIC over E2 interface
+
+Support network and UE performance report to OAM Functions in SMO domain over O1 interface.
+
+3.2.3	Solutions
+
+Table 3.2.3-1: QoS Based Resource Optimization use case
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+QoS-aware resource optimization in E2 Nodes in accordance with A1 policies and O1 configuration.
+
+Actors and Roles
+
+OAM Functions in SMO domain: Performance data and training data collection, AI Model training targeting to QoS optimization
+
+Non-RT RIC in SMO domain: Creates and updates A1 policies
+
+Near-RT RIC: Enforces A1 policies and generates RIC CONTROL and/or POLICY
+
+E2 Node: RIC CONTROL and POLICY execution and RIC REPORT creation
+
+Refer to 3.2.2 for more details.
+
+Assumptions
+
+All relevant functions and components are instantiated and configured.
+
+A1, O1, E2 interface connectivity is established.
+
+Pre-conditions
+
+Network is operational with default configuration.
+
+OAM Functions have established RAN data collection, and Non-RT RIC has access to this data.
+
+Non-RT RIC analyzes the history data from RAN and triggers SMO to train the relevant AI/ML models which are deployed or updated in Near-RT RIC via O1 interface.
+
+Non-RT RIC and Near-RT RIC have exchanged capabilities for the support of QoS-aware resource optimization.
+
+Begins when
+
+QoS-aware optimization policy is required to be initiated or updated.
+
+Step 1 (O)
+
+(Start of Outer loop control)
+
+Non-RT RIC evaluates the collected data and A1 policy feedback, if required, and generates or updates the appropriate QoS-aware resource optimization policy, such as QoS targets, and sends it to Near-RT RIC via A1 interface.
+
+Step 2 (M)
+
+When Near-RT RIC receives an A1 policy from Non-RT RIC, Near-RT RIC initiates the corresponding optimization procedure.
+
+Step 3 (M)
+
+(Start of Inner loop control)
+
+Near-RT RIC subscribes to a UE context information and measurement metrics via E2 interface.
+
+Step 4 (M)
+
+E2 Nodes report the UE context information and E2 measurements via RIC REPORT periodically or event-triggered.
+
+Step 5 (M)
+
+Near-RT RIC evaluates the performance data from E2 Nodes (including performance data from different E2 Nodes for the same UE) and finds the performance is out of QoS targets which are indicated in the A1 policy. If performance is within the targets, Near-RT RIC keeps monitoring.
+
+Step 6 (M)
+
+Based on the UE context information, E2 measurement metrics (RIC REPORT), and A1 policy, Near-RT RIC may generate new or modify the existing E2 policies and sends them to E2 Nodes. Near-RT RIC may also generate control command(s) and send them to E2 Node(s) to trigger re-allocation of radio resources so that QoS indicators can move back to the limits outlined in the A1 policies.
+
+Step 3 to Step 6 may repeat. (End of Inner loop control)
+
+Step 7 (O)
+
+If required, Near-RT RIC sends policy feedback to Non-RT RIC to assess the performance of QoS optimization function in Near-RT RIC, or to assess the outcome of the applied A1 policies. Subsequently, an A1 policy can be updated.
+
+Step 1 to Step 7 may repeat (End of Outer loop control)
+
+Ends when
+
+Non-RT RIC decides to delete QoS-aware resource optimization policy and sends the related message to Near-RT RIC.
+
+Exceptions
+
+-
+
+Post Conditions
+
+Non-RT RIC continues to collect and evaluate RAN data related to the QoS-aware optimization use case.
+
+Traceability
+
+REQ-E2-QoS-FUN1, REQ-E2-QoS-FUN2, REQ-E2-QoS-FUN3, REQ-E2-QoS-FUN4, REQ-E2-QoS-FUN5, REQ-E2-QoS-FUN6
+
+@startuml
+
+skinparam ParticipantPadding 4
+
+skinparam BoxPadding 8
+
+skinparam defaultFontSize 12
+
+Box “Service Management and Orchestration” #gold
+
+    Participant OF  as “OAM Functions”
+
+    Participant non as “Non-RT RIC”
+
+End box
+
+Box “O-RAN” #lightpink
+
+   Participant near as “Near-RT RIC”
+
+   Participant ran  as “E2 Node”
+
+End box
+
+group OUTER LOOP CONTROL
+
+ran <-> OF   : <<O1>> RAN data collection
+
+OF   -> non  : Collected data
+
+non  -> non  : Collected data evaluation & QoS target generation
+
+non  -> near : <<A1-P>> A1 policy setup or update
+
+near -> near : QoS optimization initiated
+
+group INNER LOOP CONTROL
+
+      near -> ran  : <<E2>> RIC SUBSCRIPTION REQUEST (UE context and/or Measurement metrics)
+
+      ran  -> near : <<E2>> RIC INDICATION (UE context and/or Measurement metrics)
+
+	 non  -> near : (opt.) <<A1-EI>> QoS related A1 Enrichment Information
+
+      near -> near : QoS performance monitoring
+
+      near -> ran : (opt.) <<E2>> RIC SUBSCRIPTION REQUEST (QoS optimization RIC POLICY)
+
+      near -> ran : (opt.) <<E2>> RIC CONTROL REQUEST (QoS optimization RIC CONTROL)
+
+end
+
+OF <- near : (opt.) <<O1>> QoS optimization related performance information
+
+OF ->  non : (opt.) Performance information
+
+non -> non : QoS optimization performance evaluation
+
+end
+
+non  -> near : <<A1-P>> A1 policy delete
+
+near -> ran  : <<E2>> RIC SUBSCRIPTION DELETE
+
+@enduml
+
+Figure 3.2.3.1-1: The overall procedure for Qos Based Resource Optimization use case
+
+3.2.4	Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the QoS based resource optimization use case. The requirements are specified in Section 4.
+
+3.2.4.1 Control over E2
+
+DRB Control: RB control can be applied for modification of the following QoS properties:
+
+DRB QoS modification (TS 38.473 [22], TS 23.501 [4]): The DRB level QoS may be tuned to accommodate A1 policy requirement.
+
+QoS flow remapping (TS 38.473 [22]): The mapping relationship between QoS flows and DRBs may be adjusted.
+
+Logical channel reconfiguration (TS 38.331 [19], TS 36.331 [12]): The relevant parameters can be considered, e.g., priority, prioritized bit rate, bucket size duration, etc.
+
+Radio Admission Control (TS 38.331 [19], TS 36.331 [12]): DRB admission control such as reject or release may be applied.
+
+Modification of dual-connectivity DRB (TS 37.340 [14]): change of bearer termination point (MN or SN) and/or bearer types (MCG/SCG/split), and control of split ratio for a split bearer.
+
+Activation and deactivation of packet duplication and configuration of the number of legs in DC, CA, or DC+CA scenarios (TS 36.300 [9], TS 38.300 [15]).
+
+RIC CONTROL (e.g., request for QoS flow remapping) or RIC POLICY (e.g. DRB admission policy) can be applicable.
+
+Radio Resource Allocation, such as configuration of DRX, semi-persistent scheduling (SPS), or guidance for the scheduling and rate selection in MAC. For example, based on prediction, an E2 policy or control to reconfigure SPS configuration or ConfiguredGrantConfig for UL may be generated.
+
+DRX reconfiguration (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12]): Long DRX cycle length, Short DRX cycle length as well as short DRX cycle timer can be considered.
+
+SR periodicity reconfiguration (TS 38.331 [19], TS 36.331 [12]): Both sr-ProhibitTimer and sr-TransMax can be treated.
+
+SPS configuration (TS 38.331 [19], TS 36.331 [12]): Both SPS-Config (DL) and ConfiguredGrantConfig (UL) can be treated.
+
+Reconfiguration of slice level PRB quota (TS 28.541 [5])
+
+Configuration of CQI table with certain target block error rate (TS 38.214 [16])
+
+Both RIC POLICY and RIC CONTROL can be used. For example, SPS can be configured via RIC CONTROL; RIC POLICY can be used, e.g., to set the guidance for the scheduler.
+
+Radio Access Control: Depending on operator's policies, deployment scenarios, subscriber profiles, and available services, different criterion will be used in determining which access attempt should be allowed or blocked when congestion occurs in the system, as specified in 3GPP TS 22.261 [2]. For example, access control may be applied to restrict access of other UEs for a specific cell in order to achieve better QoS for some UEs. A cell-level, UE-level, or slice-level access control can be applied. Four categories of radio access control are indicated as below:
+
+RACH Backoff
+
+RRC Connection Reject
+
+RRC Connection Release
+
+Access Barring
+
+Both RIC POLICY and RIC CONTROL can be used.
+
+Connection Mobility Control: For example, a neighbouring cell may be selected for the optimization of QoS of a specific UE. A neighbour handover restriction list may be configured to prevent the UEs from HO to some neighbouring cells in order to guarantee QoS of the UEs served by those neighbouring cells. Or, a capacity boosting mechanism may be used to achieve better QoS, e.g., enable CA/DC.
+
+Handover from the source cell to the target cell
+
+Configuration/reconfiguration of handover restriction list
+
+Enable, disable, or modify CA (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+Enable, disable, or modify dual connectivity (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+Both RIC POLICY and RIC CONTROL can be used. For the specific requirements and related stage-3 E2SM works, please refer to the Traffic Steering use case defined in Section 3.1.
+
+3.2.4.2 UE Context Information from E2 Nodes
+
+The followings are examples of UE context information identified as required:
+
+UE ID (as defined in [24])
+
+Slice level: S-NSSAI
+
+DRB level: e.g., established DRB ID, mapping with QoS flows, etc.
+
+QoS related: e.g., E-RAB Level QoS Parameters (4G, NSA) or QoS Flow Level QoS Parameters (NG-RAN).
+
+UE capabilities: CA and DC capabilities
+
+RLC/MAC/PHY level: e.g., logical channel, DRX, scheduling request, SPS configurations.
+
+For example, UE ID, S-NSSAI, DRB ID, or QCI/5QI can be used for different granularity of controls over E2; an established DRB level information may be needed to change the mapping of QoS flows to a specific DRB or modify DRB attributes; the UE capabilities may be required to make sure if CA/DC can be enabled.
+
+3.2.4.3 Measurements from E2 Nodes
+
+	The E2 measurements are necessary for inference and prediction in the Near-RT RIC as the driver for decisions in addition to KPMs. For the QoS based resource optimization use case, the Near-RT RIC can translate an A1 policy (relatively static targets) into a flexible selection of controls over E2 (e.g., RB control, handover, access control) by taking into account the runtime status in the Near-RT RIC. Therefore, it is required to specify those measurement parameters as possible as needed over E2 interface.
+
+The following lists the examples of UE-level, cell-level, and slice-level measurement information identified as required:
+
+	UE-level
+
+	Radio channel info available at DU
+
+		CQI (*)
+
+	Radio channel info available at CU-CP for serving cell
+
+	RSRP (TS 38.331 [19], TS 36.331 [12])
+
+	RSRQ (TS 38.331 [19], TS 36.331 [12])
+
+	SINR (TS 38.331 [19], TS 36.331 [12])
+
+Note: include periodical measurement report and/or RRC event trigger measurement report (A1-A6, B1-B2) (TS 38.331 [19], TS 36.331 [13]).
+
+	Radio channel info available at CU-CP for neighboring cells
+
+	RSRP (TS 38.331 [19], TS 36.331 [12])
+
+RSRQ (TS 38.331 [19], TS 36.331 [12])
+
+SINR (TS 38.331 [19], TS 36.331 [12])
+
+Note: include periodical measurement report and/or RRC event trigger measurement report (A1-A6, B1-B2) (TS 38.331 [19], TS 36.331 [12]).
+
+	L2
+
+		DL/UL UE PRB usage for data traffic (*)
+
+		Average DL UE throughput in gNB (*)
+
+		Distribution of DL UE throughput in gNB (*)
+
+		Percentage of unrestricted DL UE data volume in gNB (*)
+
+		Packet Delay and RAN part packet delay components (*)
+
+		Packet Delay (*)
+
+		Data volume (per QCI, TS 36.314 [10] 4.1.8)
+
+		DL PDCP occupied buffer size (*)
+
+		DL unused PDCP buffer size (*)
+
+		Packet Loss Rate per DRB (TS 38.314 [17] 4.2.1.5) and per logical channel (*)
+
+	Cell-level
+
+	L2
+
+1. CQI (available at DU; TS 28.552 [7] 5.1.1.11.1)
+
+2. MCS Distribution in PDSCH (available at DU; TS 28.552 [7] 5.1.1.12.1)
+
+3. DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.1-2; TS 32.425 [8] 4.5.3-4)
+
+4. Distribution of DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.3-4; TS 32.425 [8] 4.5.10-11)
+
+5. DL/UL PRB used for data traffic (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.2.5 and 5.1.1.2.7)
+
+6. DL/UL PRB usage for traffic (per QCI, TS 32.425 [8] 4.5.1-2)
+
+7. DL/UL Total available PRB (available at DU; TS 28.552 [7] 5.1.1.2.6 and 5.1.1.2.8)
+
+8. DL/UL PRB full utilization (TS 32.425 [8]; 4.5.9.1-2)
+
+9. Total number of DL/UL TBs (available at DU; split into subcounters per layer at MU-MIMO case, TS 28.552 [7] 5.1.1.7.3 and 5.1.1.7.8; TS 32.425 [8] 4.5.7.1 and 4.5.7.3)
+
+10. Total error number of DL/UL TBs (available at DU; split into subcounters per layer at MU-MIMO case, TS 28.552 [7] 5.1.1.7.4 and 5.1.1.7.9, TS 32.425 [8] 4.5.7.2 and 4.5.7.4)
+
+11. Average DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.1)
+
+12. Distribution of DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.2)
+
+13. Percentage of unrestricted DL UE data volume in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7]  5.1.1.3.5)
+
+14. Packet Delay (available at DU and CU-UP; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.3)
+
+15. RAN part packet delay components (TS 38.314 [17] 4.2.1.2)
+
+16. Packet Delay (per QCI, TS 36.314 [10] 4.1.4)
+
+17. DL/UL Cell PDCP SDU Data Volume (available at CU-UP; per PLMN ID and per QoS level (mapped 5QI) and per S-NSSAI, TS 28.552 [7] 5.1.2.1 for non-split gNB, 5.1.3.6.2 for split gNB; per PLMN ID and per E-RAB QoS profile (QCI, ARP and GBR), TS 32.425 [8] 4.4.7)
+
+18. Mean number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.1 and 5.1.1.23.3)
+
+19. Max number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.2 and 5.1.1.23.4)
+
+20. Average number of Active UEs (per QCI, TS 32.425 [8] 4.4.2)
+
+21. Packet Loss Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.1)
+
+22. Packet Loss Rate (per QCI, TS 32.425 [8] 4.4.4)
+
+23. DL Packet Drop Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.2)
+
+24. DL Packet Drop Rate (per QCI, TS 32.425 [8] 4.4.3.2)
+
+(*) Detailed measurement definition will be provided in E2SM specifications.
+
+3.3	Use case 3: RAN Slice SLA Assurance
+
+The 3GPP standards architected a sliceable 5G infrastructure which allows creation and management of customized networks to meet specific service requirements that may be demanded by future applications, services, and business verticals. Such a flexible architecture needs different requirements to be specified in terms of functionality, performance and group of users which may greatly vary from one service to the other. The 5G standardization efforts have gone into defining specific slices and their Service Level Agreements (SLAs) based on application/service type [2]. Since network slicing is conceived to be an end-to-end feature that includes the core network, the transport network and the radio access network (RAN), these requirements should be met at any slice subnet during the life-time of a network slice [5], especially in RAN side. Exemplary slice performance requirements are defined in terms of throughput, energy efficiency, latency, and reliability at a high level in SDOs such as 3GPP [2] and GSMA [23]. These requirements are defined as a reference for SLA/contractual agreements for each slice, which individually need proper handling in NG-RAN.
+
+Although network slicing support is started to be defined with 3GPP Release 15, slice assurance mechanisms in RAN needs to be further addressed to achieve deployable network slicing in an open RAN environment. It is necessary to assure the SLAs by dynamically controlling slice configurations based on slice specific performance information. Existing RAN performance measurements [7] and information model definitions [6] are not enough to support RAN slice SLA assurance use cases. This use case is intended to clarify necessary mechanisms and parameters for RAN slice SLA assurance.
+
+In the context of the RAN, the SLA assurance parameters sent over the A1 interface help the Near-RT RIC guide the behavior of the E2 Nodes (O-CU-UP, O-CU-CP, O-DU). The Non-RT RIC utilizes the slice SLA information and performance metrics to derive the necessary set of A1 policies and sends those to the Near-RT RICs related to a network slice. Each subtending Near-RT RICs uses these A1 policies for further cell-level and/or UE-level policy guidance and/or control action over the E2 interface that affects the cells and/or UEs, involved in the network slice, served by the respective E2 Nodes. The combined guidance is handled as one or more A1 policies and/or E2 policies and/or E2 control actions. The intention of the SLA assurance parameters in the RAN context is to provide guidance to the E2 Nodes for assuring SLAs of the network slices in the radio access network.
+
+3.3.1	Background and goal of the use case
+
+In the 5G era, network slicing is a prominent feature which provides end-to-end connectivity and data processing tailored to specific business requirements. These requirements include customizable network capabilities such as the support of very high data rates, traffic densities, service availability and very low latency. According to 5G standardization efforts, the 5G system should support the needs of the business through the specification of several service needs such as data rate, traffic capacity, user density, latency, reliability, and availability. These capabilities are always provided based on a Service Level Agreement (SLA) between the mobile operator and the business customer, which brought up interest for mechanisms to ensure slice SLAs and prevent its possible violations. O-RAN’s open interfaces and AI/ML based architecture will enable such challenging mechanisms to be implemented and help pave the way for operators to realize the opportunities of network slicing in an efficient manner.
+
+5G Core and O-RAN cooperation for SLA Enforcement
+
+Figure 3.3.1-1: Core & RAN cooperation for SLA enforcement
+
+Figure 3.3.1-1 shows the network functions and components that are related with SLA enforcement within 5G Core (5GC) and O-RAN. Although the 5GC enforces most of the SLA parameters, the components of the 5GC have a comprehensive view of the entire wireless network but from a core perspective. 3GPP Release 17 introduces the concept of a Network Slice Admission Control Function (NSACF). This debuted from the 3GPP TR 23.700-40 Feasibility Study on Enhancement of Network Slicing Phase 2 [33], and normative in [34] clause 5.15.11. The purpose of the NSACF is to enforce some of the slice SLA parameters from a 5G Core perspective. While NSACF handles slice-specific user admission control into the network based on GSMA NG.116 [23] GST criterion, the AMF allows the UE to access slice(s) through S-NSSAI or NSSAI requests through NSACF interaction. Together, they can perform network-level policy enforcement. However, these components do not have the detailed knowledge of RAN, such as RAN resources usage or where specific UEs are geographically located within a gNB. These 5GC components can perform only at a “network view” and they also do not have control over RAN resources.
+
+O-RAN SLA assurance is independent of and complements 5GC SLA policy enforcement. Within the RAN, the Near-RT RIC provides unique SLA policy actions within the scope of E2 Nodes based on the A1 policy guidance received from the Non-RT RIC.
+
+Non-RT RIC & Near-RT RIC provide RAN guidance for SLA objectives
+
+Figure 3.3.1-2: Non-RT RIC & Near-RT RIC RAN Guidance
+
+As Figure 3.3.1-2 shows, the Non-Real Time RIC obtains the SLA parameters from SMO. The Non-RT RIC has a system level view of RAN topology, configuration, and performance, so rApps can provide ongoing guidance and decompose SLA objects to the sub-tending Near-RT RICs. The Non-RT RIC then translates the SLA parameters into SLA objective A1 policies to its subtending Near-RT RIC(s). In some cases, the SLA parameters are already RAN or UE specific. Those SLA parameters would then not need any change in their values and would be “passed-through” to the Near-RT RIC(s) in A1 policies.
+
+The Near-RT RICs obtain the SLA objectives via A1 policies from the Non-RT RIC. The Near-RT RIC can provide cell-level and/or UE-level guidance or control to the E2 Nodes to achieve SLA assurance enforcement at the RAN level. The E2 Nodes receive guidance or control from their respective Near-RT RICs. There are GSMA GST/NEST NG.116 [23] parameters, such as the Downlink and Uplink Throughput Per Network Slice, that have both Core and RAN applicability.
+
+For example, the Downlink and Uplink Throughput Per Network Slice may be used by 5GC network functions; and the Non-RT RIC can calculate maxUlThptPerSlice and maxDlThptPerSlice parameters in an A1 policy which will then be used by the Near-RT RIC as target values via monitoring E2 Node performance and, where required, requesting appropriate E2 services (CONTROL and/or POLICY) to provide guidance to the E2 Nodes
+
+3.3.2	Entities/resources involved in the use case
+
+Non-RT RIC:
+
+Retrieve RAN slice SLA target from respective entities such as SMO, NSSMF
+
+Long term monitoring of RAN slice performance measurements
+
+Training of potential ML models that will be deployed in Non-RT RIC for slow loop optimization and/or Near-RT RIC for fast loop optimization.
+
+Support deployment and update of AI/ML models into Near-RT RIC
+
+Receive slice control/slice SLA assurance rApps from SMO
+
+Create and update A1 policies based on RAN intent and A1 feedback.
+
+Send A1 policies and enrichment information to Near-RT RIC to drive slice assurance
+
+Send O1 reconfiguration requests to SMO for slow-loop slice assurance
+
+Near-RT RIC:
+
+Near real-time monitoring of slice specific RAN performance measurements
+
+Support deployment and execution of the AI/ML models from Non-RT RIC
+
+Receive slice SLA assurance xApps from SMO
+
+Support interpretation and execution of policies from Non-RT RIC
+
+Perform optimized RAN (E2) actions to achieve RAN slice requirements based on O1 configuration, A1 policy, and E2 reports
+
+E2 node:
+
+Support slice assurance actions such as slice-aware resource allocation, prioritization, etc. through E2.
+
+Support slice specific performance measurements through O1
+
+Support slice specific performance reports through E2
+
+3.3.3	Solutions
+
+3.3.3.1 RAN Slice SLA assurance
+
+Table 3.3.3-1: RAN Slice SLA assurance
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+RAN Slice SLA assurance
+
+Actors and Roles
+
+SMO Functions, Non-RT RIC Framework, Near-RT RIC, E2 Nodes
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+A1, O1, E2 interface connectivity is established.
+
+Pre-conditions
+
+Near-RT RIC and Non-RT RIC are instantiated with A1 interface connectivity being established between them.
+
+O1 interfaces are established between SMO and Near-RT RIC, and SMO and E2 nodes.
+
+RAN slice SLA assurance applications have been deployed in Non-RT RIC and Near-RT RIC respectively.
+
+Begins when
+
+A RAN slice is activated, or an operator defined trigger is detected
+
+Step 1 (M)
+
+OAM Functions may configure baseline Slice SLA Assurance parameters in E2 Node(s) through O1 interface.
+
+OAM Functions collects data from E2 node through O1 interface.
+
+Step 2 (M)
+
+RAN Slice SLA assurance rApp retrieves relevant information from Non-RT RIC Framework, such as active RAN slices (such as active S-NSSAIs, network slice subnet instances, topology), RAN Slice SLA information, NF configuration etc.
+
+Step 3 (M)
+
+RAN Slice SLA assurance rApp monitors and evaluates performance of RAN slices which may include detection of possible RAN Slice SLA violation.
+
+Step 4 (M)
+
+RAN Slice SLA assurance rApp decides to apply A1 policy-based RAN slice SLA assurance considering RAN slice SLA requirements and/or operator-defined RAN intents, EI from external application servers and O1 based long term trends. In addition to these input parameters, A1 feedback from Near-RT RIC, when available, can be utilized for updating existing policies.
+
+Step 5 (M)
+
+(Start of Inner loop control)
+
+Near-RT RIC subscribes to a UE context information and measurement metrics via E2 interface.
+
+Step 6 (M)
+
+E2 Nodes report the UE context information and E2 measurements via RIC REPORT periodically or event-triggered.
+
+Step 7 (M)
+
+Near-RT RIC evaluates the performance data from E2 Nodes (including performance data from different E2 Nodes for the same UE) and finds the performance is out of Slice SLA targets which are indicated in the A1 policy and/or internal near-RT RIC Slice SLA targets.
+
+Step 8 (M)
+
+Based on the UE context information, E2 measurement metrics (RIC REPORT), and A1 policy, Near-RT RIC may generate new or modify the existing E2 policies and sends them to E2 Nodes.
+
+Near-RT RIC may also generate control command(s) and send them to E2 Node(s) to trigger re-allocation of radio resources so that Slice SLA indicators can move back to the limits outlined in the A1 policies.
+
+Step 9 (O)
+
+	Near RT-RIC may send A1 Policy feedback on A1 to the Non-RT RIC.
+
+Step 10 (O)
+
+	Non-RT RIC decides to delete Slice SLA Assurance policy and sends the related message or following internal trigger, the Near-RT RIC terminates the Slice SLA Assurance procedure.
+
+Ends when
+
+RAN slice(s) is deactivated or an operator defined trigger is detected
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+SLA assurance for RAN Slice(s) over a period of time is achieved
+
+Traceability
+
+@startuml
+
+skinparam ParticipantPadding 4
+
+skinparam BoxPadding 8
+
+skinparam defaultFontSize 12
+
+Box “Service Management and Orchestration” #gold
+
+    Participant OF  as “OAM Functions”
+
+    Participant non as “Non-RT RIC”
+
+End box
+
+Box “O-RAN” #lightpink
+
+   Participant near as “Near-RT RIC”
+
+   Participant ran  as “E2 Node”
+
+End box
+
+group OUTER LOOP CONTROL
+
+ran <-> OF   : <<O1>> RAN data collection
+
+OF   -> non  : RAN Slice SLA assurance data
+
+non  -> non  : Collected data evaluation and policy creation
+
+non  -> near : <<A1>> SLA Assurance policy setup or update
+
+group INNER LOOP CONTROL
+
+      near -> ran  : <<E2>> RIC SUBSCRIPTION REQUEST (REPORT, UE context & Measurement metrics)
+
+      ran  -> near : <<E2>> RIC INDICATION (UE context & Measurement metrics)
+
+      near -> near : Evaluation, possible SLA violation prevention
+
+      near -> ran : (opt.) <<E2>> RIC SUBSCRIPTION REQUEST (POLICY)
+
+near -> ran : (opt.) <<E2>> RIC CONTROL REQUEST (Slice SLA assurance RIC CONTROL)
+
+end
+
+non <-- near: (opt.) <<A1>> A1 Policy feedback
+
+end
+
+non --> near: (opt.) <<A1>> A1 policy delete
+
+near -> near: (opt.)Slice SLA Assurance stopped
+
+near-> ran: (opt.)<<E2>> RIC SUBSCRIPTION DELETE
+
+@enduml
+
+Figure 3.3.3-2: RAN Slice SLA Assurance
+
+3.3.4	Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the Slice SLA Assurance use case. The requirements are specified in Section 4.
+
+3.3.4.1 Control over E2
+
+Radio Resource Allocation, such as configuration of slice level PRB quota or per-cell-per-slice/QoS frequency partitions. For example, based on prediction, an E2 policy or control to reconfigure slice level PRB may be generated. Another example is, based on analysis of slice level interference among cells in terms of the reliability requirement, an E2 control to reconfigure frequency partitions may be generated.
+
+Configuration and/or reconfiguration of slice level PRB quota (TS 28.541 [5])
+
+Configuration and/or reconfiguration of per-cell-per-slice/QoS frequency partitions
+
+Both RIC POLICY and RIC CONTROL can be used.
+
+Radio Access Control: Depending on operator's policies, deployment scenarios, subscriber profiles, available services and SLA of slice, different criterion will be used in determining which access attempt should be allowed or blocked when congestion occurs in the system, as specified in 3GPP TS 22.261 [2]. For example, access control may be applied to restrict access of other UEs for a specific slice in order to achieve better SLA for some slice. A UE-level, or slice-level access control can be applied. Three categories of radio access control are indicated as below:
+
+RRC Connection Reject
+
+RRC Connection Release
+
+Access Barring
+
+3.3.4.2	UE Context Information from E2 Nodes
+
+The followings are examples of UE context information identified as required:
+
+UE ID
+
+Slice level: S-NSSAI
+
+QoS level: 5QI
+
+UE-level RAN state information
+
+UE-level PM data
+
+For example, UE ID, S-NSSAI and 5QI can be used to derive the resource occupation of each slice.
+
+3.3.4.3 Measurements from E2 Nodes
+
+	The E2 measurements are necessary for inference and prediction in the Near-RT RIC as the driver for decisions in addition to KPMs. For the Slice SLA Assurance use case, the Near-RT RIC can translate an A1 policy (relatively static targets) into a flexible selection of controls over E2 (e.g. PRB control, access control) by taking into account the runtime status in the Near-RT RIC. Therefore, it is required to specify those measurement parameters as possible as needed over E2 interface.
+
+The following lists the examples of cell-level measurement information identified as required:
+
+	Cell-level
+
+	L2
+
+1. DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.1-2; TS 32.425 [8] 4.5.3-4)
+
+2. Distribution of DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.3-4; TS 32.425 [8] 4.5.10-11)
+
+3. DL/UL PRB used for data traffic (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.2.5 and 5.1.1.2.7)
+
+4. DL/UL Total available PRB (available at DU; TS 28.552 [7] 5.1.1.2.6 and 5.1.1.2.8)
+
+5. Average DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.1)
+
+6. Distribution of DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.2)
+
+7. Packet Delay (available at DU and CU-UP; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.3)
+
+8. DL/UL Cell PDCP SDU Data Volume (available at CU-UP; per PLMN ID and per QoS level (mapped 5QI) and per S-NSSAI, TS 28.552 [7] 5.1.2.1 for non-split gNB, 5.1.3.6.2 for split gNB; per PLMN ID and per E-RAB QoS profile (QCI, ARP and GBR), TS 32.425 [8] 4.4.7)
+
+9. Mean number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.1 and 5.1.1.23.3)
+
+10. Max number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.2 and 5.1.1.23.4)
+
+11. Average number of Active UEs (per QCI, TS 32.425 [8] 4.4.2)
+
+12. Packet Loss Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.1)
+
+13. Packet Loss Rate (per QCI, TS 32.425 [8] 4.4.4)
+
+14. DL Packet Drop Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.2)
+
+15. DL Packet Drop Rate (per QCI, TS 32.425 [8] 4.4.3.2)
+
+16. Wideband CQI distribution (TS 28.552 [7]; 5.1.1.11.1)
+
+17. SS-RSRP distribution per SSB for serving cell (TS 28.552 [7];5.1.1.22.1)
+
+18. SS-RSRP distribution per SSB for neighbor cell (TS 28.552 [7]; 5.1.1.22.1)
+
+	Slice-level
+
+	L2
+
+1. DL/UL PRB used for data traffic (TS 28.552 [7] 5.1.1.2.5 and 5.1.1.2.7)
+
+2. Average DL UE throughput in gNB (TS 28.552 [7] 5.1.1.3.1)
+
+3. Distribution of DL UE throughput in gNB (TS 28.552 [7] 5.1.1.3.2)
+
+4. Packet Delay (TS 28.552 [7] 5.1.3.3)
+
+5. DL/UL Cell PDCP SDU Data Volume (TS 32.425 [8] 4.4.7)
+
+6. Mean number of Active UEs in the DL/UL per cell (TS 28.552 [7] 5.1.1.23.1 and 5.1.1.23.3)
+
+7. Max number of Active UEs in the DL/UL per cell (TS 28.552 [7] 5.1.1.23.2 and 5.1.1.23.4)
+
+8. Packet Loss Rate (TS 28.552 [7] 5.1.3.1)
+
+9. DL Packet Drop Rate (TS 28.552 [7] 5.1.3.2)
+
+	UE-level
+
+	L2
+
+1. DL/UL PRB used for data traffic (O-RAN WG3 E2SM-KPM)
+
+2. Average DL UE throughput in gNB (O-RAN WG3 E2SM-KPM)
+
+3. Distribution of DL UE throughput in gNB (O-RAN WG3 E2SM-KPM)
+
+4. Packet Delay (O-RAN WG3 E2SM-KPM)
+
+5. DL/UL Cell PDCP SDU Data Volume (O-RAN WG3 E2SM-KPM)
+
+6. Mean number of Active UEs in the DL/UL per cell (O-RAN WG3 E2SM-KPM)
+
+7. Max number of Active UEs in the DL/UL per cell (O-RAN WG3 E2SM-KPM)
+
+8. Packet Loss Rate (O-RAN WG3 E2SM-KPM)
+
+9. DL Packet Drop Rate (O-RAN WG3 E2SM-KPM)
+
+10. DRB-specific RLC buffer occupancy (O-RAN WG3 E2SM-RC)
+
+11. Serving cell and neighbor cell RRC measurements (O-RAN WG3 E2SM-RC)
+
+12. Number of DRBs and PDU sessions (O-RAN WG3 E2SM-RC)
+
+13. Number of QoS flows and QoS parameters of QoS flows mapped to each DRB (O-RAN WG3 E2SM-RC)
+
+14. Number of HARQ TBs with specific MCS rates (O-RAN WG3 E2SM-KPM)
+
+15. CQI (O-RAN WG3 E2SM-KPM)
+
+16. Serving cell and neighbor cell RSRP (O-RAN WG3 E2SM-KPM)
+
+3.4	Use case 4: Massive MIMO Optimization
+
+3.4.1	Background and goal of the use case
+
+Please refer to [27].
+
+3.4.2	Entities/resources involved in the use case
+
+Note: The AI/ML model training, deployment, and inference described below may not be applicable for some mMIMO optimization features.
+
+SMO/Non-RT RIC
+
+Retrieve necessary performance indicators, measurement reports and RAN configurations from E2 nodes via the O1 interface for the purpose of AI/ML model training and performance monitoring
+
+E.g., the number of supported Non-GoB BF modes in O-DU
+
+Collect enrichment information from Application servers and associate enrichment information with collected measurements and configurations
+
+Perform AI/ML model training and deployment
+
+Perform AI/ML model performance monitoring and re-training
+
+Send enrichment information to the Near-RT RIC for inference via the A1 interface
+
+Note: The requirements of SMO/Non-RT RIC are under the scope of WG2.
+
+Near-RT RIC
+
+Support AI/ML model deployment from the Non-RT RIC via the O1/O2 interface
+
+Subscribe and retrieve necessary performance and failure indicators, measurement reports, UE context information and RAN configurations from E2 nodes via the E2 interface for the purpose of mMIMO optimization.
+
+Retrieve enrichment information from Non-RT RIC via the A1 interface, and associate enrichment information with collected measurements and configurations
+
+Perform AI/ML model training and inference.
+
+Perform AI/ML model performance monitoring and re-training.
+
+Send control or policy message for massive MIMO optimization to E2 nodes via the E2 interface.
+
+E2 nodes
+
+Support reporting of necessary performance indicators, measurement reports, UE context information and RAN configurations with required granularity to SMO/Non-RT RIC via the O1 interface
+
+Support reporting of necessary performance and failure indicators, measurement reports, UE context information collection and RAN configurations with required granularity to Near-RT RIC via the E2 interface
+
+Execute control/policy message received from the Near-RT RIC via the E2 interface
+
+3.4.3	Solutions
+
+3.4.3.1 AI/ML-assisted Non-Grid-of-Beams Beamforming Optimization
+
+3.4.3.1.1 Model Training in Non-RT RIC
+
+Note: The below Table 3.4.3.1-1 [nGoB1] and Figure 3.4.3.1-1 [nGoB1] are under the scope of WG2.
+
+Table 3.4.3.1-1 [nGoB1]: AI/ML-assisted Non-GoB BF mode selection in Non-RT RIC – model training, deployment, and update
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+To train an AI/ML model to select the best Non-GoB BF modes given wireless conditions and RAN configuration
+
+Actors and Roles
+
+SMO, Non-RT RIC, Near-RT RIC, O-DU, Application server
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+O1 interface connectivity is established.
+
+Pre-conditions
+
+O1 interface is established between SMO and O-DU to enable SMO/Non-RT RIC to obtain the number of supported Non-GoB BF modes and to collect performance measurement data and associated RAN configurations
+
+A1 interface is established between Non-RT RIC and Near-RT RIC to enable enrichment information transfer
+
+O-DU supports Non-GoB BF
+
+Begins when
+
+Operator specified trigger condition or event is satisfied.
+
+Step 1 (M)
+
+SMO requests the number of supported Non-GoB BF modes in O-DU via the O1 interface
+
+Step 2 (M)
+
+SMO collects the number of supported Non-GoB BF modes in O-DU via the O1 interface
+
+Step 3 (M)
+
+Non-RT RIC retrieves collected information
+
+Step 4 (M)
+
+For each Non-GoB BF mode, SMO requests performance measurement data and associated RAN configurations from O-DU for model training via the O1 interface
+
+Step 5 (M)
+
+SMO collects required performance measurement data and RAN configurations from O-DU via the O1 interface
+
+Step 6 (M)
+
+SMO collects enrichment information (e.g., UE mobility and location info.) from application server
+
+Step 7 (M)
+
+Non-RT RIC retrieves collected data and enrichment information
+
+Step 8 (M)
+
+	For each Non-GoB BF mode, Non-RT RIC associates received enrichment information with measurement data and RAN configurations
+
+Step 9 (M)
+
+	Non-RT RIC performs model training
+
+Step 10 (M)
+
+Non-RT RIC deploys trained model to the Near-RT RIC via O1 or O2 interface
+
+Step 11 (M)
+
+For each Non-GoB BF mode, SMO requests performance measurement data from O-DU for performance monitoring via the O1 interface
+
+Step 12 (M)
+
+For each Non-GoB BF mode, SMO collects performance measurement data from O-DU for performance monitoring via the O1 interface
+
+Step 13 (M)
+
+SMO collects enrichment information (e.g., UE mobility and location info.) from application server
+
+Step 14 (M)
+
+Non-RT RIC retrieves collected performance monitoring data and enrichment information
+
+Step 15 (M)
+
+Non-RT RIC evaluates the performance of deployed AI/ML model
+
+Step 16 (M)
+
+Non-RT RIC re-trains the model
+
+Step 17 (M)
+
+Non-RT RIC updates model in the Near-RT RIC via O1 or O2 interface
+
+Ends when
+
+Operator specified trigger condition or event is satisfied.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+Near-RT RIC executes the deployed model for AI/ML-assisted Non-GoB BF
+
+Traceability
+
+REQ-Non-RT-RIC-FUN1, REQ-Non-RT-RIC-FUN4, REQ-Non-RT-RIC-FUN5, REQ-Non-RT-RIC-FUN9,
+
+REQ-A1-FUN2, REQ-Near-RT-RIC-MM-FUN2
+
+@startuml
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+autonumber
+
+Box “Service Management and Orchestration” #gold
+
+  Participant “Collection & Control” as smo
+
+  Participant “Non-RT RIC” as non
+
+End box
+
+Box “O-RAN” #lightpink
+
+  Participant near as “Near-RT RIC”
+
+  Participant ran as “O-DU”
+
+End box
+
+Box “External” #lightcyan
+
+  Participant “Application Server” as app
+
+End box
+
+group Data Collection
+
+  smo -> ran : <<O1>> Request the number of supported Non-GoB BF modes
+
+  ran -> smo : <<O1>> Collect the number of supported Non-GoB BF modes
+
+  smo -> non : Retrieve collected information
+
+  smo -> ran : <<O1>> Request measurement data and RAN configurations for each Non-GoB BF mode
+
+  ran -> smo : <<O1>> Collect measurement data and RAN configurations for each Non-GoB BF mode
+
+  app -> smo : Collect enrichment information (e.g., UE location/mobility, etc.)
+
+  smo -> non : Retrieve collected data
+
+end
+
+group AI/ML workflow
+
+  non -> non : Associate enrichment information with \n measurements and configurations
+
+  non -> non : Train AI/ML models to select \n the best Non-GoB mode
+
+  non -> near: <<O1>> or <<O2>> \n Deploy AI/ML models
+
+end
+
+group Performance evaluation and optimization
+
+  smo -> ran : <<O1>> Request measurement data and RAN configurations for each Non-GoB BF mode
+
+  ran -> smo : <<O1>> Collect measurement data and RAN configurations for each Non-GoB BF mode
+
+  app -> smo : Collect enrichment information (e.g., UE location/mobility, etc.)
+
+  smo -> non : Retrieve collected data
+
+  non -> non : Performance monitoring & evaluation
+
+  non -> non : Re-train AI/ML models
+
+  non -> near: <<O1>> or <<O2>> \n Update AI/ML models
+
+end
+
+@enduml
+
+Figure 3.4.3.1-1 [nGoB1]: AI/ML model training in Non-RT RIC, deployment, and performance monitoring.
+
+3.4.3.1.2 Model Training in Near-RT RIC
+
+Table 3.4.3.1-2 [nGoB2]: AI/ML-assisted Non-GoB BF mode selection – model training in Near-RT RIC, deployment, and update
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+To train an AI/ML model to select the best Non-GoB BF modes given wireless conditions and RAN configuration
+
+Actors and Roles
+
+SMO, Non-RT RIC, Near-RT RIC, O-DU, Application server
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+Pre-conditions
+
+A1 interface is established between Non-RT RIC and Near-RT RIC to enable enrichment information transfer
+
+O-DU supports Non-GoB BF
+
+E2 interface is established between Near-RT RIC and O-DU
+
+Begins when
+
+Operator specified trigger condition or event is satisfied.
+
+Step 1 (M)
+
+Near-RT RIC requests the number of supported Non-GoB BF modes in O-DU via the E2 interface
+
+Step 2 (M)
+
+Near-RT RIC collects the number of supported Non-GoB BF modes in O-DU via the E2 interface
+
+Step 3 (M)
+
+For each Non-GoB BF mode, Near-RT RIC requests performance measurement data and associated RAN configurations from O-DU for model training via the E2 interface
+
+Step 4 (M)
+
+Near-RT RIC collects required performance measurement data and RAN configurations from O-DU via the E2 interface
+
+Step 5 (M)
+
+Near-RT RIC collects enrichment information (e.g., UE mobility and location info.) from Non-RT RIC via the A1 interface
+
+Step 6 (M)
+
+	For each Non-GoB BF mode, Near-RT RIC associates received enrichment information with measurement data and RAN configurations
+
+Step 7 (M)
+
+	Near-RT RIC performs model training
+
+Step 8 (M)
+
+For each Non-GoB BF mode, Near-RT RIC requests performance measurement data from O-DU for performance monitoring / training updates via the E2 interface
+
+Step 9 (M)
+
+For each Non-GoB BF mode, Near-RT RIC collects performance measurement data from O-DU for performance monitoring / training updates via the E2 interface
+
+Step 10 (M)
+
+Near-RT RIC collects enrichment information (e.g., UE mobility and location info.) from Non-RT RIC via the A1 interface
+
+Step 11 (M)
+
+Near-RT RIC evaluates the performance of deployed AI/ML model
+
+Step 12 (M)
+
+Near-RT RIC re-trains the model
+
+Ends when
+
+Operator specified trigger condition or event is satisfied.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+Near-RT RIC executes the deployed model for AI/ML-assisted Non-GoB BF
+
+Traceability
+
+REQ-Non-RT-RIC-FUN9, REQ-A1-FUN3, REQ-Near-RT-RIC-MM-FUN1, REQ-Near-RT-RIC-MM-FUN3, REQ-E2-MM-FUN2, REQ-E2-MM-FUN3, REQ-E2-MM-FUN5, REQ-E2-MM-FUN6, REQ-E2-MM-FUN9, REQ-E2-MM-FUN10
+
+@startuml
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+autonumber
+
+Box “Service Management and Orchestration” #gold
+
+  Participant “Collection & Control” as smo
+
+  Participant “Non-RT RIC” as non
+
+End box
+
+Box “O-RAN” #lightpink
+
+  Participant near as “Near-RT RIC”
+
+  Participant ran as “O-DU”
+
+End box
+
+Box “External” #lightcyan
+
+  Participant “Application Server” as app
+
+End box
+
+group Data Collection
+
+  near -> ran : <<E2>> Request the number of supported Non-GoB BF modes
+
+  ran -> near : <<E2>> Collect the number of supported Non-GoB BF modes
+
+  near -> ran : <<E2>> Request measurement data and RAN configurations for each Non-GoB BF mode
+
+  ran -> near : <<E2>> Collect measurement data and RAN configurations for each Non-GoB BF mode
+
+  non -> near : <<A1>> Collect enrichment information (e.g., UE location/mobility, etc.)
+
+end
+
+group AI/ML workflow
+
+  near -> near: Associate enrichment information with \n measurements and configurations
+
+  near -> near: Train AI/ML models to select \n the best Non-GoB mode
+
+end
+
+group Performance evaluation and optimization
+
+  near -> ran : <<E2>> Request measurement data and RAN configurations for each Non-GoB BF mode
+
+  ran -> near: <<E2>> Collect measurement data and RAN configurations for each Non-GoB BF mode
+
+  non -> near : <<A1>> Collect enrichment information (e.g., UE location/mobility, etc.)
+
+  near -> near: Performance monitoring & evaluation
+
+  near -> near: Re-train AI/ML models
+
+end
+
+@enduml
+
+Figure 3.4.3.1-2 [nGoB2]: AI/ML model training in Near-RT RIC, deployment, and performance monitoring.
+
+3.4.3.1.3 Model Inference
+
+Table 3.4.3.1-3 [nGoB3]: AI/ML-assisted Non-GoB BF mode selection – model inference
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+To generate Non-GoB control/policy message
+
+Actors and Roles
+
+SMO, Non-RT RIC, Near-RT RIC, O-DU, Application server
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+A1 and E2 interface connectivity are established.
+
+Pre-conditions
+
+A1 interface is established between Non-RT RIC and Near-RT RIC to enable enrichment information transfer
+
+E2 interface is established between Near-RT RIC and O-DU to enable Non-GoB BF mode selection via E2 control/policy message
+
+O-DU supports Non-GoB BF
+
+Begins when
+
+Operator specified trigger condition or event is satisfied.
+
+Step 1 (M)
+
+SMO collects enrichment information (e.g., UE mobility/location info.) from application server
+
+Step 2 (M)
+
+Non-RT RIC retrieves collected enrichment information
+
+Step 3 (M)
+
+Non-RT RIC sends collected enrichment information to the Near-RT RIC via the A1 interface
+
+Step 4 (M)
+
+Near-RT RIC requests measurement data and UE context information (e.g., SRS periodicity) from O-DU via the E2 interface
+
+Step 5 (M)
+
+Near-RT RIC collects measurement data and UE context information (e.g., SRS periodicity) from O-DU via the E2 interface
+
+Step 6 (M)
+
+Near-RT RIC associates received enrichment information with collected measurement data and UE context information
+
+Step 7 (M)
+
+Near-RT RIC performs model inference
+
+Step 8 (M)
+
+	Near-RT RIC generates Non-GoB control/policy message based on inferred Non-GoB BF mode selection
+
+Step 9 (M)
+
+	Near-RT RIC sends Non-GoB control/policy message to O-DU via the E2 interface
+
+Ends when
+
+Operator specified trigger condition or event is satisfied.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+Non-RT RIC monitors the performance of AI/ML-assisted Non-GoB BF mode selection in the Near-RT RIC.
+
+Traceability
+
+REQ-Non-RT-RIC-FUN9,
+
+REQ-A1-FUN3,
+
+REQ-Near-RT-RIC-MM-FUN2,
+
+REQ-Near-RT-RIC-MM-FUN3,
+
+REQ-E2-MM-FUN2,
+
+REQ-E2-MM-FUN3,
+
+REQ-E2-MM-FUN5,
+
+REQ-E2-MM-FUN6
+
+@startuml
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+autonumber
+
+Box “Service Management and Orchestration” #gold
+
+  Participant “Collection & Control” as smo
+
+  Participant “Non-RT RIC” as non
+
+End box
+
+Box “O-RAN” #lightpink
+
+  Participant near as “Near-RT RIC”
+
+  Participant ran as “O-DU”
+
+End box
+
+Box “External” #lightcyan
+
+  Participant “Application Server” as app
+
+End box
+
+app -> smo : Collect enrichment information (e.g., UE location/mobility, etc.)
+
+smo -> non : Retrieve collected data
+
+non -> near : <<A1>> Enrichment information
+
+group E2 control & Policy
+
+  near -> ran : <<E2>> Request measurement data \n and UE context information (e.g. SRS periodicity)
+
+  ran -> near : <<E2>> Collect measurement data \n and UE context information (e.g. SRS periodicity)
+
+  near -> near: Associate enrichment information with \n collected measurements and configurations
+
+  near -> near : Perform AI/ML model inference
+
+  near -> near : Generate Non-GoB control/policy message
+
+  near -> ran : <<E2>> Non-GoB control/policy message
+
+end
+
+@enduml
+
+Figure 3.4.3.1-3 [nGoB3]: AI/ML Inference.
+
+3.4.3.2 Beam-based Mobility Robustness Optimization (bMRO)
+
+Beam-based Mobility Robustness Optimization (bMRO) is an autonomous self-optimizing algorithm that improves beam-based inter-cell mobility performance by applying beam-specific HO parameters including Cell Individual Offsets (CIO), Time to Trigger (TTT), T310 counter, etc. on the handover configuration between neighbor cells, based on the analysis of beam-specific mobility-related counters and/or mobility failure events. bMRO is capable to reduce the number of unnecessary handovers, handover failures as well as ping-pong handovers particularly in cells that cover areas with different mobility characteristics. Performance, complexity, and gain analysis has been provided in [27, section 3.3]. Signaling overhead and complexity (RRC re-configuration, mobility reporting and O-CU reconfiguration messages) can be further reduced by beam grouping in which case beams with similar mobility characteristics comprise a beam group (e.g., group 1: low mobility pedestrian area, group 2: high mobility street). Mobility reports consist of aggregated mobility KPI/PMs (e.g., number of too early HOs, number of too late HOs, number of HO to wrong cell) or individual failure reports with root cause (e.g., to early HO, too late HO, HO to wrong cell) or a combination of the two. Reports are sent per each SSB beam or SSB beam group towards each neighbor cell. Individual mobility failure reports will also be reported per UE to allow UE or UE group-based optimization (besides beam or beam group specific reporting). While aggregated mobility KPIs/PMs are used for slow adaptations (e.g., 5 min), individual failure reports are used for faster adaptations (e.g., 100 ms) or for AI/ML based analysis of failure patterns. Measurement reporting periodicity and measurement type are configurable on a per cell basis considering the tradeoff between gain in mobility performance and associated signaling overhead. Mobility KPIs and failure events are forwarded from the O-CU to the Near-RT RIC, and the near-RT RIC configures the CIO and the measurement reporting in the O-CUs. CIOs might be beam- or beam group-based and can also be configurable per UE group (e.g., UE type, UE mobility or UE mode such as energy saving mode).
+
+While AI/ML based approaches are not mandated, AI/ML methods/models can be used i) to build beam groups, to ii) decide on cell individual measurement configuration, to iii) detect changes in mobility characteristics (e.g., traffic jam) that trigger optimization, to iv) group UEs in UE groups as well as v) for the bMRO optimization algorithm itself to calculate the optimal cell individual offsets. In case of dynamic beam pattern optimization, relevant mMIMO beam pattern information must be available at the Near-RT RIC, e.g., mobility reports might indicate a specific beam pattern.
+
+Table 3.4.3.2-1 [bMRO]: Near RT RIC Beam-based Mobility Robustness Optimization – model training and beam grouping
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+To obtain beam pattern optimization in case of Grid-of-Beam optimization, to train the ML models and to decide on the beam grouping.
+
+Actors and Roles
+
+SMO, Near-RT RIC, E2 Node (O-CU)
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+O1 and E2 interface connectivity are established.
+
+Pre-conditions
+
+Network is operational with default configuration.
+
+(optional) OAM Functions have configured bMRO targets in Near-RT RIC through O1 interface
+
+OAM Functions have configured baseline mobility parameters in O-CUs through O1 interface
+
+O-CUs support reporting of beam-based mobility performance and/or instantaneous mobility failure event reporting
+
+Near-RT RIC has access to the beam-based mobility performance and/or failure reporting from the E2 node
+
+Begins when
+
+Operator specified trigger condition or event is satisfied.
+
+Step 1 (M)
+
+OAM provides ML model to the Near-RT RIC via O1 or O2 interface (e.g., to perform beam grouping, to identify a change in mobility characteristics, to derive optimized mobility reporting configuration and/or to calculate the optimized mobility settings)
+
+Step 2 (M)
+
+Near-RT RIC subscribes to cell change configuration reports from E2 Node (O-CU) to obtain mMIMO beam pattern information.
+
+Step 3 (M)
+
+Near-RT RIC obtains cell change configuration reports from E2 Node (O-CU) including mMIMO beam pattern information.
+
+Step 4 (M)
+
+Near-RT RIC subscribes to beam based mobility performance and failure reporting via E2 interface.
+
+Step 5 (M)
+
+Near-RT RIC obtains to beam based mobility performance and failure reporting via E2 interface.
+
+Step 6 (M)
+
+Near-RT RIC performs model training.
+
+Step 7 (M)
+
+Near-RT RIC obtains to beam based mobility performance and failure reporting via E2 interface.
+
+Step 8 (M)
+
+Near-RT RIC performs AI/ML based beam grouping algorithm to group beams with similar mobility characteristics based on received mobility reports.
+
+Step 9 (M)
+
+Near-RT RIC generates beam grouping policy message and send policy message to O-CUs via E2 interfaces.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+None identified
+
+Traceability
+
+REQ-Near-RT-RIC-TS-FUN1,
+
+REQ-Near-RT-RIC-TS-FUN2,
+
+REQ-E2-MM-FUN1,
+
+REQ-E2-MM-FUN4,
+
+REQ-E2-MM-FUN5,
+
+REQ-E2-MM-FUN7,
+
+REQ-E2-MM-FUN8
+
+@startuml
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+Autonumber
+
+Box “SMO” #gold
+
+   Participant SMO as “Operator/SMO”
+
+   Participant NON as “Non-RT RIC”
+
+end box
+
+Box “O-RAN” #lightpink
+
+   Participant NearRTRIC as “Near-RT RIC”
+
+   Participant ORANnodes as "E2 Nodes"
+
+End box
+
+group AI/ML Model Training
+
+	SMO -> NearRTRIC: <<O1>> Initialize/Provide ML Model
+
+	NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (cell configuration report)
+
+	ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (cell configuration)
+
+	Hnote over NearRTRIC
+
+		mMIMO Beam Pattern Information is available
+
+	Endhnote
+
+	NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (mobility reports)
+
+	ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+	NearRTRIC -> NearRTRIC: AI/ML model training
+
+end
+
+group Beam grouping
+
+	ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+	NearRTRIC -> NearRTRIC: AI/ML model inference(beam grouping)
+
+	NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (beam grouping policy)
+
+end
+
+@enduml
+
+Figure 3.4.3.2-1 [bMRO]: Procedure for Near RT RIC Beam-based Mobility Robustness Optimization – model training and initial beam grouping
+
+Table 3.4.3.2-2 [bMRO]: Near RT RIC Beam-based Mobility Robustness Optimization – model inference and mobility optimization
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Based on evaluation of mobility performance and failure reporting, identify changes in mobility characteristics and derive optimized mobility settings such as CIO, TTT, T310 etc. to optimize beam-based mobility performance between neighbor cells.
+
+Actors and Roles
+
+SMO, Near-RT RIC, E2 Node (O-CU)
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+O1 and E2 interface connectivity are established.
+
+ML models are trained, and beam groups are defined
+
+Pre-conditions
+
+Network is operational with default configuration.
+
+(optional) OAM Functions have configured bMRO targets in Near-RT RIC through O1 interface
+
+OAM Functions have configured baseline mobility parameters in O-CUs through O1 interface
+
+Near-RT RIC has up-to-date beam pattern information
+
+O-CUs support reporting of beam-based mobility performance and/or instantaneous mobility failure event reporting
+
+Near-RT RIC has access to the beam-based mobility performance and/or failure reporting from the E2 node
+
+Begins when
+
+Operator specified trigger condition or event is satisfied.
+
+Step 1 (M)
+
+Near-RT RIC subscribes to beam- or beam-group based mobility performance and/or failure reporting via E2 interface for mobility optimization.
+
+Step 2 (M)
+
+Near-RT RIC subscribes to cell configuration reports via E2 interface to get informed about mMIMO beam pattern changes.
+
+Step 3,4,5,6,7 (M)
+
+SMO may trigger mobility optimization by configuration of a new GoB beam pattern in the E2 Node (O-CU). Near-RT RIC obtains the cell configuration from E2 Node via E2 interface and detects a mMIMO beam pattern change. Based on obtained mobility reports from E2 Nodes, AI/ML model inference in the Near-RT RIC derives an updated beam grouping. Near-RT RIC requests to apply an updated beam grouping policy at E2 Node (O-CU).
+
+Step 8 (M)
+
+Alternatively, OAM may trigger mobility optimization by operator specified trigger or a new optimization target.
+
+Step 9 (M)
+
+Near-RT RIC obtains to beam- or beam-group based mobility performance and failure reporting via E2 interface for mobility optimization.
+
+Step 10 (M)
+
+Near-RT RIC performs AI/ML based mobility report analysis to detect a change in mobility characteristics and to trigger reconfiguration of mobility reporting and mobility parameter settings.
+
+Step 11 (M)
+
+Near-RT RIC subscribes to updated beam- or beam-group based mobility performance and failure reporting via E2 interface.
+
+Step 12 (M)
+
+Near-RT RIC obtains to beam-or beam-group based mobility performance and failure reporting via E2 interface.
+
+Step 13 (M)
+
+Near-RT RIC performs Mobility Robustness Optimization to update mobility parameter settings.
+
+Step 14 (M)
+
+Near-RT RIC requests to apply an updated beam- or beam-group based mobility parameter policy (e.g., CIO, TTT, T310 etc.) at E2 Node (O-CU).
+
+Ends when
+
+Operator specified trigger condition or event is satisfied.
+
+Exceptions
+
+None identified
+
+Post Conditions
+
+Near-RT RIC monitors the performance of Mobility Robustness Optimization in the Near-RT RIC and initiates ML model retraining if required.
+
+Traceability
+
+REQ-Near-RT-RIC-TS-FUN1,
+
+REQ-Near-RT-RIC-TS-FUN2,
+
+REQ-Near-RT-RIC-TS-FUN3,
+
+REQ-E2-MM-FUN1,
+
+REQ-E2-MM-FUN4,
+
+REQ-E2-MM-FUN5,
+
+REQ-E2-MM-FUN7,
+
+REQ-E2-MM-FUN8
+
+@startuml
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+Autonumber
+
+Box “SMO” #gold
+
+   Participant SMO as “Operator/SMO”
+
+   Participant NON as “Non-RT RIC”
+
+end box
+
+Box “O-RAN” #lightpink
+
+   Participant NearRTRIC as “Near-RT RIC”
+
+   Participant ORANnodes as "E2 Nodes"
+
+End box
+
+group OUTER LOOP CONTROL
+
+		NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (mobility reports)
+
+		NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (cell configuration report)
+
+	group alt 1
+
+		SMO -> ORANnodes: <<O1>> Optimization Trigger:\nNew GoB configuration
+
+		ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (cell configuration)
+
+		Hnote over NearRTRIC
+
+			mMIMO Beam Pattern Change
+
+		Endhnote
+
+		ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+		NearRTRIC -> NearRTRIC: AI/ML model inference (beam grouping)
+
+		NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (beam grouping policy)
+
+	end
+
+	group alt 2
+
+		SMO -> NearRTRIC: <<O1>> Optimization Trigger:\nNew optimization target
+
+	end
+
+	group INNER LOOP CONTROL
+
+		ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+		NearRTRIC -> NearRTRIC: AI/ML model inference (optimization trigger)
+
+		Hnote over NearRTRIC
+
+			Change in mobility characteristics
+
+		Endhnote
+
+		NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (mobility reports)
+
+		ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+		NearRTRIC -> NearRTRIC: Mobility Robustness Optimization
+
+		Hnote over NearRTRIC
+
+			Update mobility parameters
+
+		Endhnote
+
+		NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (mobility parameter policy)
+
+	end
+
+end
+
+group Performance Monitoring
+
+	NearRTRIC -> ORANnodes: <<E2>> RIC SUBSCRIPTION REQUEST (mobility reports)
+
+	ORANnodes -> NearRTRIC: <<E2>> RIC INDICATION (mobility reports)
+
+	NearRTRIC -> NearRTRIC: Performance monitoring and evaluation
+
+	NearRTRIC -> NearRTRIC: Model retraining and update
+
+end
+
+@enduml
+
+Figure 3.4.3.2-2 [bMRO]: Procedure for Near RT RIC Beam-based Mobility Robustness Optimization – optimization trigger, model inference and mobility optimization
+
+3.4.4	Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the massive MIMO optimization use case. The requirements are specified in Section 4.
+
+3.4.4.1 Control over E2
+
+Non-Grid-of-Beams Beamforming Optimization
+
+Output Data
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Config. Period, granularity
+
+New or existing config
+
+E2
+
+Near-RT RIC → O-DU
+
+Non-GoB control/policy (non-GoB beamforming mode)
+
+index
+
+~per N x 100ms, per UE
+
+New
+
+Beam-based Mobility Robustness Optimization
+
+Output Data
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Config. Period, granularity
+
+New or existing config
+
+E2
+
+Near-RT RIC → O-CU
+
+Cell Individual Offset (CIO) to a given neighbor cell
+
+dB
+
+~per N x 100ms, per beam or beam group, per UE group (optional)
+
+3GPP TS 38.331 [19]
+(Sec. 5.3.5, Sec. 5.5.4)
+
+New: beam or beam group, per UE group configuration of CIOs
+
+E2
+
+Near-RT RIC → O-CU
+
+Time To Trigger (TTT)
+
+ms
+
+~per N x 100ms, per beam or beam group, per UE group (optional)
+
+3GPP TS 38.331 [19]
+(Sec. 5.3.5, Sec. 6.3.2)
+
+New: beam or beam group, per UE group configuration of TTTs
+
+E2
+
+Near-RT RIC → O-CU
+
+UE Timer 310 (T310)
+
+ms
+
+~per N x 100ms, per beam or beam group, per UE group (optional)
+
+3GPP TS 38.331 [19]
+(Sec. 5.8.8, Sec. 6.3.2)
+
+New: beam or beam group, per UE group configuration of TTTs
+
+3.4.4.2 UE Context Information from E2 Nodes
+
+<From O-DU>
+
+Input Data
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Reporting Period, granularity
+
+New or existing definition,
+
+Existing Specification
+
+(Section)
+
+Applicable sub-features
+
+E2
+
+O-DU → Near-RT RIC
+
+UE ID
+
+~per N x 100ms, per UE
+
+Existing definition
+
+O-RAN.WG3.E2SM-v02.00 [26]
+
+New reporting
+
+Non-GoB
+
+E2
+
+O-DU → Near-RT RIC
+
+SRS configuration periodicity
+
+slots
+
+~per N x 100ms, per UE
+
+Existing definition
+
+3GPP TS 38.331 [19] (Sec. 6.3.2 “SRS-Config >periodicityAndOffset”)
+
+New reporting
+
+Non-GoB
+
+<From O-CU>
+
+3.4.4.3 Measurements from E2 Nodes
+
+<From O-DU>
+
+Input Data
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Reporting Period, granularity
+
+New or existing definition,
+
+Existing Specification
+
+(Section)
+
+Applicable sub-features
+
+E2
+
+O-DU → Near-RT RIC
+
+RSRP L1 measurement (based on Synchronization Signal)
+
+dBm
+
+~per N x 100ms, per UE
+
+Existing definition
+
+3GPP TS 38.133 (Sec. 10.1.6) [28]
+
+3GPP TS 38.215 (Sec. 5.1.1) [29]
+
+New reporting
+
+Non-GoB
+
+L1/L2 BM
+
+E2
+
+O-DU → Near-RT RIC
+
+DL L1 SINR measurement (based on Synchronization Signal)
+
+dB
+
+~per N x 100ms, per UE
+
+Existing definition
+
+3GPP TS 38.133 (Sec. 10.1.16) [28]
+
+3GPP TS 38.215 (Sec. 5.1.5) [29]
+
+New reporting
+
+Non-GoB
+
+L1/L2 BM
+
+E2
+
+O-DU → Near-RT RIC
+
+UL SRS RSRP measurement
+
+dBm
+
+~per N x 100ms, per UE
+
+Existing definition
+
+3GPP TS 38.133 (Sec. 13.3.1) [28]
+
+3GPP TS 38.215 (Sec. 5.2.5) [29]
+
+New reporting
+
+Non-GoB
+
+E2
+
+O-DU → Near-RT RIC
+
+Average DL UE throughput in gNB with associated non-GoB BF mode and MIMO mode
+
+Kb/s + index
+
+(non-real-time for training)
+
+Existing definition
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.3.1)
+
+New reporting
+
+New component is associated non-GoB BF mode index and MIMO mode (SU/MU)
+
+Non-GoB
+
+E2
+
+O-DU → Near-RT RIC
+
+Average UL UE throughput in gNB with associated non-GoB BF mode and MIMO mode
+
+Kb/s + index
+
+(non-real-time for training)
+
+Existing definition
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.3.3)
+
+New reporting
+
+New component is associated non- GoB BF mode index and MIMO mode (SU/MU)
+
+Non-GoB
+
+<From O-CU>
+
+Input Data
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Reporting Period, granularity
+
+New or existing definition,
+
+Existing Specification
+
+(Section)
+
+Applicable sub-features
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of too early HOs to a given neighbor cell
+
+count
+
+~ 1 min, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.25)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of too late HOs to a given neighbor cell
+
+count
+
+~ 1 min, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.25)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of HO to wrong cell to a given neighbor cell
+
+count
+
+~ 1, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.25)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of requested legacy HO executions (HO attempts) to a given neighbor cell
+
+count
+
+~ 1 min, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.6)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of successful legacy HO executions to a given neighbor cell
+
+count
+
+~ 1 min, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.6)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Number of failed legacy HO executions to a given neighbor cell
+
+count
+
+~ 1 min, per beam or beam group
+
+3GPP TS 28.552 [7]
+(Sec. 5.1.1.6)
+
+bMRO
+
+E2
+
+O-CU → Near-RT RIC
+
+Mobility failure indication with root cause (too early HO, too late HO, HO to wrong cell; ping-pong HO) and number of requested or number of successful HO executions at the time of failure
+
+message
+
+Instantaneous at failure event, per beam or beam group, per UE
+
+New measurement and
+new reporting
+
+bMRO
+
+Note: Measurements for bMRO to be associated with active beam pattern in case of GoB optimization.
+
+3.4.4.4 E2 node Configuration
+
+<From O-DU>
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Reporting Period, granularity
+
+New or existing definition,
+
+Existing Specification
+
+(Section)
+
+Applicable sub-features
+
+E2
+
+O-DU → Near-RT RIC
+
+Number of supported non-GoB beamforming modes
+
+count
+
+infrequent event
+(> hours)
+
+New
+
+Non-GoB
+
+<To O-CU>
+
+Interface
+
+Source → Target
+
+Name/Description
+
+Units
+
+Config. Period, granularity
+
+New or existing definition,
+
+Existing Specification
+
+(Section)
+
+Applicable sub-features
+
+E2
+
+Near-RT RIC → O-CU
+
+Beam grouping info (list of beam group IDs with associated beam IDs)
+
+list
+
+infrequent event
+(> hours)
+
+New
+
+bMRO
+
+3.5	Use case 5: QoE Optimization
+
+Based on the end-to-end requirements for the QoE optimization use case defined in [24] section 3.4 and [30] section 3.2, some high-level functional description, and requirements over Near-RT RIC and E2 interface are introduced.
+
+3.5.1	Background and goal of the use case
+
+The highly demanding 5G native applications like Cloud VR are both bandwidth consuming and latency sensitive. However, for such traffic-intensive and highly interactive applications, current semi-static QoS framework can be insufficient to satisfy diversified QoE requirements especially taking into account potentially significant fluctuation of radio transmission capability. It is expected that QoE estimation/prediction can help deal with such uncertainty and improve the efficiency of radio resources, and eventually improve user experience. RAN analytics information (RAI) as RAN service can be exposed to RAI service consumers for specific UE (identified according to [32] section 4.5) or for groups of UE (per slice, per cell, per PLMN, etc.). RAI is envisioned to be helpful for the applications to improve the user experience.
+
+Near-RT RIC and E2 interface are leveraged to support this use case. Measurement data through E2 interface, e.g., cell level data, UE level data, can be acquired and processed via ML algorithms to support traffic recognition, QoE prediction, and QoS enforcement decisions. When requested, the analytics information, e.g., traffic rate, latency, packet loss rate, is exposed to the RAI service consumers to help applications execute logical control.
+
+3.5.2	Entities/resources involved in the use case
+
+Near-RT RIC:
+
+Support receiving request or subscription messages from RAI service consumer.
+
+Support receiving network state and UE performance report from RAN.
+
+Support data analysis and executing the AI/ML models to infer RAN analytics information, e.g., QoE prediction, and available bandwidth prediction.
+
+Support exposure RAN analytics information to RAI service consumer.
+
+RAN:
+
+Support network state and UE performance report with required granularity to Near-RT RIC over E2 interface.
+
+RAI service consumer:
+
+Request or subscribe to RAN analytics information from the Near-RT RIC.
+
+Support UE identification using data structure defined in O-RAN Architecture [32] section 4.
+
+3.5.3	Solutions
+
+3.5.3.0 Introduction
+
+This section specifies solution components that can be combined into different solutions. A solution based on E2 control/policy consists of section 3.5.3.1 and section 3.5.3.2. Another solution based on RAN analytics information exposure consists of section 3.5.3.1 and section 3.5.3.3.
+
+3.5.3.1 AI/ML Model training and distribution
+
+Overall process defined in [30] section 3.2.3.1 “Model training and distribution” however step 3 would be performed over O2 when and if “image based” ML model deployment option is selected (see [31] section 7).
+
+3.5.3.2 Policy generation and performance evaluation
+
+Editor’s note: to be defined based on requirements from [30] section 3.2.4.1.
+
+3.5.3.3 RAN Performance Analytics assisted QoE Optimization
+
+RAN Performance analytics may be requested by the RAI service consumer using either a Request/Response solution or a Subscription Based solution.
+
+Table 3.5.3.3-1: RAN Performance Analytics assisted QoE Optimization using Request/Response
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Expose RAN analytics information to RAI service consumer for QoE optimization.
+
+Actors and Roles
+
+Near-RT RIC, RAI service consumer, E2 Nodes
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+RAI service consumer has obtained the necessary information to initiate request for QoE related RAI from the Near-RT RIC.
+
+Pre-conditions
+
+QoE related ML models have been deployed in Near-RT RIC.
+
+E2 interface is established to enable collection of measurements from E2 Nodes.
+
+Begins when
+
+RAI service consumer decides to request RAN analytics information for QoE optimization.
+
+Step 1 (M)
+
+RAI service consumer requests for QoE related RAN analytics information from Near-RT RIC.
+
+Step 2 (O)
+
+Near-RT RIC initiates measurement data collection from E2 Nodes via RIC Subscription procedure. (NOTE 1)
+
+Step 3-4 (M)
+
+E2 Node sends periodic measurement data to Near-RT RIC, received data is processed and stored
+
+Step 5 (M)
+
+Near-RT RIC generates the RAN analytics information, using QoE related AI/ML models and collected measurement data.
+
+Step 6 (M)
+
+Near-RT RIC sends the RAN analytics information to RAI service consumer.
+
+Ends when
+
+RAI service consumer receives the RAN analytics information response.
+
+Exceptions
+
+FFS
+
+Post Conditions
+
+RAI service consumer obtains RAI necessary for QoE optimization.
+
+Near-RT RIC may stop data collection.
+
+NOTE 1: Near-RT RIC may be configured to start collection of measurement data before requested by RAI service consumer.
+
+@startuml
+
+Skin rose
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+Box “O-RAN” #lightpink
+
+  Participant near as “Near-RT RIC”
+
+  Participant ran as “E2 Nodes”
+
+End box
+
+Box “External” #lightcyan
+
+  Participant “RAI service consumer” as app
+
+End box
+
+app -> near : 1. RAI Request for QoE optimization
+
+near <--> ran: 2. <<E2>> RIC Subscription procedure(Report: Measurements)
+
+Loop Data collection
+
+  ran -> near : 3. <<E2>> RIC Indication (Report)
+
+    near -> near : 4. Process and store data
+
+end
+
+near -> near: 5. RAN analytics information generation
+
+near -> app: 6. RAI Response (RAN analytics information)
+
+near <--> ran: <<E2>> RIC Subscription Delete procedure(Report: Measurements)
+
+@enduml
+
+Figure 3.5.3.3-1: RAN Performance Analytics assisted QoE Optimization using Request/Response
+
+Table 3.5.3.3-2: RAN Performance Analytics assisted QoE Optimization using subscription-based solution
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Expose RAN analytics information to RAI service consumer for QoE optimization.
+
+Actors and Roles
+
+Near-RT RIC, RAI service consumer, E2 Nodes
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+RAI service consumer has obtained the necessary information to initiate request for QoE related RAI from the Near-RT RIC.
+
+Pre-conditions
+
+QoE related ML models have been deployed in Near-RT RIC.
+
+E2 interface is established to enable collection of measurements from E2 Nodes.
+
+Begins when
+
+RAI service consumer decides to subscribe to reports of RAN analytics information for QoE optimization.
+
+Step 1 (M)
+
+RAI service consumer initiates RAI subscription procedure for QoE related RAN analytics information from Near-RT RIC.
+
+Step 2 (O)
+
+Near-RT RIC may initiate measurement data collection from E2 Nodes via RIC Subscription procedure. (NOTE 1)
+
+Steps 3-5 loop with RAI service consumer receiving requested subscription-based reports
+
+Step 3-4 (M)
+
+E2 Node sends periodic measurement data to Near-RT RIC, received data is processed and stored
+
+Step 5 (M)
+
+Near-RT RIC generates the RAN analytics information, using QoE related AI/ML models and collected measurement data.
+
+Step 6 (M)
+
+Near-RT RIC sends the RAN analytics information to RAI service consumer.
+
+Ends when
+
+RAI service consumer initiates RAI subscription delete procedure.
+
+Exceptions
+
+FFS
+
+Post Conditions
+
+RAI service consumer obtains RAI necessary for QoE optimization.
+
+Near-RT RIC may stop E2 Node data collection
+
+NOTE 1: Near-RT RIC may be configured to start collection of measurement data before requested by RAI service consumer.
+
+@startuml
+
+Skin rose
+
+skinparam ParticipantPadding 5
+
+skinparam BoxPadding 10
+
+skinparam defaultFontSize 12
+
+Box “O-RAN” #lightpink
+
+  Participant near as “Near-RT RIC”
+
+  Participant ran as “E2 Nodes”
+
+End box
+
+Box “External” #lightcyan
+
+  Participant “RAI service consumer” as app
+
+End box
+
+app <-> near : 1. RAI Subscription procedure for QoE optimization
+
+near <--> ran: 2. <<E2>> RIC Subscription procedure(Report: Measurements)
+
+Loop Until subscription terminated
+
+  Loop Data collection
+
+    ran -> near : 3. <<E2>> RIC Indication (Report)
+
+    near -> near : 4. Process and store data
+
+  end
+
+  near -> near: 5. RAN analytics information generation
+
+  near -> app: 6. RAI Report (RAN analytics information)
+
+end
+
+app <-> near : RAI Subscription Delete procedure
+
+near <--> ran: <<E2>> RIC Subscription Delete procedure(Report: Measurements)
+
+@enduml
+
+Figure 3.5.3.3-2: RAN Performance Analytics assisted QoE Optimization using Subscription based solution
+
+3.5.4	Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the QoE Optimization use case, especially for RAN Performance Analytics. The requirements are specified in Section 4.
+
+3.5.4.1 UE Context Information from E2 Nodes
+
+The followings are examples of UE context information identified as required:
+
+UE ID
+
+List of S-NSSAI
+
+List of QoS related ID, eg., 5QI, QFI
+
+For example, UE ID, S-NSSAI or QoS related ID can be used to collect, analysis and predict the resource occupation of each user, slice, or service, eg. maximum/average throughput, maximum/average latency, average packet loss rate.
+
+3.5.4.2 Measurements from E2 Nodes
+
+	The E2 measurements are necessary for inference and prediction in the Near-RT RIC as the driver for decisions in addition to KPMs. For the QoE Optimization use case, especially for RAN Performance Analytics, the Near-RT RIC receives the request or subscription from RAI service consumer and subscribes and receives the measurement data from O-CU/O-DU through E2 interface. Based on it, with QoE related AI/ML models, the Near-RT RIC infers the RAN analytics information, and exposes it to RAI service consumer.
+
+The following lists the examples of cell-level and UE level measurement information:
+
+Cell-level
+
+L2
+
+1. MCS Distribution in PDSCH (available at DU; TS 28.552 [7] 5.1.1.12.1)
+
+2. DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.1-2; TS 32.425 [8] 4.5.3-4)
+
+3. Distribution of DL/UL Total PRB usage (available at DU; TS 28.552 [7] 5.1.1.2.3-4; TS 32.425 [8] 4.5.10-11)
+
+4. DL/UL PRB used for data traffic (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.2.5 and 5.1.1.2.7)
+
+5. DL/UL PRB usage for traffic (per QCI, TS 32.425 [8] 4.5.1-2)
+
+6. DL/UL Total available PRB (available at DU; TS 28.552 [7] 5.1.1.2.6 and 5.1.1.2.8)
+
+7. DL/UL PRB full utilization (TS 32.425 [8]; 4.5.9.1-2)
+
+8. Total number of DL/UL TBs (available at DU; split into subcounters per layer at MU-MIMO case, TS 28.552 [7] 5.1.1.7.3 and 5.1.1.7.8; TS 32.425 [8] 4.5.7.1 and 4.5.7.3)
+
+9. Total error number of DL/UL TBs (available at DU; split into subcounters per layer at MU-MIMO case, TS 28.552 [7] 5.1.1.7.4 and 5.1.1.7.9, TS 32.425 [8] 4.5.7.2 and 4.5.7.4)
+
+10. Average DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.1)
+
+11. Distribution of DL UE throughput in gNB (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.3.2)
+
+12. Packet Delay (available at DU and CU-UP; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.3)
+
+13. RAN part packet delay components (TS 38.314 [17] 4.2.1.2)
+
+14. Packet Delay (per QCI, TS 36.314 [10] 4.1.4)
+
+15. DL/UL Cell PDCP SDU Data Volume (available at CU-UP; per PLMN ID and per QoS level (mapped 5QI) and per S-NSSAI, TS 28.552 [7] 5.1.2.1 for non-split gNB, 5.1.3.6.2 for split gNB; per PLMN ID and per E-RAB QoS profile (QCI, ARP and GBR), TS 32.425 [8] 4.4.7)
+
+16. Mean number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.1 and 5.1.1.23.3)
+
+17. Max number of Active UEs in the DL/UL per cell (available at DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.1.23.2 and 5.1.1.23.4)
+
+18. Average number of Active UEs (per QCI, TS 32.425 [8] 4.4.2)
+
+19. Packet Loss Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.1)
+
+20. Packet Loss Rate (per QCI, TS 32.425 [8] 4.4.4)
+
+21. DL Packet Drop Rate (available at CU-UP or DU; optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3) and subcounters per supported S-NSSAI, TS 28.552 [7] 5.1.3.2)
+
+22. DL Packet Drop Rate (per QCI, TS 32.425 [8] 4.4.3.2)
+
+UE-level
+
+Radio Channel Info in CU-CP
+
+1. SINR (TS 38.331 [19], TS 36.331 [12])
+
+2.RSRP (TS 38.331 [19], TS 36.331 [12])
+
+3.RSRQ (TS 38.331 [19], TS 36.331 [12])
+
+L2
+
+CQI, MCS
+
+DL/UL UE throughput
+
+DL/UL UE PRB usage
+
+RLC buffer size
+
+RLC occupied buffer
+
+RLC unused buffer
+
+UL/DL MAC rate
+
+Packet Delay
+
+Packet Interval
+
+Packet Jitter, eg. Packet Interval Jitter, Packet Size Jitter
+
+Data volume (per UE, TS 36.314 [10] 4.1.8)
+
+Data volume (per UE)
+
+Packet Loss Rate per DRB per UE (TS 38.314 [17] 4.2.1.5)
+
+Block Error Rate
+
+DL Packet Drop Rate
+
+Total number of RLC SDUs/PDUs
+
+Slice-level
+
+L2
+
+DL/UL UE PRB usage
+
+RLC buffer size
+
+RLC occupied buffer
+
+RLC unused buffer
+
+UL/DL MAC rate
+
+Packet Delay
+
+Packet Interval
+
+Packet Jitter, eg. Packet Interval Jitter, Packet Size Jitter
+
+Data volume (per QCI, TS 36.314 [10] 4.1.8)
+
+Data volume (per 5QI)
+
+Packet Loss Rate per DRB per UE
+
+Block Error Rate
+
+DL Packet Drop Rate (TS 28.552 [7] 5.1.3.2)
+
+Total number of RLC SDUs/PDUs
+
+3.5.5	RAN analytics information exposed by Near-RT RIC
+
+	Based on the measurements from E2 nodes, with QoE related AI/ML models, the Near-RT RIC infers the RAN analytics information and expose it to RAI service consumer. The exposed RAN analytics information will be helpful for the applications to evaluate network status and execute logic control, e.g., TCP transmission window adjustment, video coding rate selection to improve QoE.
+
+The following lists the examples of RAN analytics information:
+
+	UE-level
+
+	Predicted RAN performance
+
+minimum/maximum/average throughput
+
+minimum/maximum/average latency
+
+average packet loss rate
+
+QoE prediction (FFS)
+
+	Prediction related information
+
+Confidence
+
+validity period
+
+3.6	Use case 6: Network Energy Saving
+
+This use case provides the motivation, description, and requirements for Near RT RIC and E2 interface to support Network Energy Saving, whose end-to-end requirements are defined in [35].
+
+The RAN is responsible for the majority of the Energy Consumption (EC) of a mobile network, and the O-RU consumes the largest part of the energy consumption of the RAN. The rarefication of fossil fuel-based energy resources and the urgent need to reduce CO2 emissions make energy saving a strategic goal for network operators, in addition to the significant energy related OPEX reduction requirement.
+
+Energy consumption can be reduced by improving the Energy Efficiency (EE) of the network, and by introducing different Energy Saving (ES) mechanisms. Several ES mechanisms are related to switching off certain components in the network and differ from one another by their time scale. In a longer time-scale of minutes, hours and above, and when the cell load is low, ES can be achieved by switching off one or more carriers or the cell itself. At the same or shorter time-scale, from seconds to minutes, ES can be achieved by switching off RF channels (including possibly array of antennas) of a Massive-MIMO (mMIMO) system. At a shorter time-scale corresponding to a symbol, subframe and frame, Advanced Sleep Modes (ASM) can be considered [36]-[38].
+
+The ES use cases are divided into three sub-use cases, which have different properties, the time scale of the control and the controlled system involved:
+
+Carrier and cell switch off/on.
+
+RF channel reconfiguration.
+
+Advanced Sleep Modes
+
+3.6.1	Carrier and Cell Switch Off/On
+
+3.6.1.1 Background and goal of the use case
+
+Carrier and cell switch off/on control by the Non-RT or Near-RT RIC can consider overall network energy efficiency instead of local optimization. In addition to the ES optimization in the SMO/Non-RT RIC, optimizing network EC in the Near-RT RIC brings significant gains due to more UE centric, near real-time intelligent control capabilities with finer granularity. The AI/ML models' functionality in the Near-RT RIC may include prediction of future traffic, user mobility, resource usage, QoS and QoE on a per UE basis and may also predict expected energy efficiency enhancements, resource usage, and network performance for different carrier and cell switching off/on options. Based on the predicted results, optimized ES control actions or policies can be given by the Near-RT RIC to E2 nodes in near real-time manner to track the dynamic network conditions. ES control also includes preparation actions (before carrier and cells are switched off)  and post control actions (after carrier and cells are switched on) such as checking ongoing emergency calls and warning messages, enabling/disabling/modifying Carrier Aggregation and/or Dual Connectivity, steering traffic and handing over UEs from source cells/carriers to other cells/carriers, changing MU-MIMO layers, beam scheduling policies and SSB burst configurations etc, which can be handled in the Near-RT RIC by the intelligent and UE centric RAN control capabilities coordinated with the SMO/Non-RT RIC.
+
+The goal of Near-RT RIC Energy Saving is to interpret the policies received over A1 and to determine the optimum changes it can make according to these policies. More specifically, Near-RT RIC triggers E2 procedure and related control/policies so as to obtain network performance that would fulfill the criteria identified in the A1 policies. It may also leverage the A1 enrichment information to make more informed decisions. Traffic Steering may reuse mechanisms provided by other use cases to affect the changes necessary to achieve its goals. The Near-RT RIC may also work in Background Processing without the A1 Policy guidance from the Non-RT RIC.
+
+3.6.1.2 Entities/resources involved in the use case
+
+Near-RT RIC:
+
+Near real-time monitoring of Energy Saving related performance measurements.
+
+Receive Energy Saving xApps from SMO.
+
+Support interpretation and enforcement of A1 policies from Non-RT RIC.
+
+Support enrichment information via the A1 interface.
+
+Perform optimized RAN (E2) actions to achieve ES requirements based on O1 configuration, A1 policy, A1 enrichment information and E2 reports.
+
+E2 node:
+
+Support ES optimization actions or policy enforcements via E2.
+
+Support ES related performance measurements through O1.
+
+Support ES related performance reports through E2.
+
+3.6.1.3 Solution
+
+There are three general ES processing modes and the transitions between them.  The three processing modes, Baseline, Background and A1 Policy based, as described in clause 3.1.3 for Traffic Steering use case applies to the Energy Saving use case as is except that the modes represent the way the Near-RT RIC operates on a given E2 node rather than UE specific.
+
+Use Case Stage
+
+Evolution / Specification
+
+<<Uses>>
+
+Related use
+
+Goal
+
+Drive energy saving cell switching off/on optimization in accordance with RAN OAM configured background behavior (Mode 1) or policies information from the Non-RT RIC using A1 interface (Mode 2).
+
+Actors and Roles
+
+Non-RT RIC in SMO domain: Creates and updates A1 policies, provide A1 enrichment information.
+
+Near-RT RIC: Enforces A1 policies and generates RIC CONTROL and/or POLICY.
+
+E2 Node: RIC CONTROL and POLICY execution and RIC REPORT creation.
+
+Refer to 3.6.1.2 for more details.
+
+Assumptions
+
+All relevant functions and components are instantiated.
+
+A1, O1 and E2 interface connectivity is established.
+
+A1 Policy scope defined
+
+Pre-conditions
+
+Network is operational with default configuration.
+
+OAM Functions have configured a baseline measurement configuration and the Non-RT RIC has access to this data.
+
+OAM Functions have configured baseline traffic steering parameters in E2 Node(s) through O1 interface.
+
+(optional) If ES Mode 1, OAM Functions have configured background ES behavior to the near-RT RIC through O1 interface.
+
+Non-RT RIC analyzes the historical data from RAN for training the relevant AI/ML models to be deployed or updated in the near-RT RIC, as well as AI/ML models required for non-real-time optimization of configuration and policies.
+
+ Begins when
+
+Energy saving optimization by cell switching off/on is activated or an operator defined trigger is detected.
+
+Step 1 (O)
+
+(Start of Outer loop control)
+
+If ES Mode 1, OAM Functions collects data from E2 node through O1 interface.
+
+Step 2 (O)
+
+Non-RT RIC retrieve ES related performance data from OAM function.
+
+Step 3 (O)
+
+Non-RT RIC evaluates the collected data and A1 policy feedback, if required, and generates or updates the appropriate ES optimization policy, such as ES targets and carrier/cell switching off/on guidance etc.
+
+Step 4 (O)
+
+Non-RT RIC sends the ES optimization policy to Near-RT RIC via A1 interface.
+
+Step 5 (O)
+
+Non-RT RIC sends optional ES related A1 Enrichment Information.
+
+Step 6 (O)
+
+If ES Mode 2, Near-RT RIC collects data from E2 node through E2 interface.
+
+Step 7 (O)
+
+ Near-RT RIC evaluates the collected data, if required, generates, or updates the internal background mode ES optimization targets or policies.
+
+Step 8 (M)
+
+(Start of Inner loop control)
+
+Near-RT RIC subscribes to a UE context information and measurement metrics via E2 interface.
+
+Step 9 (M)
+
+E2 Nodes report the UE context information and E2 measurements via RIC REPORT periodically or event-triggered.
+
+Step 10 (M)
+
+Near-RT RIC evaluates the performance data from E2 Nodes and finds potential improvements to energy efficiency which are indicated in the A1 policy and/or internal Near-RT RIC TS targets.
+
+Step 11 (O)
+
+Based on the UE context information, E2 measurement metrics (RIC REPORT), and A1 policy, Near-RT RIC may generate new or modify the existing E2 policies and sends them to E2 Nodes.
+
+E2 node functions target of E2 policy may be:
+
+E-UTRAN-NR Dual Connectivity
+
+Carrier Aggregation
+
+Connected mode mobility
+
+Idle mode mobility
+
+Radio access control
+
+Cell switching off/on control
+
+Step 12 (O)
+
+Near-RT RIC may also generate control command(s) and send them to E2 Node(s) to trigger re-allocation of radio resources and switching off/on carrier and cells so that the overall network energy efficiency can be improved.
+
+E2 node functions target of E2 control command may be:
+
+Same as Step 11
+
+(End of Inner loop control)
+
+Step 13 (O)
+
+	For ES Mode 2, Near RT-RIC may send A1 Policy feedback on A1 to the Non-RT RIC.
+
+(End of Outer loop control)
+
+Step 14 (O)
+
+Non-RT RIC decides to delete ES optimization policy in case of ES mode 2 and sends the related messages.
+
+Step 15,16 (M)
+
+Following A1 policy deletion (Mode 2) or internal trigger (Mode 1), the Near-RT RIC terminates the ES optimization procedure and delete the related RIC Subscriptions.
+
+Ends when
+
+ES optimization is deactivated, or an operator defined trigger is detected.
+
+Exceptions
+
+None
+
+Post Conditions
+
+Energy saving over a period of time is achieved.
+
+Traceability
+
+REQ-E2-ES-FUN1, REQ-E2-ES-FUN2, REQ-Near-RT-RIC-ES-FUN1, REQ-Near-RT-RIC-ES-FUN2，REQ-Near-RT-RIC-ES-FUN3
+
+@startuml
+
+autonumber
+
+skinparam ParticipantPadding 4
+
+skinparam BoxPadding 8
+
+skinparam defaultFontSize 12
+
+Box “Service Management and Orchestration” #gold
+
+    Participant OAM as “OAM Functions”
+
+    Participant non as “Non-RT RIC”
+
+End box
+
+Box “O-RAN” #lightpink
+
+   Participant near as “Near-RT RIC”
+
+   Participant ran as “E2 Node”
+
+End box
+
+group OUTER LOOP CONTROL
+
+   OAM <--> ran : (Mode 2) <<O1>> RAN Data collection
+
+   OAM --> non: (Mode 2) ES related performance information
+
+   non --> non: (Mode 2) Collected data evaluation and policy creation
+
+   non --> near : (Mode 2) <<A1>> A1 policy setup or update
+
+   non --> near: (opt.) <<A1-EI>> ES related A1 enrichment information
+
+   near <--> ran: (Mode 1) <<E2>> RAN Data collection
+
+   near --> near: (Mode 1) Collected data evaluation and policy creation
+
+   group INNER LOOP CONTROL
+
+      near -> ran : <<E2>> RIC SUBSCRIPTION REQUEST(UE context & measurement metrics)
+
+      ran -> near: <<E2>> RIC INDICATION (UE context & E2 measurement metrics)
+
+      near -> near: Evaluation, potential improvement to energy efficiency
+
+      near -> ran : (opt.) <<E2>> RIC SUBSCRIPTION REQUEST (ES optimisation POLICY)
+
+      near -> ran : (opt.) <<E2>> RIC CONTROL REQUEST (ES optimisation RIC CONTROL)
+
+   end
+
+   non <-- near: (Mode 2) <<A1>> A1 policy feedback
+
+end
+
+non --> near: (Mode 2) <<A1>> A1 policy delete
+
+near -> near: ES optimization stopped
+
+near-> ran: <<E2>> RIC SUBSCRIPTION DELETE
+
+@enduml
+
+Figure 3.6.1.3-1: ES Optimization by Carriers and Cell Switching off/on
+
+3.6.1.4 Required data
+
+This section elaborates the Near-RT RIC and the E2 Node capabilities necessary for implementation of the ES Carrier and Cell Switch Off/On use case. The requirements are specified in Section 4.
+
+3.6.1.4.1 Control over E2
+
+Radio Access Control: Access control may be applied to restrict access of other UEs for a specific cell in order to prepare for switching off the cell to save energy. A cell-level, UE-level, or slice-level access control can be applied. Four categories of radio access control are indicated as below:
+
+RACH Backoff
+
+RRC Connection Reject
+
+RRC Connection Release
+
+Access Barring
+
+Both RIC POLICY and RIC CONTROL can be used.
+
+Mobility Control: For example, a neighbouring cell may be selected in order to switch off the current serving cell. A neighbour handover restriction list may be configured to prevent the UEs from HO to some neighbour cells in order to reduce traffic load of the neighbour cells and switch them off.
+
+Handover from the source cell to the target cell
+
+Configuration/reconfiguration of handover restriction list
+
+Configuration of idle mode mobility parameters
+
+Enable, disable, or modify CA (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+Enable, disable, or modify dual connectivity (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+Both RIC POLICY and RIC CONTROL can be used.
+
+Carriers and Cell Switch off/on Control: Depending on the traffic condition, certain number of carriers and cells can be switched off by the Near-RT RIC by sending guidance to the E2 node when the traffic is low in order to save energy.
+
+Note: Once E2 node receives the guidance from Near-RT RIC for switching off/on a cell/carrier, it is not expected that the cell/carrier can be switched off immediately. The E2 node may take time to do all necessary actions to prepare for switching off/on the carrier/cell and there is also a delay in O-RU and Open Fronthaul interface for switching off/on the cell/carrier. However, it is still expected [35] that the Near-RT RIC to send this intent to the E2 node to start the process for cell/carrier switching off/on after the network performance and energy efficiency are jointly optimized through for example traffic steering and QoS/QoE optimisation by the Near-RT RIC through 1) and 2). The E2 node (e.g., O-CU-CP) can optionally do traffic steering and OoS optimisation upon receiving this command from the Near-RT RIC before triggering the cell/carrier switching off/on.
+
+Either RIC POLICY or RIC CONTROL can be used which is FFS.
+
+3.6.1.4.2 UE Context Information from E2 Nodes
+
+The followings are examples of UE context information identified as required:
+
+UE ID (as defined in [24])
+
+Slice level: S-NSSAI
+
+DRB level: e.g., established DRB ID, mapping with QoS flows, etc.
+
+QoS related: e.g., E-RAB Level QoS Parameters (4G, NSA) or QoS Flow Level QoS Parameters (NG-RAN).
+
+UE capabilities: CA and DC capabilities
+
+For example, UE ID, S-NSSAI, DRB ID, or QCI/5QI can be used to derive the QoS requirements and the resource occupation; the UE capabilities may be required to select the appropriate RRM action (e.g., CA/DC configuration).
+
+3.6.1.4.3 Measurements from E2 Nodes
+
+	The E2 measurements are necessary for inference and prediction in the Near-RT RIC as the driver for decisions in addition to KPMs. For the Energy Saving Carrier and Cell switch off/on use case, the Near-RT RIC can translate an A1 policy (relatively static targets) into a flexible selection of controls over E2 (e.g. handover control, DC, CA, idle mode mobility, carrier and cell switching off/on) by taking into account the RAN resource utilization, cell level and the UE level performance, the radio and traffic conditions, QoS and QoE requirements and energy consumption and efficiency etc.
+
+	The following lists the examples of measurement information identified as required:
+
+Table 3.1.4.3-1: Measurements from E2 Nodes
+
+Cell/SSB area related measurements
+
+DL/UL Total PRB Usage, Distribution of DL/UL Total PRB Usage, DL/UL GBR PRB Usage, DL/UL non-GBR PRB Usage, RRC Connection Number, Available RRC Connection Capacity Value, Mean and Maximum Number of Active UEs per DRB in the DL/UL, DL/UL Scheduling PDCCH CCE Usage, DL/UL Composite Available Capacity, DL/UL Cell PDCP SDU Data Volume (including secondary RAT usage for EN-DC/MR-DC), Handover success ratio
+
+DL/UL SSB Area Total PRB Usage, DL/UL SSB Area GBR PRB Usage, DL/UL SSB Area non-GBR PRB Usage, SSB Area Capacity Value
+
+DL/UL PRB usage per QCI, DL/UL PRB usage per 5QI, DL/UL PRB usage per slice, Slice Available Capacity Value
+
+Ref. 3GPP 32.425[8], 3GPP 28.552[7], 3GPP 36.314[10], 3GPP 38.314[17], 3GPP 38.423[20], 3GPP 38.463[21] and 3GPP 38.473[22]
+
+E2-node user plane measurements per-UE / UE group
+
+Average DL/UL throughput
+
+DL/UL PRB usage
+
+DL/UL Scheduled IP throughput
+
+Buffer Status Information (e.g., UL BSR)
+
+Ref. 3GPP 32.425[8], 3GPP 28.552[7], 3GPP 36.314[10], 3GPP 38.314[17], 3GPP 38.423[20], 3GPP 38.473[22], 3GPP 38.463[21], 3GPP 36.321[11], 3GPP 38.321[18]
+
+UE L1/L2/L3 measurements
+
+RSRP and RSRQ measurements
+
+SINR measurements
+
+CQI/MCS measurements
+
+Location and Velocity measurements
+
+Ref. 3GPP TS 36.331[12], 3GPP TS 38.331[19]
+
+Energy consumption measurement
+
+Energy consumption measurement of O-RU
+
+PNF Power Consumption (average/min/max)
+
+PNF Energy Consumption (average/min/max)
+
+Ref. 3gpp TS 28.,552[7]
+
+3.6.1.4.4 E2 node Configuration
+
+Cell level configuration parameters in order to configure UE measurements required for traffic steering and QoS/QoE optimization (see clause 3.1.4.4) for optionally preparing for and optimizing network performance and efficiency before cell/carrier switching off/on.
+
+Requirements
+
+4.1	Functional requirements
+
+4.1.1	Near-RT RIC generic functional requirements
+
+Table 4.1.1-1 Near-RT RIC Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+REQ-Near-RT-RIC-TS-FUN1
+
+Near-RT RIC shall be able to use Traffic Steering-related A1 policies to determine and execute appropriate E2 actions
+
+REQ-Near-RT-RIC-TS-FUN2
+
+Near-RT RIC shall be able to use Traffic Steering-related A1 enrichment information, e.g., the radio finger print information, to determine and execute appropriate E2 actions
+
+REQ-Near-RT-RIC-MM-FUN1
+
+Near-RT RIC shall support training of Massive MIMO-related models in xApps
+
+REQ-Near-RT-RIC-MM-FUN2
+
+Near-RT RIC shall support deployment of Massive MIMO-related trained models in xApps
+
+REQ-Near-RT-RIC-MM-FUN3
+
+Near-RT RIC shall be able to use Massive MIMO-related A1 enrichment information, e.g., location and mobility information, to determine and execute appropriate E2 actions
+
+REQ-Near-RT-RIC-QOE-FUN1
+
+Near-RT RIC shall be able to generate QoE related RAN analytics information and expose it to RAI service consumer.
+
+REQ-Near-RT-RIC-ES-FUN1
+
+Near-RT RIC shall be able to use Energy Saving-related A1 policies and enrichment information, e.g., the radio finger print information, to determine and execute appropriate E2 actions.
+
+REQ-Near-RT-RIC-ES-FUN2
+
+Near-RT RIC shall be able to trigger necessary energy saving related actions based on the configuration from O1 interface.
+
+REQ-Near-RT-RIC-ES-FUN3
+
+Near-RT RIC shall be able to handle mobility of users to account for potential coverage loss directly or indirectly via guidance to the E2 Node.
+
+4.1.2	E2 Interface functional requirements
+
+Table 4.1.2-1 E2 Interface Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+REQ-E2-TS-FUN1
+
+E2 shall support retrieval over E2 (read or receive via REPORT) of the following:
+
+Cell level configuration parameters, such as PCI, neighbor relations and related offsets for measurement, cell reselection and handover, etc.
+
+Supported REPORT triggers shall include:
+
+Modification of the configuration parameters
+
+REQ-E2-TS-FUN2
+
+E2 shall support the configuration (including range and granularity) and retrieval of cell/SSB area or slice related measurements in the nomenclature specified in 3GPP 28.552[7], 3GPP 32.425[8], 3GPP 36.314[10], 3GPP 36.423[13], 3GPP 38.314[17], 3GPP 38.423[20], 3GPP 38.463[21] and 3GPP 38.473[22]. These include:
+
+DL/UL Total PRB Usage, Distribution of DL/UL Total PRB Usage, DL/UL GBR PRB Usage, DL/UL total available PRB, DL/UL non-GBR PRB Usage, RRC Connection Number, Available RRC Connection Capacity Value, Mean and Maximum Number of Active UEs in the DL/UL per DRB, DL/UL Scheduling PDCCH CCE Usage, DL/UL Composite Available Capacity, DL/UL Cell PDCP SDU Data Volume (including secondary RAT usage for EN-DC/MR-DC), Handover success ratio
+
+DL/UL SSB Area Total PRB Usage, DL/UL SSB Area GBR PRB Usage, DL/UL SSB Area non-GBR PRB Usage, SSB Area Capacity Value
+
+DL/UL PRB usage per QCI, DL/UL PRB usage per 5QI, DL/UL PRB usage per slice, Slice Available Capacity Value
+
+Note: Time granularity of the measurements is FFS
+
+Supported REPORT triggers shall include:
+
+Availability of new information e.g., new load measurement generated
+
+Threshold crossing
+
+REQ-E2-TS-FUN3
+
+E2 shall support the configuration and retrieval of E2-node user plane measurements per-UE / UE group, in the nomenclature specified in 3GPP 28.552[7], 3GPP 32.425[8], 3GPP 36.314[10], 3GPP 36.321[11], 3GPP 38.314[17], 3GPP 38.321[18], 3GPP 38.423[20], 3GPP 38.463[21] and 3GPP 38.473[22], e.g.:
+
+Average DL/UL throughput
+
+DL/UL PRB usage
+
+Buffer Status Information (e.g., UL BSR)
+
+Supported REPORT triggers shall include:
+
+Availability of new information e.g., new load measurement generated
+
+Threshold crossing
+
+REQ-E2-TS-FUN4
+
+E2 shall support the configuration and retrieval of UE L1/L2/L3 measurements reported by individual UE, e.g.:
+
+RSRP and RSRQ measurements
+
+SINR measurements
+
+CQI/MCS measurements
+
+Supported REPORT triggers shall include:
+
+Availability of new information e.g., reception of RRC measurement reports.
+
+REQ-E2-TS-FUN5
+
+E2 shall support the control of EN-DC/MR-DC function in E2 nodes, including the configuration of the relevant parameters for EN-DC/MR-DC procedures, e.g.
+
+X2 SgNB Addition
+
+X2 SgNB Modification
+
+X2 SgNB Release
+
+X2 SgNB Change
+
+PSCell change
+
+Inter-Master Node Handover
+
+and UE level cell preference guidance for EN-DC/MR-DC, e.g.:
+
+Ordered list of target cells for sgNB addition and change.
+
+INSERT/CONTROL and POLICY shall be supported in order to trigger the operation by a RAN event, as well as REPORT/CONTROL for Near-RT RIC to trigger the operation asynchronously where appropriate
+
+REQ-E2-TS-FUN6
+
+E2 shall support the control of Handover function in E2 nodes, including the configuration of the relevant parameters for Handover procedures, e.g.:
+
+Intra-frequency/inter-frequency/inter-RAT handover
+
+Intra/inter-eNB/gNB handover
+
+and UE level cell preference guidance for handover, e.g.:
+
+Ordered list of target cells for handover
+
+INSERT/CONTROL and POLICY shall be supported in order to trigger the operation by a RAN event, as well as REPORT/CONTROL for Near-RT RIC to trigger the operation asynchronously where appropriate
+
+REQ-E2-TS-FUN7
+
+E2 shall support the control of Carrier Aggregation function in E2 nodes, including the configuration of the relevant parameters for CA procedures (e.g.: addition, modification, and release of a component carrier) and UE level cell preference guidance for CA (e.g., ordered list of target cells for Scell addition/modification)
+
+INSERT/CONTROL and POLICY shall be supported in order to trigger the operation by a RAN event, as well as REPORT/ CONTROL for Near-RT RIC to trigger the operation asynchronously
+
+REQ-E2-TS-FUN8
+
+E2 shall support the control of Idle mode mobility function in E2 nodes, including the configuration of the relevant parameters for idle mode procedures (e.g., Intra-frequency/inter-frequency/inter-RAT cell reselection priority)
+
+INSERT/CONTROL and POLICY shall be supported in order to trigger the operation by a RAN event, as well as REPORT/CONTROL for RIC to trigger the operation asynchronously
+
+REQ-E2-TS-FUN9
+
+E2 shall support the fetching of UE information including e.g.:
+
+UE ID [24]
+
+S-NSSAI
+
+QCI/5QI,
+
+UE capabilities (DC/CA)
+
+Active DRBs/QoS Flows
+
+REQ-E2-TS-FUN10
+
+E2 shall support the configuration and retrieval of measurements related to UE location and velocity that are reported by an individual UE, e.g.:
+
+LocationInfo, CommonLocationInfo
+
+Supported REPORT triggers shall include:
+
+Availability of new information e.g., reception of RRC measurement reports.
+
+REQ-E2-QoS-FUN1
+
+E2 interface shall support retrieval of the UE context related information from E2 Nodes:
+
+UE ID [24]
+
+Slicing info, such as S-NSSAI
+
+QoS info, such as E-RAB Level QoS Parameters (4G, NSA) or QoS Flow Level QoS Parameters (NG-RAN)
+
+Radio bearers related info, such as established DRB ID, flow-to-DRB mapping
+
+RLC/MAC/PHY related info, such as LCID, scheduling related parameters
+
+UE capability info, such as CA (carrier aggregation) and DC (dual connectivity) capabilities
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-QoS-FUN2
+
+E2 interface shall support retrieval of the following measurements info from E2 Nodes:
+
+UE-level
+
+Radio channel info available at DU: CQI (TS 28.552 [7])
+
+Radio channel info available at CU-CP for serving cell: RSRP, RSRQ, SINR (TS 36.331 [12], TS 38.331 [19]), including from periodical and/or event triggered measurement report (A1-A6, B1-B2).
+
+Radio channel info available at CU-CP for neighboring cells: RSRP, RSRQ, SINR (TS 36.331 [12], TS 38.331 [19]), including from periodical and/or event triggered measurement report (A1-A6, B1-B2).
+
+Layer-2: DL/UL UE PRB used for data traffic, Average DL UE throughput in gNB, Distribution of DL UE throughput in gNB, Percentage of unrestricted DL UE data volume in gNB, Packet Delay and RAN part packet delay components, Packet Delay, Data Volume (TS 36.314 [10]), DL PDCP occupied buffer size, DL unused PDCP buffer size, Packet Loss Rate per DRB (TS 38.314 [17]) and per logical channel
+
+Cell-level
+
+Layer-2: CQI, MCS Distribution in PDSCH, DL/UL Total PRB usage, Distribution of DL/UL Total PRB usage, DL/UL PRB used for data traffic, DL/UL Total available PRB, Total number of DL/UL TBs, Total error number of DL/UL TBs, Average DL UE throughput in gNB, Distribution of DL UE throughput in gNB, Percentage of unrestricted DL UE data volume in gNB, Packet Delay, Mean number of Active UEs in the DL/UL per cell, Max number of Active UEs in the DL/UL per cell (so far TS 28.552 [7]), DL/UL PRB usage for traffic, DL/UL Total PRB usage, Distribution of DL/UL Total PRB usage, DL/UL PRB full utilization, Total number of DL/UL TBs, Total error number of DL/UL TBs, Average number of Active UEs (so far TS 32.425 [8]), RAN part packet delay components (TS 38.314 [17]), Packet Delay (TS 36.314 [10]), DL/UL Cell PDCP SDU Data Volume, Packet Loss Rate, DL Packet Drop Rate (TS 28.552 [7], TS 32.425 [8])
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-QoS-FUN3
+
+E2 interface shall support the control of Radio Bearer related functions in E2 nodes, including configuration/modification of the following:
+
+DRB QoS (TS 38.473 [22], TS 23.501 [4])
+
+QoS flow mapping (TS 38.473 [22])
+
+Logical channel configuration (TS 38.331 [19], TS 36.331 [12])
+
+Radio admission control (TS 38.331 [19], TS 36.331 [12])
+
+Change of bearer termination point (MN or SN) and/or bearer types (MCG/SCG/split) (TS 37.340 [14]); Control of split ratio for a split bearer; Control of packet duplication and number of legs (TS 36.300 [9], TS 38.300 [15])
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-QoS-FUN4
+
+E2 interface shall support the control of Resource Allocation function in E2 nodes, including configuration/modification of the following:
+
+DRX parameters (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12]) such as long DRX cycle, short DRX cycle, short DRX timer.
+
+SR (scheduling request) periodicity (TS 38.331 [19], TS 36.331 [12]) such as sr-ProhibitTimer, sr-TransMax.
+
+SPS (semi-persistent scheduling) parameters (TS 38.331 [19], TS 36.331 [12]), such as SPS-Config (DL) and ConfiguredGrantConfig (UL)
+
+Slice level PRB quota (TS 28.541 [5])
+
+CQI table (TS 38.214 [16]) with target block error rate
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-QoS-FUN5
+
+E2 interface shall support the control of Radio Access related functions in E2 nodes, including configuration/modification of the following:
+
+Access control (cell-level, UE-level, slice-level), such as RACH Backoff, RRC Connection Reject, RRC Connection Release, Access Barring, etc.
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-QoS-FUN6
+
+E2 interface shall support the control of Mobility management function in E2 nodes, including configuration/modification of the following:
+
+Handover
+
+Handover Restriction List
+
+Carrier Aggregation (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+MR-DC, including (NG)EN-DC, NE-DC, NR-DC (TS 38.473 [22], TS 38.331 [19], TS 36.331 [12])
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-SLA-FUN1
+
+E2 shall support retrieval over E2 (read or receive via REPORT) of the following:
+
+Cell level and/or slice level configuration parameters
+
+Supported REPORT triggers shall include:
+
+Modification of cell level and/or slice configuration parameters
+
+REQ-E2-SLA-FUN2
+
+E2 shall support the configuration (including range and granularity) and retrieval of cell or slice related measurements in the nomenclature specified in 3GPP 28.552 [7], 3GPP 32.425 [8], 3GPP 36.314 [10], 3GPP 36.423 [13], 3GPP 38.314 [17], 3GPP 38.423 [20], 3GPP 38.463 [21] and 3GPP 38.473 [22]. These include:
+
+DL/UL Total PRB Usage, Distribution of DL/UL Total PRB Usage, DL/UL total available PRB, RRC Connection Number, Available RRC Connection Capacity Value, Mean and Maximum Number of Active UEs in the DL/UL per DRB
+
+DL/UL PRB usage per slice, Slice Available Capacity Value
+
+Supported REPORT triggers shall include:
+
+Availability of new information e.g., new load measurement generated
+
+Threshold crossing
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-SLA-FUN3
+
+E2 shall support the fetching of UE information including e.g.:
+
+UE ID
+
+PLMN, S-NSSAI(s)
+
+DRB related information
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-SLA-FUN4
+
+E2 interface shall support the configuration and retrieval of individual UE measurements, including the following:
+
+RSRP, RSRQ
+
+CQI
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-SLA-FUN5
+
+E2 interface shall support the control of slice resource allocation in E2 nodes, including configuration/modification of the following:
+
+Per-slice dedicated PRB allocation percentages for downlink and uplink
+
+Per-slice maximum PRB allocation percentages for downlink and uplink
+
+Per-UE-per-slice maximum PRB allocation percentages for downlink and uplink
+
+Per-slice indication of resource sharing allowance to achieve utilization of unused slice resources by other network slices
+
+Per-slice priority values to achieve scheduling prioritization among network slices with different priorities
+
+Applicable
+
+RIC services:
+
+REPORT
+
+CONTROL
+
+REQ-E2-SLA-FUN6
+
+E2 interface shall support the slice-level control of radio resource management related functions in E2 nodes, including the following:
+
+Slice based radio admission control
+
+Slice based radio bearer control
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-MM-FUN1
+
+E2 shall support retrieval over E2 (read or receive via REPORT) of the following:
+
+Beam level configuration parameters, such as beam pattern information (TS 28.541 [6] section 4.3.40)
+
+Supported REPORT triggers shall include:
+
+Modification of the configuration parameters
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-MM-FUN2
+
+E2 shall support retrieval from E2 node of DL L1 measurements reported by individual UE, e.g.:
+
+RSRP-SS measurements (TS 38.133 [28], TS 38.215 [29])
+
+SINR-SS measurements (TS 38.133 [28], TS 38.215 [29])
+
+Supported REPORT triggers shall include:
+
+Availability of new information
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-MM-FUN3
+
+E2 shall support retrieval from E2 node of UL L1 measurements reported for individual UE, e.g.:
+
+SRS RSRP measurements (TS 38.133 [28], TS 38.215 [29])
+
+Supported REPORT triggers shall include:
+
+Availability of new information
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-MM-FUN4
+
+E2 shall support retrieval from E2 node of L3 mobility measurements reported per beam/beam group, e.g.:
+
+Number of too early HOs (TS 28.552 [7])
+
+Number of too late HOs (TS 28.552 [7])
+
+Number of HOs to wrong cell (TS 28.552 [7])
+
+Number of requested legacy HO executions (HO attempts) (TS 28.552 [7])
+
+Number of successful legacy HO executions (TS 28.552 [7])
+
+Number of failed legacy HO executions (TS 28.552 [7])
+
+Per UE event mobility failure indication with root cause (too early HO, too late HO, HO to wrong cell) and number of requested or number of successful HO executions at the time of failure
+
+Supported REPORT triggers shall include
+
+For mobility KPIs, periodic reporting
+
+For mobility failure indication, message event trigger
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-MM-FUN5
+
+E2 shall support retrieval of UE Context Information from E2 node for individual UE, e.g.:
+
+UE ID
+
+SRS Periodicity (TS 38.331 [19])
+
+Supported REPORT triggers shall include:
+
+Configuration or reconfiguration of the UE Context Information
+
+Applicable
+
+RIC services:
+
+REPORT, QUERY
+
+REQ-E2-MM-FUN6
+
+E2 interface shall support the control of beamforming in E2 nodes, including the following:
+
+Configuration of non-Grid of beams beamforming mode, separately for Single User- and Multi-user MIMO, on a per-UE basis
+
+Applicable
+
+RIC services:
+
+CONTROL
+
+POLICY
+
+REQ-E2-MM-FUN7
+
+E2 interface shall support the control of L3 mobility configuration in E2 nodes, including the following:
+
+Cell Individual Offset (CIO), Time To Trigger (TTT), UE Timer 310 (T310) on a per beam/beam group, per UE/UE group basis (TS 38.331 [19])
+
+Applicable
+
+RIC services:
+
+POLICY
+
+REQ-E2-MM-FUN8
+
+E2 interface shall support the configuration of beam grouping information in E2 nodes, including the following:
+
+List of beam group IDs with associated beam IDs
+
+Applicable
+
+RIC services:
+
+POLICY
+
+REQ-E2-MM-FUN9
+
+E2 shall support request and reporting of the number of supported non-GoB BF modes in O-DU
+
+Applicable
+
+RIC services:
+
+QUERY
+
+REQ-E2-MM-FUN10
+
+E2 shall support retrieval from E2 node of average DL/UL per-UE throughput in gNB with associated non-GoB BF mode and MIMO mode (SU/MU)
+
+Applicable
+
+RIC services:
+
+REPORT
+
+REQ-E2-QoE-FUN1
+
+E2 shall support UE Context Information including e.g.:
+
+UE ID
+
+List of S-NSSAI
+
+List of QoS related ID, e.g., 5QI, QFI
+
+REQ-E2-QoE-FUN2
+
+E2 interface shall support retrieval of UE-level or cell-level measurement, including e.g.:
+
+Cell-level:
+
+Layer-2: MCS Distribution in PDSCH (TS 28.552 [7] 5.1.1.12.1), DL/UL Total PRB usage (TS 28.552 [7] 5.1.1.2.1-2; TS 32.425 [8] 4.5.3-4), Distribution of DL/UL Total PRB usage (TS 28.552 [7] 5.1.1.2.3-4; TS 32.425 [8] 4.5.10-11), DL/UL PRB used for data traffic (TS 28.552 [7] 5.1.1.2.5 and 5.1.1.2.7), DL/UL PRB usage for traffic (TS 32.425 [8] 4.5.1-2), DL/UL Total available PRB (TS 28.552 [7] 5.1.1.2.6 and 5.1.1.2.8), DL/UL PRB full utilization (TS 32.425 [8]; 4.5.9.1-2), Total number of DL/UL TBs (TS 28.552 [7] 5.1.1.7.3 and 5.1.1.7.8; TS 32.425 [8] 4.5.7.1 and 4.5.7.3), Total error number of DL/UL TBs (TS 28.552 [7] 5.1.1.7.4 and 5.1.1.7.9, TS 32.425 [8] 4.5.7.2 and 4.5.7.4), Average DL UE throughput in gNB (TS 28.552 [7] 5.1.1.3.1), Distribution of DL UE throughput in gNB (TS 28.552 [7] 5.1.1.3.2), Packet Delay (TS 28.552 [7] 5.1.3.3), RAN part packet delay components (TS 38.314 [17] 4.2.1.2), Packet Delay (TS 36.314 [10] 4.1.4), DL/UL Cell PDCP SDU Data Volume (TS 28.552 [7] 5.1.2.1 for non-split gNB, 5.1.3.6.2 for split gNB; per PLMN ID and per E-RAB QoS profile (QCI, ARP and GBR), TS 32.425 [8] 4.4.7), Mean number of Active UEs in the DL/UL per cell (TS 28.552 [7] 5.1.1.23.1 and 5.1.1.23.3), Max number of Active UEs in the DL/UL per cell (TS 28.552 [7] 5.1.1.23.2 and 5.1.1.23.4), Average number of Active UEs (TS 32.425 [8] 4.4.2), Packet Loss Rate (TS 28.552 [7] 5.1.3.1), Packet Loss Rate (TS 32.425 [8] 4.4.4), DL Packet Drop Rate (TS 28.552 [7] 5.1.3.2), DL Packet Drop Rate (TS 32.425 [8] 4.4.3.2)
+
+UE-level
+
+Radio channel info: SINR (TS 38.331 [19], TS 36.331 [12]), RSRP (TS 38.331 [19], TS 36.331 [12]), RSRQ (TS 38.331 [19], TS 36.331 [12])
+
+Layer-2: CQI, MCS, DL/UL UE throughput, DL/UL UE PRB usage, RLC buffer size, RLC occupied buffer, RLC unused buffer, UL/DL MAC rate, Packet Delay, Data volume (per UE, TS 36.314 [10] 4.1.8，TS 38.314), Packet Loss Rate per DRB (TS 38.314 [17] 4.2.1.5) and per UE, DL Packet Drop Rate, Total number of RLC SDUs/PDUs
+
+Slice-level
+
+Layer-2: DL/UL UE PRB usage, RLC buffer size, RLC occupied buffer, RLC unused buffer, UL/DL MAC rate, Packet Delay, Data volume (per QCI/5QI, TS 36.314 [10] 4.1.8，TS 38.314), Packet Loss Rate per DRB (TS 38.314 [17] 4.2.1.5) and per UE, DL Packet Drop Rate (TS 28.552 [7] 5.1.3.2), Total number of RLC SDUs/PDUs
+
+REQ-E2-ES-FUN1
+
+E2 interface shall support forwarding the guidance of cell and carrier switching off/on from the Near-RT RIC to the E2 node.
+
+REPORT/CONTROL shall be supported for Near-RT RIC to trigger the operation asynchronously where appropriate
+
+REQ-E2-ES-FUN2
+
+E2 interface shall support the configuration and retrieval of
+
+energy saving related measurement and cell state information from the E2 Node.
+
+4.1.3	RAI Exposure Interface functional requirements
+
+Table 4.1.3-1 RAI Exposure Interface Functional Requirements
+
+REQ
+
+Description
+
+Note
+
+REQ-RAI-QoE-FUN1
+
+RAI exposure interface shall support request for QoE related analytics from RAI service consumers, with request scopes including:
+
+List of UE ID
+
+REQ-RAI-QoE-FUN2
+
+RAI exposure interface shall support exposure to RAI service consumers the following QoE related information:
+
+Predicted RAN performance
+
+minimum/maximum/average throughput
+
+minimum/maximum/average latency
+
+average packet loss rate
+
+QoE prediction (FFS)
+
+Prediction related information
+
+Confidence
+
+validity period
+
+4.2	Non-functional requirements
+
+4.2.1	Near-RT RIC non-functional requirements
+
+Void
+
+4.2.2	E2 Interface non-functional requirements
+
+Void
+
+Annex A (informative): Example Use Cases
+
+A.1	Example Use Cases for RAN Slice SLA Assurance
+
+A.1.1	Downlink and Uplink Throughput Per Slice
+
+The Downlink and Uplink Throughput Per Network Slice are NG.116 attributes used in the definition and deployment of a network slice. They become maxDlThptPerSlice and maxUlThptPerSlice parameters in A1 Polic(ies). The maximum downlink throughput per slice defines the aggregated data rate in the downlink for all UEs together in the network slice. This parameter is defined in GSMA GST NEST NG.116 Downlink throughput per network slice in clause 3.4.5[23]. See also 3GPP TS28.541[6] clause 6.3.4 which defines the SliceProfile that captures some of the parameters from GSMA depending on the slice type. The parameter places an upper limit on the capacity of the slice so that the slice does not over-utilize available network resources and thereby provides a target to guide resource utilization.
+
+The following explanation describes the relevance to the Near-RT RIC. These attributes are sent by the Non-RT RIC to the Near-RT RIC(s) together with the scope identifier (S-NSSAI) and optional Cell List or Tracking Area List. The Near-RT RICs split the A1 Policy guidance from the Non-RT RIC. Thus, the subtending Near-RT RICs each provide guidance to the cells of their E2 Nodes (O-DU, O-CU-UP, O-CU-CP) involved in the slice.
+
+For example, suppose there is an SLA parameter, Downlink throughput per network slice, with a value of 600,000 kilobits per second (kbps). The Non-RT RIC in this case has three sub-tending Near-RT RICs. Then, the Non-RT RIC might split the SLA parameter of 600,000 kbps into three A1 Policies: maxDlThptPerSlice = 120,000 kbps for Near-RT RIC #1; maxDlThptPerSlice = 180,000 kbps for Near-RT RIC #2, and maxDlThptPerSlice = 300,000 kbps for Near-RT RIC #3 for the respective slice. This example use case can be seen in Figure A.1.1-1.
+
+Figure A.1.1-1: A1 Policy Decomposition Example
+
+The consumer of the maxDlThptPerSlice and maxUlThptPerSlice parameters is the Near-RT RIC via A1 policy. Slice SLA assurance-related xApp(s), within the Near-RT RIC, can apply or utilize this parameter to provide control of throughput within the E2 Nodes. The xApp(s) can utilize E2 interface to adjust throughput-related RAN parameters, such as adjusting PRB allocation levels The Near-RT RIC has influence over the operation of cells in a geographical area. The adjustment of the PRB allocation levels in MAC schedulers directly impact the throughput achieved by the slice. Therefore, this parameter at the RAN level influences the throughput. There might be other throughput-related parameters that could be employed, such as MCS, which is left for future study.
+
+3GPP Release 17 will introduce the concept of a Network Slice Admission Control Function (NSACF), see reference [(TR23.700-40 S2-1908583)] and reference [(TS23.501 v17.1.1 clause 5.15.11)]. The purpose of the NSACF is to enforce some of the slice SLA parameters from a 5G Core perspective. The NSACF handles slice-specific user admission control into the network based on NG.116 criterion. However, the NSACF has no knowledge of RAN and RAN resources; thus, it cannot control RAN resources. Therefore, there is no interaction between NSACF and the handling of these parameters by the Near-RT RIC. Thus, the usage of the SLA-related parameters by the Near-RT RIC xApp(s) are in the scope of gNBs and will complement the 5GC SLA enforcement but from the perspective of the RAN.
+
+A.1.2 Guaranteed Downlink and Uplink Throughput Per Slice
+
+The Guaranteed Downlink Throughput Quota and Guaranteed Uplink Throughput Quota are attributes used in the definition and deployment of a network slice in NG.116. They are used in A1 Policies as guaDlThptPerSlice and guaUlThptPerSlice. The guaranteed downlink/uplink throughput quota describes the guaranteed throughput or data rate supported by the network slice for the aggregate of all GBR QoS flows in downlink/uplink belonging to the set of all UEs using the network slice. This parameter is defined in GSMA GST NEST NG.116 Downlink/Uplink throughput per network slice in clause 3.4.5 [23]. See also 3GPP TS28.541 clause 6.3.4 [6] which defines the SliceProfile which captures some of the parameters from GSMA depending on the slice type. The Maximum Ul/Dl Throughput per Network Slice parameters (section 3.3.3.1.1) place an upper limit on the capacity of the slice while the Guaranteed Ul/Dl Throughput Quota parameters ensure a certain level of throughput. Thus, these two parameters complement each other: one giving a lower bound and the other giving an upper bound. For the upper bound (Maximum Ul/Dl Throughput per Network Slice) this ensures that the slice does not over-utilize available network resources while for the lower bound (Guaranteed Dl/Ul Throughput Quota) meets a minimum throughput for the slice.
+
+These attributes are sent by the Non-RT RIC to the Near-RT RIC(s) together with the scope identifier (S-NSSAI) and optional Cell List or Tracking Area List. The Near-RT RICs split the A1 Policy guidance from the Non-RT RIC. Thus, the subtending Near-RT RICs each provide guidance to the cells of the E2 Nodes (O-DU, O-CU-UP, O-CU-CP) involved in the slice.
+
+For example, suppose there is an SLA parameter, Guaranteed Uplink Throughput Quota, with a value of 1,000,000 kilobits per second (kbps). The Non-RT RIC in this case has three sub-tending Near-RT RICs. Then, the Non-RT RIC might split the SLA parameter of 1,000,000 kbps into three A1 Policies: guaUlThptPerSlice = 170,000 kbps for Near-RT RIC #1; guaUlThptPerSlice = 230,000 kbps for Near-RT RIC #2, and guaUlThptPerSlice = 600,000 kbps for Near-RT RIC #3 for the respective slice.
+
+The consumer of the guaUlThptPerSlice and guaDlThptPerSlice parameters is the Near-RT RIC via A1 policy. Slice SLA assurance-related xApp(s), within the Near-RT RIC, can apply or utilize this parameter to provide control of and throughput within the E2 Nodes (O-CU-UP, O-CU-CP, O-DU). The xApp(s) can utilize E2 interface to adjust throughput-related RAN parameters, such as adjusting PRB allocation levels. The Near-RT RIC has influence over the operation of cells in a geographical area. The adjustment of the PRB allocation levels in MAC schedulers directly impacts the throughput achieved by the slice. Therefore, this parameter at the RAN level influences the throughput. There might be other throughput-related parameters that could be employed, such as MCS, which is left for future study.
+
+Annex (informative): Revision history
+
+Date
+
+Revision
+
+Description
+
+2023.03.17
+
+03.00.01
+
+Initial version towards v04.00
+
+Removed v03.00 revision history.
+
+Addition of CR:
+
+NOK.AO-2022.01.19-WG3-CR-0001-UCR-RAN Slice SLA Assurance Use Case-v11
+
+2023.05.03
+
+03.00.02
+
+Addition of CR:
+
+FJT-2023.01.23-WG3-CR-0002-WG3UCR_Interference_Control-v02
+
+2023.07.11
+
+03.00.03
+
+Addition of CR:
+
+RMI.AO-2023.04.28-WG3-CR-0001-UCR-Energy saving Cell & Carrier Shutdown Use Case-v07
+
+2023.07.26
+
+03.00.04
+
+WG3 review comments are addressed, and approval is completed. All changes accepted, clean version.
+
+2023.07.26
+
+04.00
+
+Final version ready for TSC approval and publication.
+
+Annex (informative): History
+
+Date
+
+Revision
+
+Description
+
+2021.08.10
+
+01.00
+
+Version 1.0 (Details of v1.0 content can be found in v1.0 “Revision History”)
+
+2022.08.02
+
+02.00
+
+Version 2.0 (Details of v2.0 content can be found in v2.0 “Revision History”)
+
+2022.11.18
+
+03.00
+
+Version 3.0 (Details of v3.0 content can be found in v3.0 “Revision History”)
+
+_______________________________________________________________________________________________ © 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.            72

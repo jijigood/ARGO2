@@ -1,0 +1,2528 @@
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Technical Specification
+
+O-RAN Working Group 1
+Slicing Architecture
+
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form w ithout the prior
+written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification
+for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information
+provided that you acknowledge O -RAN ALLIANCE as the source  of the material and that you inform the third party that these conditions
+apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+.
+.
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      2
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Contents  1
+Chapter 1. Introduction ................................................................................................................................... 4 2
+1.1 Scope ................................................................................................................................................................. 4 3
+1.2 References.......................................................................................................................................................... 4 4
+1.3 Definitions and Abbreviations ........................................................................................................................... 6 5
+1.3.1 Definitions ................................................................................................................................................... 6 6
+1.3.2 Abbreviations ............................................................................................................................................... 7 7
+Chapter 2. Slicing Overview ........................................................................................................................... 9 8
+Chapter 3. High-Level O-RAN Slicing Use Cases ....................................................................................... 10 9
+3.1 O-RAN Slice Subnet Management and Provisioning Use Cases .................................................................... 10 10
+3.1.1 O-RAN Slice Subnet Instance Creation ..................................................................................................... 11 11
+3.1.2 O-RAN Slice Subnet Instance Activation .................................................................................................. 12 12
+3.1.3 O-RAN Slice Subnet Instance Modification .............................................................................................. 13 13
+3.1.4 O-RAN Slice Subnet Instance Deactivation .............................................................................................. 14 14
+3.1.5 O-RAN Slice Subnet Instance Termination ............................................................................................... 15 15
+3.1.6 O-RAN Slice Subnet Instance Configuration ............................................................................................ 16 16
+3.1.7 O-RAN Slice Subnet Feasibility Check ..................................................................................................... 17 17
+3.2 O-RAN Slicing Use Cases ............................................................................................................................... 18 18
+3.2.1 Use Case 1: RAN Slice SLA Assurance .................................................................................................... 18 19
+3.2.2 Use Case 2: Multi-vendor Slices ................................................................................................................ 19 20
+3.2.3 Use Case 3: NSSI Resource Allocation Optimization ............................................................................... 21 21
+Chapter 4. O-RAN Slicing Principles and Requirements ............................................................................. 24 22
+4.1 General Principles ............................................................................................................................................ 24 23
+4.2 Slicing Requirements ....................................................................................................................................... 24 24
+4.2.1 Functional Requirements ........................................................................................................................... 24 25
+4.2.2 Non-Functional Requirements ................................................................................................................... 27 26
+Chapter 5. O-RAN Reference Slicing Architecture ...................................................................................... 28 27
+5.1 Non-RT RIC .................................................................................................................................................... 28 28
+5.2 Near-RT RIC ................................................................................................................................................... 29 29
+5.3 O-RAN Central Unit (O-CU)........................................................................................................................... 29 30
+5.4 O-RAN Distributed Unit (O-DU) .................................................................................................................... 29 31
+5.5 A1 Interface ..................................................................................................................................................... 30 32
+5.6 E2 Interface ...................................................................................................................................................... 30 33
+5.7 O1 Interface ..................................................................................................................................................... 30 34
+5.8 O2 Interface ..................................................................................................................................................... 31 35
+5.9 Transport Network Slicing ............................................................................................................................... 31 36
+Chapter 6. O-RAN Slice Subnet Provisioning Procedures ........................................................................... 34 37
+6.1 O-RAN Slice Subnet Instance (O-NSSI) Allocation Procedure ...................................................................... 34 38
+6.2 O-RAN Slice Subnet Instance (O-NSSI) Modification Procedure .................................................................. 36 39
+6.3 O-RAN Slice Subnet Instance (O-NSSI) Deallocation Procedure ................................................................... 38 40
+Annex A (informative): Additional Information .............................................................................................. 41 41
+A.1 Implementation Options .................................................................................................................................. 41 42
+A.1.1 3GPP and ETSI NFV-MANO based O-RAN Slicing Architecture Implementation Option ..................... 41 43
+A.1.2 ONAP based O-RAN Slicing Architecture Implementation Option .......................................................... 42 44
+B.1 Transport Network Slicing Use Cases ............................................................................................................. 42 45
+C.1 Slicing and 3GPP Slice Modeling Terminology Awareness ........................................................................... 50 46
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      3
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+C.1.1 Conceptual Differences Between 3GPP SA2 and SA5 .............................................................................. 50 1
+C.1.2 Name Containment Limitation .................................................................................................................. 50 2
+C.1.3 Network Slice Subnet is a Purposeful Generic Collection ......................................................................... 51 3
+C.1.4 Slicing Instance Example ........................................................................................................................... 52 4
+C.1.5 NSSI Slice Profile and PLMNInfo............................................................................................................. 53 5
+C.1.6 Managed Functions Have a List of PLMNInfo .......................................................................................... 54 6
+C.1.7 Single Network Slice Selection Assistance Information (S-NSSAI) ......................................................... 55 7
+D.1 RAN Management services exposure for Multi-Operator Slice ...................................................................... 55 8
+D.1.1 Management services exposure for Multi-Operator slice - Relevant Standards ........................................ 56 9
+D.1.2 Concepts of management services exposure for Multi-Operator slice ....................................................... 57 10
+D.1.3 Management aspects of external exposure of MnS related to RAN slicing  ............................................... 58 11
+D.1.4 Multi-Operator slice: high level use cases and potential requirements for exposure fo MnS related to 12
+RAN slicing ............................................................................................................................................... 60 13
+Revision History ............................................................................................................................................... 64 14
+History .............................................................................................................................................................. 64 15
+ 16
+  17
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      4
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 1.  Introduction 1
+1.1 Scope 2
+This Technical Specification has been produced by O-RAN Alliance. 3
+The contents of the present document are subject to continuing work within O-RAN WG1 Slicing Task Group  and may 4
+change following formal O-RAN approval. In the event that O-RAN Alliance decides to modify the contents of the present 5
+document, it will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version 6
+number as follows: 7
+Release x.y.z 8
+where: 9
+x the first digit  is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 10
+etc. (the initial approved document will have x=01). 11
+y the second digit is incremented when editorial only changes have been incorporated in the document . 12
+z the third digit included only in working versions of the document indicating incremental changes during t he 13
+editing process. 14
+The current document describes the high level O -RAN slicing related use cases, requirements and architecture. While 15
+some of the requirements are derived from use cases, some of the relevant SDO requirements are captured as they have 16
+impact on O -RAN functions. Along with requirements and reference slicing architecture, slicing related impact to O -17
+RAN functions and interfaces are captured as well. 18
+1.2 References 19
+The following documents contain provisions which, through reference in this tex t, constitute provisions of the present 20
+document. 21
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 22
+non-specific. 23
+- For a specific reference, subsequent revisions do not apply. 24
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 25
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 16. 26
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications” 27
+[2] 3GPP TS 22.261: “Technical Specification Group Services and System Aspects; Service requirements for the 5G 28
+system; Stage 1”, Release 16, December 2019. 29
+[3] 3GPP TS 23.003 “Technical Specification Group Core Network and Terminals; Numbering, ad dressing and 30
+identification” Release 16, June 2021. 31
+[4] 3GPP TS 23.501: “Technical Specification Group Services and System Aspects; System Architecture for the 5G 32
+System; Stage 2”, Release 16, December 2019. 33
+[5] 3GPP TS 28.526: “Technical Specification Group Services and System Aspects; Telecommunication management; 34
+Life Cycle Management (LCM) for mobile networks that include virtualized network functions; Procedures”, 35
+Release 15, December 2018. 36
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      5
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+[6] 3GPP TS 28.531: “Management and orchestration; Provisioning”, Release 16, March 2020. 1
+[7] 3GPP TS 28.532: “Management and orchestration; Generic Management Services”, Release 16, April 2021.  2
+[8] 3GPP TS 28.533: “Technical Specification Group Services and System Aspects; Management and orchestration; 3
+Architecture framework”, Release 16, April, 2021. 4
+[9] 3GPP TS 28.541: “ Management and orchestration; 5G Network Resource Model (NRM); Stage 2 and stage 3 ”, 5
+Release 16, January 2020. 6
+[10] 3GPP TS 28.552: “Technical Specification Group Services and System Aspects; Management and orchestration; 7
+5G performance measurements”, Release 16, January 2020. 8
+[11] 3GPP TR 28.801: “Study on management and orchestration of network slicing for next generation network”, 9
+Release 15, January 2018. 10
+[12] 3GPP TS 32.300 Technical Specification Group Services and System Aspects; Telecommunication management; 11
+Configuration Management (CM); Name convention for managed objects. Release 16. July 2020.  12
+[13] 3GPP TS 38.300: “NR and NG-RAN Overall Description”, Release 16, January 2020. 13
+[14] ETSI GS NFV 003: “ Network Functions Virtualisat ion (NFV); Terminology for Main Concepts in NFV ”, 1.4.1, 14
+August 2018. 15
+[15] NGMN Alliance, 5G P1 Requirements & Architecture “Description of Network Slicing Concept.” Version 1.0.8. 16
+September 2016. 17
+[16] O-RAN.WG1.O1-Interface.0-v04.00: “O-RAN Operations and Maintenance Interface Specification”. 18
+[17] O-RAN.WG1.OAM-Architecture-v04.00: “O-RAN WG1 Operations and Maintenance Architecture”. 19
+[18] ORAN.WG2.A1.GA&P-v01.00: “O-RAN Working Group 2; (A1 interface: General Aspects and Principles)”. 20
+[19] ORAN.WG3.E2GAP-v01.00: “O -RAN Wo rking Group 3; Near -Real-time RAN Intelligent Controller 21
+Architecture & E2 General Aspects and Principles”. 22
+[20] O-RAN-WG6.CAD-V02.01: “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”. 23
+[21] O-RAN.WG6.ORCH-USE-CASES-v02.00: “Orchestration Use Cases and Requirements for O -RAN Virtualized 24
+RAN”. 25
+[22] O-RAN.WG9.XPSAAS-v01.00: “O-RAN Open Transport Working Group 9 Xhaul Packet Switched Architectures 26
+and Solutions”. 27
+[23] O-RAN-WG9.XTRP-REQ-v01.00: “O-RAN Open Xhaul Transport Working Group 9 Xhaul Transport Network 28
+Requirements”.  29
+[24] O-RAN_Study_ORAN_Slicing_Technical_Report.v02.00: “Study on O-RAN Slicing”, Technical Report. 30
+[25] 3GPP TS 23.222: “Functional architecture and information flows to support Common API Framework for 3GPP 31
+Northbound APIs; Stage 2”, Release 17, June 2021. 32
+[26] 3GPP TS 29.222: “Common API Framework for 3GPP Northbound APIs”, Release 17, December 2021.  33
+[27] 3GPP TS 28.533: “Management and orchestration; Architecture framework”, Release 17, March 2022.  34
+[28] 3GPP TS 28.824: “Study on network slice management capability exposure”, Release 17, July 2022. 35
+[29] 3GPP TS 23.501: “System architecture for the 5G System (5GS)”, Release 17, June 2022  36
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      6
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+[30] 3GPP TS 28.530: “Management and orchestration; Concepts, use cases and requirements”, Release 17, September 1
+2022 2
+[31] 3GPP TR 28.811: “Management and orchestration; Study on Network Slice Management Enhancement”, Release 3
+17, December 2021 4
+[32] 3GPP TR 23.700-99: “Study on Network Slice Capability Exposure for Application Layer Enablement ”, Release 5
+18, September 2022 6
+[33] Slicenet, https://5g-ppp.eu/slicenet/ 7
+ 8
+1.3 Definitions and Abbreviations 9
+1.3.1 Definitions 10
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. 11
+A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP 12
+TR 21.905 [1]. 13
+ 14
+A1: Interface between non -RT RIC and Near -RT RIC to enable policy -driven guidance of Near -RT RIC 15
+applications/functions, and support AI/ML workflow. 16
+A1 policy: Type of declarative policies expressed using formal statements that enable the non -RT RIC function in the 17
+SMO to guide the near-RT RIC function, and hence the RAN, towards better fulfilment of the RAN intent. 18
+A1 Enrichment information: Information utilized by near-RT RIC that is collected or derived at SMO/non-RT RIC 19
+either from non-network data sources or from network functions themselves. 20
+E2:  Interface connecting the Near -RT RIC and one or more O -CU-CPs, one or more O -CU-UPs, and one or more O -21
+DUs. 22
+E2 Node: a logical node terminating E2 interface. In this version of the specification, O-RAN nodes terminating E2 23
+interface are: 24
+- for NR access: O-CU-CP, O-CU-UP, O-DU or any combination;  25
+- for E-UTRA access: O-eNB. 26
+FCAPS: Fault, Configuration, Accounting, Performance, Security. 27
+near-RT RIC: O-RAN near-real-time RAN Intelligent Controller: a logical function that enables near -real-time control 28
+and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface. 29
+non-RT RIC: O-RAN non-real-time RAN Intelligent Controller : a logical function that enables non -real-time control 30
+and optimization of RAN elements and resources, AI/ML workflow inclu ding model training and updates, and policy -31
+based guidance of applications/features in near-RT RIC. 32
+NMS: A Network Management System. 33
+Network Service : C omposition of Network Function(s) and/or Network Service(s), defined by its functional and 34
+behavioural specification [14] 35
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      7
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Network Slice: A Network Slice is a set of run -time network functions, and resources to run these network functions, 1
+forming a complete instantiated  logical network to meet certain network characteristics required by the Service 2
+Instance(s). See reference NGMN 5G P1 Description of a Network Slice [15]. Note: “En d-to-End” is often associated 3
+with term Network Slice, but it was deliberately excluded from this term because the “Ends” change based on the 4
+perspective of the user and is relative. 5
+Network Slice Instance (NSI) : A set of network functions and the resources for these network functions  which are 6
+arranged and configured, forming a complete logical network to meet certain network characteristics. See 3GPP TS23.501 7
+[4]. 8
+NetworkSliceSubnet MOI (NSSI) : A generic recursive collection or set allowing non -restricted grouping of Managed 9
+Functions and EP_Transport endpoint(s). Non -restricted means that it is not bound by name -containment rules of 10
+TS32.300 [12]. Each collection may have a “purpose” represented by the sliceProfile(s) associated with the collection. 11
+See Figure 6.2.1-1 of 3GPP 5G NRM TS28.541 [9]. 12
+ 13
+O-CU: O-RAN Central Unit 14
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting the RRC and the control plane part of the PDCP 15
+protocol. 16
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of the PDCP protocol and the 17
+SDAP protocol. 18
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional 19
+split. 20
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional 21
+split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH 22
+extraction).   23
+O1: Interface between the Service Management and Orchestration Framework and O-RAN managed elements 24
+O2: Interface between the Service Management and Orchestration Framework and the O -Cloud 25
+RAN: Generally referred as Radio Access Network. In terms of this document, any component  below near-RT RIC per 26
+O-RAN architecture, including O-CU/O-DU/O-RU. 27
+Resource isolation: regime of resource management when a resource used by one network slice instance cannot be shared 28
+with another network slice instance. See 3GPP TR 28.801 [11].  29
+Single Network Slice Selection Assistance Information (S-NSSAI): An S-NSSAI is comprised of an SST (Slice/Service 30
+type) and an optional SD (Slice Differentiator) field. See Clause 4.3.37 of 3GPP TS28.541 [9]. 31
+ 32
+ 33
+1.3.2 Abbreviations 34
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An 35
+abbreviation defined in the present document takes precedence over the definition of the same abbre viation, if any, in 36
+3GPP TR 21.905 [1].  37
+ 38
+eNB eNodeB (applies to LTE)  39
+gNB gNodeB (applies to NR) 40
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      8
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+KPI Key Performance Indicator  1
+KQI Key Quality Indicator 2
+Near-RT RIC O-RAN Near-Real-Time RIC 3
+NFMF Network Function Management Function 4
+Non-RT RIC O-RAN Non-Real-Time RIC 5
+NS Network Service 6
+NSMF Network Slice Management Function 7
+NSSMF Network Slice Subnet Management Function 8
+O-CU O-RAN Central Unit 9
+O-DU O-RAN Distributed Unit 10
+O-RU O-RAN Radio Unit  11
+PNF Physical Network Function 12
+PRB Physical Resource Block 13
+RIC O-RAN RAN Intelligent Controller 14
+RRM Radio Resource Management 15
+SDO Standards Developing Organizations (For ex: 3GPP, ETSI, ONAP, O-RAN) 16
+SMO Service and Management Orchestration 17
+VNF Virtual Network Function 18
+  19
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      9
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 2.  Slicing Overview 1
+Network Slicing is expected to play a critical role in 5G networks because of various use cases and services 5G will 2
+support. It allows a network operator to provide services tailored to customers’ requirements. Network slice is defined as 3
+a logical network with a bundle of specified network services over a common network infrastructure.  A single physical 4
+network is sliced into multiple virtual networks that can suppo rt different service types over a single RAN. 3GPP has 5
+standardized 4 different service types: eMBB, URLLC, MIoT and V2X  [3].  6
+3GPP defined 5G architecture and procedures containing network slicing and related concepts in Release 15. Furthermore, 7
+management and orchestration of 5G networks featuring slicing was defined in the 3GPP specifications. Other standard 8
+groups e.g. GSMA, ETSI NFV-MANO, ETSI ZSM and ONAP focus on the different aspects of network slicing. Further 9
+information regarding network slicing and other SDO’s contributions was discussed in the Study on O-RAN Slicing 10
+Technical Report [24]. 11
+A sample RAN slicing deployment of O-RAN network functions based on the select initial deployment option, option B 12
+as described in [20], is shown in Figure 2-1, with some of the network functions shared between RAN slice subnets (such 13
+as O-CU-CP, O-DU, O-RU) and some network functions dedicated to a particular RAN slice subnet (such as O-CU-UP). 14
+ 15
+Figure 2-1: Example O-RAN Slicing Deployment  16
+ 17
+ 18
+  19
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      10
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 3.  High-Level O-RAN Slicing Use Cases 1
+This section contains high-level O-RAN slicing use cases that O -RAN is expected to support. Slicing requirements will 2
+include the requirements derived from the specified use cases.   Additional use cases will be added as prioritized by the 3
+O-RAN community in future versions of this document. It should be noted that not all of the use cases presented here are 4
+currently supported by O-RAN specifications and these use cases will be addressed in future O-RAN work. 5
+3.1 O-RAN Slice Subnet Management and Provisioning Use 6
+Cases 7
+Network slicing is conceived to be an end -to-end feature that includes the core network, the transport network and the 8
+RAN. Although 3GPP has started defining network slicing support with Release 15, slicing in O-RAN needs to be further 9
+addressed in line with 3GPP to achieve deployable network slicing in an open RAN environment.   10
+Management aspects of network slicing such as Network Sli ce Instances (NSI) and Network Slice Subnet Instances 11
+(NSSI) are defined by 3GPP. While NSI refers to an end -to-end network slice, NSSI refers to a part of it such as a RAN 12
+slice subnet. The provisioning of network slicing includes the four phases which ar e preparation, commissioning, 13
+operation and decommissioning. The NSI/NSSI provisioning operations include:  14
+- Create an NSI/NSSI; 15
+- Activate an NSI/NSSI; 16
+- De-active an NSI/NSSI; 17
+- Modify an NSI/NSSI; 18
+- Terminate an NSI/NSSI. 19
+Further details of NSI and NSSI lifecycle management and provisioning can be found 3GPP TS28.531 [6], Section 4.1. 20
+This chapter provides the use cases and procedures necessary for O -RAN Slice Subnet Management that is in -line with 21
+3GPP Slice Management framework. For this purpose, use cases such as slice subnet creation, activation, modification, 22
+deactivation, termination, configuration and feasibility check are considered for O-RAN architecture. 23
+  24
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      11
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3.1.1 O-RAN Slice Subnet Instance Creation 1
+Table 3.1.1-1: O-RAN Slice Subnet Instance Creation Use Case 2
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal
+Creation of a new O -RAN network slice subnet instance (O -NSSI) or use an
+existing O -NSSI to satisfy the RAN slice subnet related requirements (see
+clause 5.1.2 in TS 28.531 [6]).
+
+Actors and Roles
+NSSMS_C such as NSMF, who acts as  an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF who acts as an example of
+network function management service provider.
+O-Cloud M&O, who acts as O -Cloud management and orchestration provider
+within SMO.
+Non-RT RIC
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_P is aware of O -Cloud M&O to manage the lifecycle of VNFs and
+interconnection between the VNFs and PNFs.
+Pre conditions VNF packages for virtualized O-RAN network functions to be included in the O-
+RAN slice subnet instance have been already on-boarded.
+Begins when  NSSMS_P receives request for a network slice subnet instance. The request
+contains network slice subnet related requirements.
+Step 1 (M)
+NSSMS_P checks the feasibility of the request, based on the received network
+slice subnet related requirements.
+O-RAN Slice
+Subnet Feasibility
+Check
+Step 2 (M) NSSMS_P decides to create a new O-NSSI or use an existing O-NSSI.
+Step 3 (M)
+If an existing O-NSSI is decided to be used, NSSMS_P may trigger modification
+of the existing O-NSSI to satisfy the network slice subnet related requirements.
+Go to “Step 11”.
+Otherwise, NSSMS_P triggers creation of a new O-NSSI, continue with Step 4
+O-RAN Slice
+Subnet Instance
+Modification Use
+Case
+Step 4 (M) NSSMS_P derives the requirements for the constituent NSSI(s).
+Step 5 (O)
+If the required O-NSSI contains constituent NSSI(s) managed by other
+NSSMS_P(s), NSSMS_P may trigger creation of respective constituent
+NSSI(s) through other NSSMS_P(s) which manages the constituent NSSI(s).
+In that case, NSSMS_P receives the constituent NSSI information from the
+other NSSMS_P(s) and associates the constituent NSSI(s) with the required O-
+NSSI.
+(O-RAN) Slice
+Subnet Instance
+Creation Use
+Case (to create
+constituent
+(O-)NSSI(s)
+managed by other
+NSSMS_P(s))
+Step 6 (M)
+NSSMS_P determines the service related requirements and triggers a service
+request to O -Cloud M&O for instantiation of virtual O -RAN network functions
+and virtual links within the determined O-Cloud(s).
+Based on  the service request, O-Cloud M&O performs corresponding NF
+instantiation procedures and virtual link establishment.
+FFS in WG6
+Step 7 (M) NSSMS_P associates the service response received from O-Cloud M&O with
+the corresponding O-NSSI.  FFS in WG6
+Step 8 (M) NSSMS_P uses (O -RAN) NF provisioning service exposed by NFMS_P to
+configure (O-)NSSI constituents. FFS in WG1
+Step 9 (M) NSSMS_P configures the O -NSSI MOI with each constituent (O -)NSSI MOI
+identifier. FFS in WG1
+Step 10 (M) NSSMS_P triggers O -RAN TN Manager coordination procedure to establish
+necessary links such as for A1, E2, and midhaul and fronthaul connectivity. FFS in WG9
+Step 11 (M) NSSMS_P notifies Non -RT RIC with network slice subnet requirements and
+respective O-NSSI information. FFS in WG2
+Step 12 (M) NSSMS_P notifies NSSMS_C with the resulting status of this process and
+relevant O-NSSI information.
+Ends when O-RAN O -NSSI and relevant O -RAN NFs are created, and Non -RT RIC is
+configured with slice requirements and O-NSSI information.
+Exceptions One of the steps identified above fails.
+Post Conditions O-NSSI is ready to satisfy the network slice subnet related requirements.
+Traceability REQ-SL-FUN14, REQ-SL-FUN20 - REQ-SL-FUN27
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      12
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3.1.2 O-RAN Slice Subnet Instance Activation 1
+Table 3.1.2-1: O-RAN Slice Subnet Instance Activation Use Case 2
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal Activation of an O -RAN network slice subnet instance (O -NSSI) (see clause
+5.1.10 in TS 28.531 [6]).
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF  who acts as an example  of
+network function management service provider.
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_P is providing services to authorized consumers.
+Pre conditions
+An O-NSSI has already been created and it is inactive.
+As an example, the O -NSSI may contain inactive O -RAN NFs:- Near-RT
+RIC is installed and active
+- O-CU-CP installed (i .e. operationalState = enabled), but not yet
+activated (i.e. administrativeState = locked).
+- O-CU-UP installed (i.e. operationalState = enabled), but not yet
+activated (i.e. administrativeState = locked).
+- O-DU installed (i.e. operationalState = enabled), but not yet activated
+(i.e. administrativeState = locked) (see figure B.2.2 in TS 28.541
+[9]).
+- O-RU physically installed (i.e. operationalState = enabled), but not
+yet activated (i.e. administrativeState = locked).
+
+NOTE: The O-CU-CP, O-CU-UP, O-DU and O-RU are not shared by other O-
+NSSI, since they are not yet activated. Near-RT RIC has already been
+activated for other services.
+
+Begins when  NSSMS_P decides to activate the  O-NSSI based on the received network slice
+subnet related request from its authorized consumer NSSMS_C.
+Step 1 (M)
+NSSMS_P receives a request from NSSMS_C to activate the O-NSSI (via NSSI
+Provisioning service with operation modifyMOIAttributes (see table 6.2-1 in TS
+28.531 [6]) to change administrativeState of the O-NSSI to unlocked.)
+
+Step 2 (M)
+NSSMS_P identifies the inactive constituents within the O-NSSI and decides to
+activate those constituents which can be NFs or NSSI.
+As an example, NSSMS_P activates the following inactive O -RAN NF
+constituents:
+
+- the O-CU-CP NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531 [6]) to
+request NFMS_P to activate the O-CU-CP by changing the
+administrativeState of the O-CU-CP to unlocked.
+NOTE: O-CU-CP starts to establish the E2 interface connection with Near -
+RT RIC.
+
+- the O-CU-UP NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531 [6]) to
+request NFMS_P to activate the  O-CU-UP by changing the
+administrativeState of the O-CU-UP to unlocked.
+NOTE 1: O-CU-UP starts to establish the E2 interface connection with Near-
+RT RIC.
+NOTE 2: E1 interface connection will be established between O-CU-CP and
+O-CU-UP.
+
+- the O -DU NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531 [6]) to
+request NFMS_P to activate the  O-DU by changing the
+administrativeState of the O-DU to unlocked.
+NOTE 1: O-DU starts to establish the F1 interface connection with O -CU,
+(see Annex A.1 in TS 28.541 [9]).
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      13
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+NOTE 2: O-DU starts to establish the E2 interface connection with Near-RT
+RIC.
+
+- the O -RU NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531  [6]) to
+request NFMS_P to activate the O-RU by changing the
+administrativeState of the O-RU to unlocked.
+NOTE: O-RU starts to establish the M plane interface connection with O-DU
+[14].
+Step 3 (M)
+NSSMS_P receives notifications indicating that all inactive NSSI constituents
+are activated. (NSSMS_P is notified by respective NFMS_P(s) which invokes
+NF Provisioning data report service with notification
+notifyMOIAttributeValueChanges (see table 6.3-1 in TS 28.531 [6]) that the O-
+CU-CP, O-CU-UP, O-DU and O-RU have been activated.)
+
+Step 4 (M)
+NSSMS_P changes administrativeState of the O-NSSI to unlocked, and
+invokes NSSI Provisioning data report service with notification
+notifyMOIAttributeValueChanges (see table 6.2 -1 in TS 28.531 [6]) to notify
+NSSMS_C that the O-NSSI has been activated.
+
+Ends when O-RAN O-NSSI is activated.
+Exceptions One of the steps identified above fails.
+Post Conditions O-NSSI is in operation.
+Traceability REQ-SL-FUN25, REQ-SL-FUN28
+ 1
+3.1.3 O-RAN Slice Subnet Instance Modification 2
+Table 3.1.3-1: O-RAN Slice Subnet Instance Modification Use Case 3
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal Modification of an existing O -NSSI to satisfy O -RAN slice subnet related
+requirements (see clause 5.1.9 in TS 28.531 [6]).
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF who acts as an example of
+network function management service provider.
+O-Cloud M&O, who acts as O -Cloud management and orchestration provider
+within SMO.
+Non-RT RIC
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_P is aware of O -Cloud M&O to manage the lifecycle of VNFs and
+interconnection between the VNFs and PNFs.
+Pre conditions VNF Packages for virtualized O-RAN network functions to be included in the O-
+RAN slice subnet instance have been already on-boarded.
+Begins when  NSSMS_P receives request for a modification of an existing O -NSSI. The
+request contains new network slice subnet related requirements.
+Step 1 (M)
+NSSMS_P checks the feasibility of the request, based on the received network
+slice subnet related modification requirements. If the modification requirements
+can be satisfied, go to step 2, else go to step 8.
+O-RAN Slice
+Subnet
+Feasibility
+Check
+Step 2 (M) NSSMS_P decomposes the O -NSSI modification request into modification
+requests for each (O-)NSSI constituent.
+Step 3 (O)
+If the required  O-NSSI contains constituent (O-)NSSI(s) managed by other
+NSSMS_P(s), NSSMS_P may trigger modification of respective constituent
+(O-)NSSI(s) through other NSSMS_P(s) which manages the constituent
+(O-)NSSI(s).
+In that case, NSSMS_P receives the constituent (O-)NSSI information from the
+other NSSMS_P(s) and associates the constituent (O-)NSSI(s) with the
+required O-NSSI.
+(O-RAN) Slice
+Subnet Instance
+Modification Use
+Case (to modify
+constituent
+(O-)NSSI(s)
+managed by
+other
+NSSMS_P(s))
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      14
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Step 4 (O)
+If the O-NSSI contains virtualized part (s), NSSMS _P triggers a service
+modification request to O-Cloud M&O for scaling, updating, instantiation etc. of
+virtual O -RAN network functions and virtual links within the determined O -
+Cloud(s).
+FFS in WG6
+Step 5 (O) If the O-NSSI consists of NF instances, NSSMS_P uses NF provisioning service
+exposed by NFMS_P to (re-)configure (O-)NSSI constituents. FFS in WG1
+Step 6 (O)
+If the NSSI contains TN part, NSSMS_P triggers O -RAN TN Manager
+coordination procedure to establish/modify necessary links such as for A1, E2,
+midhaul and fronthaul connectivity.
+FFS in WG9
+Step 7 (M) NSSMS_P notifies Non -RT RIC with the updated network slice subnet
+requirements and respective O-NSSI information. FFS in WG2
+Step 8 (M) NSSMS_P notifies NSSMS_C with the resulting status of this process and
+relevant O-NSSI information.
+Ends when O-RAN O -NSSI and relevant O -RAN NFs are modified, and Non -RT RIC is
+configured with modified slice requirements and O-NSSI information.
+Exceptions One of the steps identified above fails.
+Post Conditions O-NSSI is ready to satisfy the updated network slice subnet related
+requirements.
+Traceability REQ-SL-FUN24 - REQ-SL-FUN27, REQ-SL-FUN29, REQ-SL-FUN30
+ 1
+3.1.4 O-RAN Slice Subnet Instance Deactivation 2
+Table 3.1.4-1: O-RAN Slice Subnet Instance Deactivation Use Case 3
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal Deactivation of an O-RAN network slice subnet instance (O-NSSI) (see clause
+5.1.11 in TS 28.531 [6]).
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF  who acts as an example of
+network function management service provider.
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_P is providing services to authorized consumers.
+Pre conditions
+An O-NSSI has already and it is in active state.
+As an example, the existing O -NSSI includes active O -CU-CP, O-CU-UP, O-
+DU and O -RU O-RAN NFs, where the administrativeState is unlocked
+(see figure B.2.2 in TS 28.541 [9]).
+
+NOTE: The O-CU-CP, O-CU-UP, O-DU and O-RU are not shared by other O -
+NSSI.
+
+Begins when  NSSMS_C decides to deactivate  the O-NSSI based on the received network
+slice subnet related request from its authorized consumer NSSMS_C.
+Step 1 (M)
+NSSMS_P receives a request from NSSMS_C to deactivate the O -NSSI (via
+NSSI Provisioning service with operation modifyMOIAttributes (see table 6.2-1
+in TS 28.531 [6]) to request NSSMS_P to deactivate the O-NSSI that is to
+change administrativeState of the O-NSSI to locked).
+
+Step 2 (M)
+NSSMS_P identifies active constituents (e.g. NSSI, NF) of the NSSI and
+decides to deactivate those constituents.
+As an example, NSSMS_P finds that the O -NSSI contains active non -shared
+O-RAN NFs:
+- the O-CU-CP NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531  [6]) to
+request NFMS_P to de activate the O-CU-CP by changing the
+administrativeState of the O-CU-CP to locked.
+NOTE 1: O-CU-CP starts to terminate the E2 interface connection with Near-
+RT RIC.
+NOTE 2: E1 interface connection will be released between O -CU-CP and
+O-CU-UP.
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      15
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+- the O-CU-UP NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531 [6]) to
+request NFMS_P to de activate the O-CU-UP by changing the
+administrativeState of the O-CU-UP to locked.
+NOTE: O-CU-UP starts to terminate the E2 interface connection with Near-
+RT RIC.
+
+- the O -DU NF constituent, and invokes NF Provisioning service with
+operation modifyMOIAttributes (see table 6.3 -1 in TS 28.531 [6]) to
+request NFMS_P to de activate the O-DU by changing the
+administrativeState of the O-DU to locked.
+NOTE 1: O-DU starts to terminate the F1 interface connection with O -CU,
+(see Annex A.1 in TS 28.541 [9]).
+NOTE 2: O-DU starts to terminate the E2 interface connection with Near-RT
+RIC.
+
+- the O-RU constituent, and invokes NF Provisioning service with operation
+modifyMOIAttributes (see table 6.3-1 in TS 28.531 [6]) to request NFMS_P
+to deactivate the O-RU by changing the administrativeState of the
+O-RU to locked.
+NOTE: O-RU starts to  terminate the M plane interface connection with O -
+DU [14].
+Step 3 (M)
+NSSMS_P receives notifications indicating that all active non -shared NSSI
+constituents are deactivated.
+(NSSMS_P is notified by respective NFMS_P(s) which invoke NF Provisioning
+data report service with notification notifyMOIAttributeValueChanges (see table
+6.3-1 in TS 28.531 [6]) to notify that the O-CU-CP, O-CU-UP, O-DU and O-RU
+have been deactivated.)
+
+Step 4 (M)
+NSSMS_P changes administrativeState of the O -NSSI to locked, and
+invokes NSSI Provisioning data report service with notification
+notifyMOIAttributeValueChanges (see table 6.2 -1 in TS 28.531 [6]) to notify
+NSSMS_C that the O-NSSI has been deactivated.
+
+Ends when O-RAN O-NSSI is deactivated.
+Exceptions One of the steps identified above fails.
+Post Conditions O-NSSI is inactive.
+Traceability REQ-SL-FUN25, REQ-SL-FUN31
+ 1
+3.1.5 O-RAN Slice Subnet Instance Termination 2
+Table 3.1.5-1: O-RAN Slice Subnet Instance Termination Use Case 3
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal Termination or disassociation of an existing O -RAN network slice subnet
+instance (O-NSSI) (see clause 5.1.4 in TS 28.531 [6]).
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+O-Cloud M&O, who acts as O -Cloud management and orchestration provider
+within SMO.
+Non-RT RIC
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_P is  aware of O -Cloud M&O to manage the lifecycle of VNFs and
+interconnection between the VNFs and PNFs.
+Pre conditions  O-NSSI exists and it is in inactive state.
+Begins when
+NSSMS_P receives a request for an O -RAN network slice subnet instance
+indicating that the O -NSSI is no longer needed . The request contains network
+slice subnet identifier.
+
+Step 1 (M) NSSMS_P checks whether the O -NSSI is a shared network slice subnet
+instance.
+O-RAN Slice
+Subnet Instance
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      16
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+
+If the O-NSSI is shared, O-NSSI will be disassociated via O-NSSI slice subnet
+instance modification use case. Go to step 5
+
+If the O-NSSI is not shared, O-NSSI will be terminated. Go to step 2
+Modification
+Use Case
+Step 2 (M)
+If the O-NSSI consists of constituent NSSIs that are not managed directly by
+the NSSMS_P, it sends a request to other NSSMS_P(s) indicating that the
+constituent NSSIs are no longer needed for the O-NSSI.
+O-RAN Slice
+Subnet Instance
+Termination
+Use Case
+Step 3 (O) NSSMS_P triggers a service termination request to O -Cloud M&O for removal
+of non-shared virtual O-RAN network functions. FFS in WG6
+Step 4 (O) If the O-NSSI includes constituent transport links , NSSMS_P triggers O -RAN
+TN Manager coordination procedure.  FFS in WG9
+Step 5 (M) NSSMS_P notifies Non-RT RIC that the O-NSSI has been terminated.  FFS in WG2
+Step 6 (M) NSSMS_P notifies NSSMS_C with the resulting status of this process and
+relevant O-NSSI information.
+Ends when All the steps identified above are successfully completed.
+Exceptions One of the steps identified above fails.
+Post Conditions O-NSSI has been terminated or disassociated and Non-RT RIC is notified.
+Traceability REQ-SL-FUN21, REQ-SL-FUN23, REQ-SL-FUN27, REQ -SL-FUN32 - REQ-
+SL-FUN34
+ 1
+3.1.6 O-RAN Slice Subnet Instance Configuration 2
+Table 3.1.6-1: O-RAN Slice Subnet Instance Configuration Use Case 3
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal Configuration of an O-NSSI (see clause 5.1.13 in TS 28.531 [6]).
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  network slice sub net
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF, who acts as an example
+network function management service provider.
+O-RAN Network Functions: NFs such as Near -RT RIC, O -CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions
+NSSMS_P is providing services to authorized consumers.
+NSSMS_P is aware of the respective NSSMS_P(s) and NFMS_P(s) which
+manages the constituent NSSI(s) and NF(s).
+
+Pre conditions The O-NSSI exists.
+Begins when  NSSMS_C triggers the (re-)configuration of an O-NSSI and its constituents.
+Step 1 (M) NSSMS_P receives a request from NSSMS_C with slice subnet
+(re-)configuration information for (re-)configuration of an O-NSSI.
+Step 2 (M) NSSMS_P decomposes the received slice subnet configuration information and
+prepares CM requests for each constituent if necessary and applicable.
+Step 3 (O) NSSMS_P configures the constituent O-NSSI(s) if it is managed directly by the
+NSSMS_P.
+Step 4 (O)
+If the O-NSSI contains constituent NSSI (s) managed by other NSSMS_P(s),
+NSSMS_P triggers configuration of respective constituent NSSI(s) through
+NSSMS_P(s) which manages the constituent NSSI(s).
+(O-RAN) Slice
+Subnet
+Configuration
+Use Case
+Step 5 (O)
+If the required O-NSSI contains constituent O-RAN NF (s) managed by
+NFMS_P(s), NSSMS_P triggers configuration requests with corresponding slice
+subnet configuration information through NFMS_P(s) which manages the
+constituent O-RAN NF(s).
+FFS in WG1
+Step 6 (M) NSSMS_P sends the configuration result to the NSSMS_C which might be
+based on results received from other CM service providers.
+Ends when All the steps identified above are successfully completed.
+Exceptions One of the steps identified above fails.
+Post Conditions The required (re -)configuration is accomplished at the corresponding
+constituent(s).
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      17
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Traceability REQ-SL-FUN24, REQ-SL-FUN25
+ 1
+3.1.7 O-RAN Slice Subnet Feasibility Check 2
+Table 3.1.7-1: O-RAN Slice Subnet Feasibility Check 3
+Use Case Stage Evolution / Specification <<Uses>>
+Related use
+Goal
+To check the feasibility of provisioning an O-RAN network slice subnet instance
+(O-NSSI) to determine whether the O-NSSI requirements can be satisfied (e.g.,
+in terms of resources) (see clause 5.1.21 in TS 28.531 [6]).
+
+Actors and Roles
+NSSMS_C such as NSMF, who acts as an example network slice subnet
+management service consumer.
+NSSMS_P such as NSSMF, who acts as an example  of network slice subnet
+management service provider.
+NFMS_P such as SMO OAM Functions or NFMF who acts as an example of
+network function management service provider.
+O-Cloud M&O, who acts as O -Cloud management and orchestration provider
+within SMO.
+Non-RT RIC
+O-RAN Network Functions: NFs such as Near -RT RIC, O-CU-CP, O-CU-UP,
+O-DU and O-RU.
+
+Assumptions NSSMS_C has decided to check the feasibility of provisioning an O-NSSI based
+on, for example, internal decision or an external service request.
+Pre conditions Network slice subnet requirements have been derived or received by network
+slice subnet management service consumer NSSMS_C.
+Begins when  NSSMS_P receives the request to evaluate the feasibility of an O-NSSI
+according to the network slice subnet requirements.
+O-RAN Slice
+Subnet Instance
+Creation, O-
+RAN Slice
+Subnet Instance
+Modification
+Step 1 (M) NSSMS_P identifies the network slice subnet constituents according to the
+requirements, e.g., network services to be requested from O-Cloud M&O.
+Step 2 (O)
+For the purpose of checking the feasibility of provisioning a n O-NSSI,
+NSSMS_P may obtain information from the  SMO and Non-RT RIC (e.g., load
+level information, resource usage information from management data analytics
+services).
+FFS in WG2
+Step 3 (M)
+NSSMS_P sends enquiries with reservation requests to O-Cloud M&O to
+determine availability of network constituents, e.g., network services, network
+functions.
+FFS in WG6
+Step 4 (O) For the purpose of checking the feasibility of transport network links, NSSMS_P
+may obtain information from TN Manager. FFS in WG9
+Ends when
+NSSMS_P provides feasibility check results to NSSMS_C. If provisioning of O-
+NSSI is feasible, the information about reserved resources may also be
+provided.
+
+Exceptions One of the mandatory steps fails.
+Post Conditions N/A
+Traceability REQ-SL-FUN35 - REQ-SL-FUN37
+   4
+ 5
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      18
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3.2 O-RAN Slicing Use Cases 1
+3.2.1 Use Case 1: RAN Slice SLA Assurance 2
+In the 5G era, network slicing is a prominent feature which provides end-to-end connectivity and data processing tailored 3
+to specific business requirements. These requirements include customizable network capabilities such as the support of 4
+very high data rates, traffic densities, service availability and very low latency. According to 5G standardization efforts, 5
+the 5G system should support the needs of the business through the specification of several service needs such as data 6
+rate, traffic capacity, user density, latency, reliability, and availability. These capabilities are always provided based on a 7
+Service Level Agreement (SLA) between the mobile operator and the business customer, which brought up interest for 8
+mechanisms to ensure slice SLAs and prev ent its possible violations. O -RAN’s open interfaces and AI/ML based 9
+architecture will enable such challenging mechanisms to be implemented and help pave the way for operators to realize 10
+the opportunities of network slicing in an efficient manner.   11
+RAN slice SLA assurance scenario involves Non-RT RIC, Near-RT RIC, E2 Nodes and SMO interaction.  The scenario 12
+starts with the retrieval of RAN specific slice SLA/requirements (possibly within SMO or from NSSMF depending on 13
+Operator deployment options). Based on  slice specific performance measurements from E2 Nodes, Non -RT RIC and 14
+Near-RT RIC can fine-tune RAN behavior aligned with O -RAN architectural roles to assure RAN slice SLAs. Non -RT 15
+RIC monitors long-term trends and patterns for RAN slice subnets’ performance, and employs AI/ML methods to perform 16
+corrective actions through SMO (e.g. reconfiguration via O1) or via creation of A1 policies. Non -RT RIC can also 17
+construct/train relevant AI/ML models that will be deployed at Near -RT RIC. A1 policies possibly incl ude scope 18
+identifiers (e.g. S-NSSAI) and statements such as KPI targets. On the other hand, Near -RT RIC enables optimized RAN 19
+actions through execution of deployed AI/ML models in near-real-time by considering both O1 configuration (e.g. static 20
+RRM policies) and received A1 policies, as well as received slice specific E2 measurements.  21
+ 22
+ 23
+Figure 3.2.2-1: RAN Slice SLA Assurance use case overview 24
+ 25
+The more detailed functions provided by the entities for RAN slice SLA assurance are listed as below:  26
+1) SMO 27
+a) Provides information about slice topology and SLA associated with the slice to the Non -RT RIC 28
+2) Non-RT RIC:  29
+a) Retrieve RAN slice SLA target from respective entities such as SMO, NSSMF   30
+b) Long term monitoring of RAN slice subnet performance measurements 31
+c) Training of potential ML models that will be deployed in Near-RT RIC for optimized slice assurance 32
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      19
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+d) Support deployment and update of AI/ML models into Near-RT RIC 1
+e) Send A1 policies and enrichment information to Near-RT RIC to drive slice assurance 2
+f) Send O1 reconfiguration requests to SMO for slow-loop slice assurance 3
+3) Near-RT RIC: 4
+a) Near real-time monitoring of slice specific RAN performance measurements 5
+b) Support deployment and execution of the AI/ML models from Non-RT RIC 6
+c) Support interpretation and execution of policies from Non-RT RIC 7
+d) Perform optimized RAN (E2) actions to achieve RAN slice subnet requirements based on O1 configuration, 8
+A1 policy, and E2 reports 9
+4) E2 Nodes (O-CU-CP, O-CU-UP, O-DU): 10
+a) Support slice assurance actions such as slice-aware resource allocation, prioritization, etc. 11
+b) Support slice specific performance measurements through O1 12
+c) Support slice specific performance reports through E2 13
+ 14
+3.2.2 Use Case 2: Multi-vendor Slices  15
+This use case enables multiple slices with functions provided by multi-vendors, such as slice #1, composed of DU(s) and 16
+CU(s), provided by vendor B and slice #2, composed of DU(s) and CU(s), provided by vendor C. 17
+ 18
+ 19
+Figure 3.2.2-1: Multi-vendor Slices 20
+ 21
+When providing multiple slices, it is assumed that suitable vO-DU/scheduler and vO-CU treat each slice respectively. A 22
+vendor who provides vO-DU and vO-CU function may have a strength of a customized scheduler for a certain service. 23
+With accomplishment of multi-vendor circumstances, following benefits can be expected: 24
+1) More flexible and time to market deployment 25
+Operators can maximize options to choose suitable vO -DU/scheduler and vO -CU to offer various slices.  For 26
+example, some vendors may have a strength of a scheduler for eMBB service and the other may have a strength of 27
+scheduler for URLLC service. Or, vendor A can provide vO -DU/scheduler and vO-CU suitable for URLLC earlier 28
+than vendor B, therefore operators can choose vO -DU and vO -CU functions from vendor A to meet their service 29
+requirements. 30
+Also, when an operator wants to add a new service/slice, new functions from a new vendor can be introduced with 31
+less consideration for existing vendors if multi -vendor circumstance was realized. This may help expand vendor’s 32
+business opportunities rapidly. 33
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      20
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+2) Flexible deployment when sharing RAN equipment among operators 1
+When operators want to share RAN equipment and resources, RAN vendors and their placement of each RAN 2
+functions may be different. If multi -vendor circumstance was introduced, then it can relax restrictions among 3
+operators to share RAN equipment and resources. This may help expanded opportunities for reaching agreements 4
+of RAN sharing among operators. With expansion of RAN sharing, operators CAPEX and OPEX can be optimized, 5
+helping with additional investment opportunities. 6
+3) Reducing supply chain risk 7
+If an existing vendor providing a certain pair of vO -DU and vO -CU functions withdraws of the market due to 8
+business reasons, operators can deploy new vO -DU and vO -CU functions alternatively from other vendors under 9
+this multi-vendor circumstance. This can reduce a risk for operators’ business continuity.  10
+ 11
+To realise multi-vendor slices, some coordination between vO-DU/vO-CUs will be required since radio resource shall be 12
+assigned properly and without any conflicts. Depending on different service goals and the potential impact on O -RAN 13
+architecture, a required coordination scheme needs to be determined. The possible cases are: 14
+1) Loose coordination through O1/E2/A1 interface (Case 1 in Figure 3.2.2-2) 15
+2) Moderate coordination through X2/F1 interface (Case 2 in Figure 3.2.2-2) 16
+3) Tight coordination through a new interface between vO-DUs (Case 3 in Figure 3.2.2-2) 17
+ 18
+ 19
+Figure 3.2.2-2: Multi-vendor Slices Coordination Scheme Options 20
+ 21
+In case 1, a resource allocation between slices or vO-DU/vO-CUs is provisioned through O1/A1 /E2 interface and each 22
+pair of vO-DU and vO-CU will allocate radio resources to each customer  within radio resources allocated by Near -RT 23
+RIC and/or Non-RT RIC. 24
+In case 2, a resource allocation can be negotiated between slices or vO-DU/vO-CUs through X2 and F1 after provisioned 25
+through O1/E2/A1 interface. Negotiation period will be several seconds due to periodicity of X2 and F1 message exchange 26
+between vO-CU(s). 27
+If a more adaptive radio resource allocation is needed (case 3), a more frequent negotiation would be required. This can 28
+potentially be achieved via an interface or API extension between vO-DU(s), which would be for FFS in WG1 and WG4. 29
+ 30
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      21
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3.2.3 Use Case 3: NSSI Resource Allocation Optimization  1
+5G networks are becoming increasingly complex with the densification of millimeter wave small cells, and various new 2
+services, such as eMBB (enhanced Mobile Broadband), URLLC (Ultra Reliable Low Latency Communications), and 3
+mMTC (massive Machine Type Communications) that are characterized by high speed high data volume, low speed ultra-4
+low latency, and infrequent transmitting low data volume from huge number of emerging smart devices, respectively. It 5
+is a challenging task for 5G networks to allocate resources dynamically and efficiently among multiple network nodes to 6
+support various services. However, eMBB, URLLC, and mMTC services in 5G are typically realized as NSI(s) (Network 7
+Slice instance(s)). Therefore, the resources allocated to NSSI (Network Slice Subn et Instance) to support the O -RAN 8
+nodes can be optimized according to the service requirements. 9
+As the new 5G services have different characteristics, the network traffic tends to be sporadic, where there may be 10
+different usage pattern in terms of time, location, UE distribution, and types of applications. For example, most IoT sensor 11
+applications may run during off-peak hours or weekends. Special events, such as sport games, concerts, can cause traffic 12
+demand to shoot up at certain times and locations. The refore, NSSI resource allocation optimization function trains the 13
+AI/ML model, based on the huge volume of performance data collected over days, weeks, months from O -RAN nodes. 14
+It then uses the AI/ML model to predict the traffic demand patterns of 5G netwo rks in different times and locations for 15
+each network slice subnet, and automatically re-allocates the network resources ahead of the network issues surfaced.  16
+The resource quota policies associated with RAN NFs (E2 Nodes) included in the respective NSSIs enable 5G network 17
+providers to optimize or prioritize the utilization of the RAN resources across slices and supports the flexibility to share 18
+resources optimally across critical service slices during resource surplus or scarcity. For example, an NSSI alloc ated for 19
+premium service can receive a major share of the resources compared to a slice allocated for a standard/best-effort service.  20
+Another such example is the scenario of additional resource allocation for emergency services. An important 21
+consideration here is that the NSSI resource quota polic ies focuses on maximization of resource utilization across the 22
+NSSIs .The resource quota policies can be used as a constraint for resource allocation that defines the range of resources 23
+that can be allocated per s lice. One use case for applying such a constraint is the analysis a nd decision based on history 24
+of resource allocation failure that may be reflected in the RAN Node measurements. Here resource quota policy can be 25
+provisioned to control the minimum, maximum and dedicated resources that need to be allocated based on the historical 26
+pattern. Figure 3.2.3 -1 shows t he NSSI resource allocation optimization  on the Non-RT RIC, and may consist of the 27
+following steps: 28
+1. Monitoring: monitor the radio network(s) by collecting data via the O1 interface, including the following 29
+performance measurements that are measured per S-NSSAI (TS 28.552 [10]): 30
+- DL PRB used for data traffic (TS 28.552 [10] Clause 5.1.1.2.5) 31
+- UL PRB used for data traffic (TS 28.552 [10] Clause 5.1.1.2.7) 32
+- Average DL UE throughput in gNB (TS 28.552 [10] Clause 5.1.1.3.1) 33
+- Average UL UE throughput in gNB (TS 28.552 [10] Clause 5.1.1.3.3) 34
+- Number of PDU Sessions requested to setup (TS 28.552 [10] Clause 5.1.1.5.1) 35
+- Number of PDU Sessions successfully setup (TS 28.552 [10] Clause 5.1.1.5.2) 36
+- Distribution of DL UE throughput in gNB (TS 28.552 [10] Clause 5.1.1.3.2) 37
+- Distribution of UL UE throughput in gNB (TS 28.552 [10] Clause 5.1.1.3.4) 38
+- Number of DRBs successfully setup (TS 28.552 [10] Clause 5.1.1.10.2) 39
+ 40
+2. Analysis & Decision: consisting of the following steps:  41
+o Utilize AI/ML models to analyze the measurements and predict the future traffic demand, including the 42
+RRMPolicyRatio IOC limits, for each NSSI for a given time and location. 43
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      22
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+o Determine the actions needed to add or reduce the resources (e.g. capacity, VNF resources, slice subnet 1
+attributes (TS 28.541 [9]), etc.) for the RAN NFs (E2 Nodes) included in the respective NSSI at the 2
+given time, and location 3
+3. Execution: execute the following actions to reallocate the NSSI resources:  4
+3a. Re-configure the NSSI attributes, including RRMPolicyRatio IOCs (TS 28.541 [9]) via the OAM Functions 5
+in SMO which uses O1 interface to configure the E2 Nodes. 6
+3b. Update the cloud resources via the O2 interface 7
+ 8
+Service management & Orchestration Framework
+Near-RT RIC
+O-DU
+O-CU-
+CP
+O-CU-
+UP
+O-Cloud
+E2
+E1
+F1-CF1-U
+Open Fronthaul interface
+O-RU
+A1
+O1
+O2
+E2
+Network functions
+Non-RT RIC
+NSSI Resource
+Allocation Optimization
+2. analysis & decision 1. monitoring
+O-Cloud
+M&O
+E2
+3.a. execution
+ 9
+Figure 3.2.3-1: The realization of NSSI resource allocation optimization over Non-Real Time RIC 10
+ 11
+The more detailed functions provided by the entities for NSSI resource optimization are listed as follows: 12
+ 13
+1) SMO: 14
+a) Pre-Provision the default NSSI resource quota policy as constraint for NSSI resource allocation optimization. 15
+This information is optionally used by the Non -RT RIC in case the resource quota that needs to be allocated 16
+per slice is not specified during the slice creation and for conflict resolution at the time of resource scarcity  17
+2) Non-RT RIC: 18
+a) Collect the performance measurements related to NSSI resource usage from the O -RAN nodes via the O1 19
+interface. 20
+b) Train the AI/ML model based on the analysis of historical performance measurements, to predict of the traffic 21
+demand patterns of NSSI at different times and locations. 22
+c) Determine the time/date and locations (i.e. which O-RAN nodes) to add or reduce the resources (e.g. capacity, 23
+VNF resources, slice subnet attributes (TS 28.541 [9]), RRMPolicyRatio IOC, etc.) for a given NSSI based on 24
+inference.  25
+d) Perform the following action(s) to optimize the NSSI resource allocation, at the time determined by the model 26
+i. Re-configure the NSSI attributes via the O1 interface 27
+ii. Update the cloud resources via the O2 interface 28
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      23
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+3) E2 Nodes (O-CU-CP, O-CU-UP, O-DU, and O-RU): 2
+a) Support the performance measurement collection with required granularity over O1 interface.  3
+b) Support the configuration related to the NSSI resource allocation update over O1 interface.  4
+   5
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      24
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 4.  O-RAN Slicing Principles and Requirements 1
+4.1 General Principles 2
+This section contains the general O-RAN slicing architecture principles as described below:  3
+ O-RAN slicing architecture and interface specifications shall be consistent with 3GPP architecture and interface 4
+specifications to the extent possible 5
+ O-RAN slicing architecture shall provide standardized management service interfaces for RAN slicing 6
+management services 7
+ O-RAN slicing architecture shall enable multi-vendor interoperability 8
+ O-RAN slicing architecture shall support various Network Operator deployment options  9
+ O-RAN slicing architecture shall support management of RAN slice subnets in multi-operator scenarios 10
+ 11
+4.2 Slicing Requirements 12
+4.2.1 Functional Requirements 13
+Initial set of O-RAN slicing functional requirements based on the use cases defined in this version of the specification 14
+are captured in Table 4.2.1-1 15
+Table 4.2.1-1: O-RAN Slicing Functional Requirements 16
+REQ Description Note
+[REQ-SL-FUN1]
+O-RAN slicing architecture and interfaces must support network
+slicing, where an instance of O -RAN network function may be
+associated with one or more slices.
+ORAN OAM Specification
+v02.00
+[REQ-SL-FUN2] O-RAN slicing architecture shall support differentiated handling of
+traffic for different RAN slice subnets  3GPP TS 38.300
+[REQ-SL-FUN3] O-RAN slicing architecture shall support resource isolation
+between slices  3GPP TS 38.300
+[REQ-SL-FUN4]
+O-RAN slicing architecture shall enable traffic and services in one
+RAN slice subnet having no impact on traffic and services in other
+RAN slice subnets in the same network
+3GPP TS 22.261
+[REQ-SL-FUN5]
+O-RAN slicing architecture shall enable mechanisms to avoid
+shortage of shared resources in one slice breaking the service level
+agreement for another slice
+3GPP TS 38.300
+[REQ-SL-FUN6]
+O-RAN slicing architecture shall enable defining a priority order
+between different RAN slice  subnets in case multiple slices
+compete for resources on the same RAN
+3GPP TS 22.261
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      25
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+[REQ-SL-FUN7] O-RAN slicing architecture shall apply policies at S -NSSAI level
+according to the SLA required by the network slice  -
+[REQ-SL-FUN8]
+O-RAN slicing architecture shall support means by which the
+operator can differentiate  policy control,  functionality and
+performance provided in different RAN slice subnets
+3GPP TS 22.261
+[REQ-SL-FUN9] O-RAN slicing architecture shall support QoS differentiation
+within a slice 3GPP TS 38.300
+[REQ-SL-FUN10]
+O-RAN slicing architecture shall enable slice aware radio resource
+management strategies (such as admission control, congestion
+control, handover preparation)
+3GPP TS 38.300
+[REQ-SL-FUN11] O-RAN slicing architecture shall allow creation, modification, and
+deletion of a RAN slice subnet 3GPP TS 28.531
+[REQ-SL-FUN12]
+O-RAN slicing architecture shall support interaction between the
+SMO Framework and Non -RT RIC to consume provisioning
+management services exposed by each O -RAN managed element
+to configure RAN slice subnets through the O1 interface
+RAN Slice SLA Assurance
+use case , NSSI Resource
+Allocation Optimization
+use case
+[REQ-SL-FUN13]
+O-RAN slicing architecture shall support the interaction between
+the SMO Framework and Non-RT RIC to consume management of
+slice specific PM jobs, PM data collection/storage/query/statistical
+reports from O-RAN network functions through the O1 interface
+RAN Slice SLA Assurance
+use case , NSSI Resource
+Allocation Optimization
+use case
+[REQ-SL-FUN14]
+O-RAN slicing architecture shall support interaction between the
+SMO Framework and Non -RT RIC to retrieve /notify RAN slice
+subnet requirements (SLA) along with O-NSSI information
+RAN Slice SLA Assurance
+use case, O -RAN Slice
+Subnet Instance Creation
+use case
+[REQ-SL-FUN15]
+O-RAN slicing architecture shall support provisioning, generation
+and monitoring of slice specific RAN performance metrics through
+O1 interface
+RAN Slice SLA Assurance
+use case , NSSI Reso urce
+Allocation Optimization
+use case
+[REQ-SL-FUN16]
+O-RAN slicing architecture shall support training, deployment and
+execution of AI/ML models for slice SLA assurance and NSSI
+resource allocation optimization
+RAN Slice SLA Assurance
+use case , NSSI Resource
+Allocation Optimization
+use case
+[REQ-SL-FUN17] O-RAN slicing architecture shall support slice specific policy
+guidance, enrichment information and policy feedback
+RAN Slice SLA Assurance
+use case
+[REQ-SL-FUN18]
+O-RAN slicing architecture shall support provisioning, generation
+and monitoring of slice specific RAN performance data through E2
+interface
+RAN Slice SLA Assurance
+use case
+[REQ-SL-FUN19] O-RAN slicing architecture  shall support reconfiguration of slice
+specific RAN parameters and resources for slice SLA assurance
+RAN Slice SLA Assurance
+use case
+[REQ-SL-FUN20]
+O-RAN slicing architecture shall enable creation of O -RAN
+network slice subnet instances as O -RAN network  service (NS)
+instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Instance Creation use case
+[REQ-SL-FUN21]
+O-RAN slicing architecture shall enable association and
+disassociation of O -Cloud NS instances with corresponding O -
+NSSIs
+O-RAN Slice Subnet
+Instance Creation use case,
+O-RAN Slice Subnet
+Instance Termination use
+case
+[REQ-SL-FUN22]
+O-RAN slicing architecture shall enable creation of O -RAN
+network slice subnet instances as O -RAN network function (NF)
+instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Instance Creation use case
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      26
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+[REQ-SL-FUN23]
+O-RAN slicing architecture shall enable association and
+disassociation of O -Cloud NF instances with corresponding O -
+NSSIs
+O-RAN Slice Subnet
+Instance Creation use case,
+O-RAN Slice Subnet
+Instance Termination use
+case
+[REQ-SL-FUN24] O-RAN slicing architecture shall support (re -)configuration of an
+O-NSSI’s constituent network functions through the O1 interface
+O-RAN Slice Subnet
+Instance Creation use case,
+O-RAN Slice Subnet
+Modification use case, O -
+RAN Slice Sub net
+Configuration use case
+[REQ-SL-FUN25] O-RAN slicing architecture shall support (re -)configuration of an
+O-RAN network slice subnet instance (O-NSSI) attributes
+O-RAN Slice Subnet
+Instance Creation  /
+Activation / Modification /
+Deactivation /
+Configuration use case
+[REQ-SL-FUN26]
+O-RAN slicing architecture shall have the capability for the
+establishment of required transport network connectivity between
+O-RAN NFs during provisioning of O -RAN network slice subnet
+instances
+O-RAN Slice Subnet
+Instance Creation use case,
+O-RAN Slice Subnet
+Instance Modification use
+case
+[REQ-SL-FUN27]
+O-RAN slicing architecture shall enable Non-RT RIC to be notified
+when an O-NSSI has been created, activated, modified, deactivated
+and terminated
+O-RAN Slice Subnet
+Instance Creation use case,
+O-RAN Slice Subnet
+Instance Modification use
+case, O-RAN Slice Subnet
+Instance Termination use
+case
+[REQ-SL-FUN28]
+O-RAN slicing architecture shall support the capability to activate
+the constituent physical network functions such a s O-DU and O -
+RU within an O-NSSI
+O-RAN Slice Subnet
+Instance Activation use
+case
+[REQ-SL-FUN29]
+O-RAN slicing architecture shall enable modification of O -RAN
+network slice subnet instances through modification (such as
+scaling, updating, instantiation, etc.) of O -RAN network service
+(NS) instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Instance Modification use
+case
+[REQ-SL-FUN30]
+O-RAN slicing architecture shall enable modification of O -RAN
+network slice subnet instances through modification (such as
+scaling, updating, instantiation, etc.) of O -RAN network function
+(NF) instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Instance Modification use
+case
+[REQ-SL-FUN31]
+O-RAN slicing architecture shall support the capability to
+deactivate the constituent physical network functions such as O-DU
+and O-RU within an O-NSSI
+O-RAN Slice Subnet
+Instance Deactivation use
+case
+[REQ-SL-FUN32]
+O-RAN slicing architecture shall enable removal of constituent O-
+RAN network service (NS) instance(s) that were functioning within
+O-Cloud(s) and were associated to O -RAN network slice subnet
+instance(s)
+O-RAN Slice Subnet
+Instance Termination use
+case
+[REQ-SL-FUN33]
+O-RAN slicing architecture shall enable removal of constituent O-
+RAN network function (NF) instance(s) that were functioning
+within O -Cloud(s) and were associated to O -RAN network slice
+subnet instance(s)
+O-RAN Slice Subnet
+Instance Termination use
+case
+[REQ-SL-FUN34]
+O-RAN slicing architecture shall have the capability for the
+removal of non-shared transport network connectivity between O -
+RAN NFs during termination of O -RAN network slice subnet
+instances
+O-RAN Slice Subnet
+Instance Termination use
+case
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      27
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+[REQ-SL-FUN35] O-RAN slicing architecture shall enable reservation of O -RAN
+network service (NS) instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Feasibility Check
+[REQ-SL-FUN36] O-RAN slicing architecture shall enable reservation of O -RAN
+network service (NF) instance(s) within O-Cloud(s)
+O-RAN Slice Subnet
+Feasibility Check
+[REQ-SL-FUN37]
+O-RAN slicing architecture shall enable retrieval of network
+utilization information from the SMO and Non-RT RIC (e.g., load
+level information, resource usage information from management
+data analytics services)
+O-RAN Slice Subnet
+Feasibility Check
+[REQ-SL-FUN38]
+O-RAN slicing architecture shall support interaction between the
+SMO Framework and Non -RT RIC to consume O -Cloud
+management and orchestration services through the O2 interface
+RAN Slice SLA Assurance
+use case, NSSI Resource
+Allocation Optimization
+use case
+[REQ-SL-FUN39] O-RAN slicing architecture shall enable provisioning and
+management of multiple slices on O-RU
+Multi-vendor Slices use
+case
+[REQ-SL-FUN40] O-RAN slicing architecture shall enable O -RU to route per slice
+user plane traffic to one or more O-DUs
+Multi-vendor Slices use
+case
+ 1
+4.2.2 Non-Functional Requirements 2
+Initial set of O-RAN slicing non-functional requirements based on the use cases defined in this version of the specification 3
+are captured in Table 4.2.2-1 4
+Table 4.2.2-1: O-RAN Slicing Non-Functional Requirements 5
+REQ Description Note
+[REQ-SL-NFUN1] O-RAN slicing architecture shall support use of AI/ML to support RAN
+slicing use cases
+ 6
+  7
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      28
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 5.  O-RAN Reference Slicing Architecture 1
+This section provides O-RAN reference slicing architecture along with the high level roles and responsibilities of O-RAN 2
+network functions.  3
+ 4
+ 5
+Figure 5-1: O-RAN Reference Slicing Architecture 6
+ 7
+O-RAN reference slicing architecture includes slice management functions along with O-RAN architectural components. 8
+As O-RAN’s general principle is to be as compliant as possible with 3GPP architecture, these slice management functions 9
+are 3GPP defined NSMF and NSSMF with extensions for O-RAN network functions. Various deployment options of the 10
+location of NSMF and NSSMF have been presented in  [24] and more detailed architectural implementation options for 11
+SMOs including NFV-MANO and ONAP are being presented in Appendix A. 12
+ 13
+5.1 Non-RT RIC  14
+The fundamental role of the Non-RT RIC in O-RAN slicing architecture is to gather long term slice related data through 15
+interaction with the SMO framework and apply AI/ML based approaches interworking with the Near-RT RIC to provide 16
+innovative RAN slicing use cases. For this purpose, Non -RT RIC should be aware of RAN slice  subnets and their 17
+respective SLAs through SMO. In addition, Non-RT RIC may retrieve enrichment information from 3rd party applications 18
+enabling advanced RAN slicing technology to be applied in O-RAN framework.  19
+In order to construct AI/ML models to be deployed in the Near-RT RIC, Non-RT RIC retrieves slice specific performance 20
+metrics, configuration parameters and required attributes of the RAN slice subnets from the SMO framework. Complex 21
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      29
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+problems for Near-RT RIC e.g. applying RRM policies can be tackled by learning capabilities of AI/ML. The output of 1
+these algorithms can lead non-real-time optimization of the slice specific parameters of Near-RT RIC, O-CU and O-DU 2
+over O1 interface through SMO interaction. Moreover, these performance, configuration and other slice related data are 3
+used to generate policy guidance and assist Near-RT RIC over A1 to provide closed loop slice optimization. Appl ying 4
+such slice optimizations in the Near-RT RIC can be used for SLA assurance and prevent SLA violations between the 5
+slices as well. 6
+5.2 Near-RT RIC 7
+Near-RT RIC is the component which enables near-real-time RAN slice subnet optimization through execution of slicing 8
+related xApps and communicating necessary parameters to O-CU and O-DU through E2 interface. Deployed xApps may 9
+utilize either AI/ML based models or other control schemes which can further be guided by A1 policies that are generated 10
+by Non-RT RIC.  11
+In order to drive sliced RAN resources properly, Near-RT RIC should have the knowledge of existing RAN slice subnets 12
+as well as their requirements. This information will be received through O1 interface during provisioning of RAN slic e 13
+subnets. Therefore similar to Non -RT RIC, Near-RT RIC will be aware of RAN slice  subnets through O-RAN specific 14
+information models and provisioning procedures.    15
+In O-RAN slicing architecture, configuration of slice resources on E2 nodes can be achieved  through slow loop with O1 16
+configuration and through fast loop with E2 configuration. This architecture enables advanced slicing use cases such as 17
+RAN slice SLA assurance and further enhances 3GPP slicing capability without misalignment. In the context of the RAN, 18
+the SLA assurance parameters sent over the A1 interface help the Near -RT RIC guide the behavior of the E2 Nodes (O -19
+CU-UP, O-CU-CP, O-DU). While Near-RT RIC is capable for fast-loop configuration, slicing related O1 configuration, 20
+such as RRM policy information sent to O-CU, configured by the SMO framework will be taken into account. Moreover, 21
+slice specific near -RT performance data will be monitored through E2 interface  which needs proper PM mechanisms 22
+between E2 nodes and Near-RT RIC as well. 23
+5.3 O-RAN Central Unit (O-CU) 24
+O-CU, which includes a single O -CU-CP and possibly multiple O -CU-UP(s), which are communicating through E1 25
+interface, needs to support slicing features as defined by 3GPP. Depending on slice requirements, O-CU-UP can be shared 26
+across slices or a specific instance of O -CU-UP can be instantiated  per slice. On top of 3GPP slicing features, O -RAN 27
+further enhances slicing through the utilization of E2 interface and the assistance of Near-RT RIC dynamic slice 28
+optimizations along with the enhanced O1 interface to support additional slice configuration parameters.  29
+O-CU stacks, which are the upper layer protocols of the RAN stack, should be slice aware and execute slice specific 30
+resource allocation and isolation strategies. These stacks are initially configured through O1 interface based on the slice 31
+specific requirements and then dynamically updated through E2 interface via Near-RT RIC for various slicing use cases.  32
+Based on the PM requests from SMO and Near-RT RIC, O-CU may need to generate and send specific PMs through O1 33
+and E2 interfaces respectively, where the PMs can be used for slice performance monitoring and slice SLA assurance 34
+purposes. 35
+5.4 O-RAN Distributed Unit (O-DU) 36
+O-DU, which runs the lower layer protocols of RAN stack, should support slice specific resource allocation strategies as 37
+well. Based on the initial O1 configuration of PRB allocation levels along with O-CU directives over F1 interface and the 38
+dynamic guidance received from Near-RT RIC over E2 interface, MAC layer needs to allocate and isolate relevant PRBs 39
+to specific slices.  40
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      30
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Based on the PM requests from SMO and Near-RT RIC, O-DU may need to generate and send specific PMs through O1 1
+and E2 interfaces resp ectively, where the PMs can be used for slice performance monitoring and slice SLA assurance 2
+purposes. 3
+5.5 A1 Interface 4
+A1, which is the interface between the Non -RT RIC and the Near -RT RIC, supports policy management, ML model 5
+management and enrichment information services [18]. These three services will be utilized for various slicing use cases, 6
+such as slice SLA assurance. Policy management will be used by Non-RT RIC to send slice specific (e.g. S-NSSAI based) 7
+policies to guide Near -RT RIC with slice resource allocations and slice specific control activities, as well as to receive 8
+slice specific policy feedback for the policies deployed on the Near-RT RIC. 9
+For the use cases that make use of external enrichment data or where Non-RT RIC produces enrichment information, A1 10
+enrichment interface will be used to send slice specific enrichment data to Near -RT RIC. 11
+It should be noted that slice specific A1 policies are not persis tent (do not survive the restart of Near-RT RIC) and while 12
+they may take precedence over O1 slice specific configurations, they should be aligned and not deviate significantly from 13
+O1 configurations.  14
+Note: It is intended to add examples for the usage of A1 services for slicing use cases in the next version of this document. 15
+5.6 E2 Interface 16
+E2, which is the interface between the Near -RT RIC and the E2 nodes, supports E2 primitives (Report, Insert, Control 17
+and Policy) to control the services exposed by E2 nodes [19]. These primitives will be used by slice specific applications 18
+(xApps) to drive E2 nodes’ slice configurations and slice specific behaviour, such as slice based radio resource 19
+management, radio resource allocations, MAC scheduling policies and other  configuration parameters used by various 20
+RAN protocol stacks.  21
+E2 will be used to configure and receive slice specific reports and performance data from E2 nodes. Thes e reports may 22
+include 3GPP defined slice specific PMs (such as PRB utilization, average delay, etc.  [10]) and new PMs that can be 23
+defined by O-RAN to support various slicing use cases. 24
+Note: It is intended to add examples for the usage of E2 primitives for slicing use cases in the next version of this document. 25
+5.7 O1 Interface 26
+O1, which is the interface between O-RAN managed elements and the management entity as defined in [14], will be used 27
+to configure slice specific parameters of O-RAN nodes based on the service requirements of the slice. 3GPP have defined 28
+some of the slice specific information models in TS 28.541 [9], including the RRM policy attributes to provide the ratio 29
+of PRBs and the split of these PRBs among slices. To support O-RAN slicing use cases and their requirements , 3GPP 30
+information models may be extended and additional information models may be defined to capture slice profiles and slice 31
+specific configuration parameters, which will be carried over O1 interface as well. 32
+O1 will also be used to configure and gather slice specific performance metrics and slice specific faults from O -RAN 33
+nodes. 34
+Note: It is intended to add examples for the usage of O1 for the configuration, performance and fault management of 35
+slicing use cases in the next version of this document. 36
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      31
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+5.8 O2 Interface 1
+O2, which is the interface between the SMO and O -Cloud as introduced in [20], will be used for life cycle managem ent 2
+of virtual O-RAN network functions. As part of RAN NSSI creation and provisioning, RAN NSSMF, in interaction with 3
+SMO, triggers the instantiation of necessary O-RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP and O-DU) 4
+based on slice requirements.  After the creation of RAN NSSI, NSSMF in interaction with SMO can execute NSSI 5
+modification and NSSI deletion procedures. 6
+Since Non-RT RIC is part of SMO and would be instantiated along with other SMO functions, O2 is not expected to be 7
+used for lifecycle management of Non-RT RIC. 8
+Note: It is intended to add examples for the usage of O2 for slice lifecycle management of O -RAN network functions in 9
+the next version of this document. 10
+5.9 Transport Network Slicing 11
+As RAN Slice Subnet is composed of not only the O -RAN NFs but also the transport network components; Fronthaul 12
+interface (FH) between O-RU and O-DU and the Midhaul interface (MH) between the O-DU and O-CU, transport slicing 13
+aspects needs to be considered and incorporated into the overall O-RAN Slicing Architecture.  14
+There are different emerging approaches for defining transport network slicing that can meet 5G requirements, which 15
+mobile interfaces (Fronthaul and Midhaul in RAN slice subnet, Backhaul between RAN slice subnet and Core slice 16
+subnet, and between Core slice subnet and the PDN) can and need to be sliced, what form they will take and the number 17
+of slices required at the transport layer [22]. 18
+This section aims to capture the transport network slicing aspects for Fronthaul and Midhaul links and provide references 19
+to relevant WG4 (Fronthaul), WG6 (intra -DC virtual links) and WG9 (inter -DC links) specifications as these specs 20
+become available. Giv en the current state and progress in these WGs, this version of the O -RAN Slicing Architecture 21
+Specification will focus only on WG9 aspects, with Figure 1 illustrating the scope of the network segments covered by 22
+WG9. The area inside the dotted green line characterizes the transport networks composed of a number of Transport 23
+Network Elements (TNE) deployed among different components defined in other O -RAN WGs. WG9 does not define 24
+the interfaces along the dotted green line. As an example, the Fronthaul inter face of an O -RU or O -DU are defined by 25
+WG4.  26
+ 27
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      32
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure 5.9-1: Xhaul Transport Network Overview (ref: Figure 5-1 [22]) 2
+ 3
+Packet Switched Transport Network Slicing: 4
+O-RAN WG9 has defined the architecture and the best practices for an Open Xhaul transport network based on an end -5
+to-end packet switching architecture in “Xhaul Packet Switched Architectures and Solutions specification” [22] that can 6
+support the requirements outlined in the O-RAN WG9 Transport Requirements document [23]. While the “Xhaul Packet 7
+Switched Architectures and Solutions specification” [22] describes the best practices for O-RAN transport based on end-8
+to-end packet switching technology, it is recognized that other solutions, not based on packet switching, could be utilized, 9
+or mixed with a packet switching solution as well (which are FFS).  10
+As indicated in section 17 [22] the terms hard and soft slicing has emerged for transport networks, referring to the level 11
+of isolation between different slices: 12
+ Hard slicing: Transport resources are dedicated to a specific “Network Slice Instance” (NSI) and cannot be shared 13
+with other slices.  14
+ Soft slicing: Transport resources are shared and can be re-used by other slices.  15
+  16
+A packet switched inf rastructure, as described in [22], has an extensive toolset, consisting of underlay forwarding 17
+solutions, Quality of Service (QoS) and VPNs that allows an operator to  scalable partition the transport network to cater 18
+for both hard and soft slices. See Figure 5.9-2 for transport slice requirements and associated toolset.   19
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      33
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure 5.9-2: Packet switched toolset for transport level slicing (ref: Figure 17-2 [22]) 2
+ 3
+Further details of transport network slicing based on packet switching technology is captured in sec tion 17 and section 4
+18.10 of [22], including packet-switched underlay networks, transport network Quality of Service, 5G service and slices 5
+and a transport slicing scenario on a packet switched Xhaul network. 6
+  7
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      34
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Chapter 6. O-RAN Slice Subnet Provisioning Procedures 1
+6.1 O-RAN Slice Subnet Instance (O-NSSI) Allocation Procedure 2
+Figure 6.1-1 captures the procedure for allocation of an O-RAN slice subnet instance to satisfy the O-NSSI requirements. 3
+ 4
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      35
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure 6.1-1: O-NSSI Allocation Procedure 2
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      36
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+1) Slice subnet management function receives an allocate O-NSSI request (see AllocateNssi operation defined in clause 1
+6.5.2 in 3GPP TS 28.531  [6]) with network slice subnet related requirements (network slice subnet relate d 2
+requirements defined in SliceProfile see clause 6.3.4 in TS 28.541 [9]). 3
+2) Slice subnet management function checks the feasibility of O -RAN slice subnet related requirements utilizing O -4
+NSSI Feasibility Check Procedure (FFS). If the network slice subnet related requirements can be satisfied, the 5
+following steps are needed, else go to step 15. 6
+3) Based on the O -RAN slice subnet related requirements slice subnet management function decides whether to use 7
+an existing O-NSSI or create a new O-NSSI.  8
+4) If using an existing O -NSSI and the existing O -NSSI needs to be modified, slice subnet management funct ion 9
+invokes the O-NSSI Modification Procedure (FFS). 10
+5) If creating a new O-NSSI, slice subnet management function creates the MOI for the O-NSSI to be created and then 11
+derives the corresponding O -RAN slice subnet constituent (i.e. O -RAN NF, constituent O -NSSI) related 12
+requirements and transport network related requirements from the received network slice subnet related 13
+requirements.  14
+ 15
+For each required O-NSSI constituent, steps 6-11 are needed: 16
+ 17
+6) If the required O -NSSI constituent is constituent O -NSSI, slice subnet management function invokes O -NSSI 18
+Allocation Procedure (Clause 6.1). 19
+  20
+If the required O-NSSI constituent is a virtual O-RAN NF instance, steps 7-8 are needed: 21
+7) Slice subnet management function derives O-Cloud requirements for O-RAN NF  22
+8) If the O-RAN NF is a virtual NF, slice subnet management function establishes virtual intra-Cloud links, allocates 23
+slice tags (i.e. , VLAN ID) and optionally instantiate s NF on O -Cloud by executing O-RAN.WG6.ORCH-USE-24
+CASES Clause 3.10.1 Network Slice Creation [21]. If an existing O-RAN virtual NF instance needs to be modified, 25
+slice subnet management function may execute Clause 3.2.2 Scale Out of NF, 3.2.3 Scale In of NF as defined in O-26
+RAN.WG6.ORCH-USE-CASES [21]. 27
+9) Slice subnet management function derives CM requirements for O-RAN NF   28
+10) Slice subnet management function executes O-RAN.WG1.O1-Interface Clause 2.1 Provisioning Management 29
+Services [15] 30
+11) Slice subnet management function configures the O-NSSI MOI. 31
+ 32
+For each transport network requirement, step 12 is needed: 33
+ 34
+12) If the transport link is a physical link that needs to be established across clouds, slice subnet management function 35
+request transport link establishment from TN management functions. 36
+13) If Non-RT RIC has subscribed for O-NSSI allocation event notifications, slice subnet management function notifies 37
+Non-RT RIC with O-NSSI information 38
+14) Slice subnet management function returns appropriate O-NSSI allocation result (see AllocateNssi operation defined 39
+in clause 6.5.2 of 3GPP TS 28.531  [6]). If the O -NSSI is created successfully, the result includes the relevant 40
+constituent network slice subnet instance information (see NetworkSlic eSubnet IOC defined in clause 6.3.2 in TS 41
+28.541 [9]). 42
+ 43
+6.2 O-RAN Slice Subnet Instance (O-NSSI) Modification 44
+Procedure 45
+Figure 6.2-1 captures the procedure for modification of an O-RAN slice subnet instance to satisfy the O-NSSI 46
+requirements. 47
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      37
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure 6.2-1: O-NSSI Modification Procedure 2
+1) Slice subnet m anagement function receives a modify O -NSSI request (see modifyMOIAttributes operation 3
+defined in clause 11.1.1.3 in 3GPP TS 28.532 [7]). 4
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      38
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+2) Based on the modification request, slice subnet management function derives modification requirements for the 1
+O-NSSI that may involve its constituents and transport network. 2
+3) If required, slice subnet management function checks the feasibility of modification requireme nts utilizing O -3
+NSSI Feasibility Check Procedure (FFS). If the network slice subnet modification requirements can be satisfied, 4
+the following steps are needed, else go to step 11.  5
+For each O-NSSI constituent that needs modification, steps 4-9 are needed: 6
+4) If the constituent is an O-NSSI constituent that needs to be modified, slice subnet management function invokes 7
+O-NSSI Modification Procedure (Clause 6.2) 8
+If the constituent is an O-RAN network function, steps 5 and 6 are needed: 9
+5) If the constituent network function is an O-RAN virtual network function that needs to be instantiated / modified 10
+/ deleted, slice subnet management function realizes the following use cases defined in [15] depending on the 11
+modification requirements: 12
+a. O-RAN.WG6.ORCH-USE-CASES Clause 3.2.1 Instantiate NF On O-Cloud 13
+b. O-RAN.WG6.ORCH-USE-CASES Clause 3.2.2 Scale Out of NF 14
+c. O-RAN.WG6.ORCH-USE-CASES 3.2.3 Scale In of NF 15
+d. O-RAN.WG6.ORCH-USE-CASES 3.2.5 Terminate NF on O-Cloud. 16
+6) If the constituent network function needs configuration changes, s lice subnet management function executes O -17
+RAN.WG1.O1-Interface Clause 2.1 Provisioning Management Services [10]. 18
+If O-NSSI constituent has TN part that needs to be modified, for each transport network requirement, steps 7 -8 19
+are needed:  20
+7) If the transport link is within a cloud, slice subnet management function requests virtual link modification within 21
+respective O-Cloud from NFO. Details of this request is FFS. 22
+8) If the transport link is a physical link that is established across clouds, slice subnet management function requests 23
+transport link modification from TN management functions. Details of this request is FFS. 24
+9) If O-NSSI MOI needs to be modified, slice subnet management function reconfigures the O -NSSI MOI.  25
+10)  If Non-RT RIC has subscribed for O -NSSI modification event notifications, slice subnet management function 26
+notifies Non -RT RIC with modified O-NSSI information . Details of event notification between slice subnet 27
+management function and Non-RT RIC is FFS. 28
+11) Slice subnet management function returns O -NSSI modification result (see modifyMOIAttributes operation 29
+defined in clause 11.1.1.3 of 3GPP TS 28.532 [7]).  30
+ 31
+6.3 O-RAN Slice Subnet Instance (O-NSSI) Deallocation 32
+Procedure 33
+Figure 6.3-1 captures the procedure for deallocation of an O-RAN slice subnet instance to satisfy the O-NSSI requirements. 34
+ 35
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      39
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure 6.3-1: O-NSSI Deallocation Procedure 2
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      40
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+1) Slice subnet management function receives a deallocate O -NSSI request (see DeallocateNssi operation defined in 1
+clause 6.5.4 in 3GPP TS 28.531 [6]). 2
+ 3
+Slice subnet management function decides whether the O -RAN slice subnet instance needs to be modified or 4
+terminated. If the O-NSSI needs to be modified, go to step 2 and then step 13, else steps 3-13 are needed. 5
+ 6
+2) Slice subnet management function invokes the O-NSSI Modification Procedure (FFS). 7
+ 8
+For each O-NSSI constituent, steps 3-9 are needed: 9
+ 10
+3) If the constituent is an O -NSSI constituent, slice subnet management function invokes O -NSSI Deal location 11
+Procedure (Clause 6.3). Then go to step 13. 12
+ 13
+If the constituent is an O-RAN NF, steps 4-9 are needed: 14
+ 15
+If O-RAN NF needs to be terminated and is a virtual NF, steps 4 -5 are needed, else if O -RAN NF needs to be 16
+modified go to step 6. 17
+ 18
+4) Slice subnet management function derives the O-Cloud requirements for O-RAN NF termination to terminate the 19
+NF within the respective O-Cloud. 20
+5) Slice subnet management function removes virtual intra-Cloud links, optionally deallocates slice tags (i.e. , VLAN 21
+ID) and terminates NF on O -Cloud utilizing steps defined in O-RAN.WG6.ORCH-USE-CASES 3.10.2 Network 22
+Slice Deletion use case [21]. 23
+ 24
+If O-RAN NF is a virtual NF that needs to be modified, steps 6-7 are needed, else go to step 8: 25
+ 26
+6) Slice subnet management function derives the requirements for O -RAN NF modification request to modify the NF 27
+within the respective O-Cloud.  28
+7) Slice subnet management function invokes O-RAN.WG6.ORCH-USE-CASES 3.2.3 Scale In of NF use case [21]. 29
+ 30
+If O-RAN NF needs to be reconfigured, steps 8-9 are needed, else go to step 10: 31
+ 32
+8) Slice subnet management function derives the CM requirements for the O-RAN NF.  33
+9) Slice subnet management function invokes O-RAN.WG1.O1-Interface Clause 2.1 Provisioning Management 34
+Services [15] 35
+ 36
+For each transport network requirement, step 10 is needed: 37
+ 38
+10) If the transport link is a physical link that needs to be modified/terminated across clouds, slice subnet management 39
+function request transport link modification/termination from TN management functions. 40
+11) If Non -RT RIC has subscribed for O -NSSI deallocation event notifications, slice subnet management function 41
+notifies Non-RT RIC with O-NSSI deallocation. 42
+12) Slice subnet management function returns appropriate O -NSSI deallocation result ( see DeallocateNssi operation 43
+defined in clause 6.5.4 of 3GPP TS 28.531 [6]). 44
+ 45
+ 46
+  47
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      41
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Annex A (informative): Additional Information 1
+A.1 Implementation Options 2
+This section presents example deployment options for various SMO options. 3
+A.1.1 3GPP and ETSI NFV-MANO based O-RAN Slicing Architecture 4
+Implementation Option 5
+ 6
+ 7
+Figure A.1.1-1: O-RAN Slicing Reference Architecture (ETSI NFV-MANO based example) 8
+ 9
+In Figure A.1.1-1, a 3GPP - ETSI NFV-MANO based example of O-RAN slicing reference architecture and interfaces is 10
+shown to describe the relationship betwee n 3GPP defined slice management functions (NSMF, NSSMF), 3GPP defined 11
+management functions (Network Function Management Function, NFMF [6]) and O-RAN network functions in terms of 12
+slice lifecycle management and slice configuration procedures.  Life Cycle Management (LCM) procedures for mobile 13
+networks that include virtualized network functions (VNFs) as well as addition of physical network functions (PNFs) to 14
+network service (NS) instances are described in 3GPP TS28.526 [5].  15
+ 16
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      42
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+A.1.2 ONAP based O-RAN Slicing Architecture Implementation Option 1
+ 2
+Figure A.1.2-1: Example architecture depiction for ONAP based O-RAN Slicing support 3
+In A.1.2-1, current version of ONAP - O-RAN slicing reference architecture is depicted (based on ONAP G -release). In 4
+this architecture, one option is RAN NSSMF being located within SMO and is responsible for t he entire RAN subnet, 5
+including the O-RAN NFs and the related O -RAN transport network components; Fronthaul interface (FH) be tween O-6
+RU and O -DU and Midhaul interface (MH) between O -DU and O -CU. RAN NSSMF determines slice specific 7
+configuration of O -RAN NFs based on SliceProfile received from NSMF and determines the necessary slice specific 8
+requirements for FH and MH interface triggering Transport Network Management Domain (TN MD) to execute the actual 9
+configuration of FH and MH interface. ETSI ZSM based Management Domain approach is adopted for TN management. 10
+B.1 Transport Network Slicing Use Cases 11
+This section describes the ORAN Transport Network slicing related use cases and per -slice configuration of O -RAN 12
+transport network instances, phases of transport  network slicing definition process and the corresponding scope of work 13
+for the relevant O-RAN WGs, considering the projected progress.  14
+ 15
+Transport Network slicing Use Cases are built based on the definitions of slicing in O -RAN WG1 Slicing Architecture 16
+Specification, WG6.CAD Scenario C.1 and C.2 , WG4 O-RU Slicing with support of RAN -Sharing (WG4 Use Case 7 17
+and Use Case 10). 18
+ 19
+Transport network slicing use cases are grouped into phases to incrementally extend the scope of work in relevant O -20
+RAN WGs.  21
+Brief definition of phases: 22
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      43
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Phase 1: Slicing as defined in [2], [3] and [4]. Slicing appears on the N3 (NG) interface. Number of slices are limited. 1
+UPF is centrally located.  2
+Phase 2: Phase 1 is augmented with per -slice QoS characteristics. Slices are multiple w ith multiple exit-points and local 3
+break-outs.  4
+Phase 3 and beyond are FFS 5
+For the current version of Transport Network slicing use cases the following scope and constrains are assumed, based on 6
+mutual discussions and agreements between WG1, WG6, WG9:   7
+ Delineation of slices in O -RAN CUPS User plane interfaces for current phases 1 -5 is based on physical or 8
+VLAN+IP separation. For this delineation, procedures for coordination between TN<>O -RAN and TN<>5GC 9
+provisioning VLAN, IP and corresponding TN service instances are expected. 10
+ Fronthaul – connectivity driven domain, providing traffic differentiation and prioritization according to Open 11
+Fronthaul interface definition, given in O-RAN.WG4.CUS.0-v06.00. No need to support slicing in phases 1 to 12
+4. The support for multi-vendor slicing in the Fronthaul is expected to be introduced in phase 5. 13
+ Midhaul – connectivity driven domain, providing traffic differentiation and prioritization according to 5QI model 14
+of F1 interface, defined in TS38.474. No need to support s licing in phases 1 to 3. DDoS prevention and traffic 15
+control are expected to protect O -DUs from O-CU-UPs, which in future phases may belong and be controlled 16
+by 3rd parties. From phase 3 and beyond, Midhaul is slicing aware domain, serving communication of  O-CU-17
+UP<>O-DU with slicing. For that O -CU-UP and O-DU are expected to perform marking of F1AP with DSCP 18
+and attach VLAN .1q tag and assign IP for slice delineation.  19
+ Backhaul – slicing aware domain, serving communication of UPF <> O -CU-UP with slicing. O -CU-UP and 20
+UPF are expected to perform marking of N3 interface according to 5QI<>DSCP marking and push .1q tag and 21
+assign IP for slice delineation.  22
+ Based on shared O-RU feature progress (WG4 Use Case 7 and Use Case 10), single O-RU are expected to serve 23
+multiple slices and multiple O -DUs, so the expectation is to have capability to maintain mapping of PLMN ID  24
+information to corresponding VLAN+ optional IP pair on C/U Plane of Open Fronthaul interface.   25
+ O-DU is expected to support multiple slices. Single O -DU, serving multiple slices, supposed to have capability 26
+to maintain mapping of O-NSSI information to corresponding VLAN+IP pair on F1 interface and 5QI to DSCP 27
+mapping.  This assumes  progress of WG5 effort on definition upstream DU > CU_UP F1_U 5QI<>DSCP 28
+mapping capabilities.  29
+ O-CU-UP is expected to support multiple slices. Single O -CU-UP, serving multiple slices, supposed to have  30
+capability to maintain mapping of O-NSSI information  to corresponding VLAN+IP pair on F1 interface, 31
+however in current phases 1-5 it is assumed that cluster of O-CU-UPs will serve single O-NSSI, as it is depicted 32
+on Figure B.1-1. 33
+  34
+ 35
+Figure B.1-1: Assumption of mapping functions of O-DU and O-CU-UP to slices 36
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      44
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+From O-RAN perspective, a single network slice may start from O-DU and can have multiple distributed O-CU-UPs and 2
+UPFs, connecting a certain Slice in Data Network with multiple N6 interfaces and multiple local breakouts.  3
+In TN domain TNEs with attachment circuits to O -RU, O -DU and O -CU maintain corresponding QoS schemes and 4
+Transport Network Slice profiles as depicted on Figures B.1-2 and B.1-3. 5
+ 6
+ 7
+Figure B.1-2: Types of slicing in various O-RAN scenarios 8
+ 9
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      45
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure B.1.-3: Types of attachment circuits in TNE 2
+The following figure captures the assumptions of slicing capabilities on the Core and O-RAN for the Option 1 which are 3
+mapped to the phase 1. 4
+ 5
+The Option 2 depicts the expectation of the target capabilities of the systems, including capabilities on the Option 1.  6
+ 7
+ 8
+Figure B.1-4: Options for slicing, demapping orthogonal plane of 5QI per slice in Option 1 and multiple planes of 9
+5QI as attribute per planes of slices 10
+ 11
+For Phase 1 following constrains are assumed: 12
+1) Single operator with one O-NSSI MBB, one O-NSSI mMTC, one O-NSSI NB-IoT slice  13
+2) Fix mapping of slices inter to intra – DC 14
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      46
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3) Flat mapping of standards based 5QI (Table 5.7.4-1 of 3GPP TS 23.501) <> DSCP <> QoS in TN domain  1
+ 2
+ 3
+Figure B.1-5: Diagram of network location of O-RAN instances with relevant domains for use cases 4
+ 5
+As an outcome of the following mapping, it is expected capability of TN domain to accommodate all domains with 6
+relevant QoS profiles and slices in each TNE, as depicted in the figure below:  7
+ 8
+ 9
+Figure B.1-6: Diagram of O-RAN flows to be accomodated in each TNE 10
+ 11
+Table B.1-1 captures assumptions of TN slicing capabilities in each interface for the phase 1:  12
+ORAN
+interface
+Stream
+direction
+Queue  Slicing
+VLAN
+Differentiated QoS
+behavior per slice
+Fronthaul C/U Any EF (HP) No No
+Fronthaul M-pane,
+E1, E2, F1_c, O2, A1,
+Xn_c, N2, N4
+Any AF No No
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      47
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+F1_U DU > CU-UP AF* or 5QI<>DSCP
+mapped**
+No  No
+F1_U CU-UP > DU 5QI<>DSCP
+mapped**
+No No
+N3 (NG) CU-UP >
+UPF
+5QI<>DSCP
+mapped**
+Yes No
+N3 UPF > CU-
+UP
+5QI<>DSCP
+mapped**
+Yes No
+Xn_U Any 5QI<>DSCP mapped
+(as per TS 38.424)
+No No
+Table B.1-1: Scope of the capabilities of O-RAN elements in Phase 1 1
+* Based on current 3GPP TS38.474 Section 5.4 definition of 5QI<>DSCP capability of F1_U f or the link DU > CU-UP 2
+may be limited. If this is the case, for the phase 1 the mapping of F1_U is recommended to a bandwidth queue.  3
+** 5QI QoS Identifiers, the Priority Level (if explicitly signaled), and other NG -RAN traffic parameters (e.g., ARP)  in 4
+O-RAN and Core domains mapped to DSCP and ToS or CoS parameters, aligned with TN domain with accordance to 5
+3GPP NRM in TS 28.541, with the flow depicted in the chart below: 6
+ 7
+ 8
+Figure B.1-7: Diagram of profiles information model parameters mapped to the domains to form a slice  9
+According to these parameters, the relation of RANSliceSubnetProfile and RANSliceSubnetProfile with VLAN and IP 10
+mapping could be established with corresponding EP_Transport VLAN and IP mapping, allowing TN domain to perform 11
+separation allocation of resources per slice.  12
+ 13
+In 3GPP Rel 16 definition of 3GPP IM/DM in TS 28.541 [9] TN domain is out of scope, and network slice parameters of 14
+the RAN and CN are existing in the corresponding fields of the IM/DM. More details in of 3GPP IM/DM in regard for 15
+network slicing can be found in WG9 XTRP-MGT.0-v.04 Section 9.1. 16
+ 17
+Phase 2 assumes the following constrains: 18
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      48
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+1) Single operator with enterprise slices use case  1
+2) Number of slices: many.  2
+3) Multiple exit points and multiple UPFs  3
+4) Per-slice (tenant) 5QI<>DSCP<>QoS model in TN domain  4
+ 5
+ 6
+Figure B.1-8: Scope of the capabilities of O-RAN elements in Phase 2 7
+* 5QI QoS Identifiers, the Priority Level (if explicitly signaled), and other NG-RAN traffic parameters (e.g., ARP) in O-8
+RAN and Core domains mapped to DSCP and ToS or CoS parameters, aligned with TN domain with accordance to 3GPP 9
+NRM in TS 28.541, with the flow depicted in the chart below 10
+ 11
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      49
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Phase 2 and 3: 1
+ 2
+ 3
+Figure B.1-9 Diagram of use cases for phase 2 and 3 4
+Table B.1-2 captures assumptions of TN slicing capabilities in each interface for the phase 2  and later: 5
+ 6
+ORAN
+interface
+Stream
+direction
+Queue in 4Queue model  Slicing
+VLAN
+Differentiated
+QoS behavior
+per slice
+Fronthaul C/U any EF (HP) no no
+Fronthaul M-pane,
+E1, E2, F1_C, O2, A1,
+Xn_c, N2, N4
+any AF no no
+F1_U DU > CU-UP 5QI<>DSCP mapped* yes** no
+F1_U CU-UP > DU 5QI<>DSCP mapped yes** no
+N3 (NG) CU-UP > UPF 5QI<>DSCP mapped*** yes no
+N3 UPF > CU-UP 5QI<>DSCP mapped*** yes no
+Xn_U any AF no no
+Table B.1-2: Scope of the capabilities of O-RAN elements in Phase 2 and later 7
+*based on assumption on WG5 and WG6 effort on definition upstream DU > CU_UP F1_U 5QI<>DSCP mapping 8
+capabilities 9
+**based on assumption on WG5 and WG6 effort  on definition F1_U slicing capabilities (inter -DC risk of missing the 10
+March train) 11
+***More on Mapping recommendation in WG9 “RBBN-TFCA-QoS mapping” contribution 12
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      50
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+ 2
+After this analysis and discussions within ORAN WG9 the conclusion is that NRM 3GPP TS28.541 [9] does not provide 3
+enough data to create valid Transport Network Slice.  4
+ 5
+However, since some of the parameters required to create transport network slice may be extracted from NRM TS28.541 6
+[9] and some can be translated from SMO expectations, the following scope of work for WG9 and WG10 is proposed:  7
+- Collect missing parameters in NRM TS 28.541 [9] for TN Slice creation  8
+- Propose enhancements of NRM TS 28.541 [9] to include OpenModelClass TNSliceSubnet to link EP_Transport 9
+to TN and add options for linking 3GPP subsystems to TN subsystems  10
+- File ORAN liaison to SA5 in order to augment TS 28.541 [9] with missing information and proposed items. 11
+- Align with IETF TN Network Slice abstraction  12
+- Define information flows 13
+- Align ORAN WG1, WG9 and WG10  14
+ 15
+C.1 Slicing and 3GPP Slice Modeling Terminology Awareness 16
+This section intends to provide further information and clarified awareness for some of the fundamental network slicing 17
+concepts and 3GPP modeling aspects.  18
+C.1.1 Conceptual Differences Between 3GPP SA2 and SA5 19
+(System Architecture) Network Slice (3GPP SA2): Even though this is a system architecture group, the RAN architecture 20
+is out of the scope of SA2. RAN3 owns the RAN architecture. SA2 service -based architecture (SBA) is a functional 21
+architecture with mostly service-based interfaces. 22
+(Management Aspect) Network Slice (3GPP SA5): SA5 describes all the management aspects of a network, which is 23
+modular and model driven. It is a service -based management architecture (SBMA), using service -based API allowing 24
+implementations to pick and choose appropriate API and compliance per API. See 3GPP TS 28.533 [8].  25
+A Network Slice Instance (NSI), a SA2 term, is a set of functions. SA2 also introduced the concept of an instance because 26
+there would be more than one slice of the same type for the purpose of scaling. What is managed by an operator is a group 27
+of functions (an NSI). 28
+A NetworkSlice Managed Object Instance (MOI) , a SA5 usage, is an object exposing to an exte rnal consumer. Once an 29
+operator builds a something to satisfy expectations, it needs to build something that is exposed to an external consumer 30
+which is a NetworkSlice MOI. Scale in/Scale out is an operation within Life Cycle Management which is under the 31
+purview of SA5. In the context of SA5, a NSI is just an attribute carrying signaling “NSI” value semantic. From a 32
+management perspective, the abbreviation NSI is sometimes used as a replacement of the proper term NetworkSlice MOI. 33
+However, this is just an improper use of terminology.  34
+A NetworkSliceSubnet MOI is sometimes called an NSSI. However, in SA5, any occurrences of the term NSSI should 35
+be perceived as a NetworkSliceSubnet MOI. 36
+C.1.2 Name Containment Limitation 37
+NSSI stands for NetworkSliceSubnet Inst ance a.k.a. Managed Object Instance (MOI) of the NetworkSliceSubnet 38
+Information Object Class (IOC). 39
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      51
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+NetworkSliceSubnet IOC has been introduced to group instances (of any IOC) in a way that is NOT restricted by the 1
+Name Containment (DN) rules. Those name containment rules are described in 3GPP TS 32.300 [12]. Name containment 2
+defines a managing hierarchy . This is ok; however,  it restricts the flexibility needed for Net work Slice management 3
+(especially for shared Network Functions). 4
+This shortcoming of the TS 32.300 [12] is addressed by the NetworkSliceSubnet which allows for multip le views or 5
+“overlays” to augment the management hierarchies. This grouping is independent of how the network is managed and 6
+structured via distinguished names. Note that the NetworkSliceSubnet inherits from the top IOC (see TS 28.541 [9] clause 7
+6.2.2). 8
+This is illustrated in the following diagram: 9
+ 10
+Figure C.1.2-1: Multi-Parent inheritance supported from Network Slice Subnet Instance 11
+C.1.3 Network Slice Subnet is a Purposeful Generic Collection 12
+The definitions and diagrams that follow are driven from 3GPP 5G NRM specifications in TS  28.541 [9]. The 3GPP 5G 13
+NRM serves as a foundation for ORAN specification development, and modeling work from which ORAN development 14
+aligns to. For further details, please refer to O-RAN WG5 and WG10 specifications. The diagrams in this document utilize 15
+elements from the 3GPP 5G NRM but should be fully applicable to the ORAN IM.  16
+The NetworkSliceSubnet is a purposeful generic collection of objects. The NetworkSliceSubnet can be comprised of a 17
+number of managedfunctions, networkservices and EP_transport endpoints as shown in the diagram below inspired from 18
+the 3GPP TS28.541 [9] clause 6.  19
+Three key points that the diagram illustrates is that:  20
+1. Generic Collection: The NetworkSliceSubnet is a purposeful generic collection of objects shown in 21
+the diagram. 22
+2. Recursive:The NetworkSliceSubnet is a recursive structure which can self -reference 23
+NetworkSliceSubnets 24
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      52
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+3. Purposeful: The “purpose” of that Generic Collection of objects is defined in the SliceProfile. Note: The 1
+cardinality between NetworkSliceSubnet and SliceProfile which is written as 1…* could be an empty list: 1…0 2
+which would imply there is no SliceProfile. You could group a set of objects without a profile. Profiles are 3
+derived from the SLS. Note: it st ated that it is under consideration for FFS in 3GPP that the SliceProfile may 4
+become an IOC. 5
+ 6
+These points are highlighted in the following diagram: 7
+ 8
+Figure C.1.3-1: NetworkSliceSubnet is a purposeful generic collection 9
+C.1.4 Slicing Instance Example 10
+The following diagram shows an example instance of a NetworkSliceSubnet. 11
+ 12
+ 13
+ 14
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      53
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure C.1.4-1: Slicing Instance Example 2
+ 3
+As a concrete example of figure  C.1.4-1, the above diagram shows instances of managed functions and network slice 4
+subnets. Depicted are two Network Slices (NS1, NS2), with their associated NetworkSliceSubnets, Core and RAN 5
+managed function components. The picture illustrates that NetworkSliceSubnets are generic groupings of objects. These 6
+relationships are indicated by the <<groups>> tag. This diagram shows two eMBB Network Slices that are providing two 7
+different services with different throughp ut SLA requirements within the network of the same service provider (PLMN -8
+A). 9
+Notice that the NetworkSliceSubnets have SliceProfiles associated with them in this example. The illustration also 10
+highlights how some name containment relationships (see TS  32.300 [12]). These are indicated by the <<names>> tag. 11
+Notice that NSS2 (NetworkSliceSubnet #2) is a collection of 5G Core Components (UPF1, AMF1, SMF1); and that NSS1 12
+is a collection of 5G RAN components (DU1, CUCP1, CUUP1, NRCellDU1, NRCellCU1). NSS3 and NSS4 are the 13
+NetworkSliceSubnets that expose the “stitched” groupings. The NSS3/NSS4 will have a slice profile that reflects the 14
+entire SLA/SLS represented by the service profile. While NSS1/NSS2 will have portions of the entire SLS pertaining to 15
+the corresponding (e.g. Transport, RAN, Core) parts of the slice. This illustrates that the “stitching” occurs at the OSS / 16
+network management layer not at the BSS layer where slice orchestration happens. Slice instances at the BSS, the subnets 17
+are handled as the management layers. 18
+C.1.5 NSSI Slice Profile and PLMNInfo 19
+The “purpose” of the NetworkSliceSubnet MOI is given in the SliceProfile which is associated with it. It may be 20
+associated with a particular network slice or a group of network slices. The association is accomplished through the 21
+pLMNInfoList attribute of the SliceProfile. The Slice Profile is a data type that represents the requirements or purpose 22
+of the generic collection instance that may support one or more NetworkSliceSubnet instances. For an end-to-end Network 23
+Slice to exist, it is expected that it would have an associated slice profile containing a pLMNInfoList.  24
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      54
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Note: a NetworkSliceSubnet may be just a generic collection of objects not associated with an End-to-End Network Slice. 1
+In this case, there might not be a slice profile associated with NetworkSliceSubnet.  2
+Both 3GPP Release 16 and 3GPP Release 17 5G NRM have the SliceProfile , please refer to 3GPP TS 28.541 [9] for 3
+further details. This is illustrated in the following diagram: 4
+ 5
+Figure C.1.5-1: Slice Profile contains a List of PLMNInfo 6
+C.1.6 Managed Functions Have a List of PLMNInfo 7
+The concrete managed functions, notably the gNBCUUPFunction, NRCellCU and NRCellDU each can have a list of 8
+PLMNInfo attributes. Concrete managed functions are configured with the slice information via the pLMNInfoList 9
+attribute. It is mainly used for signaling. Additionally, the concrete managed function becomes associated with a Network 10
+Slice.  11
+There are two possible error scenarios: 12
+First, it may be possible that a managed function is configured with a particular entry in the pLMNInfoList but it is not 13
+member of any Network Slice Subnets associated with profiles containing the same entry in their pLMNInfoList 14
+(Signaling configured, management association missing).  15
+Second, it may be possible that a managed function is not configured with a particular entry in the pLMNInfoList but is 16
+a member of a Network Slice Subnet associated with profiles containing this particular entry (Management association 17
+present, signaling configuration missing). 18
+This is illustrated in the following diagram: 19
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      55
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Figure C.1.6-1: Managed Functions have a list of PLMNInfo   2
+C.1.7 Single Network Slice Selection Assistance Information (S-NSSAI) 3
+A Single Network Slice Selection Assistance Information (S-NSSAI) is used to define a slice. It is a 32-bit number defined 4
+by 3GPP TS 23.003 [3] Clause 28.4.1. S-NSSAI is comprised of Slice / Service Type (SST) and Slice Differentiator (SD). 5
+SST have values 0 to 127 standards reserved and 128 values are operator defined. These are defined in TS 23.501 [4]. 6
+The Standardized SST values are given in 3GPP TS 23.501 [4] clause 5.15.2.2. 7
+ 8
+D.1 RAN Management services exposure for Multi-Operator Slice 9
+Sharing of RAN resources is one of the key requirements for Mobile Network Operators (MNO) to reduce the RAN 10
+infrastructure cost and increase profitability, while enhancing the coverage. Currently O -RAN drives the RAN sharing 11
+models and associated considerations through WG1 Use Cases Detailed Specification Use Case 7:  RAN Sharing which 12
+focus on the MORAN (Multi Operator RA N) scenario and sharing computing resources (for more details refer to [2]) . 13
+The goal of the existing RAN Sharing use case is to enable multiple operators to share the same O -RAN infrastructure 14
+wherein each operator utilizes a separate carrier, while allow ing them to remotely configure and control the shared 15
+resources via a remote O1, O2 and E2 interface.  16
+ 17
+While the RAN Sharing use case set the premise for sharing the infrastructure and extending the management interfaces, 18
+the use case does not clearly depict the network slicing scenarios especially offering and usage of RAN objects related to 19
+network slicing in context of relation between multiple operators. The need for such a slice usage consumption /offering 20
+scenario is depicted in 3GPP specification TR 28.824 [28], TR 28.801 [11], TS 28.530 [30] and other industry initiatives 21
+like 5GPPP Slicenet [33] project. Specifically, 3GPP TR 28.824 [28] depicts the management capability exposure across 22
+multiple operators, especially Network Operator (NOP) role played by multiple operator organizations – one offering 23
+RAN objects related to network slicing and other using the RAN objects related to network slicing to establish an end-to-24
+end slice. Few examples of business use cases are depicted below:   25
+ 26
+- Cross MNO Model of offering and usage of RAN objects related to network slicing 27
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      56
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ Two MNOs get into agreement in a scenario where one of the MNOs do not have spectrum or coverage in a 1
+particular region (such as foreign country, remote areas, out of service area) to share RAN resources. The arrived 2
+solution to share RA N is to utilize RAN objects related to network slicing to fix coverage gaps. E.g., network 3
+slice consisting of core objects belonging to MNO1, and RAN objects belonging to MNO2. 4
+ Many MNOs form a consortium and share RAN resource through bulk provisioning of RAN objects related to 5
+network slicing that can be offered on demand for subscription to address the needs of consortium participating 6
+MNOs (for example to address the emergency, disaster response) 7
+ MVNO relying on multiple MNOs. Each MNO offers its RAN resources as RAN objects related to network 8
+slicing  9
+- MNO and Hyperscale Public Cloud Provider Slice Consumption Offering Model  10
+ There is a market trend of collaboration between H yperscale Public Cloud Companies and MNOs in which 11
+Hyperscalers count on access network infrastructure owned by MNO, while utilizing the Edge and Core network 12
+services using their own or partner services. In this model the RAN objects related to network slicing  is offered 13
+to the Hyperscalers and integrated to offer a unified service 14
+ 15
+Considering that standards, related marketing trends and described cases with multiple parties involved, there is a great 16
+value to streamline parties’ interaction with respective O-RAN specification activities.  17
+ 18
+From an O-RAN standardization perspective following three aspects need to be considered in context of these use case 19
+models: 20
+ Exposure of management services providing lifecycle management, CM, FM, PM, performance analytics and 21
+other management capabilities of RAN logical instances (as a collected group of RAN objects related to network 22
+slicing) for usage of RAN objects related to network slicing in context of relation between multiple operators  23
+ Exchange and mapping of resource identifiers corresponding  to  a collected group of  RAN objects related to 24
+network slicing for it to be composed into an end-to-end slice 25
+ Governance of the exposed RAN Slice Subnet management services for them to be made available externally in 26
+a secured and manageable manner 27
+ 28
+Notes:  29
+a) Logical instances as collected group of RAN objects related to network slicing implies representation of a group 30
+of logical components within each RAN node that collectively provide required  characteristics of network slice at 31
+RAN part which is commonly called in the O-RAN Slicing Architecture Specification as O-RAN Slice Subnet 32
+b) Direct SMO exposure to external slice management systems across MNOs assumes prior business agreement 33
+(contract) between parties 34
+c) Correct interpretation of FM and PM data may require prior interface agreements with exchange of related data 35
+(e.g., specifications of PM, FM problem types, MIB files) 36
+d) “Multi-Operator slice” is a term used to represent a concept of e nd-to-end network slice that uses RAN Slice 37
+Subnet instances (collected group of RAN objects related to network slicing) provided by MNO in shared RAN 38
+resources. As needed, the partner operator would define its PLMN specific network slice (as per 3GPP TS 23.501 [4] 39
+identified by S-NSSAI within specific PLMN ID but not multiple PLMN IDs) in that end -to-end slice.  40
+ 41
+D.1.1 Management services exposure for Multi-Operator slice - Relevant 42
+Standards 43
+ 3GPP TS 28.530 [30] Clause 4.1.6 Network Slice as a Service (NSaaS) : Explains the concep t of NSaaS offered 44
+by CSP to CSC and the ability of the CSC to manage the network slice as manager via management interface 45
+exposed by the CSP. Further, the CSC is also allowed to offer their own services ( e.g., communication services) 46
+on top of the network slice obtained from the CSP. 47
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      57
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 3GPP TS 28.533 [8] Clause A.3  Utilization of management services by Exposure Governance Management 1
+Function (EGMF) : Explains the manag ement capability of EGMF , especially Exposure Governance and also 2
+depicts an example of exposing the management function (MnF) capability through the EGMF to MnF from 3
+another operator or to 3 rd Party . The standardization of EGMF in 3GPP is not mature and  require further 4
+elaboration.  5
+ 3GPP TS 28.824 [28]: Focused study on network slice management capability exposure. Highlights the general 6
+concept of exposure of management service ( e.g., via BSS, without going through BSS) , the roles related  to 7
+network management capability exposure, types of interfaces for exposure of network slice. Further, the study 8
+item also highlights a use cases and scenario of exposure of network slice as a service, wherein RAN Slice is 9
+offered as a product to CSP. Thi s informative section reuses the concepts defined in 3GPP 28.824 [28] and 10
+investigate the O-RAN specific impacts. 11
+ 3GPP TS 28.811 [31]: Study on the network slice management enhancements. This study item covers potential 12
+enhancements to slice management such as -  Multi-operator relationships in network slice management, Concepts 13
+like  roaming, network slice isolation, edge computing, network slice specific authentication, management data 14
+isolation for different Network Slice Consumers(NSCs). One relevant scenario considered in the study item is 15
+network slice using multiple net works scenario which highlights two potential options – a) Solution based on 16
+Network slice as a service (NSaaS) – enhancements to NetworkSlice  IOC or new ExternalNetworkSlice IOC and 17
+b) Solution based on Network slice subnet as a service  (NSSaaS) - enhancements to NetworkSliceSubnet IOC or 18
+new ExternalNetworkSliceSubnet IOC.  19
+ 3GPP TR28.801 [11]: Study on management and orchestration of network slicing for next gener ation network. 20
+Clause 5.1.8.2 describes the scenario of creating an end-to-end Network Slice Instance across multiple operators. 21
+Similarly, Clause 5.1.9 describes a scenario of limited level of management exposure for multiple Network Slice 22
+Instances 23
+ 3GPP TR 23.700 -99 [32]: Study on Network Slice Capability Exposure for Application Layer Enablement 24
+(NSCALE). This study identifies key issues, solutions, and potential requirements to enable exposure of network 25
+slice management capabilities applied to vertical industries (exposure to Application Function). This study item 26
+highlights some key requirements that may be relevant for the external management of RAN Slice Subnet – such 27
+as the ones described in clause 4.1.1 [AR 4.1.1 -a] - The application enablement layer shall support interaction 28
+with 3GPP network management system to consume network slice management service.  29
+D.1.2 Concepts of management services exposure for Multi-Operator slice 30
+This section summarizes the key concepts related to management services  exposure for multi -operator slice. These 31
+concepts build on those already defined in 3GPP TR 28.824 [28]. 32
+ exposed Management Service (eMnS): The SMO has a certain set of capabilities. Some of the capabilities of the 33
+SMO need to be exposed northbound.  34
+ eMnS Producer: The logical function of SMO that provides management service that can be consumed by a eMnS 35
+Consumer.  36
+ eMnS Consumer: The logical entity outside the administrative and trust boundaries of SMO that consumes 37
+exposed management service  38
+ MnS Producer: The logical function of SMO that provides management service(s) that ca n be discovered  and 39
+consumed within a MNO's administrative and trust boundaries 40
+ eMnS Exposure: Set of procedures that make available management service in SMO for external consumer. This 41
+can include registration of service producers in external exposure functions, publishing of a management service 42
+for external exposure, authentication, and authorization of eMnS consumer, discovery of required eMnS based 43
+on selection criteria defined by eMnS consumer 44
+ eMnS Discovery: Discovery of the eMnS Producer management services by a eMnS Consumer based on its 45
+selection criteria. 46
+ SMO external exposure functions: Abstract notion to be used in use cases and scenarios description consolidating 47
+SMO Services providing capabilities to support eMnS Exposure and potent ially other similar services. SMO 48
+external exposure function is used as an example to logically represent this set of capabilities.  49
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      58
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+ 1
+Note 1: The discovery service can be realized using either an existing service discovery functions in SMO or to be defined 2
+new SMO external exposure functions or a gateway function as defined in 3GPP 28.533 [8] like EGMF.  The exposure 3
+of eMnS capabilities may also adopt the approach in  3GPP TR 23.700-99 [32] leveraging the Network Slice Capability 4
+Enablement Server (NSCE-S) in combination with EGMF. 5
+Note 2:  Since SMO external exposure function is not limited to eMnSs related to RAN network slicing, it is assumed to 6
+be addressed within the scope of WG1 Architecture work and is not supposed to be formally defined in this specification. 7
+An extensive functional description is beyond the scope of thi s specification. Some potential references for realizing the 8
+functionality of SMO external exposure functions are – CAPIF (3GPP TS 23.222 [25], 29.222 [26]), EGMF (3GPP 28.533 9
+[8]) etc. 10
+ Operator Business Roles: 11
+o Managed Network Operator (MNO): provides or consumes Management Services related to RAN 12
+slicing.  13
+o E_NSSMS_C ( External consumer of MnS related to RAN slicing ): Operator who discovers and 14
+consumes eMnSs related to RAN slicing 15
+o E_NSSMS_P (Provider of external MnS related to RAN slicing): Operator who is exposes and provides 16
+eMnSs related to RAN slicing  17
+D.1.3 Management aspects of external exposure of MnS related to RAN 18
+slicing 19
+D.1.3.1 General  20
+External exposure of MnS related to RAN slicing  can be treated as a particular case of  the generic service exposure 21
+existing in the industry and covered in standard specifications like 3GPP Common API Framework [25], [26]. Therefore, 22
+many aspects related to generic exposure architecture may be applicable to the the external exposure of MnS related to 23
+RAN slicing case as well. 24
+According to 3GPP CAPIF framework, clear separation of registry specific aspects and service specific aspects is 25
+recommended in functional model, architecture, and procedures. In CAPIF architecture the CAPIF core functi on 26
+consolidates all registry specific aspects and enable service APIs from both the MNO trust domain and the 3rd party trust 27
+domain having business relationship with MNO, while service specific aspects are covered by API provider functions 28
+(API exposing function (AEF), API publishing function (APF) and API management function (AMF)).  29
+Similarly, management of external exposure of MnS related to RAN slicing would include two categories of aspects: 30
+- related to service specific aspects (i.e., actual processing of service requests to exposed management services 31
+(eMnSs) from E_NSSMS_C e.g., service endpoint termination, throttling, translation between external and 32
+internal information, re-exposure of service operations and events, topology hiding, routing, etc.) 33
+- related to registry and catalog specific aspects (i.e. , capabilities to manage various data records and profiles to 34
+support registration, discovery, publishing, identity management, authentication, authorization, access policies, 35
+data translation rules, topology hiding policies etc.)  36
+ 37
+While the CAPIF framework helps to reuse registry specific capabilities for various API exposure scenarios, it presumes 38
+decomposed architecture with  additional interactions between CAPIF Core Function (CCF) and API provider functions 39
+(AEF, APF, AMF) which adds more complexity and may not be always preferred.  40
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      59
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+With regard to possible impact on capabilities of SMO management services, at least two alternative options may be 1
+considered for management of external exposure of MnS related to RAN slicing: 2
+- Option 1: Consolidation of exposure capabilities. Internal SMO management services are off -loaded from 3
+capabilities of external exposure as much as possible, i.e., service related aspects are as well managed by dedicated 4
+category of SMO external exposure services 5
+ 6
+ 7
+Figure D.1.3.1-1: Option 1: Consolidation of exposure capabilities 8
+ 9
+- Option 2: Decomposition of exposure capabilities. Internal SMO management services are aware of exposure and 10
+enriched with at least service specific aspects to proceed requests from external consumer of MnS related to RAN 11
+slicing following identity and policy information managed in SMO external exposure services  responsible for 12
+registry specific aspects. 13
+ 14
+ 15
+Figure D.1.3.1-2: Option 2: Decomposition of exposure capabilities 16
+Note:  17
+E_NSSMS_C
+SMO/
+E_NSSMS_P SMO external exposure functions
+SMO Functions
+External consumer of MnS related to RAN slicing
+service specific
+aspects
+capabilities
+Authentication,
+discovery,… Operations
+Capabilities of SMO
+Management Services
+Capabilities of SMO
+external exposure
+services
+Services producing Services consuming
+Registry
+Capabilities
+SMO
+Management
+Services
+SMO external
+exposure services
+E_NSSMS_C
+SMO/
+E_NSSMS_P SMO external exposure functions
+SMO Functions
+External consumer of MnS related to RAN slicing
+Registry
+Capabilities
+service specific
+aspects
+capabilities
+Authentication,
+discovery,…
+Operations
+Services producing Services consuming
+SMO external
+exposure services
+SMO
+Management
+Services
+Capabilities of SMO
+Management Services
+Capabilities of SMO
+external exposure
+services
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      60
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+CAPIF is originated out of 3GPP SA6 WG ( application enablement and critical communication applications group for 1
+vertical markets) and 3GPP CT WG3 (design and specification of the Northbound APIs between the  vertical application 2
+servers and the Core Network) which are not dedicated to management specifications design. Management specifications 3
+design is in responsibility of 3GPP SA5 WG (Management, Orchestration and Charging for 3GPP systems) 4
+SA5 WG gives high level definition [27] of Exposure Governance Management Function (EGMF) as a management 5
+function with the role of management service exposure governance (i.e. , abstraction, simplification, filtering, etc.) . 6
+Functional model and requiremen ts are not yet defined for EGMF. 3GPP conducts the study ([28], not yet finalized) 7
+suggesting possible roles of EGMF and p ossible solutions for combined CAPIF/EGMF architecture applied to  8
+management domain. One of the considered architectures is where EGMF  consolidates the registry specific functions  9
+(CAPIF Core Function) and API provider domain functions 10
+D.1.4 Multi-Operator slice: high level use cases and potential requirements 11
+for exposure fo MnS related to RAN slicing 12
+As noted above, the term “Multi-Operator slice” is used here to represent a concept of end-to-end network slice that uses 13
+RAN Slice Subnet instances (collected group of RAN objects related to network slicing) provided by MNO in shared 14
+RAN resources. As needed, the partner operator would def ine its PLMN specific network slice (as per 3GPP TS 23.501 15
+[4] identified by S-NSSAI within specific PLMN ID but not multiple PLMN IDs) in that end -to-end slice. 16
+This clause provides the high-level use cases and potential requirements for controlled external exposure of of MnS related 17
+to RAN slicing. 18
+D.1.4.1 Registration of producers of MnSs related to RAN slicing for external exposure 19
+D.1.4.1.1 Background and goal of the use case  20
+In order to expose MnS related to RAN slicing  externally SMO Functions responsible for external exposure (SMO 21
+external exposure functions) need to be aware of producer of these services in SMO. This may be achieved by registering 22
+producers of respective MnSs in SMO external exposure functions 23
+D.1.4.1.2 Description 24
+Pre-condition 25
+ There are existing trust relations between SMO external exposure functions and SMOF that is a producer of MnS 26
+related to RAN slicing  27
+ SMOF can reach SMO external expo sure services (as one of the possibilities, SMOF gets informed of SMO 28
+external exposure services capabilities and service end-points through preliminary registration of SMO external 29
+exposure functions as a producer of SMO external exposure services  in SMOF  responsible for service 30
+registration and management)  31
+ 32
+Note: SMOF responsible for service registration and management is not yet formally defined in SMO architecture.  33
+ SMOF playing a role of a producer of MnS related to RAN slicing determines its MnSs are  required to be 34
+exposed externally.  35
+ SMO Function responsible for external exposure does not have information about the producer of MnSs related 36
+to RAN slicing.  37
+ 38
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      61
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+High level procedure 1
+1. SMOF playing a role of a producer of MnS related to RAN slicing  requests SMO external exposure services to 2
+register its MnSs.  3
+2. SMO external exposure services producer creates registry record for the producer of MnSs related to RAN slicing 4
+containing data about available MnSs and additional data (e.g. , id, end-point URIs, MnS Producer profile with 5
+supported MnSs, load level, heartbeat etc).  6
+3. SMO external exposure services  producer acknowledges the successful registration or failure. SMO external 7
+exposure function may subscribe to SMOF status or SMOF sets pushing status heartbeat 8
+ 9
+   10
+Figure D.1.4.1.2-1. Flow of registration of MnS related to RAN slicing for external exposure 11
+ 12
+Post-condition 13
+SMO external exposure services producer has created the registry record for a producer of MnS related to RAN 14
+slicing   15
+D.1.4.1.3 Potential requirements 16
+REQ-SL-EXP-FUNxx SMO shall support a capability to register MnSs that are required to be exposed externally  17
+REQ-SL-EXP-FUNxx SMO shall support a capability to discover the MnS of the function that provides registration  for 18
+MnSs that are required to be exposed externally 19
+REQ-SL-EXP-FUNxx SMO shall support a capability to store, query, update, and deliver information about producer of 20
+MnSs that can be exposed externally  21
+Editor’s note: The above requirements are intention ally not yet numbered and will be numbered if/when they become 22
+normative requirements. 23
+D.1.4.2 Discovery of producers of MnS related to RAN slicing for external exposure 24
+D.1.4.2.1 Background and goal of the use case  25
+In order to expose capabilities of MnS related to RAN slicing  externally SMO external exposure functions  need to be 26
+aware of producer of these services in SMO. This may be achieved by discovering producers of  respective MnSs by 27
+querying SMOF responsible for service registration and management  and providing common registration service to 28
+MnSs)  29
+SMO/
+E_NSSMS_P SMO external exposure functions
+SMO Functions
+Registry
+Capabilities
+producer of MnS
+related to RAN slicing
+MnS MnS MnS
+No Record Record created
+0
+1
+2
+3
+SMO external
+exposure services
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      62
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Note: SMOF responsible for service registration and management is not yet formally defined in SMO architecture.   1
+D.1.4.2.2 Description 2
+Pre-condition 3
+ There are existing trust relations between SMO external exposure function and SMOF responsible for service 4
+registration and management 5
+ SMO external exposure function can reach SMOF responsible for service registration and management  6
+ SMOF playing the role of a producer of MnS related to RAN slicing registered its MnSs in SMOF responsible 7
+for service registration and management  8
+ SMO external exposure function determines MnSs that are required to be exposed externally  9
+ SMO external exposure function does not have information of the producer of MnSs that are required to be 10
+exposed externally.  11
+ 12
+High level procedure 13
+1. SMO external exposure function requests SMOF responsible for service registration and management to discover 14
+a producer of specific MnSs by providing filter criteria.  15
+2. SMOF responsible for service r egistration and management applies filter criteria to the existing registry records 16
+for MnS producers. 17
+3. SMOF responsible for service registration and management  provides response with details on producers of 18
+matching MnSs 19
+ 20
+ 21
+Figure D.1.4.2.2-1: Flow of discovery of MnS related to RAN slicing for external exposure 22
+ 23
+Post-condition 24
+SMO external exposure function has obtained the registry records for a producer of the MnSs that are required to be 25
+exposed externally as per requested filter criteria   26
+D.1.4.2.3 Potential requirements 27
+REQ-SL-EXP-FUNxx SMO shall support a capability for an authorized SMOF to discover MnSs that are required to be 28
+exposed externally 29
+SMO/
+E_NSSMS_P SMO external exposure functions
+SMO Functions
+Registry
+Capabilities
+producer of MnS
+related to RAN slicing
+MnS
+No Record Record created
+0
+1
+3
+2
+service registration and
+management  SMOFMnS 0 Record exists
+MnS
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      63
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+REQ-SL-EXP-FUNxx SMO shall support a capability  for an authorized SMOF to obtain information about MnS s that 1
+are required to be exposed externally based on criteria specified by that SMOF  2
+Editor’s note: The above requirements are intentionally not yet numbered and will be numbered if/when they become 3
+normative requirements. 4
+  5
+ 6
+  7
+
+_______________________________________________________________________________________________
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification      64
+O-RAN.WG1.Slicing-Architecture-R003-v09.00
+Revision History  1
+Date Revision Description
+2022.11.10 08.00.01 Removed v08.00 history
+Initial version towards v09.00, starting with v08.00.01 per O-RAN specification revision
+numbering process
+Addition of CR:
+- NC.AO-2022.05.02-WG1-NC-0004-MultiOperatorSliceAnnexure-v04
+2022.11.10 08.00.02 Addition of CR:
+- NC.AO-2022.05.02-WG1-NC-0005-MultiOperatorSliceAnnexure-v04
+2022.11.10 08.00.03 Addition of CR:
+- NOK.AO-2022.10.14-WG1-CR-0000-NetworkSlicing-Editorials-v02
+2022.11.13 08.00.04 Added O-RAN Release “R003” to document name, updated copyright to 2023 as the
+document will be published externally in 2023.
+
+All changes accepted, clean version for WG1 approval
+2022.11.18 09.00 WG1 review comments are addressed, and approval is completed. Ready for TSC
+approval and publication
+ 2
+History 3
+Date Revision Description
+2020.03.11 01.00 v01.00 publication
+2020.07.16 02.00 v02.00 publication
+2020.11.13 03.00 v03.00 publication
+2021.03.13 04.00 v04.00 publication
+2021.07.19 05.00 v05.00 publication
+2021.11.23 06.00 v06.00 publication
+2022.04.04 07.00 v07.00 publication
+2022.08.01 08.00 v08.00 publication
+ 4
+ 5
+ 6
+ 7

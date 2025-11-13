@@ -1,0 +1,1437 @@
+O-RAN.WG5.TS.D2GAP.0-R004-v02.00
+
+O-RAN.WG5.TS.D2GAP.0-R004-v02.00
+
+Technical Specification
+
+O-RAN Open F1/W1/E1/X2/Xn/D2 Interfaces Working Group
+
+D2 Interface: General Aspects and Principles
+
+Copyright © 2025 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+List of figures	3
+
+List of tables	3
+
+Foreword	4
+
+Modal verbs terminology	4
+
+1	Scope	5
+
+2	References	5
+
+2.1	Normative references	5
+
+2.2	Informative references	5
+
+3	Definition of terms, symbols and abbreviations	6
+
+3.1	Terms	6
+
+3.2	Symbols	6
+
+3.3	Abbreviations	6
+
+4	General aspects	6
+
+4.1	D2 interface general principles	6
+
+4.2	D2 interface within O-RAN architecture	7
+
+4.3	Functional split for PCell O-DU and SCell O-DU	8
+
+4.4	D2 interface specification objectives	8
+
+4.5	D2 interface capabilities	8
+
+5	Functions of the D2 interface	9
+
+5.1 	General	9
+
+5.2	D2-c function	9
+
+5.2.1	Interface management function	9
+
+5.2.2	UE management function	10
+
+5.3	D2-u function	12
+
+5.3.1	D2-u general principles	12
+
+5.3.2	Transfer of user data	13
+
+6	Procedures of the D2 interface	14
+
+6.1	Control plane procedures	14
+
+6.1.1 	Interface management procedures	15
+
+6.1.2 	UE management procedures	15
+
+6.2	User plane procedures	15
+
+6.2.1 	Downlink data transfer	15
+
+7	D2 application protocol structure	16
+
+7.1	D2 control plane protocol (D2-c)	16
+
+7.2	D2 user plane protocol (D2-u)	17
+
+8	D2 interface transport requirements	17
+
+9	D2 interface management and configuration aspects	17
+
+10	D2 interface security requirements	17
+
+Annex A (informative): Deployment options	18
+
+A.1	General deployment considerations	18
+
+A.2	Deployment model A: Co-located deployments	18
+
+A.3	Deployment model B: Non-co-located deployments	19
+
+Annex B (informative): D2 interface Implications	20
+
+B.1	O-CU-CP/O-CU-UP	20
+
+B.2	 Synchronization Requirements	20
+
+Annex (informative): Change history	21
+
+List of figures
+
+	Figure 4.21: D2 Interface for Intra CU inter DU carrier aggregation	7
+
+	Figure 4.31:User Data exchange for inter O-DU DL CA (PUSCH not shown)	8
+
+	Figure 5.2.11: Interface Management Function	10
+
+	Figure 5.2.21: UE Management Function	12
+
+	Figure 5.3.21:Transfer of user data and scheduling control information	14
+
+	Figure 7.11: Interface Protocol structure for D2-c	16
+
+	Figure 7.21:Protocol stack for D2-u	17
+
+	Figure A.21: Addition of co-located O-RU and O-DU	18
+
+	Figure A.22:Addition of co-located O-RU and O-DU connected with different O-CU-UPs	19
+
+	Figure A.31:Addition of non co-located O-RU and O-DU	19
+
+	Figure A.32:Addition of non-co-located O-RU and O-DU connected with different O-CU-UPs	20
+
+List of tables
+
+	Table 6.11:D2-c Procedures	14
+
+Foreword
+
+This Technical Specification (TS) has been produced by WG5 of the O-RAN Alliance.
+
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+
+version xx.yy.zz
+
+where:
+
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+
+Modal verbs terminology
+
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+
+1	Scope
+
+The present document specifies the general aspects and principles of the D2 interface. D2 is a point-to-point interface interconnecting two O-DUs to enable NR carrier aggregation. The O-DUs are connected to the same O-CU-CP. PCell in this document refers to SpCell as defined in 3GPP TS 37.340 [5].
+
+2	References
+
+2.1	Normative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are necessary for the application of the present document.
+
+[1]					O-RAN.WG1.TS.OAD:  	"O-RAN Architecture Description"
+
+[2]					O-RAN.WG9.XTRP-REQ-v01.00: "Xhaul Transport Requirements".
+
+[3]	O-RAN.WG4.CUS.0-v09.00:	"Control, User and Synchronization Plane Specification"
+
+[4]	O-RAN.WG9.XTRP-SYN.0-v03.00:	"Synchronization Architecture and Solution Specification"
+
+[5]	3GPP TS 37.340:		"Evolved Universal Terrestrial Radio Access (E-UTRA) and NR; Multi-connectivity; Overall Description; Stage-2”.
+
+[6] 	3GPP TS 38.401:		"5G; NG-RAN; Architecture description "
+
+[7]					3GPP TS 38.133: 	"5G; NG-RAN; Requirements for support of radio resource management"
+
+[8]	3GPP TS 38.323: 	"5G; NG-RAN; Packet Data Convergence Protocol (PDCP) specification"
+
+[9]	IETF RFC 4960:		"Stream Control Transmission Protocol".
+
+[10] 				IETF RFC 8200 (2017-07): 		"Internet Protocol, Version 6 (IPv6) Specification"
+
+[11]				IETF RFC 791 (1981-09): 		"Internet Protocol".
+
+2.2	Informative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or nonspecific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+
+[i.1]	3GPP TR 21.905: 	“Vocabulary for 3GPP Specifications”.
+
+[i.2]		O-RAN.WG1.TR.SA-MVD-R004-v03.00: 	"Spectrum Aggregation for Multi-Vendor Deployments"
+
+[i.3]		3GPP TS 38.473:		"5G; NG-RAN; F1 Application Protocol (F1AP)"
+
+3	Definition of terms, symbols and abbreviations
+
+3.1	Terms
+
+For the purposes of the present document, the terms given in [i.1] and the following apply:
+
+carrier aggregation: aggregation of two or more NR or E-UTRA component carriers in order to support wider transmission bandwidths
+
+D2 interface: The inter O-DU interface to enable multi-vendor carrier aggregation in NR is named as D2 according to WG1 ATG definitions.
+
+PCell O-DU:  O-DU, where the PCell is configured for a UE to support inter O-DU carrier aggregation.
+
+SCell O-DU:  O-DU, where only SCell(s) are configured for a UE to support inter O-DU carrier aggregation.
+
+3.2	Symbols
+
+Void
+
+3.3	Abbreviations
+
+For the purposes of the present document, the abbreviations [given in [i.1]] and the following apply:
+
+D2-c		D2 Control plane interface
+
+D2CP		D2 Control Protocol
+
+D2-u		D2 User Plane interface
+
+D2UP	D2 User Plane Protocol
+
+DL	Downlink
+
+HARQ	Hybrid Automatic Repeat Request
+
+MAC		Medium Access Control
+
+MNO 	Mobile Network Operator
+
+O-CU-CP	O-RAN Central Unit – Control Plane
+
+O-CU-UP	O-RAN Central Unit – User Plane
+
+O-DU		O-RAN Distributed Unit
+
+O-RU	O-RAN Radio Unit
+
+PDCCH	Physical downlink control channel
+
+PUCCH	Physical uplink control channel
+
+PUSCH	Physical uplink shared channel
+
+RLC 		Radio Link Control
+
+SCTP 		Stream Control Transmission Protocol
+
+SMO	Service Management and Orchestration
+
+TB		Transport Block
+
+UE	User Equipment
+
+4	General aspects
+
+4.1	D2 interface general principles
+
+The general principles for the specification of the D2 interface are as follows:
+
+the D2 interface is open;
+
+the D2 interface supports the exchange of signalling information between the endpoints. In addition, the interface supports data transmission to the respective endpoints;
+
+the D2 is a point-to-point interface between the endpoints on two O-DUs. A point-to-point logical interface should be feasible even in the absence of a physical direct connection between the two O-DUs.
+
+the D2 interface supports control plane(D2-c)  and user plane (D2-u) separation;
+
+the D2 interface enables exchange of UE associated information and non-UE associated information;
+
+the D2 interface is designed in a future proof way to fulfil new requirements, and services;
+
+the D2 interface supports NR carrier aggregation of carriers configured in different O-DU nodes. The schedulers in the O-DUs operate independently of each other.
+
+4.2	D2 interface within O-RAN architecture
+
+O-DUs can be interconnected by the D2 interface. Figure 4.21 shows the D2 interface in the O-RAN WG1.OAD Figure 5.1-2 [1]. In the present document, O-DUs interconnected by the D2 interface are connected to a single O-CU-CP as shown in Figure 4.21.
+
+O-CU-CP1
+
+O-CU-UP1
+
+O-DU1
+
+O-DU2
+
+O-RU1
+
+O-DUn
+
+O-RU2
+
+O-RU3
+
+F1-u
+
+F1-u
+
+F1-c
+
+F1-c
+
+Open FH
+
+D2-c/ D2-u
+
+D2-c/ D2-u
+
+D2-c/ D2-u
+
+Open FH
+
+Open FH
+
+E1
+
+F1-c
+
+F1-u
+
+O-CU-CP1
+
+O-CU-UP1
+
+O-DU1
+
+O-DU2
+
+O-RU1
+
+O-DUn
+
+O-RU2
+
+O-RU3
+
+F1-u
+
+F1-u
+
+F1-c
+
+F1-c
+
+Open FH
+
+D2-c/ D2-u
+
+D2-c/ D2-u
+
+D2-c/ D2-u
+
+Open FH
+
+Open FH
+
+E1
+
+F1-c
+
+F1-uNOTE:	O-DUs interconnected by the D2 interface can be connected to different O-CU-UP. Figure 4.21 shows the connection between O-DUs connected to a single O-CU-CP.
+
+Figure 4.21: D2 Interface for Intra CU inter DU carrier aggregation
+
+The D2 interface is a logical interface connecting two O-DUs for supporting inter O-DU carrier aggregation. A pair of O-DUs can be connected with each other by the D2 interface.
+
+F1 (F1-c, F1-u) and E1 are logical 3GPP interfaces, whose protocols, termination points and cardinalities are specified in 3GPP TS 38.401 [6]. Open FH is O-RAN defined interface as specified in O-RAN WG4.CUS [3].
+
+Using D2 interface, the O-DUs are able to exchange user data and control information to support inter O-DU carrier aggregation. Configuration for establishment and functioning of D2 interface (for example  peer O-DU IP address etc) is provided to O-DU by SMO over O1 interface, or by other means such as local node configuration.
+
+4.3	Functional split for PCell O-DU and SCell O-DU
+
+The functional split in the PCell and SCell O-DU for supporting inter O-DU DL CA is as follows:
+
+The user data and control information message exchange take place at MAC level.
+
+Single RLC per UE resides in the PCell O-DU as shown in Figure 4.31.
+
+For supporting DL CA using D2 interface PUCCH allocation and reception of PUCCH data from UE is performed by the PCell O-DU for both PCell and SCells. The PCell O-DU shares the received information with the SCell O-DU as shown in Figure 4.31
+
+RLC
+
+MAC
+
+PHY
+
+MAC
+
+PHY
+
+DL Data
+
+PUCCH
+
+UE
+
+PDCCH
+
+PDCCH
+
+PUCCH
+
+PDSCH
+
+PDSCH
+
+PCell O-DU
+
+SCell O-DU
+
+DL Data
+
+RLC
+
+MAC
+
+PHY
+
+MAC
+
+PHY
+
+DL Data
+
+PUCCH
+
+UE
+
+PDCCH
+
+PDCCH
+
+PUCCH
+
+PDSCH
+
+PDSCH
+
+PCell O-DU
+
+SCell O-DU
+
+DL Data
+
+Figure 4.31:User Data exchange for inter O-DU DL CA (PUSCH not shown)
+
+4.4	D2 interface specification objectives
+
+The D2 interface specifications facilitate the following:
+
+inter connection between two O-DUs.
+
+inter O-DU carrier aggregation by exchanging user and control information between O-DUs.
+
+4.5	D2 interface capabilities
+
+The D2 interface supports:
+
+procedures to establish, maintain and release D2 connection between two O-DUs.
+
+procedures to establish, maintain and release D2 context for storing the UE information across O-DUs for supporting inter O-DU CA.
+
+procedures to exchange user data and control data across O-DUs to support the inter O-DU CA.
+
+5	Functions of the D2 interface
+
+5.1 	General
+
+The D2 interface provides connectivity between O-DUs to facilitate inter O-DU carrier aggregation. Its functionality is divided into two parts: control plane (D2-c) and user plane(D2-u). The following clauses describe the functions supported over D2-c and D2-u.
+
+5.2	D2-c function
+
+5.2.1	Interface management function
+
+The D2 setup function allows for the initial setup of a D2 connection between two O-DUs, including exchange of the cell-level data. Configuration of the D2 interface endpoints can be managed by the SMO to O-DU via the O1 interface. D2 configuration can also be provided through node specific O&M systems. The D2 setup can be initiated by any O-DU that successfully completes the cell setup procedure. During this process, both the originating and destined O-DUs share cell capabilities, for example sub-carrier spacing, duplexing methods, and TDD DL-UL configurations etc.
+
+Once the D2 connection is established, any changes for the cells used for inter O-DU CA, such as a cell being locked, cell unlocked, overloaded or changes to cell configuration (including cell addition and removal) are communicated to its peer O-DU using the D2 configuration update function. If cell status is changed to locked or disabled, context for all the UEs configured for inter O-DU CA in that SCell is released.
+
+D2 release function is used to remove the D2 connection between the two O-DUs, so that all the related resources between the two O-DUs are cleared.
+
+The error indication function is used by the O-DU to indicate to the peer O-DU that an error has occurred. For example, if parsing of D2 Configuration Update Acknowledge or D2 Setup Response fails, O-DU can inform the peer O-DU about the failure using error indication function.
+
+ Figure 5.2.11 shows the interface management functions.
+
+@startuml
+
+Skinparam titleBorderRoundCorner 25
+
+skinparam titleBorderThickness 2
+
+skinparam titleBorderColor red
+
+skinparam titleBackgroundColor Coral
+
+skinparam titleFontSize 20
+
+participant DU1 as "O-DU1"
+
+participant DU2 as "O-DU2"
+
+Note over DU1: O-DU1 is initiating the connection
+
+DU1->DU2 : D2 SETUP REQUEST (\n O-DU1 Cell list, cell Capability etc)
+
+group#Gold #LightBlue Success
+
+DU2->DU1: D2 SETUP RESPONSE (\n O-DU2 Cell list, cell Capability etc)
+
+Note over DU1 : If cells are locked, unlocked or overloaded \nor any other scenario causing update in Cell config.
+
+DU1->DU2 : D2 CONFIGURATION UPDATE
+
+DU2->DU1 : D2 CONFIGURATION UPDATE ACKNOWLEDGE
+
+Note over DU2: Based on the received cause in Configuration Update,\n context for UEs in that cell can be released.
+
+Note over DU1: Decides to bring down D2 connection gracefully
+
+DU1->DU2: D2 RELEASE REQUEST
+
+DU2->DU1: D2 RELEASE RESPONSE
+
+Note over DU1, DU2: D2 connection is released. \nAll the D2 contexts is cleared. SCTP connection is released.\nNo further message exchange over D2 connection.
+
+else #LightPink Failure
+
+DU2->DU1: D2 SETUP FAILURE
+
+End
+
+@enduml
+
+Figure 5.2.11: Interface Management Function
+
+5.2.2	UE management function
+
+The UE management function supports the establishment and modification of D2 context for SCells for a UE. These functions include establishment, modification and release of the SCells in PCell and SCell O-DUs. The procedures include addition, deletion or modification of a SCell for a UE in the O-DUs.
+
+The establishment of UE addition is initiated by the PCell O-DU. It is accepted or rejected by the SCell O-DU based on the admission control criteria for example resource availability, loading etc. Upon reception of successful addition response for the UE from the SCell O-DU, the PCell O-DU sends UE Context Setup/Modification response to O-CU-CP. RRC Reconfiguration procedure is triggered towards UE for SCell addition. Once RRC Reconfiguration Complete is received from UE, the PCell O-DU sends the UE Reconfiguration Completion message to the SCell O-DU.
+
+The modification of SCell configuration for a UE is initiated by the	 PCell O-DU. If an SCell for a UE is already configured in the SCell O-DU, PCell O-DU can use modification function to add another SCell. The modification function is also used by the PCell O-DU to update any of the UE configuration parameters for example change of security key, UL configuration, DRX cycle, change of measurement gap, PDU session add/rel/mod (QoS flow add/rel, 5QI Change), DRB etc in the SCell O-DU. If multiple SCells are configured in an SCell O-DU for a UE, this function can also be used to release some of the SCells.
+
+PCell O-DU uses UE release function to clear the UE context in the SCell O-DU. This function can be used if UE is released in the PCell O-DU or all the SCells in an SCell O-DU are deleted for a UE. Upon successful completion, the UE information for the SCell is cleared in the SCell O-DU.
+
+SCell O-DU uses the modification required function to request the release of SCell(s) for a UE. This can be triggered due to any scenario taking place in SCell O-DU for example overloading, or cell lock or cell down. The PCell O-DU removes the corresponding SCell reference for the UE for which the message is received. The PCell O-DU responds back with confirm message after successful deletion of SCells. The SCell O-DU then clears the SCell(s) for the UE.
+
+Figure 5.2.21 captures the UE management functions.
+
+@startuml
+
+Skinparam titleBorderRoundCorner 25
+
+skinparam titleBorderThickness 2
+
+skinparam titleBorderColor red
+
+skinparam titleBackgroundColor Coral
+
+skinparam titleFontSize 20
+
+participant CU as "O-CU-CP"
+
+participant pDU as "PCell O-DU"
+
+participant sDU as "SCell O-DU"
+
+participant UE
+
+Note over pDU, sDU: D2 Link is up and running
+
+group #lightpink "First UE Addition from a SCell O-DU"
+
+CU-> pDU: UE CONTEXT SETUP/MODIFICATION REQUEST
+
+pDU ->sDU : UE ADDITION REQUEST
+
+sDU-> pDU: UE ADDITION RESPONSE
+
+pDU ->CU: UE CONTEXT SETUP/MODIFICATION RESPONSE
+
+end
+
+group #lightblue "Addition of more SCells or modification in existing SCells for a UE"
+
+CU-> pDU: UE CONTEXT MODIFICATION REQUEST
+
+pDU ->sDU : UE MODIFICATION REQUEST
+
+sDU-> pDU: UE MODIFICATION RESPONSE
+
+pDU ->CU: UE CONTEXT MODIFICATION RESPONSE (status)
+
+end
+
+CU->UE: RRC Reconfiguration Request (via F1 procedure)
+
+UE->pDU: RRC Reconfiguration Complete
+
+pDU->sDU: UE RECONFIGURATION COMPLETE
+
+group #lightyellow SCell O-DU is unable to handle UE for a SCELL
+
+sDU-> pDU: UE MODIFICATION REQUIRED (Cause)
+
+pDU ->sDU : UE MODIFICATION UPDATE CONFIRM (status)
+
+end
+
+group #lightgreen "Either CU decides to release Scell or UE is Released – UE release function"
+
+CU-> pDU: UE CONTEXT MODIFICATION/RELEASE
+
+pDU ->sDU: UE DELETION REQUEST
+
+sDU-> pDU: UE DELETION RESPONSE
+
+End
+
+@enduml
+
+Figure 5.2.21: UE Management Function
+
+5.3	D2-u function
+
+5.3.1	D2-u general principles
+
+The following principles apply to D2-u for inter O-DU DL carrier aggregation.
+
+The PCell O-DU requests the SCell O-DU to schedule new user data and/or retransmissions due to HARQ feedback for the UE indicating a range of time slots, where data can be scheduled by the SCell O-DU. The range is configurable.
+
+Data retransmission due to HARQ feedback is executed in the same node where the first transmission was executed. The SCell O-DU stores the TB until retransmission is successful or the HARQ process is cleared by the PCell O-DU.
+
+CSI-RS transmission for a UE that is added by D2 interface is triggered when an SCell is added for the UE.
+
+5.3.2	Transfer of user data
+
+Transfer of user data comprises of two functions, the data transfer function and the UCI transfer function.
+
+The data transfer function allows the transfer of user data between O-DUs to support inter O-DU carrier aggregation. For DL CA, PCell O-DU sends the user data to SCell O-DU.
+
+The data transfer function consists of procedures that allow the exchange of user data, scheduling related information (range of slots) and associated control information between PCell O-DU and SCell O-DU for supporting inter O-DU CA.
+
+The PCell O-DU may initiate a procedure to request the SCell O-DU to schedule a user data transmission or to schedule a HARQ retransmission for a particular UE. With each request the PCell O-DU also indicates the range of slots which can be used by the SCell O-DU to schedule new user data or HARQ retransmission. The PCell O-DU may also provide the CSI information to the SCell O-DU. The PCell O-DU may send one or more scheduling requests.
+The SCell O-DU may reply with the scheduled user data size and/or scheduled HARQ retransmission, as well as the air interface timing details (i.e. slot number). The SCell O-DU may send one or more replies to the PCell O-DU.
+Requests from the PCell O-DU and replies from the SCell O-DU are sent asynchronously.
+
+The PCell O-DU may send the user data matching the scheduled user data size together with the needed PUCCH information to the SCell O-DU.
+
+The UCI transfer function enables the PCell O-DU to share CSI reports and/or HARQ feedback to the SCell O-DU. The PCell O-DU may also send a TB clear-flag to indicate that no more re-transmission is needed for a particular HARQ process. Upon reception of the TB clear-flag the SCell O-DU may delete the TB buffer and reuse the HARQ process ID for a new user data transmission.
+
+Figure 5.3.21 captures the flow control of user data exchange over D2 connection.
+
+@startuml
+
+Skinparam titleBorderRoundCorner 15
+
+skinparam titleBorderThickness 2
+
+skinparam titleBorderColor red
+
+skinparam titleBackgroundColor Coral
+
+skinparam titleFontSize 30
+
+participant pDU as "PCell O-DU"
+
+participant sDU as "SCell O-DU"
+
+Note over pDU : DL Data Received from O-CU-UP
+
+Group CSI report
+
+Note over pDU : Receives CSI Indication \nfor the SCell from UE.
+
+pDU->sDU : UCI TRANSFER (CSI, etc.)
+
+end
+
+Note over pDU: PCell O-DU determines the user data size. it requests \n the SCell O-DU to schedule the UE in a requested slot range.
+
+Group User Data Transfer
+
+Note over pDU: PCell O-DU may send asynchronously many DL SCHEDULE REQUEST messages \nwith different user data size and may also extend the slot range
+
+pDU->sDU : DL SCHEDULE REQUEST (Requested User Data size, requested slot range, CSI, etc.)
+
+Note over sDU: SCell O-DU determines the data size and slot it can schedule \n and sends that to the PCell O-DU
+
+sDU->pDU: DL DATA REQUIRED (Scheduled user data size, selected slot)
+
+Note over sDU: The SCell O-DU may send asynchronously many DL DATA REQUIRED \n messages for different selected slots
+
+Note Over pDU: Allocates PUCCH resources for the selected slot
+
+pDU->sDU : PUCCH RESOURCE TRANSFER(K1, DAI, etc.)
+
+Note over pDU: PCell O-DU sends the user data TB matching \nthe scheduled size received from the SCell O-DU
+
+pDU->sDU: DL DATA TRANSFER(User Data TB, etc.)
+
+end
+
+Group HARQ control, CSI report, TB Clearing
+
+Note over pDU: UE has sent HARQ feedback or CSI report and/or PCell O-DU indicates clearing of a TB
+
+pDU -> sDU : UCI TRANSFER (HARQ feedback,CSI,TB Clear-flag, etc.)
+
+end
+
+@enduml
+
+Figure 5.3.21:Transfer of user data and scheduling control information
+
+6	Procedures of the D2 interface
+
+6.1	Control plane procedures
+
+Table 6.11 below captures all the procedures defined for D2-c interface.
+
+Table 6.11:D2-c Procedures
+
+Procedure
+
+Initiating Message
+
+Successful Outcome
+
+Unsuccessful Outcome
+
+Response Message
+
+Failure Message
+
+D2 Setup
+
+D2 SETUP REQUEST
+
+D2 SETUP RESPONSE
+
+D2 SETUP FAILURE
+
+D2 Configuration Update
+
+D2 CONFIGURATION UPDATE
+
+D2 CONFIGURATION UPDATE ACKNOWLEDGE
+
+D2 CONFIGURATION UPDATE FAILURE
+
+D2 Release
+
+D2 RELEASE REQUEST
+
+D2 RELEASE RESPONSE
+
+Error Indication
+
+D2 ERROR INDICATION
+
+UE Addition
+
+UE ADDITION REQUEST
+
+UE ADDITION RESPONSE
+
+UE ADDITION FAILURE
+
+UE Modification Update
+
+UE MODIFICATION REQUEST
+
+UE MODIFICATION RESPONSE
+
+UE MODIFICATION FAILURE
+
+UE Reconfiguration Complete
+
+UE RECONFIGURATION COMPLETE
+
+UE Modification Update Required
+
+UE MODIFICATION REQUIRED (Cause)
+
+UE MODIFICATION UPDATE CONFIRM (status)
+
+UE Release
+
+UE DELETION REQUEST
+
+UE DELETION RESPONSE
+
+6.1.1 	Interface management procedures
+
+The D2 Interface management procedures are listed below:
+
+D2 Setup procedure
+
+D2 Configuration Update procedure
+
+Error Indication
+
+D2 Release procedure
+
+6.1.2 	UE management procedures
+
+The D2 UE management procedures are listed below:
+
+UE Addition procedure
+
+UE Modification Update procedure
+
+UE Modification Update Required procedure
+
+UE Reconfiguration Complete
+
+UE Release procedure
+
+6.2	User plane procedures
+
+6.2.1 	Downlink data transfer
+
+Transfer of user data and associated scheduling control information related messages are listed below:
+
+DL Schedule Request
+
+DL Data Required
+
+DL Data Transfer
+
+PUCCH Resource Transfer
+
+UCI Transfer
+
+7	D2 application protocol structure
+
+7.1	D2 control plane protocol (D2-c)
+
+D2CP
+
+SCTP
+
+IP
+
+Data Link Layer
+
+Physical Layer
+
+Transport Network Layer
+
+Radio Network Layer
+
+Control Plane
+
+D2CP
+
+SCTP
+
+IP
+
+Data Link Layer
+
+Physical Layer
+
+Transport Network Layer
+
+Radio Network Layer
+
+Control PlaneFigure 7.11 shows the protocol structure of D2-c. The application layer signalling protocol is referred to as D2CP
+
+Figure 7.11: Interface Protocol structure for D2-c
+
+The Transport Network Layer is based on IP transport, comprising the SCTP on top of IP. SCTP (IETF RFC 4960 [9] ) shall be supported as the transport layer of D2-c control bearer (D2CP). SCTP refers to the Stream Control Transmission Protocol developed by the Sigtran working group of the IETF for the purpose of transporting various signalling protocols over IP network. There shall be only one SCTP association established between two O-DUs. No SCTP Destination Port number value was assigned by IANA for the D2CP protocol and so networks shall rely on O-DU configuration to select a suitable port number.
+
+The application layer signalling protocol is referred to as D2CP (D2 Control Protocol). The Payload Protocol Identifier assigned by IANA to be used by SCTP for the application layer protocol D2CP is 71. This value is to be used for all deployment configurations described in the present document. The byte order of the Payload Protocol Identifier shall be big-endian. The O-DUs shall support a configuration with a single SCTP association per O-DU pair.
+
+The support of any suitable Data Link Layer protocol, e.g. PPP, Ethernet, etc., shall not be prevented.
+
+The O-DUs shall support IPv6 (IETF RFC 8200 [10]) and/or IPv4 (IETF RFC 791 [11]). The IP layer of D2-c only supports point-to-point transmission for delivering D2CP message.
+
+Between two O-DUs connected by D2 interface:
+
+A single pair of stream identifiers shall be reserved over the SCTP association for the sole use of D2CP elementary procedures for D2 interface management.
+
+At least one pair of stream identifiers shall be reserved for the sole use of D2CP elementary procedures are utilized for D2 UE management signalling. However, a few pairs (i.e. more than one) should be reserved.
+
+For a single UE-associated signalling, the O-DU shall use one SCTP association and one SCTP stream, and the association/stream should not be changed during the communication of the UE-associated signalling.
+
+7.2	D2 user plane protocol (D2-u)
+
+ Figure 7.21 shows the protocol stack for D2-u.
+
+Physical layer
+
+Data link layer
+
+IP
+
+UDP
+
+D2UP
+
+Transport network layer
+
+Application layer
+
+Physical layer
+
+Data link layer
+
+IP
+
+UDP
+
+D2UP
+
+Transport network layer
+
+Application layer
+
+Figure 7.21:Protocol stack for D2-u
+
+The D2UP (D2 user plane protocol) messages are transported by UDP over IP. Between a pair of O-DU nodes, one or more UDP ports may be used for D2-u.
+
+8	D2 interface transport requirements
+
+The D2 interface is specified to accommodate the latency class High75, High100 & High200 as described in O-RAN WG9.XTRP [2], section 7.2. D2 interface can also function when using High500 latency but it may have impact on performance.
+
+9	D2 interface management and configuration aspects
+
+The configuration for establishing and functioning of D2 interface is provided by SMO via O1 interface or manualy or via node specific OAM to O-DUs. Parameters such as IP addresses of peer O-DUs, support of CA (UL, DL, both or None) for each cell in O-DU are needed for functioning of D2 interface.
+
+NOTE:	Detailed definition of configuration parameters will be in O1 specification.
+
+10	D2 interface security requirements
+
+Authentication and authorization of O-DUs that exchange control or data information over D2 interface shall be supported. Existing security algorithm for example IPSec can be used to protect the D2 interface. User data exchanged over D2 interface is protected by PDCP (Packet Data Convergence Protocol)[8].
+
+NOTE:	Security requirement for protecting the D2 interface will be defined in security specifications.
+
+Annex A (informative): Deployment options
+
+A.1	General deployment considerations
+
+A.2	Deployment model A: Co-located deployments
+
+This model considers the deployment scenarios where relevant O-RAN NFs for carrier aggregation are co-located at a cell site. O-RAN NFs may be supporting the same or different band/duplexing capability.
+
+In this deployment scenario, depicted in Figure A.21and Figure A.22, the MNO may deploy a new O-RU and O-DU to add a new frequency band to the existing infrastructure. The O-DUs will be connected to the single O-CU-CP. The O-DUs can be connected to the multiple O-CU-UPs as shown in Figure A.22. O-DUs are connected by D2 interface to support the inter O-DU carrier aggregation.
+
+NG
+
+O-CU-UP
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1
+
+O-DU1
+
+O-RUn
+
+O-FH
+
+Centralized Location
+
+Cell Site 1
+
+NG
+
+O-CU-UP
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1
+
+O-DU1
+
+O-RUn
+
+O-FH
+
+Centralized Location
+
+Cell Site 1
+
+Figure A.21: Addition of co-located O-RU and O-DU
+
+NG-C
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1-C
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1-C
+
+O-DU1
+
+O-RUn
+
+O-FH
+
+O-CU-UP
+
+E1
+
+F1-U
+
+F1-U
+
+Centralized Location
+
+Cell Site 1
+
+NG-U
+
+O-FH
+
+NG-C
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1-C
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1-C
+
+O-DU1
+
+O-RUn
+
+O-FH
+
+O-CU-UP
+
+E1
+
+F1-U
+
+F1-U
+
+Centralized Location
+
+Cell Site 1
+
+NG-U
+
+O-FH
+
+Figure A.22:Addition of co-located O-RU and O-DU connected with different O-CU-UPs
+
+A.3	Deployment model B: Non-co-located deployments
+
+This model considers the deployment scenarios where aggregated frequencies are served by equipment that are not co-located at a cell site. O-CU-CP/O-CU-UP might be residing at a centralized location while O-DUs may be located at cell site or at a centralized location.
+
+In this deployment scenario, depicted in Figure A.31 and Figure A.32, the MNO may deploy a new O-RU and O-DU to add a new frequency band, that is not co-located with other O-RUs and O-DUs serving the same geographic area. The O-DUs will be connected to the single O-CU-CP. The O-DUs can be connected to the multiple O-CU-UPs as shown in Figure A.32. O-DUs are connected by D2 interface to support the inter O-DU carrier aggregation.
+
+NG
+
+O-CU-UP
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1
+
+O-DU1
+
+O-RUn
+
+Non-co-located
+
+O-FH
+
+Co-located
+
+Centralized Location
+
+Cell Site 1
+
+Cell Site 2
+
+O-FH
+
+NG
+
+O-CU-UP
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1
+
+O-DU1
+
+O-RUn
+
+Non-co-located
+
+O-FH
+
+Co-located
+
+Centralized Location
+
+Cell Site 1
+
+Cell Site 2
+
+O-FH
+
+Figure A.31:Addition of non co-located O-RU and O-DU
+
+NG-C
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1-C
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1-C
+
+O-DU1
+
+O-RUn
+
+Non-co-located
+
+O-FH
+
+O-CU-UP
+
+E1
+
+F1-U
+
+F1-U
+
+Co-located
+
+Centralized Location
+
+Cell Site 1
+
+Cell Site 2
+
+NG-U
+
+O-FH
+
+NG-C
+
+O-CU-CP
+
+O-RU1
+
+O-RU2
+
+F1-C
+
+UE
+
+O-FH
+
+D2
+
+O-DUn
+
+F1-C
+
+O-DU1
+
+O-RUn
+
+Non-co-located
+
+O-FH
+
+O-CU-UP
+
+E1
+
+F1-U
+
+F1-U
+
+Co-located
+
+Centralized Location
+
+Cell Site 1
+
+Cell Site 2
+
+NG-U
+
+O-FH
+
+Figure A.32:Addition of non-co-located O-RU and O-DU connected with different O-CU-UPs
+
+Annex B (informative): D2 interface Implications
+
+B.1	O-CU-CP/O-CU-UP
+
+O-CU-CP will be able to add, delete or modify the SCells from peer O-DUs, connected by D2 interface and to same O-CU-CP, in UE Context Request/Modification procedures.
+
+No impact on O-CU-UP is expected.
+
+B.2		Synchronization Requirements
+
+Existing synchronization requirement specified in O-RAN WG9.XTRP  [4] section 6.3.3 is sufficient to meet the carrier aggregation requirement as mentioned in 3GPP 38.133 [7].
+
+Annex (informative): Change history
+
+Date
+
+Revision
+
+Description
+
+2024.11.24
+
+00.01
+
+Initial skeleton created
+
+2025.01.30
+
+00.02
+
+Incorporated MAV CR 006 and MAV CR 007
+
+2025.02.25
+
+00.03
+
+Incorporated MAV CR 0009, MAV CR 0010, MAV CR 0013, ERI CR 0133, ERI CR 0131, NEC CR 0103, MAV CR 0011
+
+2025.03.06
+
+00.04
+
+Editorial corrections and review comment incorporation
+
+2025.03.06
+
+00.05
+
+Inclusion of SCTP Protocol payload identified for D2
+
+2025.03.07
+
+00.06
+
+Inclusion of CR ERI-0134 and editorial corrections
+
+2025.03.08
+
+00.07
+
+Inclusion of CR MAV-0008 and making all the figures similar
+
+2025.03.10
+
+00.08
+
+Updated review commens
+
+2025.03.12
+
+00.09
+
+Review comments incorporated
+
+2025.03.12
+
+00.10
+
+Review comments incorporated
+
+2025.03.13
+
+00.11
+
+Figure Center aligned, History on new page and reference correction
+
+2025.03.28
+
+01.00
+
+Resolved all the comments. Specification is approved by WG as TS 01.00
+
+2025.06.05
+
+01.00.01
+
+Incorporated ERI CR 137, ERI CR 139 and ERI CR 145
+
+2025.06.13
+
+01.00.02
+
+Incorporated review comments
+
+2025.06.19
+
+01.00.03
+
+Incorporated review comments
+
+2025.06.25
+
+01.00.04
+
+Incorporated review comments
+
+2025.06.26
+
+01.00.05
+
+Incorporated review comments
+
+2025.07.02
+
+01.00.06
+
+Updated the references section as per new O-RAN template
+
+	© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.	52

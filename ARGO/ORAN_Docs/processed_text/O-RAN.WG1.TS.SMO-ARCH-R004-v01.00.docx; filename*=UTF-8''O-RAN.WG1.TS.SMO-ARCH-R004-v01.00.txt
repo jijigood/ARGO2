@@ -1,0 +1,436 @@
+O-RAN.WG1.TS.SMOARCH-R004-v01.00
+
+O-RAN.WG1.TS.SMOARCH-R004-v01.00
+
+Technical Specification
+
+O-RAN Work Group 1 (Use Cases and Overall Architecture)
+
+SMO Architecture
+
+Copyright © 2025 by the O-RAN ALLIANCE e.V.
+
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V. is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+
+Contents
+
+Foreword	3
+
+Modal verbs terminology	3
+
+1	Scope	4
+
+2	References	4
+
+2.1	Normative references	4
+
+2.2	Informative references	4
+
+3	Definition of terms, symbols and abbreviations	5
+
+3.1	Terms	5
+
+3.2	Symbols	5
+
+3.3	Abbreviations	5
+
+4	O-RAN SMO Architecture	5
+
+4.1	SMO Overview	5
+
+4.2	      SMO Services (SMOS)	6
+
+4.2.1	Introduction to SMO Services	6
+
+4.2.2	Service Management and Exposure (SME) SMOS description	6
+
+4.2.3	Data Management and Exposure (DME) SMOS description	6
+
+4.2.4	RAN NF OAM SMOS description	7
+
+4.2.5	Network Function Orchestrator SMOS description	7
+
+4.2.6	Federated O-Cloud Orchestration and Management (FOCOM) SMOS description	8
+
+4.2.7	Service and Slice Subnet Orchestration SMOS (SO SMOS) description	8
+
+4.2.8	Service and Slice Subnet Assurance SMOS (SA SMOS) description	9
+
+4.2.9	rApp Management SMOS description	9
+
+4.2.10	Topology Exposure and Inventory SMOS description	10
+
+4.2.11	Software Package Onboarding SMOS description	10
+
+4.2.12	A1 Related SMOS description	10
+
+4.3	SMO in consumer role of southbound interfaces	10
+
+4.4	Northbound external exposure of SMO Services	11
+
+4.5	Extending the SMO services	11
+
+4.6	SMO Functions	11
+
+4.6.1	Introduction	11
+
+4.6.2	Non-RT RIC SMOF	11
+
+Annex (informative):  Change history/Change request (history)	11
+
+Foreword
+
+This Technical Specification (TS) has been produced by WG1 of the O-RAN ALLIANCE.
+
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN ALLIANCE modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+
+version xx.yy.zz
+
+where:
+
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01). Always 2 digits with leading zero if needed.
+
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+
+Modal verbs terminology
+
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+
+1	Scope
+
+The present document specifies the SMO architecture based on the service-based-architecture principles described in [1] and provides the description of the SMO Services that are provided by the SMO.
+
+2	References
+
+2.1	Normative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies. In the case of a reference to a 3GPP document, a non-specific reference implicitly refers to the latest version of that document in Release 18, or the latest 3GPP release prior to Release 18 that includes that document.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are necessary for the application of the present document.
+
+	O-RAN.WG1.TS.OAD: "O-RAN Architecture Description"
+
+	O-RAN.WG6.O2-GA&P: "O2 Interface General Aspects and Principles"
+
+	O-RAN.WG6.ORCH-USE-CASES: “Cloudification and Orchestration Use Cases and Requirements”
+
+	O-RAN.WG2.TS.Non-RT-RIC-ARCH: "Non-RT RIC: Architecture"
+
+	O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE: “O-RAN O2dms Interface Specification: Profile based on ETSI NFV Protocol and Data Models”
+
+	O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE: “O-RAN O2dms Interface Specification: Kubernetes Native API Profile for Containerized NFs”
+
+	O-RAN.WG10.TE&IV-UCR: “O-RAN Topology Exposure and Inventory Management Services Use Cases and Requirements”
+
+	O-RAN.WG10.TS.OAM-Architecture: "O-RAN Operations and Maintenance Architecture"
+
+	O-RAN.WG10.TS.OnboardingSMOSGAP: “O-RAN Onboarding SMOS General Aspects and Principles”
+
+	O-RAN.WG2.TS.A1GAP: “O-RAN A1 interface: General Aspects and Principles”
+
+	ETSI GS-NFV SOL 003: “RESTful protocols specification for the Or-Vnfm Reference Point”
+
+2.2	Informative references
+
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies. In the case of a reference to a 3GPP document, a non-specific reference implicitly refers to the latest version of that document in Release 18, or the latest 3GPP release prior to Release 18 that includes that document.
+
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+
+[i.1] 	O-RAN.WG2.TS.Non-RT-RIC-ARCH: "Non-RT RIC: Architecture".
+
+3	Definition of terms, symbols and abbreviations
+
+3.1	Terms
+
+For the purposes of the present document, the terms given in [1] apply.
+
+3.2	Symbols
+
+Void.
+
+3.3	Abbreviations
+
+For the purposes of the present document, the abbreviations given in [1] apply.
+
+4	O-RAN SMO Architecture
+
+4.1	SMO Overview
+
+The SMO capabilities identified as SMOSs are represented in a service-based architecture in Figure 4.1-1 below. All the SMO Service producers represented in Figure 4.1-1 can also be SMOS consumers.
+
+Service Management and Orchestration (SMO) and Service Management and Orchestration framework (SMO framework) are used interchangeably in this document.
+
+NOTE: The SMOS interfaces and modelling are not specified in the present document.
+
+Figure 4.1-1: SMO capabilities represented as SMOSs in the SMO SBA approach
+
+NOTE: The AI/ML Workflow, RAN Analytics and Policy Management and Information SMOSs shown in Figure 4.1-1 are not addressed in the current version of this specification.
+
+The SMOS Communication, shown in Figure 4.1-1, represents the logical support for communication between any SMOS Producer, SMOS Consumer, and rApps. Examples of SMOS Communication implementation include, but are not limited to, service mesh, API gateway, direct communication, and message bus. SMOS consumers and producers rely on the capabilities provided by SME for purposes such as service discovery and on the capabilities provided by DME for purposes such as data exposure.
+
+The R1 interface, shown in Figure 4.1-1, is a service-based interface. R1 termination, also shown in Figure 4.1-1, enables R1 service producers and R1 service consumers to exchange messages via the R1 interface.
+
+	SME and DME support the exposure of SMO services, and/or data to authorized external services, and/or external data consumers, as represented in the SBA approach depicted in Figure 4.1-1.
+
+SME and DME support the SMO consumption of external services, and/or data from authorized external services, and/or external data producers, as represented in the SBA approach depicted in Figure 4.1-1.
+
+4.2	      SMO Services (SMOS)
+
+4.2.1	Introduction to SMO Services
+
+Editor’s Note: overview of the SMO capabilities.
+
+4.2.2	Service Management and Exposure (SME) SMOS description
+
+The SME service is introduced in the Non-RT RIC Architecture specification [i.1] section 3.1. The SME services are applicable to any entities within the SMO that fulfil the roles of Service Producer and/or Service Consumer.
+
+In a service-based SMO architecture, the SME can be leveraged as a generic SMOS, handling service management and exposure for any SMOSs within SMO. The SME SMOS provides a set of common SMO capabilities that are needed for all SMO Services.
+
+The SME SMOS offers the following capabilities:
+
+Service registration,
+
+Service discovery,
+
+Authentication and authorization to access a service,
+
+Communication support (e.g. service mesh) between Service Producers and Service Consumers,
+
+Bootstrap of new Service consumers and Service Producers (determination of the endpoints for the SME services) (optional),
+
+Heartbeat of Service producers (optional).
+
+The role of one, or both, of Service Producer and Service Consumer can be assumed by any SMOF or rApp in the SMO. The services are registered individually. The Service Consumers can also be external to the SMO, for the services made discoverable and exposed also to the external SMO consumers.
+
+4.2.3	Data Management and Exposure (DME) SMOS description
+
+The DME SMOS provides capabilities that allow Data Consumers, as defined in the Non-RT RIC Architecture specification [i.1], to discover data types and to consume collected data, and allow Data Producers, as defined in the Non-RT RIC Architecture specification [i.1], to register data types and to produce data for collection. The DME services can handle any registered data types and expose them for discovery and consumption to Data Consumers. In the Non-RT RIC Architecture specification [i.1] clause 3.2, both the Data Producer and Data Consumer are restricted to refer only to rApps, because the scope of [i.1] is the R1 interface between rApps and the SMO/Non-RT RIC framework.
+
+This is extended in a decoupled service-based SMO architecture, where the DME SMOS can be leveraged as an enabler handling any SMOS data types, therefore any SMOF can also be a Data Producer and/or a Data Consumer which can benefit from using DME SMOS to register, produce, discover and consume data.
+
+The role of one, or both, of Data Producer and Data Consumer can be assumed by any SMOF and rApp (for the data types related to each SMOS and/or rApp) in the SMO. The SMO Data Consumers can also be external SMO consumers, for the data made discoverable and allowed to be exposed to the external SMO consumers.
+
+4.2.4	RAN NF OAM SMOS description
+
+The RAN NF OAM SMOS includes, but is not limited to, the following set of capabilities:
+
+Provisioning Management, including bulk and basic synchronous and asynchronous configuration management CRUD (create, read, update, delete) operations, CM notifications and model exposure.
+
+Fault Supervision Management, including alarm subscription, notification, clearing, acknowledgement, and query
+
+Performance Management, including PM counter initiation and supervision
+
+Trace Management, including trace initiation and supervision
+
+Streaming Data Reporting, including stream collection and stream exposure.
+
+File Data Reporting, including file collection and file exposure.
+
+PNF software and hardware management.
+
+NF Log data collection and exposure.
+
+RAN NF OAM capabilities are exposed to consumers via SME and DME.
+
+The RAN NF OAM capabilities also provide mechanisms to allow their service consumers to scope the target of their requests (e.g., to entire RAN, to specific areas, NFs, cells, etc.), allowing the request to be applied to either a single target or multiple targets at once.
+
+4.2.5	Network Function Orchestrator SMOS description
+
+The Network Function Orchestrator (NFO) SMOS includes capabilities for the orchestration of the NF Deployments that constitute the Cloudified NFs. This includes the initial deployment of the software and any subsequent lifecycle management actions necessary on the respective NF Deployments instances, such as healing, updates, scaling, software upgrades, termination, etc.
+
+The NFO SMOS leverages the NF Deployment management services provided by the O-Clouds, each exposing O2dms services over the O2 interface, for deployment and lifecycle management of NF Deployment instances.
+
+The NFO SMOS interacts with the DMS by means of specified O2dms profiles:
+
+The ETSI NFV O2dms profile [5], which is based on the ETSI GS-NFV SOL 003 protocol specification [11]
+
+The Kubernetes O2dms profile [6], which is based on the Kubernetes API protocol specification
+
+The NFO SMOS also provide capabilities for:
+
+Monitoring the execution status of lifecycle operations/requests that the NFO has been requested to execute
+
+Querying to understand which O-Cloud node cluster an NF Deployment is deployed on
+
+Secure handling of sensitive NF Deployment configuration data
+
+NFO SMOS capabilities are exposed to consumers via SME and DME.
+
+NOTE: The capability of the NFO is introduced from a logical perspective in the O-RAN Working Group 6 O2 Interface General Aspects and Principles specification [2] and the use cases are described in the O-RAN WG6 Cloudification and Orchestration Use Cases and Requirements specification [3].
+
+4.2.6	Federated O-Cloud Orchestration and Management (FOCOM) SMOS description
+
+The Federated O-Cloud Orchestration and Management (FOCOM) SMOS includes capabilities for orchestration of cluster and infrastructure resources in one or several O-Clouds. It includes, but is not limited to, the following capabilities:
+
+Querying and discovery of O-Cloud infrastructure inventory information such as O-Cloud Sites, physical and logical infrastructure resources, Node Clusters, Deployment Managers and O-Cloud Template information.
+
+Subscription for notifications related to changes in O-Cloud infrastructure inventory information.
+
+Provisioning (create, update, delete) of cluster and infrastructure resources in each O-Cloud.
+
+Monitoring of cluster and infrastructure resources in each O-Cloud.
+
+The FOCOM SMOS exposes O-Cloud infrastructure inventory information that is acquired from the O-Cloud O2ims inventory service. The FOCOM SMOS enables the service consumer to subscribe for notifications related to particular O-Cloud resource types.
+
+FOCOM SMOS capabilities are exposed to consumers via SME and DME.
+
+NOTE: The functionality of FOCOM is introduced from a logical perspective in the O-RAN Working Group 6 O2 Interface General Aspects and Principles specification [2] and the use cases are described in the O-RAN WG6 Cloudification and Orchestration Use Cases and Requirements specification [3].
+
+4.2.7	Service and Slice Subnet Orchestration SMOS (SO SMOS) description
+
+The SO SMOS includes capabilities to perform the orchestration of a RAN service and/or slice subnet. This includes both the orchestration of the fulfilment of the RAN service or the RAN slice subnet, and orchestration support for the actuation of an assurance process. The behaviour of the SO SMOS is dependent on both the SO requests that it receives and the related artifacts to support the requests. The exact definition of the RAN service is defined by the operator using the SMO, it can be generally considered as a logical concept that represents the capability for the RAN within a certain geographic area, to provide UEs the ability to have voice and/or data connectivity to the core, with requested characteristics. This includes the RAN slice subnet. In order to execute on its responsibilities, the SO SMOS consumes other services including the RAN NF OAM SMOS for configuration, the FOCOM SMOS for infrastructure management requests, the NFO for deployment requests, as well as services produced by rApps, etc.
+
+The SO SMOS includes the following capabilities:
+
+Oversees and automates the fulfillment of a service or a slice subnet order, received directly or via a higher -level orchestrator, according to the information contained in the service or a slice subnet order and the related artifacts, utilizing the services provided by SMOFs (such as SMOFs supporting RAN NF OAM SMOS for configuration, NFO SMOS for NF Deployment [2] LCM, etc.) and services produced by rApps.
+
+Coordinates the orchestration of lifecycle and service or the slice subnet-related configuration for one or more RAN NFs (also including multiple NF Deployments), including taking the homing decision considering both the RAN service or the slice subnet, and application-level requirements as well as the non-functional requirements e.g., infrastructure capabilities needed as well as the transport networks used to interconnect the O-RAN NFs (and NF Deployments) and O-RUs when they are deployed over different sites in order to meet the connectivity requirements for the RAN service or the slice subnet. This can include generating the required configuration used when requesting (via the appropriate SMOS) the configuration of the RAN NFs.
+
+Coordination of the NFs transport connectivity: based on requirements and objectives obtained on RAN NF connectivity it requests the suitable transport networks management domain to fulfil the requirements of the RAN service and/or slice subnet requirements.
+
+Based on the infrastructure requirements of the O-RAN NF Deployments, it orchestrates the necessary management actions to the O-Cloud infrastructure, by coordinating with FOCOM SMOS producer for the needed O-Cloud management requests.
+
+SO SMOS capabilities are exposed to consumers via SME and DME.
+
+4.2.8	Service and Slice Subnet Assurance SMOS (SA SMOS) description
+
+The SA SMOS includes capabilities to ensure the required assurance for the RAN services and slice subnets. The behaviour of SA SMOS is dependent upon the related artifacts to support the request. It consumes the services provided by other SMOS Producers and can delegate responsibilities to rApps according to its configuration.
+
+The SA SMOS includes the following capabilities:
+
+Assures the intended state (together with rApps and/or other SMOSs) of the RAN services and slice subnets.
+
+It monitors/observes the data that is relevant (produced by other SMOS producers and/or services produced by rApps) to assessing the current RAN service, and/or RAN slice subnet characteristics against the service requirements.
+
+In case the RAN service and/or RAN slice subnet requirements are not met, decisions are taken (together with rApps and/or other SMOSs) on a course of remedial actions.
+
+The identified actions (e.g., configuration changes, scaling, changes of connectivity, etc.) are executed (by making requests to rApps and/or other SMOSs producers), as part of an open or closed automation loop.
+
+In the case that the service or slice subnet requirements cannot be met, the service assurance will escalate to the operator and/or northbound systems.
+
+SA SMOS capabilities are exposed to consumers via SME and DME.
+
+4.2.9	rApp Management SMOS description
+
+The rApp management SMOS includes the following set of capabilities:
+
+rApp lifecycle management, including rApp deployment, rApp upgrade and rApp termination.
+
+rApp configuration management, which enables management of the rApp instance configuration settings.
+
+rApp fault management, which enables an rApp instance to report faults that are related to the rApp itself or to its communication with other entities.
+
+rApp performance management, which enables an rApp instance to report on the performance of the rApp itself or to its communication with other entities.
+
+rApp logging, which enables an rApp instance to generate and report timestamped logs, including audit trail records of its configuration actions within the network.
+
+rApp management SMOS capabilities are exposed to consumers via SME and DME.
+
+NOTE 1: An rApp instance is a specific occurrence of an rApp as defined in [1].
+
+NOTE 2: rApp package on-boarding is a prerequisite for executing the capabilities of the rApp management SMOS. The rApp package on-boarding is not in scope of this SMOS.
+
+For further details see O-RAN TS: Non-RT RIC Architecture [4].
+
+4.2.10	Topology Exposure and Inventory SMOS description
+
+The Topology Exposure and Inventory (TE&IV) SMOS includes, but is not limited to, the following capabilities:
+
+Creating, updating and deleting information about TE&IV resources and the relationships between them
+
+Querying to obtain information about the TE&IV resources and the relationships between them, using filter criteria such as TE&IV resource types and/or geo-location data
+
+Subscribing for notifications of changes to TE&IV resource information
+
+TE&IV resources include both RAN resources and O-Cloud resources. For further details see O-RAN TS: O-RAN Topology Exposure and Inventory Management Services Use Cases and Requirements [7].
+
+Topology Exposure and Inventory SMOS capabilities are exposed to consumers via SME and DME.
+
+4.2.11	Software Package Onboarding SMOS description
+
+The Software Package Onboarding SMOS includes, but is not limited to, the following capabilities:
+
+Onboarding of software packages to the SMO
+
+Validation of software packages to ensure that their format and contents can be understood by the SMO
+
+Security verification of the software package contents
+
+Extraction of artifacts contained in the software package and making them available to other SMOSs for consumption
+
+Deletion of software packages from the SMO
+
+Querying the list of onboarded software packages
+
+Software packages supported by the Software Package Onboarding SMOS include O-RAN NFs (as defined in the O-RAN Operations and Maintenance Architecture [8]), rApps and xApps.
+
+Software Package Onboarding SMOS capabilities are exposed to consumers via SME and DME.
+
+For further details see O-RAN TS: O-RAN Onboarding SMOS General Aspects and Principles [9].
+
+4.2.12	A1 Related SMOS description
+
+The A1 Related SMOS includes, but is not limited to, the following capabilities:
+
+Support for management of A1 policies, including discovery of A1 policies and A1 policy types available in Near-RT RICs, as well as creation, querying, updating, and deletion of A1 policies, querying the enforcement status of A1 policies, and subscribing for event notifications related to A1 policies and A1 policy types.
+
+Support for A1 Enrichment Information (EI), including registration and deregistration of EI types.
+
+Support for discovering AI/ML model training capabilities exposed by Near-RT RICs, and requesting AI/ML model training and status of training jobs.
+
+The capabilities of the A1 Related SMOS are exposed to consumers via SME.
+
+For further details on the A1 interface see O-RAN TS: O-RAN A1 interface: General Aspects and Principles [10].
+
+4.3	SMO in consumer role of southbound interfaces
+
+Editor’s Note: SMO southbound interfaces.
+
+4.4	Northbound external exposure of SMO Services
+
+Editor’s Note: introduce the external northbound SMO exposure.
+
+4.5	Extending the SMO services
+
+Editor’s Note: address how new services/capabilities can be added in the SMO.
+
+4.6	SMO Functions
+
+4.6.1	Introduction
+
+Editor’s Note: introduce SMOFs as combos of one or more SMOS Producers.
+
+4.6.2	Non-RT RIC SMOF
+
+Editor’s Note: clarify Non-RT RIC SMOF role within SMO.
+
+Annex (informative):
+Change history/Change request (history)
+
+Date
+
+Revision
+
+Description
+
+2025.07.28
+
+01.00
+
+	First version. Includes a service-based SMO architecture diagram and descriptions of SMOSs (SMO Services) in the SMO.
+
+	Describes SMOS Communications, R1 interface and R1 termination, and support for external service/data producers and/or consumers.
+
+	© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification.	52

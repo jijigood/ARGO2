@@ -1,0 +1,1354 @@
+O-RAN.WG9.XTRP-MGT.0-v03.00
+Technical Specification
+O-RAN Open X-haul Transport Working Group
+ Management interfaces for Transport
+Network Elements
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this specification in
+any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print
+or download extracts of the material on this site for your personal use, or copy the material on this site for the
+purpose of sending to individual third parties for their information provided that you acknowledge O-RAN
+ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them
+and that they must comply with them.
+Copyright © 2022 by O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing,
+displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License Agreement
+contained in Annex ZZZ of this specification. All other rights reserved.
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189
+
+                                  O-RAN.WG9.XTRP-MGT.0-v03.00
+Technical Specification
+
+Copyright © 2022 O-RAN ALLIANCE e.V. All Rights Reserved
+                    1
+
+O-RAN Open X-haul Transport Working Group
+
+ Management interfaces for Transport
+Network Elements
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        2
+1 Revision History 1
+Date Revision Author Description
+2021/02/28 v1.00 Management interface
+team
+V1 release
+2021/06/29 v2.00 Management interface
+team
+Minor improvements throughout document
+New additions:
+Description of management & SDN for fixed
+access networks - section 8.2
+IP / Ethernet section 8.4 content created
+2021/11/21 v3.00 Management interface
+team
+New content in optical access, Grandmaster
+clock and slicing use case. Clarifications in
+many places throughout document.
+ 2
+  3
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        3
+2 Contents 1
+1 Revision History ....................................................................................................................................... 2 2
+2 Contents .................................................................................................................................................... 3 3
+3 Scope ........................................................................................................................................................ 4 4
+4 References ................................................................................................................................................ 5 5
+5 Definitions and abbreviations ................................................................................................................... 6 6
+5.1 Definitions ......................................................................................................................................................... 6 7
+5.2 Abbreviations ..................................................................................................................................................... 6 8
+6 Modelling Schema.................................................................................................................................... 8 9
+7 Device Communication Protocols ............................................................................................................ 9 10
+7.1 Configuration Management ............................................................................................................................... 9 11
+7.2 Fault and Performance management .................................................................................................................. 9 12
+7.3 Life cycle management ...................................................................................................................................... 9 13
+8 Transport Technology dependent ........................................................................................................... 10 14
+8.1 Microwave transport ........................................................................................................................................ 10 15
+8.2 Optical access .................................................................................................................................................. 13 16
+8.2.1 TDM-PON ................................................................................................................................................. 13 17
+8.2.2 Point-to-point interfaces ............................................................................................................................. 16 18
+8.2.3 WDM-PON ................................................................................................................................................ 16 19
+8.3 Optical transport .............................................................................................................................................. 16 20
+8.3.1 Fronthaul WDM systems ........................................................................................................................... 16 21
+8.3.2 Mid- and backhaul ROADM transport ....................................................................................................... 22 22
+8.4 IP/Ethernet transport ........................................................................................................................................ 25 23
+8.4.1 Provisioning and managing a packet switched infrastructure .................................................................... 26 24
+8.4.2 Orchestrators and controllers...................................................................................................................... 27 25
+8.4.3 Transport Slicing orchestration and SLA management .............................................................................. 29 26
+8.4.4 Assessment methodology and analysis ...................................................................................................... 29 27
+8.4.5 Conclusion ................................................................................................................................................. 34 28
+8.5 Grand master clock .......................................................................................................................................... 34 29
+9 Network Slicing Use Case ...................................................................................................................... 35 30
+Annex ZZZ: O-RAN Adopter License Agreement .......................................................................................... 36 31
+Section 1: DEFINITIONS ................................................................................................................................................ 36 32
+Section 2: COPYRIGHT LICENSE ................................................................................................................................. 36 33
+Section 3: FRAND LICENSE .......................................................................................................................................... 36 34
+Section 4: TERM AND TERMINATION ........................................................................................................................ 37 35
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 37 36
+Section 6: INDEMNIFICATION ..................................................................................................................................... 38 37
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 38 38
+Section 8: ASSIGNMENT ............................................................................................................................................... 38 39
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 38 40
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 38 41
+Section 11: GENERAL ..................................................................................................................................................... 38 42
+  43
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        4
+3 Scope 1
+This Technical Specification has been produced by the O-RAN Alliance. The document is intended to describe 2
+best practices for O -RAN transport Network Element (TNE) management interfaces. Beyond the solutions 3
+described in this document, other management  solutions may be adequate for t ransport network element 4
+management and can be considered in future versions of this document. In this document, f irst, generic 5
+requirements are given for these interfaces and then more specific technology-related recommendations. 6
+ 7
+This document uses information published by O-RAN, 3GPP, IEEE, ITU-T, ONF, IETF, CableLabs, NGMN 8
+and many other standard bodies and industry associations. 9
+ 10
+Phase one of this document in early 2021 covered: 11
+• Microwave,  12
+• TDM-PON,  13
+• optical transport (fronthaul and mid-and backhaul) 14
+ 15
+Phase 2 enhanced this document in July 2021with the following topics: 16
+• IP/Ethernet for O-RAN slicing phase 1 17
+• Optical access for point-to-point interfaces and WDM-PON 18
+ 19
+Phase 3 adds the following topics in November of 2021: 20
+• Grandmaster clock for Synchronization, 21
+• WDM fronthaul interface requirements for passive-passive and passive-active, 22
+• Clarified security requirements, 23
+• Network slicing use case. 24
+ 25
+The following items are not covered and may be addressed in phase 4: 26
+• Future phases of O-RAN slicing support. 27
+ 28
+  29
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        5
+4 References 1
+The following documents contain provisions which, through reference in this text, constitute provisions of 2
+the present document. 3
+- References are either specific (identified by date of publication, edition number, version number, etc.) 4
+or non-specific. 5
+- For a specific reference, subsequent revisions do not apply. 6
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document 7
+(including a GSM document), a non-specific reference implicitly refers to the latest version of that 8
+document in Release 15. 9
+ 10
+[1] IETF RFC 7950 – The YANG 1.1 Data Modeling language 11
+[2] IETF RFC 6241 - Network Configuration Protocol (NETCONF) 12
+[3] IETF RFC 6242 - Using the NETCONF Protocol over Secure Shell (SSH) 13
+[4] IETF RFC 7589 - Using the NETCONF Protocol over Transport Layer Security (TLS) 14
+with Mutual X.509 Authentication 15
+[5] O-RAN Security Focus Group specification document O-RAN.SFG.O-RAN-Security-16
+Protocols-Specifications-v02.00.06.docx 17
+[6] Google Network Management Interface – gNMI - github.com/openconfig/gnmi 18
+[7] VNF Event Streaming – VES - https://wiki.opnfv.org/display/ves/VES+Home 19
+[8] ONF Core Information Model TR 512 20
+[9] ONF Wireless Transport Model TR 532 21
+[10] IETF RFC 8561 – Data Model for Microwave Radio Link 22
+[11] BBF TR-416 23
+[12] ITU-T specification G.988 24
+[13] BBF TR-385: ITU-T PON YANG Modules 25
+[14] BBF TR-383: Common YANG Modules 26
+[15] BBF WT-435: Netconf Requirements on OLT (including ZTP)  27
+[16] TR-402: Functional Model for PON Abstraction Interface  https://www.broadband-28
+forum.org/download/TR-402.pdf  29
+[17] TR-403: PON Abstraction Interface for Time-Critical Applications 30
+[18] IEEE 1904.2 31
+[19] ITU-T specification G.989.2 32
+[20] ITU-T specification G.698.4 33
+[21] ITU-T specification G.989.3 34
+[22] ITU-T specification G.9806 35
+[23] OpenConfig data models - https://openconfig.net/projects/models/ 36
+[24] OpenROADM data models – http://OpenROADM.org 37
+[25] O-RAN Management Plane Specifications – https://www.o-ran.org/specifications 38
+[26] O-RAN WG9 Xhaul Packet Switched Architectures and solutions O-39
+RAN.WG9.XPSAAS-v02 40
+[27] IETF RFC8969 - A Framework for Automating Service and Network Management with 41
+YANG 42
+[28] IETF RFC8199 - YANG Module Classification 43
+[29] IETF RFC 8309 - Service Models Explained 44
+[30] IETF RFC8466 - A YANG Data Model for Layer 2 Virtual Private Network (L2VPN) 45
+Service Delivery 46
+[31] IETF RFC8299 - YANG Data Model for L3VPN Service Delivery 47
+[32] https://development.standards.ieee.org/myproject-web/public/view.html#pardetail/8494 48
+[33] https://github.com/YangModels/yang/blob/master/standard/ieee/draft/1588/ieee1588-49
+ptp.yang 50
+ 51
+  52
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        6
+5 Definitions and abbreviations 1
+5.1 Definitions 2
+The key words “MUST”, “MUST NOT”, "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", 3
+"MAY", and "OPTIONAL" in this document are to be interpreted as described in IETF RFC 2119 [25]. All 4
+key words must be in upper case, bold text. 5
+Items that are REQUIRED (contain the words SHALL or SHALL NOT) will be labeled as [Rx] for 6
+required. Items that are RECOMMENDED (contain the words SHOULD or SHOULD NOT) will be 7
+labeled as [Dx] for desirable. Items that are OPTIONAL (contain the words MAY or OPTIONAL) will be 8
+labeled as [Ox] for optional.  9
+Items, if supported, are not meant to be active at all times, but should be available for use. Their state (active 10
+or not active) should be based on configuration. 11
+5.2 Abbreviations 12
+Abbreviations defined in this document take precedence over the definition of 3GPP  13
+ 14
+AF Application Function IP Internet Protocol
+AMF Access and Mobility Management Function IQ Inphase Quadrature
+AN Access Node ITU-T International Telecom Union-Telecom
+ARP Address Resolution Protocol LAN Local Area Network
+BBU Baseband Unit LTE Long Term Evolution
+BH Backhaul MAC Medium Access Layer
+BiDi Bidirectional MPLS Multi Protocol Label Switching
+BS Base Station MIMO Multiple Inputs Multiple Outputs
+BW Bandwidth MNO Mobile Network Operator
+CAPEX Capital Expense NGMN Next Generation Mobile Network
+CBS Committed Burst Size NR New Radio
+CFP Common Form factor Pluggable NSA Non-Stand Alone
+CIR Committed Information Rate NSSI Subnet Networking Slices Instance
+CN Core Network OAM Operation Administration Maintenance
+CoMP Cooperative Multipoint O-CU O-RAN Central Unit
+CP Control Plane O-DU O-RAN Distributed Unit
+CPRI Common Public Radio Interface OPEX Operation Expense
+CU Central Unit ORU O-RAN Radio Unit
+DC Data Center PCF Policy Control Function
+DL Downlink PDCP Packet Data Convergence Protocol
+DN Data Network PRTC Primary Reference Telecom Clock
+DHCP Dynamic Host Configuration Protocol PTP Precision Time Protocol
+DSCP  Differentiated Services Codepoint OFDM Orthogonal Frequency Division Multiplexing
+DU Distributed Unit QAM Quadrature Amplitude Modulation
+eCPRI evolved Common Public Radio Interface QoS Quality of Service
+eMBB enhanced Mobile Broadband QSFP Quad SFP
+eNB Enhanced NodeB RB Resource Block
+EP Ethernet Private ROADM Reconfigurable Optical Add Drop Multiplexer
+EPC Enhanced Packet Core RRH Remote Radio Head
+EPL Ethernet Private Line RU Radio Unit
+EVP Ethernet Virtual Private  SCTP Stream Control Transmission Protocol
+EVPL Ethernet Virtual Private Line SDN Software Defined Networking
+FDD Frequency Division Duplexed SFF Small Form Factor
+FFO Fractional Frequency Offset SFP Small Form factor Pluggable
+FFS For Further Study SLA Service Level Agreement
+FH Fronthaul T-BC Telecom Boundary Clock
+FLR Frame Loss Ratio TDD Time Division Duplexing
+FR1 Frequency Range 1 TE Time Error
+FR2 Frequency Range 2 T-GM Telecom Ground Master
+FTTH Fiber To The Home TN Transport Node
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        7
+gNB gNodeB T-TSC Telecom Time Slave Clock
+gNMI Google Network Management Interface TX Transmit
+GNSS Global Navigation Satellite System UDP User Datagram Protocol
+GPRS General Packet Radio Service UE User equipment
+GTP GPRS Tunnelling Protocol UL Uplink
+ICMP Internet Control Message Protocol UNI Universal Network Interface
+IoT Internet of Things UPF User Plane Function
+  VPN Virtual Private Network
+ 1
+ 2
+  3
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        8
+6 Modelling Schema 1
+YANG (RFC 7950 [1]) is widely adopted in the industry to model equipment at the different transport layers. 2
+For consistency it makes sense to use the same schema for all layers. YANG therefore is the recommended 3
+schema for modelling in O-RAN. 4
+ 5
+[R6.1]: model MUST use YANG as schema. 6
+ 7
+It is desirable to define an open and complete interface, largely independent of specific supplier’s 8
+implementations. Complete here means Configuration Management (inventory and provisioning), Failure and 9
+Performance Management, as well as life c ycle management. If there is a need to augment the interface, an 10
+augmentation mechanism needs to be defined, as well as a clear modular structure of the model. 11
+ 12
+[R6.2]: model SHOULD be under open-source license. 13
+ 14
+[R6.3]: models MUST have modular structure with clearly defined augmentation mechanism. 15
+ 16
+[R6.4] model selected MUST be independent of specific supplier attributes or features. 17
+ 18
+[R6.5]: vendor specific augmentations MUST be temporary only (temporary SHALL be defined here as less 19
+than one year). 20
+ 21
+[D6.6]: model SHOULD support backwards compatibility and future proof enhancement solution. 22
+  23
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        9
+7 Device Communication Protocols 1
+This section defines the communication Protocols for the different applications. 2
+ 3
+7.1 Configuration Management  4
+For configuration management (CM), the current industry standard used in conjunction with the YANG 5
+schema is the NETCONF protocol (RFC6241 [2]). Security for NETCONF can either be configured over SSH 6
+[3] or TLS [4]. Other working groups in O-RAN use NETCONF over TLS, but some industry implementations 7
+use SSH. A single way for NETCONF security is recommended. The security focus group inside O-RAN has 8
+published their specifications [5]. 9
+ 10
+[R7.1]: MUST support NETCONF over SSH, according to [5], subsection 2.1. 11
+[D7.2]: SHOULD support NETCONF over TLS. 12
+[R7.2]: in case NETCONF over TLS is being supported, TLS SHALL be supported according to [5], 13
+subsection 2.2 14
+ 15
+7.2 Fault and Performance management 16
+For Fault and Performance Management (FM/PM), there are multiple implementa tions in the industry, 17
+dependent on models used and technologies supported. One option is to use NETCONF also for FM/PM, 18
+which has the advantage of only having to implement a single protocol on a network element. Another popular 19
+method for retrieving PM/FM  is streaming telemetry. The most widely used protocol there is OpenConfig’s 20
+streaming telemetry using the gNMI protocol  [6]. Another emerging standard is streaming using VES (VNF 21
+event streaming), defined by OPNFV and ONAP [7], which is already used in O-RAN. 22
+While it would be desirable to have a single retrieval mechanism for FM/PM for all transport layers, reality is 23
+that the industry has implemented different standards and it may be needed to set this on a per-technology basis 24
+inside O-RAN. The following section looks at the different transport mechanisms and some of the models and 25
+protocols used in the industry. While there may be many more models being defined, the work here 26
+concentrates on models that have been implemented in production networks and devices. Implementations in 27
+mediators and production field trial are acceptable as well. 28
+ 29
+[R7.3]: Fault management MUST support NETCONF, gNMI or VES streaming. 30
+[R7.4]: Performance management MUST support NETCONF, gNMI or VES streaming. 31
+ 32
+7.3 Life cycle management 33
+Unfortunately, very few models in the industry today support life cycle management, such as firmware or 34
+software upgrades, database backup and restore or any other such features required during the life cycle of the 35
+equipment in the network. That drive s the need for yet another interface, often manufacturer proprietary and 36
+proprietary software tools to perform those functions. 37
+Inside O-RAN, there has already been some work for software management and zero touch provisioning. There 38
+is also zero-touch provisioning work in progress at BBF. 39
+ 40
+[R7.5]: Model MUST support life cycle management functions, supported with a single NETCONF interface. 41
+ 42
+[D7.6]: The model SHOULD support full-service lifecycle as for example specified in the ONAP Architecture, 43
+ITU G8052 .1 or the MEF 22. 3.1 Transport Service Orchestration and Lifecycle Service Orchestration  44
+Framework. 45
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        10
+8 Transport Technology dependent  1
+Below, we will walk through the different transport technologies and first look at what features a typical 2
+commercial system contains and then cover the models that have been implemented commercially and 3
+compare the feature set they cover. 4
+8.1 Microwave transport 5
+Table 1 lists the features in a typical commercial microwave system. 6
+ 7
+Features  Microwave
+CM Interfaces Ethernet x
+Structure x
+AirInterface x
+
+WireInterface x
+  TDM x
+
+Equipment Shelf x
+Card x
+Slot x
+Port (SFP, RJ45 etc.) x
+FW/SW Management
+x
+Database backup/restore
+x
+Traffic protection
+x
+Synchronization
+x
+FM
+x
+PM
+x
+Security User management
+x
+Certificate handling
+x
+ 8
+Table 1: features in a typical commercial microwave system 9
+ 10
+Table 2 compares the models in commercially available microwave systems. 11
+ 12
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        11
+ 1
+Table 2: models’ comparison in commercially available microwave systems 2
+ 3
+A comparison was done between models which can be used to represent microwave systems: on one side the 4
+ONF Core Model version 1.4  [8], along with the different technology specific packages (PACs) defined in 5
+TR532 version 2.0  (still a draft version) [9] and on the other side the ietf -microwave-radio-link model 6
+(RFC8561) [10] and other IETF models. 7
+ 8
+For describing equipment information, the compared models have a somewhat similar approach: 9
+• ietf-hardware abstracts any type of component (while the type is an extensible enumeration), while the 10
+core-model differentiates in each equipment instance between connectors and contained -holders 11
+(while the type is just a string, so a flexibility for vendors, but can result in different approaches for 12
+different vendors), 13
+• ietf-hardware can contain sensor data, which is rather abstract and lets vendors build any type of data, 14
+which can result in different approaches for different vendors, while the ONF Core Model does not 15
+include sensor data, 16
+• ONF Core Model differentiates between actual and expected equipment, which is not the case in the 17
+ietf-hardware, 18
+• ietf-hardware provides some information about revisions (hardware, software etc.) and hardware 19
+information, while the ONF Core Model provides a lot more details about the hardware (physical, 20
+mechanical, spatial, environmental etc.), 21
+• both models offer parent-child relationships between the equipment instances for describing an entire 22
+hierarchy. 23
+ 24
+For describing interfaces and their attributes, the comparison focused on ietf-interfaces model (augmented by 25
+ietf-microwave-radio-link) and the ONF Core Model augmented by different technology specific PACs): 26
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        12
+• the ietf-interfaces are only augmented to provide air-interfaces (microwave specific parameters), while 1
+the ONF Core Model is augmented to provide different types of interfaces (air -interfaces, ethernet 2
+containers, wire-interfaces, even MAC and VLAN interfaces) 3
+• the ietf -interfaces model is augmented with approximately 50 microwave specific parameters that 4
+describe capabilities, performance, configuration, and status, while the ONF Core Model is augmented 5
+with approximately 175 microwave specific parameters which cover capabilities, performance 6
+(historical and current), configuration, status and current problems (alarms/faults). The current 7
+problems which are missing from the ietf-interfaces could be covered by the ietf-alarms yang model 8
+• both ietf-interfaces and the ONF Core Model support layering of interfaces (higher and lower layer, 9
+and respectively client-server relationships) 10
+• ietf-interfaces modelling is compliant with the NMDA (Network Management Datastore Architecture 11
+– RFC8342), section 5.3, while the augmentations for the ONF Core Model are not. To be more precise, 12
+section 5.3 of RFC8342 states that the operational datastore is a read-only datastore which consists of 13
+all “config false” and “config true” attributes defined in the yang models (while the original 14
+NETCONF specification indicated that the operational datastore should contain only “config false” 15
+parameters). The advantage of the new approach is that it enables the ability of nodes to expose all 16
+operational settings without needing to replicate definitions in the data model. The modelling of ietf-17
+interfaces complies with this architecture, while the core -model defines different attributes for 18
+configuration and for status of a particular configuration.  19
+ 20
+For group definitions, the comparison focused on the ietf -microwave-radio-link and augmentations for the 21
+ONF Core Model: 22
+• the ietf-microwave-radio-link describes XPIC and MIMO groups, while augmentation of core-model 23
+describe also ALIC (Adjacent Link Interference Calculation) groups 24
+Both models describe radio link protection groups, with the difference that in the ietf model the type of group 25
+is an extensible enumeration, while in the ONF Core Model the type is just a string. 26
+ 27
+For FW/SW Management, mature YANG models do not exist yet. Inside the ONF there are ongoing 28
+discussions for providing such capabilities for microwave systems, but a draft YANG model is yet to be 29
+provided. 30
+ 31
+From the user management and certificate handling perspective, a generic model that allows a centralized 32
+control does not exist yet. Each individual node can nevertheless rely of the standard NETCONF Server models 33
+for that purpose, there is no need for having a microwave specific model. 34
+ 35
+Both the ONF Core Model with its technology specific augmentations and the IETF models, which were part 36
+of the comparison, could be used to describe the management interface of a microwave system. Both models 37
+have gaps in their air -interface and in the network interface attributes, which need to be communicated to 38
+relevant standard groups for future consideration. The ONF model strives for a complete set of harmonized 39
+attributes, in order to prevent need for proprietary augmentations. The IETF model focuses on a smaller set of 40
+attributes which describe an air -interface, but which would cover a big amount of use cases, w hile allowing 41
+proprietary augmentations for attributes which are not yet considered in the model. The IETF core model is 42
+designed with flexibility in mind taking advantage of the wealth of features and models developed across the 43
+IETF/IEEE std organization s especially the one related to models supporting many packet -based features, 44
+while maintaining strict backwards compatibility to its Core Model and YANG versioning modules that require 45
+updating a published YANG module to follow the rules in clause 11 of t he IETF RFC 7950 [1] prohibiting 46
+Non-Backwards Compatible (NBC) changes. Models describing other types of interfaces present in microwave 47
+systems (wire interfaces, ethernet, VLAN etc.) exist both in ONF (proposed as augmentations for the ONF 48
+Core Model) and in the IETF, but they were not part of the gap analysis. 49
+ 50
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        13
+8.2 Optical access  1
+The optical access refers to an optical fiber equipment and infrastructure lying between an optical termination 2
+(here, typically the antenna cell site) and the central office (aggregation node). Optical line termination (OLT) 3
+and Optical Network Unit (ONU) are the active equipment which serve as the service provider endpoints at 4
+each end of the access passive optical network . The OLT shelf supports two different medium connectivity 5
+based on specific cards & interfaces.  6
+i. The first one is the PON (Passive Optical network) which is used for FTTHome based on PtMP 7
+optical infrastructure (also named ODN optical Distribution network). Several PON generations 8
+are available: G -PON ( Gigabit capable Passive Optical Network ), XGS-PON (10 Gigabit 9
+symmetrical capable Passive Optical Network) , and the coming HS -PON (High-Speed capable 10
+Passive Optical Network).  11
+ii. The second supported connectivity at OLT is Ethernet PtP based on regular transceivers. This PtP 12
+interfaces are used for business and the existing mobile backhaul. 13
+So an OLT is an equipment w hich supports these two types of access interfaces to reach customers, a 14
+backplane, one or several uplinks port to reach metropolitan nodes and a management. 15
+ 16
+Ideally, the management plane of an OLT should natively be vendor agnostic. If it were the case, all operational 17
+procedures would be defined once and used and reused for all the equipment of a given type. Over the last 18
+decades, attempts for standardizing the management interfaces of the ne twork elements have been largely 19
+unsuccessful.  Consequently, proprietary management systems are commonly used. This obliges the operator 20
+to adapt its OSS (Operations Support System) to different proprietary management interfaces, which is time 21
+consuming and requires quite a significant effort in terms of OSS development. But for this new decade, things 22
+are changing. Thanks to the emergence of SDN and the lobbying efforts from network service providers to 23
+better automate its operational processes, the introduction of software in the telecommunication industry gives 24
+SDAN (Software- Defined Access Network) solutions and opportunity allowing telcos to manage the access 25
+nodes themselves as well as create new kinds of orchestration at the service layer. Last but not least, the SNMP 26
+(Simple Network Management Protocol) management protocol and its associated data-modelling language in 27
+use today are pretty old and were inherently not well designed to comply with data -models promoted by the 28
+standards. SNMP is also cur rently used for pulling statistics and counters from the network elements 29
+(performance monitoring, troubleshooting). However, SNMP is not well designed for massive data collections. 30
+NETCONF (Network Configuration Protocol) interfaces and YANG (Yet Another Next Generation) data -31
+models for PON are now proposed (cf. IETF RFC 6241 [2] and BBF TR385 [13], respectively). They are 32
+gaining some momentum so we forecast that they will replace SNMP. The coming decade will correspond to 33
+a network migration and operatio n with natively NETCONF/YANG access equipment leveraging on a clear 34
+separation between the network node management layer and the service design and management layer. 35
+Two references implementation are proposed for SDAN by: 36
+i. Open Network Foundation with SDN-Enabled Broadband Access (SEBA) including Virtual OLT 37
+Hardware Abstraction (VOLTHA) 38
+ii. Broad Band Forum with Cloud Central Office (Cloud CO)  including BBF’s Access Abstraction 39
+Layer (BAA). Cloud CO is standardized, as for the use cases which are proposed under BBF’s 40
+“TR-416 [11]: Cloud CO Use Cases and Scenarios”. 41
+ 42
+8.2.1 TDM-PON 43
+ONU management and control interface (OMCI) is defined in the ITU-T specification G.988 [12]. 44
+Table 3 lists the features in a typical commercial TDM-PON system: 45
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        14
+ 1
+Table 3: features in a typical commercial TDM-PON system 2
+ 3
+Table 4 compares the models in commercially available TDM-PON systems: 4
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        15
+ 1
+Table 4: Models comparison of commercially available TDM-PON systems 2
+ 3
+In the TDM-PON space, there is only one model from the broadband forum (BBF) [1 3,14,15] that has been 4
+commercially implemented. So, the recommendation here is to use this interface for this purpose. 5
+ 6
+The Broadband Forum also worked on defining a functional model for PON abstraction interface and a PON 7
+abstraction interface for time-critical application: 8
+- TR-402 [16] Functional Model for PON Abstraction Interface https://www.broadband-9
+forum.org/download/TR-402.pdf 10
+- TR-403 [17] PON Abstraction Interface for Time-Critical Applications 11
+ 12
+Finally, it was proposed to standardize the transport of the ONU Management and Control Interface (OMCI) 13
+ITU-T G.988 Amendment 3 – 03/2020 [12] over Ethernet through the 'Standard for Management Channel for 14
+Customer-Premises Equipment Connected to Ethernet-based Subscriber Access Networks', in the IEEE 1904.2 15
+Task Force [18]. This standard allows remote device management, used for commercially available miniature 16
+pluggable SFP -OLTs where several control and management function s are run on commodity servers, 17
+remotely from the pluggable SFP-OLTs. 18
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        16
+8.2.2 Point-to-point interfaces 1
+For Point-to-point interfaces, we recommend to also use the ONU Management and Control Interface (OMCI) 2
+over Ethernet through the 'Standard for Management Channel for Customer -Premises Equipment Connected 3
+to Ethernet-based Subscriber Access Networks', in the IEEE 1904.2 Task Force  [18]. This implementation 4
+allows to use the existing PON management mechanism for PtP with a master equipment (at the central office 5
+(OLT with PtP interface)) and a slave equipment (at the antenna site (PtP ONU)). 6
+8.2.3 WDM-PON 7
+ITU-T SG15 Q2 launche d a study item to clarify requirements and specifications for the new WDM -PON 8
+Recommendation management channel. The approach to implement management channel is under discussion 9
+based on: 10
+1. Transparent approach: This approach doesn’t touch the bit-stream of client signal and is basically specific 11
+to the bitrate and protocol of client signal.  An example of this approach is Transparent AMCC (Auxiliary 12
+Management and Control Channel) defined in G.989.2 [19].  Another example of this is HTMC (head-to-tail 13
+message channel) defined in G.698.4 [20]. 14
+2. Unified-frame approach: This approach maps the bit -stream of client signal onto a frame defined in the 15
+PON layer.  Management information is also car ried by the frame defined in the PON layer.  An example of 16
+this approach is the TC frame with PLOAM and OMCI. 17
+Then, the following approaches seem something in between.   18
+3. Transcoded AMCC: This is defined in G.989.3  [21] and mentioned in G.9806  [22].  It is (almost) 19
+transparent for signals using for example 8B10B or 64B66B coding but cannot accommodate other protocols. 20
+4. OAM mapped into Ethernet frames: This is defined in defined in G.9806  [22].  It adds local OAM 21
+information into Ethernet frames but cann ot accommodate to protocols other than Ethernet. Also, we need a 22
+design rule for sharing the bandwidth between the client frames and the management frames. 23
+8.3 Optical transport 24
+8.3.1 Fronthaul WDM systems 25
+This section looks at Fronthaul WDM systems. More info can be found in the WDM requirements document. 26
+Passive-passive 27
+Since this is a fully passive configuration, no management interfaces are needed. An optional implementation 28
+is to keep passive the fronthaul channels transmission and to add in parallel a dedicated loopback physical 29
+channel for supervision of the trunk (between wavelength multiplexer) fiber infrastructure. This loop back is 30
+passive in the antenna location and active for only this supervision channel (not active for the fronthaul 31
+channels). Management aspects of the transceivers must be captured where they are integrated into end 32
+points (e.g., mplane [25]). Table 5 shows the interface functional requirements. 33
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        17
+ 1
+Table 5: The interface functional requirements for Passive-active system with fiber trunk 2
+supervision 3
+ 4
+Passive-active 5
+The semi-active WDM solution is composed of optical modules, passive WDM equipment at the remote O -6
+RU side and the active WDM equipment at O-DU side of the central office. For management capability of the 7
+network, t he mana gement and control system could send management requests to the active WDM 8
+equipment through the management interface and manage the semi -active WDM system, including query 9
+and configuration. 10
+Semi-active type I 11
+ 12
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        18
+The O -DU is transparent to the wavelength transmission features  and the O -RU supports the WDM 1
+transceiver. The management and control system could control the wavelength assignment  and also could 2
+interconnect with the active WDM equipment at O -DU side  to manage  the WDM system through 3
+management interface, including query and configuration. The active WDM equipment plays a master role 4
+and could manage the WDM transceiver at O-RU side by an embedded OAM channel. 5
+ 6
+ 7
+Semi-active type II 8
+ 9
+The O-RU and O-DU both support the WDM transceivers. The management and control system could 10
+control the wavelength assignment and also could interconnect with the active WDM equipment at O-DU 11
+side to monitor the WDM system through management interface. The active WDM equipment plays a 12
+master role and could monitor the WDM transceiver at both O-RU and O-DU sides by an embedded OAM 13
+channel. Table 6 shows the interface functional requirements. 14
+ 15
+Functions Semi-active
+type I
+Semi-active
+type II
+CM system Topology ×  ×
+  Connection  ×  ×
+ WDM equipment Information query  ×  ×
+  Equipment
+configuration ×  ×
+  Protection
+management ×  ×
+ Transceiver Information query  ×
+  Configuration  ×
+FM WDM equipment  ×  ×
+ Transceiver  ×  ×
+PM WDM equipment  ×  ×
+ Transceiver  ×  ×
+Security User management Netconf password config ×  ×
+ Certificate handling ×  ×
+Table 6: The interface functional requirements for Semi-active system 16
+ 17
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        19
+Active-active 1
+ This configuration has both ends fully active and uses management interfaces. In this configuration, 2
+there is an Optical Supervisory Channel (OSC). 3
+Table 7 compares features of Fronthaul WDM system features. 4
+ 5
+Table 7: Feature comparison of WDM Fronthaul Systems 6
+Table 8 shows the comparison for models for Fronthaul WDM system. 7
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        20
+ 1
+Table 8: Comparison of models for WDM Fronthaul Systems 2
+ 3
+Here are the gaps for the three different models for Transceivers (comparing May 2020 models): 4
+OpenConfig [23] 5
+• 25G Wavelengths missing. 6
+ 7
+OpenROADM [24] 8
+• No 10G or 25G on-off keyed wavelength support, 9
+• No lldp snooping, 10
+• Only rudimentary tracking of client modules. 11
+ 12
+M-Plane [25] 13
+• Only supports application where transceiver is plugged into O-DU/O-RU 14
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        21
+ 1
+ 2
+Here are the gaps for the different models for WDM fronthaul common equipment: 3
+OpenConfig 4
+• Subslot missing as explicit item, 5
+• No individual pack FW update, only whole NE SW, 6
+• OSC modeled only on amplifier, 7
+• EMS required for lamp test, 8
+• Database backup / restore is via Netconf read / write config, 9
+• Streaming telemetry no historic data, 10
+• No explicit wavelength dependent port. 11
+ 12
+OpenROADM 13
+• OSC is Ethernet only, no SONET, 14
+• OSC assumes lldp from other end (problem for passive-active?), 15
+• No path protection defined. 16
+ 17
+M-Plane 18
+• WDM common equipment not defined at all. 19
+ 20
+The following recommendation shows how the models can be used based on where the optics are 21
+located: 22
+Transceiver inside O-DU/O-RU    Use M-plane 23
+Transceiver inside router/switch    Use OpenConfig or IETF (see IP/Ethernet section) 24
+Transceiver inside transponder    Use OpenConfig or OpenROADM 25
+ 26
+For the common equipment the following recommendation can be used: 27
+If supplier already supports OpenConfig   Use OpenConfig 28
+If supplier already supports OpenROADM  Use OpenROADM 29
+ 30
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        22
+ 1
+8.3.2 Mid- and backhaul ROADM transport 2
+This section covers the optical transport needs for mid - and backhaul fiber optic systems. The 3
+assumptions are that these fiber optic transport systems are multi-point systems and therefore need 4
+reconfigurable add/drop capability, known as ROADMs. Table 9 lists the features in a typical 5
+commercial ROADM system. 6
+ 7
+Table 9: Feature list for commercial ROADM systems 8
+ 9
+Table 10 compares the models in commercially available ROADM systems. 10
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        23
+ 1
+Table 10: Model comparison for commercial ROADM systems 2
+ 3
+In terms of comparison of the two options, t he main difference between OpenConfig and OpenROADM are 4
+the assumptions of the SDN architecture behind the use cases. 5
+In the case of OpenConfig, there is an assumption that there exists a vendor controller for the ROADM 6
+switches1, where the end-to-end path through the ROADM network is configured through the vendor controller 7
+(see Figure 1). The transponders are directly controlled from the SDN Controller via OpenConfig interfaces. 8
+ 9
+
+1 this architecture is sometimes called “partial disaggregation”, and standards such as
+ONF Transport API are available for the API to the vendor controller.
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        24
+ 1
+Figure 1: OpenConfig partial disaggregation configuration 2
+ 3
+OpenROADM on the other hand assumes that all the elements are disaggregated and can be controlled by a 4
+single logical SDN controller using OpenROADM APIs.  The devices are directly integrated into the SDN 5
+Controller independent of vendor with direct control of line system (see Figure 2). 6
+ 7
+ 8
+Figure 2: OpenROADM full disaggregation configuration 9
+ 10
+Here are the gaps for the three different models for Transponders (comparing May 2020 models): 11
+OpenConfig 12
+• 25G Wavelengths missing. 13
+ 14
+OpenROADM 15
+• No 10G or 25G on-off keyed wavelength support, 16
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        25
+• No lldp snooping, 1
+• Only rudimentary tracking of client modules. 2
+ 3
+Here are the gaps for the different models for WDM common equipment: 4
+OpenConfig 5
+• No individual pack FW update, only whole NE SW, 6
+• EMS required for lamp test, 7
+• Database backup / restore is via Netconf read / write config, 8
+• Streaming telemetry no historic data. 9
+ 10
+OpenROADM 11
+• No path protection defined. 12
+ 13
+ 14
+For the ROADM equipment the following recommendation can be used: 15
+If Network Operator uses single vendor optical controller   Use OpenConfig 16
+If Network Operator disaggregates optical commons     Use OpenROADM 17
+ 18
+8.4 IP/Ethernet transport 19
+The intention of this section is to document the research that has been undertaken by the O-RAN WG9 team 20
+and provide recommendations relative to the automation and management of O-RAN networks and pertains 21
+to the architecture and solutions outlined in WG9’s Xhaul Packet Switched Architectures and solutions (O-22
+RAN.WG9.XPSAAS-v02 [26]) and how a slice can be managed. The packet switched transport architecture 23
+is illustrated in Figure 3.  24
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        26
+  1
+  2
+Figure 3: Packet switched transport for mobile Xhaul 3
+ 4
+It is a converged end to end packet switched infrastructure, beginning at the cell site, located in the edge of 5
+the access part of the transport layer, and stretching to the core of the transport layer. The packet switching 6
+TNEs are IP/MPLS or SRv6 QoS enabled, high capacity, low latency devices interconnected by point-to-7
+point Ethernet interfaces running at the full capacity of the Ethernet interface, typically using either point to 8
+point fibres or via a WDM infrastructure.  It incorporates data centers suitably placed across the transport 9
+network infrastructure to support virtual and physical NFs associated with mobile and fixed services but also 10
+potentially the placement of “Application Functions” associated with value-add services and customer 11
+specific application. 12
+ 13
+The logical architecture is based on a common underlay packet switching infrastructure based on either 14
+MPLS or SRv6 overlaid with a L2 / L3 service infrastructure (VPNs) that uses the capabilities of the 15
+underlay packet switched network to support the mobiles interfaces.  16
+The underlay packet switching infrastructure provides basic network services such as any-to-any 17
+connectivity between TNEs, scaling, fast convergence, shortest path and traffic engineered forwarding, 18
+packet-based Quality of Service (QoS) and timing.  19
+ 20
+The service layer supports native Ethernet services, using EVPN technology and IP VPN services, using MP-21
+BGP based L3VPNs. These services can utilise the facilities offered by the underlay packet switched 22
+infrastructure to support the different mobile interfaces in an appropriate fashion. Where possible transport 23
+services are built on an end-to-end basis without intermediate stitching / switching points within the transport 24
+infrastructure. This approach has been taken to minimise the transport service orchestration overhead. 25
+ 26
+8.4.1 Provisioning and managing a packet switched infrastructure 27
+There are two main phases associated with the provision and management of a packet switched 28
+infrastructure: 29
+• Building and managing the basic infrastructure. This is a process that occurs when the network is 30
+first built and later when new TNEs are installed or when TNEs are modified or upgraded. It covers 31
+the basic set-up of devices, the configuration of the management infrastructure, set-up of interfaces, 32
+core QoS and routing protocols. This function is undertaken by the network operations team and is 33
+normally largely transparent to the users of the network. 34
+• Services configuration and management. In the architecture outlined in Xhaul Packet Switched 35
+Architectures and solutions (O-RAN.WG9.XPSAAS-v02 [26]) services, such as a transport slice, are 36
+MP-BGP based on L2VPNs and L3VPNs. The construction of a service involves multiple actions 37
+and components such as building VPNs, Edge QoS, service level OAM and potentially mapping 38
+services to underlay policies. In contrast to the basic infrastructure this is an on-going process and 39
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        27
+constantly changing. The service orchestration and service assurance also need to interact with 1
+OSS/BSS components and customers. In this instance a customer can be a human or external 2
+orchestration software. Relating this specifically to transport level slicing; the customer might be the 3
+NSMF. It also needs to abstract away the topology, complexity, and technology of the actual 4
+network infrastructure, so the customer can largely treat the network as a black box offering 5
+connectivity and SLAs. 6
+ 7
+8.4.2 Orchestrators and controllers 8
+To support service automation, northbound abstraction of services and increasing interest in SDN, the IETF 9
+and other bodies, see multiple layers of orchestration and network control with different types of Yang 10
+models used in the end-to-end management of services in the transport network. The IETF has published 11
+various informational drafts that discuss different layering schemes and types of Yang models, include 12
+RFC8969 [27], RFC8199 [28], RFC8309 [29]. The basic premise in these drafts is there are different 13
+network management components communicating using different types of Yang models. Figures 4 and 5 are 14
+taken from RFC8309 [29] and show environments where there is a three-layer architecture and a four-layer 15
+architecture, respectively. In a four-layer architecture the service orchestrator is exposed to the end-user 16
+customer and includes a customer service interface. 17
+ 18
+ 19
+ 20
+Figure 4: three-layer network management architecture [29] 21
+ 22
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        28
+ 1
+Figure 5: four-layer network management architecture [29] 2
+ 3
+ 4
+Both environments support different types of Yang models including:  5
+• Service Models: An abstracted, non-technological view of a service. For example, an L2 or L3 VPN 6
+service as defined RFC 8466 [30] and 8299 [31]. 7
+• Network Models: Topology and technology aware models of how the service will be realised on the 8
+network. For example, the L2NM and L3NM models for defining L2 and L3 VPN based on MP-9
+BGP L2VPNs (draft-ietf-opsawg-l2nm-02) and L3VPNs (draft-ietf-opsawg-l3sm-l3nm-09). 10
+• Device Models: Models used to configure specific functionality on the devices.    11
+ 12
+Both environments differentiate the controller function from the orchestrator functions, with the controller 13
+providing the conversion of the network models into device configuration and the orchestrator responsible 14
+for conversion of an abstract model into a model that can be actioned by the controller. In the four-layer 15
+model there are two types of orchestrator with one associated with the service and the other associated with 16
+the network.  17
+ 18
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        29
+8.4.3 Transport Slicing orchestration and SLA management 1
+The slice architecture proposed in O-RAN.WG9.XPSAAS-v02 outlines slicing solutions based on L2VPNs 2
+and L3VPNs utilising facilities within the transport network such as SR policies, Flex-algo and traffic 3
+engineering. It also clear that a transport slice may be one or more VPNs at the transport layer. Various work 4
+is going on in the IETF TEAS group to come up with a transport slice NBI model which describes the 5
+customer transport slice requirements, at this time these are personal drafts so are not referenceable. There 6
+are also RFC based Yang models describing L2 and L3 service models and standards track drafts for a 7
+common VPN, L2 and L3NM models. In addition to the basic L2 / L3 service constructs there are other 8
+drafts such as  9
+draft-ietf-spring-sr-policy-yang-01, draft-ietf-teas-te-service-mapping-yang-07 which may have applications 10
+in mapping L2VPN and L3VPNs to underlay forwarding planes.  11
+At this time more work is required to understand how these different Yang models can work together to 12
+create an infrastructure suitable for slice orchestration.     13
+ 14
+8.4.4 Assessment methodology and analysis 15
+For the device models, the primary objective from WG9 was to evaluate open standard interfaces that can be 16
+used to between the Transport Controller (TSC) to satisfy the requirement for automation on the Xhaul 17
+Packet Switched networks as described in O-RAN.WG9.XPSAAS-v02.00 [26]. The types of interfaces fall 18
+into several categories: 19
+ 20
+• Configuration/operational interfaces (e.g. Netconf/YANG with YANG data model supporting the 21
+required functionality) 22
+• Control-plane interfaces (e.g. BGP-LS, PCEP) 23
+• Telemetry interfaces (e.g. Openconfig gRPC or NETCONF) 24
+ 25
+To break down the assessment, a list of high-level technology areas was created where interfaces and data 26
+models would be required to satisfy the functional requirements for O-RAN.  For each of these areas a 27
+review was performed to assess the availability and completeness of these interfaces.  For each of the 28
+categories research was done to assess existence, maturity and completeness of options available in IETF and 29
+Openconfig projects as well as the suitability to facilitate automation of the O-RAN proposed architecture. 30
+ 31
+The high-level technology areas reviewed were as follows: 32
+ 33
+ 34
+Configuration/Operational Interfaces: 35
+• Hardware Inventory 36
+• L3VPN 37
+• EVPN 38
+• QoS 39
+• SR 40
+• RSVP 41
+• Network Slicing 42
+• Inter-AS 43
+• OAM 44
+• Multicast 45
+• Timing 46
+ 47
+ 48
+Control-plane Interfaces: 49
+• Tunnel Discovery and tunnel CRUD operations 50
+• Topology acquisition and monitoring 51
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        30
+ 1
+ 2
+Telemetry Interfaces: 3
+• Performance monitoring 4
+• Fault monitoring 5
+ 6
+It was clear from early on in the research that there were two main source areas where significant work has 7
+already been undertaken to standardize interfaces that fall into the categories above. Firstly, within the IETF 8
+there are many different activities that have either been carried out or are work in progress. As per the 9
+agreement with WG9 only RFCs and working group drafts will be considered for recommendation (if 10
+suitable), however some Internet drafts may be tracked especially if there is a strong indication that they will 11
+soon become working group drafts and if they have high relevance to the O-RAN project. Secondly, a good 12
+deal of work has taken place within the Openconfig project where a number of network operators work to 13
+create common YANG models suitable for common network deployment scenario that can be used across 14
+multiple vendor technologies. 15
+ 16
+8.4.4.1 Configuration/Operational Interfaces 17
+8.4.4.1.1 IETF Gap Analysis 18
+There are a number of working group drafts within the IETF that are possible candidates for use when 19
+configuring the network elements.  Most of these are still in draft stage and in some cases, there are some 20
+gaps which have been identified (see table 11).  21
+ 22
+It is not clear at this time whether there is extensive support for these drafts across the various vendor 23
+implementations which could create challenges for real world adoption in the short term. 24
+ 25
+Table 11 - IETF YANG Models for Configuration 26
+ 27
+8.4.4.1.2 Openconfig Gap Analysis 28
+The research which was undertaken also reviewed the available YANG models within the Openconfig 29
+project. Table 12 shows the models that were reviewed: 30
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        31
+ 1
+ 2
+Table 12- Openconfig YANG Models for Configuration 3
+ 4
+While there appears to be good coverage in some areas like VPN technologies there are also gaps in some 5
+important areas like SRv6 and Flex Algo. 6
+ 7
+8.4.4.1.3 Native YANG models 8
+All vendors typically have their own YANG models which describe their NOS capabilities in their entirety, 9
+including both standards-based features and vendor proprietary features.  These models should (but do not 10
+always) offer the guarantee that for the given vendor platform all available features can be automated in a 11
+structured way by an automation system. One advantage to using all native models can be to avoid the 12
+complexity of taking incomplete standards-based models and trying to create augmentations for different 13
+vendors by cherry picking pieces of the native models. On the other hand, the advantage of taking standards-14
+based models and augmenting the missing pieces with native models can create synergies in network 15
+automation software between different platforms. 16
+Where working with cutting edge features the reality is that often the only approach practical is that of using 17
+a vendor-native model until such a time as open alternatives are updated. An additional area where 18
+standardization is problematic is the area of QoS. While there are efforts in both IETF and Openconfig to 19
+create standard models, it has proved very difficult (at least in IETF) to agree on certain aspects of this 20
+model. One of the challenges is the fact that vendor implementations vary considerably in the approaches to 21
+implementing QoS technologies, largely because this has been an area where vendors have deliberately 22
+sought to gain competitive advantage through their individual innovation efforts.   23
+ 24
+8.4.4.1.4 Network Slicing 25
+While not a focal point for this interaction of investigations, one area that merits further discussion is the 26
+topic of network slicing.  There are many active drafts (many of which are currently Internet drafts) being 27
+worked on in the IETF that are looking to address interface standardization in the context of Network slicing. 28
+In most cases these are still in relatively early phases and expected to evolve of the next year. Some of the 29
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        32
+interesting drafts are listed here NOT as a recommendation but as a placeholder to be reviewed as part of a 1
+future version of this document. 2
+ 3
+The following draft describes a possible YANG interface for a YANG data model for the management of 4
+slice policies on slice policy capable nodes and controllers in IP/MPLS networks: 5
+https://datatracker.ietf.org/doc/html/draft-bestbar-teas-yang-slice-policy-00 6
+ 7
+There are several drafts that aim to provide a YANG model suitable for use on the northbound interface of 8
+the Network Slice Controller (NSC), the following seems to be one of the most advanced at this time: 9
+https://datatracker.ietf.org/doc/draft-ietf-teas-ietf-network-slice-nbi-yang/  10
+ 11
+8.4.4.2 Control Plane Interfaces 12
+It is expected that many O-RAN networks will decide to adopt PCE based SDN controller which will interact 13
+directly with the control-plane of the network and provide greater visibility of the network topology and 14
+LSPs carrying IP or IPv6 traffic across the transport network. Additionally, many PCE based SDN 15
+controllers simplify the implementation of traffic engineering use cases like path diversity, BW calendaring, 16
+bin packing, LSP placement based on constraints such as inclusion or exclusion of certain links, max delay 17
+and many other use cases that can help to simplify operations, lower opex or improve the experience of the 18
+end customer.   19
+ 20
+Typically, the PCE based controller interacts with the network using PCEP and BGP-LS, the capabilities 21
+offered by these protocols are often augmented through Netconf, Telemetry collection, config parsing and 22
+other mechanisms.  23
+ 24
+This section attempts to define a set of minimum standards that should be supported by both the routers and 25
+the PCE SDN Controller. Table 13 list some of the IETF standards considered. 26
+ 27
+ 28
+Table 13: PECP RFCs and drafts 29
+ 30
+BGP-LS is widely used in transport SDN controllers to extract the IGP TED from the network via a BGP 31
+session. This allows the controller to build a topological view of the network and receive updates from the 32
+IGP when the network topology changes without being itself part of the IGP domain.  This is generally the 33
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        33
+most widely deployed approach as it provides the ability to collate information from multiple different 1
+areas/ASes in a relatively straightforward manner.  2
+ 3
+Further to this in recent years BGP-LS has been extended to allow a simpler method of collection telemetry 4
+data from the network such as link latency, packet loss and available/residual bandwidth (see table 14).  5
+ 6
+ 7
+Table 14 - BGP-LS and related drafts 8
+ 9
+8.4.4.3 Telemetry Interfaces 10
+When it comes to Perf ormance Monitoring, both Openconfig and IETF models expose almost the same 11
+attributes. Openconfig models call them “counters”, while IETF groups them under a “statistics” container. 12
+Ingress and egress attributes are being defined, and every different attri bute is of type “yang:counter64”, 13
+meaning an unsigned integer of 64 bites. Both models define attributes to measure how many octets were 14
+incoming or outgoing, how many of the ingress or egress packets were unicast, multicast, broadcast, discarded 15
+or with e rrors. Openconfig defines three extra attributes, as opposed to the IETF models: “in -pkts”, which 16
+counts the total number of packets which were incoming. The same value can be computed also in the IETF 17
+model, by adding the unicast, multicast, broadcast and  error packets, and the model does not define this sum 18
+explicitly. The same is available for the egress, where the Openconfig model defines also the attribute “out -19
+pkts” as the sum of the unicast, multicast, broadcast and error. Openconfig also defines explicitly the received 20
+packets which had an FCS error: “in-fcs-errors”. 21
+Since the PM attributes are defined in YANG, either gNMI Streaming Telemetry or polling via NETCONF 22
+get operations can be used to retrieve these metrics  (see figure 6 for a graphical exp lanation). As long as the 23
+model definition is YANG, the actual attributes defined in that model do not matter from a polling or streaming 24
+perspective. 25
+ 26
+ 27
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        34
+Figure 6: Telemetry models and protocols 1
+ 2
+ 3
+8.4.5  Conclusion 4
+In general, there is much work that has already been done to standardize the interfaces used between the IP 5
+packet network controller and the IP nodes on the O-RAN network.  When it comes to the configuration 6
+interfaces there would appear currently to be more comprehensive coverage with OpenConfig YANG 7
+models compared to those that are available in the IETF, this said neither option provides all features that we 8
+expect would be required for a fully automated O-RAN network.  9
+This considered, while it is recommended to adopt standard models as this should help with interoperability 10
+and API stability, it is acknowledged that proprietary extensions or use of native models may be required in 11
+cases where a single YANG model is not available that provides the full range of features required for a 12
+particular use case. Where working with cutting edge features the reality is that often the only approach 13
+practical is that of using a vendor-native model until such a time as open alternatives are updated. The 14
+advantage of taking standards-based models and augmenting the missing pieces with native models can 15
+create synergies in network automation software between different platforms. 16
+For the telemetry interfaces, there are no gaps in IETF or OpenConfig and both, gRPC or NETCONF can be 17
+used for retrieval. 18
+In the control plane there are mature IETF standards which are widely deployed and should be leveraged as 19
+fully as possible. 20
+    21
+8.5 Grand master clock 22
+There is currently an active project in IEEE 1588 implementing YANG data mod els for the latest timing and 23
+synchronization standard IEEE 1588-2019 [32]. This project is scheduled to complete sometime in 2023/24. 24
+IEEE 1588-2019 defines a precision timing protocol to synchronize clocks in packet networks to a grandmaster 25
+clock. The YANG data models will enable customization of all IEEE 1588-2019 defined data types, message 26
+formats, required computations, internal states, the behavior of devices with respect to transmitting, receiving, 27
+and processing protocol communications. Draft YANG files can be viewed at [33]. 28
+  29
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        35
+9 Network Slicing Use Case 1
+In this chapter we will look at the network slicing use case inside O-RAN. Ultimately, all the 2
+recommendations here will flow into the different chapters of the main document. But the goal right now is 3
+to define the functional elements and interfaces in one place as a use case before merging it back into the 4
+different chapters in a future version of this document. 5
+ 6
+ 7
+Figure 7: Functional architecture of the network slicing use case. 8
+ 9
+Figure 7 shows a full functional view of the network slicing use case. The Network Slice Management 10
+Function is part of the end-to-end Orchestrator, orchestrating across Radio, Transport and Core domains. In 11
+the Transport Domain, which is the focus of this working group, there is a subserving Transport Network 12
+Slice function (TN NSSMF). The Transport Network Slice function breaks out the request into the different 13
+Transport Domains (e.g., Packet, Optical, Microwave, etc.). While the diagram shows stand-alone elements 14
+of SDN Controller functions for each domain, those individual controller functions could be physical entities 15
+or logical entities integrated into a carrier’s SDN Controller Framework. Each of the domain controller 16
+functions then control the Transport Network Elements (TNE) creating end-to-end network slices. 17
+ 18
+As part of this Network Slicing Use Case O-RAN also will issue recommendations on management 19
+interfaces between the different functions outlined above. The interface candidate between the end-to-end 20
+orchestrator and the Transport Network Slice Management function is currently a 3GPP definition, which 21
+will be more fleshed out in a future version of this document. The Interface between the Transport Network 22
+Slice Management function and the domain SDN-Controller functions still needs more definition in existing 23
+standards organizations and will also be fleshed out in more detail in future documents. The Interface 24
+candidates southbound of the Domain SDN Controller functions have already been described in the 25
+technology specific chapters in this document.  26
+
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        36
+Annex ZZZ: O-RAN Adopter License Agreement 1
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, 2
+ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT. 3
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance 4
+and the entity that downloads, uses or otherwise accesses any O -RAN Specification, including its Affiliates 5
+(the “Adopter”). 6
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7
+Section 1: DEFINITIONS 8
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control 9
+with another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial 10
+ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 11
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in 12
+hardware, software or combinations thereof) that fully conforms to a Final Specification. 13
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including 14
+their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 15
+1.4 “Minor Update” means an update or revision to an O -RAN Specification published by O -RAN Alliance 16
+that does not add any significant new features or functionality and remains interoperable with the prior version 17
+of an O-RAN Specification. The term “O-RAN Specifications” includes Minor Updates. 18
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than 19
+design patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by 20
+a Member, Contribu tor or Academic Contributor during the term of its Member, Contributor or Academic 21
+Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant a license 22
+without the payment of consideration to a third party; and (iii) are necessarily infringed by a Compliant 23
+Implementation (without considering any Contributions not included in the Final Specification). A claim is 24
+necessarily infringed only when it is not possible on technical (but not commercial) grounds, taking into 25
+account normal technical practice and the state of the art generally available at the date any Final Specification 26
+was published by the O -RAN Alliance or the date the patent claim first came into existence, whichever last 27
+occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation without 28
+infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be 29
+implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be 30
+considered Necessary Claims. 31
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 32
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discreti on to include in 33
+their license a term allowing the licensor to suspend the license against a licensee who brings a patent 34
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their 35
+Affiliates. 36
+Section 2: COPYRIGHT LICENSE 37
+2.1 Subject to the terms and conditions of this Agre ement, O -RAN Alliance hereby grants to Adopter a 38
+nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and 39
+modify O-RAN Specifications, b ut not to further distribute such O -RAN Specification in any modified or 40
+unmodified way, solely in furtherance of implementations of an ORAN 41
+Specification. 42
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate 43
+written agreement with O-RAN Alliance. 44
+Section 3: FRAND LICENSE 45
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a 46
+separate Patent License Agreement to each Adopter under Fair Reasonable An d Non - Discriminatory 47
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        37
+(FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non -transferable, 1
+irrevocable (but subject to Defensive Suspension), non -sublicensable, worldwide patent license under their 2
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant 3
+Implementations; provided, however, that such license shall not extend: (a) to any part or function of a product 4
+in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; 5
+or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic 6
+Contributors, as set forth in Section 3.3. For the avoidance of doubt, the foregoing licensi ng commitment 7
+includes the distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed 8
+Compliant Implementations. 9
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 10
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to 11
+Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or 12
+Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 13
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 14
+Agreement to each Members, Contributors, Academic Contributors, Adopters and thei r Affiliates under Fair 15
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) 16
+a nonexclusive, non -transferable, irrevocable (but subject to Defensive Suspension), non -sublicensable, 17
+worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, 18
+sell and otherwise distribute Compliant Implementations; provided, however, that such license will not extend: 19
+(a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself 20
+part of the Compliant Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters 21
+and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3. 1. For the 22
+avoidance of doubt, the foregoing licensing commitment includes the distribution by the Members’, 23
+Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the 24
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed 25
+Compliant Implementations. 26
+Section 4: TERM AND TERMINATION 27
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 28
+4.2 O-RAN Alliance on behalf of its M embers, Contributors and Academic Contributors may terminate this 29
+Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such 30
+breach within thirty (30) days after being given notice specifying the breach. 31
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving 32
+Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who 33
+become Adopters after the date of terminatio n; and (b) for future versions of ORAN Specifications that are 34
+backwards compatible with the version that was current as of the date of termination. 35
+Section 5: CONFIDENTIALITY 36
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN 37
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than 38
+reasonable care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to 39
+an obligation of confidentiality at least as restrictive as those contained i n this Section. The foregoing 40
+obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation 41
+on use or disclosure prior to discl osure; (2) publicly available through no fault of Adopter; (3) rightfully 42
+received without a duty of confidentiality; (4) disclosed by O -RAN Alliance or a Member, Contributor or 43
+Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently 44
+developed by Adopter; (6) disclosed pursuant to  the order of a court or other authorized governmental body, 45
+or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and 46
+cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have 47
+the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN Alliance’s prior written 48
+approval. 49
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        38
+Section 6: INDEMNIFICATION 1
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or 2
+Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns (the 3
+“Indemnitees”), against any liability, damage, loss, or exp ense (including reasonable attorneys’ fees and 4
+expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, 5
+investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O -RAN 6
+Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications. 7
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 8
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND 9
+ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT  SHALL ANY PARTY BE LIABLE 10
+TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, 11
+PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON -12
+PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, 13
+TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE 14
+NOTICE OF THE POSSIBI LITY OF SUCH DAMAGES. O -RAN SPECIFICATIONS ARE PROVIDED 15
+“AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, 16
+IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIAN CE AND THE MEMBERS, 17
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR 18
+CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, 19
+NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR 20
+ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 21
+Section 8: ASSIGNMENT 22
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any 23
+grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without ha ving first 24
+received the prior, written consent of the O -RAN Alliance, which cons ent may be withheld in O -RAN 25
+Alliance’s sole discretion. O-RAN Alliance may freely assign this Agreement. 26
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 27
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future 28
+Members, Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under 29
+this Agreement, including as licensees under Section 3. 30
+Section 10: BINDING ON AFFILIATES 31
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 32
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable 33
+to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 34
+Section 11: GENERAL 35
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  36
+This Agreement constitutes the entire agreeme nt between the parties as to its express subject matter and 37
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether 38
+written or oral, relating to the subject matter of this Agreement.  39
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 40
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without 41
+limitation, export control and antitrust laws. Without limitin g the generality of the foregoing, Adopter 42
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 43
+O-RAN.WG9.XTRP-MGT.0-v03.00
+
+________________________________________________________________________________________________
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        39
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between 1
+Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set 2
+forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN 3
+Alliance or its Members, Contributors or Academic Contributors. 4
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be 5
+null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be 6
+deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this 7
+Agreement will remain in full force and effect. 8
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any 9
+of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise 10
+by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or third party 11
+beneficiary’s right to assert or rel y upon any such provision, right or remedy in that or any other instance; 12
+rather the same shall be and remain in full force and effect. 13

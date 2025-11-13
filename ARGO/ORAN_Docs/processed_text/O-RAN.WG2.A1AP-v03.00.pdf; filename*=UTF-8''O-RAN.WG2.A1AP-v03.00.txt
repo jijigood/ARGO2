@@ -1,0 +1,3779 @@
+O-RAN.WG2.A1AP-v03.00
+Technical Specification
+O-RAN Working Group 2
+A1 interface: Application Protocol
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited,
+save that you may print or download extracts of the material on this site for your personal use, or copy
+the material on this site for the purpose of sending to individual third parties for their information
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the
+third party that these conditions apply to them and that they must comply with them.
+
+O-RAN.WG2.A1AP-v03.00
+Technical Specification
+
+O-RAN Working Group 2
+A1 interface: Application Protocol
+
+Copyright © 2021 by O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving,
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License
+Agreement contained in the Annex Z of this specification. All other rights reserved.
+
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189
+
+© 2021 O-RAN ALLIANCE e.V. All Rights Reserved
+                  1
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                2
+Revision History  1
+Date Revision Author Description
+2019.09.30 01.00 Patric Lind
+(Ericsson)
+First version with A1-P (Policy Management service)
+2020.03.13 01.01 Patric Lind
+(Ericsson)
+Removal of multi-object operations and PATCH based procedures. Included
+Open API Specification and aligned text with it.
+2020.07.20 02.00 John
+Power
+(Ericsson)
+Defining A1-P/V2 based on policy types
+2020.11.09 03.00 Patric Lind
+(Ericsson)
+Defining A1-EI/V1 (A1 Enrichment Information service)
+  2
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                3
+Contents  1
+Revision History ................................................................................................................................................. 2 2
+Chapter 1 Introduction ........................................................................................................................................ 5 3
+1.1 Scope ................................................................................................................................................................. 5 4
+1.1.1 Compatibility of A1 versions ....................................................................................................................... 5 5
+1.2 References.......................................................................................................................................................... 5 6
+1.3 Definitions and Abbreviations ........................................................................................................................... 7 7
+1.3.1 Definitions .................................................................................................................................................... 7 8
+1.3.2 Abbreviations ............................................................................................................................................... 7 9
+Chapter 2 A1 Application Protocol .................................................................................................................... 9 10
+Chapter 3 A1 Services ........................................................................................................................................ 9 11
+3.1 Introduction........................................................................................................................................................ 9 12
+3.2 Policy Management Service ............................................................................................................................ 10 13
+3.2.1 Service Description .................................................................................................................................... 10 14
+3.2.2 Service Operations ..................................................................................................................................... 11 15
+3.3 ML Model Management Service ..................................................................................................................... 19 16
+3.4 Enrichment Information Service ...................................................................................................................... 19 17
+3.4.1 Service Description .................................................................................................................................... 19 18
+3.4.2 EI Discovery Service Operations ............................................................................................................... 21 19
+3.4.3 EI Job Control Service Operations ............................................................................................................. 22 20
+3.4.4 EI Delivery Service Operations .................................................................................................................. 28 21
+Chapter 4 API Definitions ................................................................................................................................ 29 22
+4.1 Introduction...................................................................................................................................................... 29 23
+4.1.2 Compatibility of API versions for A1 services .......................................................................................... 29 24
+4.2 A1-P (policy management) .............................................................................................................................. 29 25
+4.2.1 Introduction ................................................................................................................................................ 29 26
+4.2.2 Usage of HTTP .......................................................................................................................................... 30 27
+4.2.3 Resources ................................................................................................................................................... 30 28
+4.2.4 Custom Operations without associated resources ...................................................................................... 37 29
+4.2.5 Notifications ............................................................................................................................................... 37 30
+4.2.6 Data Model ................................................................................................................................................. 38 31
+4.2.7 Error Handling ........................................................................................................................................... 45 32
+4.3 A1-EI (enrichment information) ...................................................................................................................... 47 33
+4.3.1 Introduction ................................................................................................................................................ 47 34
+4.3.2 Usage of HTTP .......................................................................................................................................... 47 35
+4.3.3 Resources ................................................................................................................................................... 48 36
+4.3.4 Custom Operations without associated resources ...................................................................................... 53 37
+4.3.5 Notifications ............................................................................................................................................... 53 38
+4.3.6 Delivery ...................................................................................................................................................... 54 39
+4.3.7 Data model ................................................................................................................................................. 54 40
+4.3.8 Error handling ............................................................................................................................................ 57 41
+Annex A (normative): OpenAPI specification ................................................................................................. 58 42
+A.1 General ............................................................................................................................................................. 58 43
+A.1.1 Versioning of A1 OpenAPI documents ...................................................................................................... 58 44
+A.2 Policy Management API .................................................................................................................................. 58 45
+A.3 Enrichment Information API ........................................................................................................................... 65 46
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                4
+Annex B: JSON objects .................................................................................................................................... 73 1
+B.1 JSON schemas ................................................................................................................................................. 73 2
+B.1.1 QoS Target ................................................................................................................................................. 73 3
+B.1.2 QoE Target ................................................................................................................................................. 74 4
+B.1.3 Traffic Steering Preferences ....................................................................................................................... 76 5
+B.1.4 QoS optimization with resource directive .................................................................................................. 77 6
+B.1.5 QoE optimization with resource directive .................................................................................................. 79 7
+B.1.6 Policy Status Object ................................................................................................................................... 80 8
+B.2 Policy examples in JSON format ..................................................................................................................... 81 9
+B.2.1 QoS............................................................................................................................................................. 81 10
+B.2.2 QoE ............................................................................................................................................................ 82 11
+B.2.3 TSP ............................................................................................................................................................. 82 12
+B.2.4 QoS optimization with resource directive .................................................................................................. 83 13
+B.2.5 QoE optimization with resource directive .................................................................................................. 84 14
+B.2.6 Status object for notification ...................................................................................................................... 84 15
+Annex Z ............................................................................................................................................................ 85 16
+ 17
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                5
+Chapter 1 Introduction 1
+1.1 Scope  2
+This Technical Specification has been produced by O-RAN Alliance. 3
+The contents of the present document are subject to continuing work within O-RAN WG2 and may change following 4
+formal O-RAN approval. In the event that O -RAN Alliance decides to  modify the co ntents of the present document, it 5
+will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version number as 6
+follows: 7
+Release x.y.z 8
+where: 9
+x the first digit  is incremented for all changes of substance, i.e. techn ical enhancements, corrections, updates, 10
+etc. (the initial approved document will have x=01). 11
+y the second digit is incremented when editorial only changes have been incorporated in the document . 12
+z the third digit included only in working versions of the d ocument indicating incremental changes during the 13
+editing process. 14
+The present document is part of a TS-family covering the O-RAN WG2: A1 interface as identified below: “General 15
+Aspects and Principles”. “Transport Protocol”. “Application Protocol”. 16
+1.1.1 Compatibility of A1 versions 17
+The version number of the present document indicates that there may be implications for the compatibility between A1 18
+implementations in non/near-RT RICs that are based on different versions of this specification. 19
+An incremented first digit of this specification could indicate that a new major feature (e.g. new A1 service) has been 20
+added or that an incompatible change has been made to an A1 service. An incremented second digit could indicate that 21
+an optional feature has been added, or that clarifications or corrections have been made. 22
+The compatibility of A1 implementations in non/near-RT RICs depends on which A1 services that are implemented and 23
+which version(s) of each A1 service that are implemented. The version of an A1 service is indicated by the API version 24
+in the URI (see chapter 4) and compatibility is governed by the version of the OpenAPI document for the A1 service 25
+(see Annex A). 26
+1.2 References 27
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 28
+document. 29
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 30
+non-specific. 31
+- For a specific reference, subsequent revisions do not apply. 32
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                6
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 1
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in the same 2
+Release as the present document. 3
+[1] 3GPP TR 21.905: “3rd Generation Partnership Project; Technical Specification Group Services 4
+and System Aspects; Vocabulary for 3GPP Specifications”  5
+[2]  O-RAN WG2: “Non-RT RIC and A1 interface (Use Case Requirements)” 6
+[3] O-RAN WG2: “A1 interface: General Aspects and Principles” 7
+[4] O-RAN WG2: “A1 interface: Transport Protocol” 8
+[5] 3GPP TS 23.501: “3rd Generation Partnership Project; Technical Specification Group Services 9
+and System Aspects; System Architecture for the 5G System; Stage 2” 10
+[6] 3GPP TS 29.501: “3rd Generation Partnership Project; Technical Specification Group Core 11
+Network and Terminals; 5G System; Principles and Guidelines for Services Definition; Stage 3” 12
+[7] 3GPP TS 29.cde: “3rd Generation Partnership Project; Technical Specification Group Core 13
+Network and Terminals; 5G System; <template> Services Stage 3” 14
+[8]  3GPP TS 32.158: “3rd Generation Partnership Project; Technical Specification Group 15
+Management and orchestration; Design rules for REpresentational State Transfer (REST) Solution 16
+Sets (SS) 17
+[9] 3GPP TS 32.866: “3rd Generation Partnership Project; Technical Specification Group Services 18
+and System Aspects; Telecommunication management; Study on a REST(REpresentational State 19
+Transfer)-ful HTTP-based Solution Set (SS) 20
+[10]    IETF RFC8259: “The JavaScript Object Notation (JSON) Data Interchange Format ” 21
+[11]    (void) 22
+[12] 3GPP TS 38.463: “3rd Generation Partnership Project; Technical Specification Group Radio 23
+Access Network;  NG-RAN; E1 application protocol (E1AP)” 24
+[13] 3GPP TS 38.473: “3rd Generation Partnership Project; Technical Specification Group Radio 25
+Access Network;  NG-RAN; F1 application protocol (F1AP)” 26
+[14] (void)  27
+[15] 3GPP TS 23.003: “3rd Generation Partnership Project; Technical Specification Group Core 28
+Network and Terminals; Numbering, addressing and identification” 29
+[16] ITU-T P.1203.3: “SERIES P: TELEPHONE TRANSMISSION QUALITY, TELEPHONE 30
+INSTALLATIONS, LOCAL LINE NETWORKS; Models and tools for quality assessment of 31
+streamed media; Parametric bitstream-based quality assessment of progressive download and 32
+adaptive audiovisual streaming services over reliable transport – Quality integration module” 33
+[17] 3GPP TS 38.300: “3rd Generation Partnership Project; Technical Specification Group Radio 34
+Access Network; NR; NR and NG-RAN Overall Description; Stage 2” 35
+[18] IETF RFC 3986: “Uniform Resource Identifier (URI): Generic Syntax” 36
+[19]    IETF RFC7807: “Problem Details for HTTP APIs” 37
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                7
+[20] 3GPP TS 29.500: “3rd Generation Partnership Project; Technical Specification Group Core 1
+Network and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 2
+3” 3
+[21] 3GPP TS 21.900: “3rd Generation Partnership Project; Technical Specification Group Core 4
+Network and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 5
+3” 6
+[22] json-schema Draft 7, https://json-schema.org/draft-07/json-schema-release-notes.html 7
+[23] OPENAPI initiative, OpenAPI 3.0.0 Specification, http://spec.openapis.org 8
+[24]  Semantic Versioning 2.0.0, https://semver.org 9
+1.3 Definitions and Abbreviations 10
+1.3.1 Definitions 11
+A1 policy Declarative policy that is based on a policy type, identified by its PolicyId and contains a scope 12
+identifier and one or more policy statements. 13
+EI job Description of enrichment information to be produced and delivered that is identified by its EI 14
+job identifier and contains a scope identifier and one or more parameters and conditions.  15
+EI job identifier Identifier of an EI job that is used for requesting and delivering A1 Enrichment Information. 16
+EI job result The resulting enrichment information delivered based on an EI job.  17
+EI type The model on which an EI job and its EI job result is based. 18
+EI type identifier Identifier of an EI type. 19
+Policy identifer Identifier of an A1 policy that is used in policy operations. 20
+Policy object Representation of an A1 policy in JSON format used as payload in HTTP based policy 21
+procedures. 22
+Policy statement Expression of a directive in an A1 policy that is related to policy objectives and/or policy 23
+resources and are to be applied to/for the entities identified by the scope identifier. 24
+Policy type The model on which a policy is based and its status is expressed. 25
+Policy type identifier Identifier of a policy type. 26
+Scope identifier Identifier of what the statements in the policy or the EI job applies to (UE, group of UEs, slice, 27
+QoS flow, network resource or combinations thereof). 28
+1.3.2 Abbreviations 29
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1], O-RAN [2,3] and the 30
+following apply. An abbreviation defined in the present document takes precedence over the definition of the same 31
+abbreviation, if any, in 3GPP TR 21.905 [1].  32
+Id    Identifier 33
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                8
+JSON   JavaScript Object Notation 1
+KPI   Key Performance Indicator 2
+KQI   Key Quality Indicator 3
+ML   Machine Learning 4
+QoS   Quality of Service 5
+QoE   Quality of Experience 6
+REST   REpresentational State Transfer 7
+RAN   Radio Access Netework 8
+RT    Real Time 9
+RIC   RAN Intelligent Controller 10
+RRM   Radio Resouirce Management 11
+S-NSSAI  Single Network Slice Selection Assistance Information  12
+SMO   Service Management and Orchestration 13
+SPID   Subscriber Profile IDentity 14
+UE    User Equipment 15
+UEId   UE Identity 16
+URI   Uniform Resource Identifier 17
+  18
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                9
+Chapter 2 A1 Application Protocol 1
+This document contains a REST method realization of the interface architecture and policy procedures defined in [3]. It 2
+is based on HTTP transport as defined in [4]. 3
+This definition of the A1 Application Protocol (A1AP) is based on the 3GPP service framework for network functions 4
+[5]. It corresponds to a REST-based Solution Set and is based on the structure in the 3GPP specification 29.501 [6] and 5
+the related template [7]. The design patterns for HTTP procedures are based on [8] and the design patterns for JSON 6
+objects are based on [9]. 7
+Chapter 3 A1 Services 8
+3.1 Introduction 9
+The A1AP contains APIs for the services defined in [3]: 10
+A1-P – Policy Management Service 11
+A1-ML – ML Model Management Service 12
+A1-EI – Enrichment Information Service 13
+The A1AP is based on signaling between an A1 service consumer and an A1 service producer residing in the non-RT 14
+RIC or in the near-RT RIC. 15
+A1-P
+Consumer
+non-RT RIC
+A1-ML
+Consumer
+A1-EI
+Producer
+A1-P
+Producer
+A1-ML
+Producer
+A1-EI
+Consumer
+near-RT RIC
+A1-P A1-ML A1-EI
+ 16
+Figure 3.1-1 Service framework for the A1 services. 17
+The interactions between Service Consumer and Service Producer is based on the service framework used for 3GPP 18
+Network Functions [5] section 7.1.2 where requests are sent from the Consumer and responses and notifications are sent 19
+from the from the Producer. It is the Producer that handles the resources on which the Consumer performs operations. 20
+The terms consumer and producer does, thus, not refer to the direction of the data transfer over the A1 interface.  21
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                10
+3.2 Policy Management Service 1
+Definitions of A1 policy, policy statements, policy procedures and A1 policy life cycle aspects are found in [3]. This 2
+document defines a REST based solution set for how to realize A1 policies and perform operations on them over the A1 3
+interface [4]. 4
+3.2.1 Service Description 5
+3.2.1.1 Functional elements 6
+The A1AP is based on signaling between the A1-P Consumer residing in the non-RT RIC and the A1-P Producer 7
+residing in the near-RT RIC. Both the A1-P Consumer and the A1-P Producer contain a HTTP Client and a HTTP 8
+Server. 9
+ 10
+HTTP Client
+A1-P Consumer
+HTTP Server
+HTTP Server HTTP Client
+A1-P Producer
+PUT
+GET
+DELETE
+POST
+{notificationDestination}
+  policytypes
+  policytypes/{policyTypeId}
+  policytypes/{policyTypeId}/policies
+  policytypes/{policyTypeId}/policies/{policyId}
+  policytypes/{policyTypeId}/policies/{policyId}/status
+ 11
+Figure 3.2-1 HTTP roles in service framework. 12
+The A1AP realizes the A1 policy procedures defined in [3] using HTTP [4] operations where a policy is represented as 13
+a JSON object [10]. 14
+3.2.1.2 Policy representation 15
+The following principles are used for A1 policies when JSON is used as resource representation format : 16
+- A policy corresponds to a resource (in the REST sense); 17
+- A policy is represented as a JSON object referred to as a policy object; 18
+- A policy object contains a scope identifier and at least one policy statement (e.g. one or more policy objective 19
+statements and/or one or more policy resource statements); 20
+- A policy is identified by a policyId that is included in the URI when operation is for a single policy; 21
+- The policyId is assigned by the A1-P Consumer when the policy is created; 22
+- The A1-P Producer cannot modify or delete a policy; 23
+- Policy feedback for a specifc policy is subscribed to when the policy is created by providing a callback URI in 24
+the create policy operation; 25
+- A policy object does not contain any information related to which internal function in the near -RT RIC that is 26
+to evaluate the policy;  27
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                11
+- The A1-P Producer indicates for which policy types policy creation is supported, and the JSON schemas for 1
+those policy types can be retrieved by the A1-P Consumer; 2
+- The A1-P Consumer cannot create, modify or delete policy types. 3
+3.2.1.3 Representation objects 4
+The following JSON objects are used within the service operations of the A1 -P service: 5
+PolicyTypeObject 6
+ The policy type object contains the JSON schemas used to validate a policy object and a policy status object.  7
+PolicyObject 8
+ The policy object is the JSON representation of a complete A1 policy. 9
+PolicyStatusObject 10
+The policy status object is the JSON representation of the enforcement status of an A1 policy. 11
+ProblemDetails 12
+The problem details object is the JSON representation of the content in a response message with other HTTP error 13
+response codes (4xx/5xx). 14
+3.2.1.4 Resource identifiers 15
+The main URI for A1 policy types is: 16
+ …/policytypes 17
+A single policy type can be operated upon by adding the value of the policy type identifier to the URI: 18
+ …/policytypes/{policyTypeId} 19
+The main URI for A1 policies is: 20
+ …/policytypes/{policyTypeId}/policies 21
+A single policy can be operated upon by adding the value of the policy identifier to the URI: 22
+ …/policytypes/{policyTypeId}/policies/{policyId} 23
+The main URI for status of a single policy is: 24
+ …/policytypes/{policyTypeId}/policies/{policyId}/status 25
+The URI for policy notification is referred to as the notificationDestination and is based on a callback URI provided 26
+when creating a policy. 27
+3.2.2 Service Operations 28
+The following table describes the mapping between the A1 policy procedures and the HTTP methods used to realise 29
+them. 30
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                12
+A1 policy procedure HTTP method
+Query policy type GET
+Create policy PUT
+Query policy GET
+Update policy  PUT
+Delete policy DELETE
+Feedback policy POST
+Table 3.2-1 A1 policy procedures to HTTP methods mapping. 1
+3.2.2.1 Introduction 2
+The following sections describe the policy operations. For details on the policy objects ( in JSON format) transferred in 3
+the HTTP message bodies, see Annex B. 4
+The policy scope in a policy object contains a scope identifier that can be e.g. a ueId, a groupId or a cellId. The A1-P 5
+Consumer needs to map policyIds to scope identifiers in order to manage e.g. all policies applicable to a specific 6
+individual ueId. If there are several policies related to a single scope identifier, then several policy requests need to be 7
+made to manage that specific individual in a sequence of single policy operations. 8
+The A1-P Producer allows the A1-P Consumer to create policies of specific types and the A1-P Consumer can discover 9
+the supported policy types using the Query policy type procedures. The A1-P Consumer then indicates the policy type 10
+identifier when creating or updating a policy and when querying for a specific policy.  11
+3.2.2.2 Create policy 12
+3.2.2.2.1 General 13
+An A1 policy is created using a HTTP PUT request containing a policy object in the payload. The format of the policy 14
+object is checked, and the request is either accepted or rejected. If accepted, the policy is to be enforced. 15
+3.2.2.2.2 Create single policy 16
+The operation to create a single policy is based on HTTP PUT and a policyId created by the the A1-P Consumer.  17
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PUT   policytypes/{policyTypeId}/policies/{policyId}(PolicyObject)
+2. 201 Created (PolicyObject)
+ 18
+Figure 3.2.2.2-1 Create single policy procedure. 19
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                13
+The procedure is as follows: 1
+1) The A1-P Consumer generates the policyId and sends a HTTP PUT request to the A1-P Producer. The target 2
+URI identifies the resource (policyId) under which the new policy shall be created. The message body carries a 3
+complete policy object. 4
+2) The A1-P Producer returns the HTTP PUT response. On success, “201 Created” is returned. The location 5
+header is present and carries the URI of the new policy and the message body the complete policy object. On 6
+failure, the appropriate error code is returned, and the message body may contain additional error information. 7
+As the A1-P Producer has indicated which policy types it supports, when creating a policy, the A1-P Consumer includes 8
+a policyTypeId in the URI for the PUT request. The policyTypeId is used by the A1-P Producer to select the appropriate 9
+schemas to use for validation of the policy object and for policy status. 10
+If the provided policyTypeId is not supported or validation of the policy object fails, “400 Bad Request” is returned and 11
+the message body may contain additional error information. 12
+If the A1-P Consumer likes to receive policy status updates related to the created policy, it includes the 13
+notificationDestination as a query paremeter in the PUT request. 14
+3.2.2.2.3 Create multiple policies 15
+The operation to create multiple policies is a sequence of operations to create a single policy.  16
+3.2.2.3 Query policy 17
+3.2.2.3.1 General 18
+A1-P Consumer can use the query policy procedure to read a single policy or to check which policies that exist. 19
+3.2.2.3.2 Query single policy 20
+The operation to query a single policy is based on HTTP GET. The policy to be read is identified with a URI that 21
+includes the policyId while the message body is empty, and the response returns the complete policy object. 22
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policytypes/{policyTypeId}/policies/{policyId}
+2. 200 OK (PolicyObject)
+ 23
+Figure 3.2.2.3-1 Query single policy procedure. 24
+The procedure is as follows: 25
+1) The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the policy to 26
+be read based on the policyId under the parent resource “/policytypes/{policyTypeId}/policies”. The message 27
+body is empty. 28
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                14
+2) The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 1
+carries a complete policy object representing the read policy. On failure, the appropriate error code is returned , 2
+and the message response body may contain additional error information. 3
+3.2.2.3.3 Query multiple policies 4
+The operation to query multiple policies is a sequence of operations to query a single policy. 5
+NOTE: to query all policies applicable to e.g. a dynamically defined group of UEs, a slice or a cell, the A1-P 6
+Consumer need to map the scope identifier to the applicable policyId(s) and make a sequence of requests. 7
+3.2.2.3.4 Query all policies 8
+See operation for query multiple policies. 9
+3.2.2.3.5 Query all policy identifiers 10
+The operation to query all policy identifiers is based on HTTP GET. The resource to be read is identified within the 11
+URI while the message body is empty, and the response returns an array of identifiers representing all policies in the 12
+collection. The operation has to be performed for each policy type for which policies have been created.  13
+
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policytypes/{policyTypeId}/policies
+2. 200 OK (array(PolicyId))  14
+Figure 3.2.2.3-3 Query all policy identifiers procedure. 15
+The procedure is as follows: 16
+1) The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the parent 17
+resource “/policytypes/{policyTypeId}/policies”. The message body is empty.  18
+2) The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 19
+carries an array of policy identitfers representing all available policies of the given policy type. On failure, the 20
+appropriate error code is returned, and the message response body may contain additional error information.  21
+3.2.2.3.6 Query policy status 22
+The operation to query status for a single policy is based on HTTP GET. The policy for which status is to be read is 23
+identified with a URI that includes the policyId while the message body is empty, and the response returns a policy 24
+status object. 25
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                15
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policytypes/{policyTypeId}/policies/{policyId}/status
+2. 200 OK (PolicyStatusObject)
+ 1
+Figure 3.2.2.3-4 Query policy status procedure. 2
+The procedure is as follows: 3
+1)  The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the policy for 4
+which status is to be read based on the policyId under the parent resource “/policytypes/{policyTypeId}/policies”. 5
+The message body is empty. 6
+2)  The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 7
+carries a policy status object representing the status of the policy. On failure, the appropriate error code is returned, 8
+and the message response body may contain additional error information. 9
+3.2.2.4 Update policy 10
+3.2.2.4.1 General 11
+A1-P Consumer can use the update policy procedure to completely replace one policy. 12
+3.2.2.4.2 Update single policy 13
+The operation to completely update a single policy is based on HTTP PUT. The policy to be updated is identified with a 14
+URI that includes the policyId and the message body contains the complete policy object for the updated policy.  15
+ 16
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PUT   policytypes/{policyTypeId}/policies/{policyId}(PolicyObject)
+2. 200 OK (PolicyObject)
+ 17
+Figure 3.2.2.4-1 Update completely single policy procedure. 18
+The procedure is as follows: 19
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                16
+1) The A1-P Consumer sends a HTTP PUT request to the A1-P Producer. The target URI identifies the policy to 1
+be updated based on the policyId under the parent resource “/policytypes/{policyTypeId}/policies”. The 2
+message body contains a complete policy object. 3
+2) The A1-P Producer returns the HTTP PUT response. On success, “200 OK” is returned. The message body 4
+carries a complete policy object representing the updated policy. On failure, the appropriate error code is 5
+returned, and the message response body may contain additional error information.  6
+NOTE: In case the policy does not exist, the PUT request is handled as a create policy request and “201 7
+Created” is returned. The policyTypeId is used by the A1-P Producer to select the appropriate schemas to use 8
+for validation of the policy object and for policy status in the same was as for the Create policy operation. 9
+3.2.2.4.3 Update multiple policies 10
+The operation to update multiple policies is a sequence of operations to update a single policy.  11
+3.2.2.4.4 (Void) 12
+3.2.2.4.5 (Void) 13
+3.2.2.5 Delete policy 14
+3.2.2.5.1 General 15
+A1-P Consumer can use the delete policy procedure to delete a single policy or to delete multiple policies. 16
+3.2.2.5.2 Delete single policy 17
+The operation to delete a single policy is based on HTTP DELETE. The policy to be deleted is identified with a URI 18
+that includes the PolicyId. Neither request nor response contain any po licy object in the message body. 19
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. DELETE   policytypes/{policyTypeId}/policies/{policyId}
+2. 204 No Content
+ 20
+Figure 3.2.2.5-1 Delete single policy procedure. 21
+The procedure is as follows: 22
+1) The A1-P Consumer sends a HTTP DELETE request to the A1-P Producer. The target URI identifies the 23
+policy to be deleted based on the PolicyId under the parent resource “/policytypes/{policyTypeId}/policies”. 24
+The message body is empty. 25
+2) The A1-P Producer returns the HTTP DELETE response. On success, “204 No Content” is returned. The 26
+message body is empty. On failure, the appropriate error code is returned, and the message response body may 27
+contain additional error information.  28
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                17
+3.2.2.5.3 Delete multiple policies 1
+The operation to delete multiple policies is a sequence of operations to delete a single policy. 2
+3.2.2.6 Feedback Policy 3
+3.2.2.6.1 General 4
+Feedback policy is an operation that requires the A1-P Producer to have a reduced feature HTTP Client for sending 5
+HTTP POST requests and receiving HTTP POST responses. Correspondingly, the A1-P Consumer is required to have a 6
+reduced feature HTTP Server for receiving HTTP POST requests and sending HTTP POST responses.  7
+The A1-P Producer uses the feedback policy operation to notify the A1-P Consumer about: 8
+- Changes in the policy enforcement status for an A1 policy; 9
+All notifications are sent to the URI for notification handling and the Policy StatusObject contains the information about 10
+changes and causes. 11
+3.2.2.6.2 Policy status update 12
+The operation to provide policy feedback is based on HTTP POST. The URI contains the target resource for policy 13
+notification handling. The notification content is represented in a policy status object that is included in the message 14
+body and can contain one notification. 15
+The procedure is used to notify about an enforcement status change of a policy between ‘enforced’ and ‘not enforced’.  16
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. POST {notificationDestination}(PolicyStatusObject)
+2. 204 No content
+ 17
+Figure 3.2.2.6-1 Policy enforcement feedback procedure. 18
+The procedure is as follows: 19
+1) The A1-P Producer sends a HTTP POST request to the A1-P Consumer. The target URI 20
+(notificationDestination) identifies the sink for policy notifications. The message body contains a policy status 21
+object. 22
+2) The A1-P Consumer returns the HTTP POST response with “204 No Content”. The message body is empty. 23
+3.2.2.7 Query policy type 24
+3.2.2.7.1 General 25
+A1-P Consumer can use the query policy type procedures to check which policy types that are currently supported and 26
+to read the schemas for a single policy type. 27
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                18
+3.2.2.7.2 Query all policy type identifiers 1
+The operation to query all policy type identifiers is based on HTTP GET. The resource to be read is identified within 2
+the URI while the message body is empty, and the response returns an array of identifiers representing all policy types 3
+in the collection. 4
+
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policytypes
+2. 200 OK (array(PolicyTypeId))  5
+Figure 3.2.2.7-1 Query all policy type identifiers procedure. 6
+The procedure is as follows: 7
+1) The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the parent 8
+resource “/policytypes”. The message body is empty. 9
+2) The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 10
+carries an array of policyTypeId representing all available policy types. On failure, the appropriate error code 11
+is returned, and the message response body may contain additional error information.  12
+3.2.2.7.3 Query single policy type 13
+The operation to query a single policy type is based on HTTP GET. The policy type to be read is identified with a URI 14
+that includes the policyTypeId while the message body is empty, and the response returns the complete policy type 15
+object. 16
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policytypes/{policyTypeId}
+2. 200 OK (PolicyTypeObject)
+ 17
+Figure 3.2.2.7-2 Query single policy type procedure. 18
+The procedure is as follows: 19
+1) The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the policy 20
+type to be read based on the policyTypeId under the parent resource “/policytypes”. The message body is 21
+empty. 22
+2) The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 23
+carries a complete policy type object representing the read policy type. On failure, the appropriate error code is 24
+returned and the message response body may contain additional error information. 25
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                19
+3.3 ML Model Management Service 1
+No explicit ML Model service operations are defined in this version of the specification. 2
+3.4 Enrichment Information Service 3
+ Definitions of A1 Enrichment Information, EI transfer procedures and EI life cycle aspects are found in [3]. This 4
+document defines a REST based solution set for how to realize discovery, request and delivery of A1 Enrichment 5
+Information over the A1 interface [4]. 6
+3.4.1 Service Description 7
+3.4.1.1 Functional elements 8
+The A1-EI service of A1AP is based on signaling between the A1-EI Consumer residing in the near-RT RIC and the 9
+A1-EI Producer residing in the non-RT RIC. Both the A1-EI Consumer and the A1-EI Producer contains a HTTP Client 10
+and a HTTP Server. 11
+HTTP Client
+A1-EI Producer
+HTTP Server
+HTTP ServerHTTP Client
+A1-EI Consumer
+GET
+PUT
+DELETE
+POST
+  eitypes
+  eitypes/{eiTypeId}
+  eijobs
+  eijobs/{eiJobId}
+  eijobs/{eiJobId}/status
+ 12
+Figure 3.4.1.1-1 HTTP roles in service framework. Arrows indicate direction of HTTP requests sent from HTTP Client 13
+to HTTP Server and HTTP responses sent from HTTP Server to HTTP Client.  14
+The A1AP realizes the A1 EI procedures defined in [3] using HTTP [4] operations where EI types, jobs and job results 15
+are represented as JSON objects [10]. 16
+3.4.1.2 EI representation 17
+The following principles are used for A1 Enrichment Information when JSON is used as resource representation format: 18
+- The A1-EI Producer can indicate the EI types that are available;  19
+- An EI type is identified by an EI type identifier and the schemas for available EI types can be retrieved by the 20
+A1-EI Consumer; 21
+- An EI job can be created for delivery of information of a specific EI type; 22
+- An EI job corresponds to a resource (in the REST sense); 23
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                20
+- An EI job is represented as a JSON object referred to as an EI job object; 1
+- An EI job object contains a scope identifier and parameters and conditions re lated to the EI type the delivery is 2
+for; 3
+- An EI job is identified by an EI job identifier that is included in the URI when operation is for an EI job; 4
+- The EI job identifier is assigned by the A1-EI Consumer when the EI job is created; 5
+- Status for a specific EI job can be queried and notifications can be subscribed to when the EI job is created by 6
+providing a callback URI in the create EI job operation; 7
+- An EI job object does not contain any information related to which source that produces it nor which intern al 8
+function in the near-RIC that is to consume it;  9
+- EI job results are deliverd to a callback URI provided during create EI job operation;  10
+- Delivered EI that is represented as a JSON object is referred to as an EI job result object. 11
+3.4.1.3 Representation objects 12
+The following JSON objects are used within the service operations of the A1 -EI service: 13
+EiTypeObject 14
+The EI type object contains the JSON schemas used to formulate an EI job and interpret an EI job status object and 15
+an EI job result object. 16
+EiJobObject 17
+The EI job object is the JSON representation of an EI job.  18
+EiJobStatusObject 19
+The EI job status object is the JSON representation of the status for an EI job.  20
+EiJobResultObject 21
+The EI job result object is the JSON representation of the result delivered during an EI job.  22
+ProblemDetails 23
+The problem details object is the JSON representation of the content in a response message with other HTTP error 24
+response codes (4xx/5xx). 25
+3.4.1.4 Resource identifiers 26
+The main URI for A1 enrichment information is: 27
+ …/eitypes 28
+A single EI type can be operated upon by adding the value of the EI t ype identifier to the URI: 29
+ …/eitypes/{eiTypeId} 30
+The main URI for A1 EI jobs is: 31
+ …/eijobs 32
+A single EI job can be operated upon by adding the value of the EI job identifier to the URI:  33
+ …/eijobs/{eiJobId} 34
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                21
+The main URI for status of an EI job is: 1
+ …/eijobs/{eiJobId}/status 2
+The URI for EI job status notification is referred to as the jobStatusNotificationUri and is based on a callback URI 3
+provided when creating an EI job. 4
+The URI for EI delivery is referred to as the jobResultUri and is based on a callback URI provided when creating an EI 5
+job.  6
+3.4.2 EI Discovery Service Operations 7
+The following table describes the mapping between the A1 EI discovery procedures, and the HTTP methods used to 8
+realise them. 9
+A1 EI procedure HTTP method
+Query EI type identifiers GET
+Query EI type GET
+Table 3.4.2-1 A1 EI procedures to HTTP methods mapping. 10
+3.4.2.1 Introduction 11
+The following sections describe the EI discovery operations. For further information on the EI objects transferred in the 12
+HTTP message bodies, see chapter 4.3.7. 13
+The purpose of the EI discovery procedures is for the A1-EI Consumer to 14
+• identify which EI types that are available from the A1-EI producer. Each specific type of enrichment 15
+information is identified by a unique EI type identifier (EiTypeId); 16
+• request detailed information related to a specific EI type that can be used to create an EI job and to h andle the 17
+delivery of results from the EI job. 18
+3.4.2.2 Query EI types 19
+3.4.2.2.1 General 20
+A1-EI Consumer can use the Query EI type identifiers procedure to check which EI types that are available at the A1 -EI 21
+producer and the Query EI type procedure to request details on a specific EI type. 22
+3.4.2.2.2 Query EI type identifiers 23
+The operation to query EI type identifiers is based on HTTP GET. The resource to be read is identified within the URI 24
+while the message body is empty, and the response returns an array o f identifiers representing all EI types in the 25
+collection. 26
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                22
+
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. GET   eitypes
+2. 200 OK (array(EiTypeId))  1
+Figure 3.4.3.2.2-1 Query EI type identifiers procedure. 2
+The procedure is as follows: 3
+1) The A1-EI Consumer sends a HTTP GET request to the A1-EI Producer. The target URI identifies the parent 4
+resource “/eitypes”. The message body is empty. 5
+2) The A1-EI Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 6
+carries an array of EiTypeIds representing all available EI types. On failure, the appropriate error code is 7
+returned, and the message response body may contain additional error information.  8
+3.4.2.2.3 Query EI type 9
+The operation to query an EI type is based on HTTP GET. The EI type to be queried is identified with a URI that 10
+includes the eiTypeId while the message body is empty, and the response returns the  complete EI type object. 11
+
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. GET   eitypes/{eiTypeId}
+2. 200 OK (EiTypeObject)  12
+Figure 3.4.3.2.3-1 Query EI type procedure. 13
+The procedure is as follows: 14
+1) The A1-EI Consumer sends a HTTP GET request to the A1-EI Producer. The target URI identifies the EI type 15
+to be read based on the eiTypeId under the parent resource “/eitypes”. The message body is empty. 16
+2) The A1-EI Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 17
+carries an EI type object representing the read EI type. On failure, the appropriate error code is returned, and 18
+the message response body may contain additional error information. 19
+The procedure can be used to query that a certain EI type is available for creation of EI jobs  even if no detailed 20
+information is expected in the EI type object. 21
+3.4.3 EI Job Control Service Operations 22
+The following table describes the mapping between the A1 EI job control procedures and the HTTP methods used to 23
+realise them. 24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                23
+A1 EI procedure HTTP method
+Query EI job identifiers GET
+Create EI job PUT
+Query EI job GET
+Update EI job PUT
+Delete EI job DELETE
+Query EI job status GET
+Notify EI job status POST
+Table 3.4.3-1 A1 EI procedures to HTTP methods mapping. 1
+3.4.3.1 Introduction 2
+The following sections describe the EI job control operations. For further information on the EI job objects transferred 3
+in the HTTP message bodies, see chapter 4.3.7. 4
+The EI job contains a definition of the content and conditions for the delivery of the EI job result. 5
+The A1-EI Producer allows the A1-EI Consumer to create EI jobs for specific EI types. The A1-EI Consumer can 6
+discover the supported EI types using the Query EI types procedures. The A1-EI Consumer then indicates the EI type 7
+identifier in all EI job related operations.  8
+3.4.3.2 Query EI jobs 9
+3.4.3.2.1 General 10
+A1-EI Consumer can use the query EI job identifiers procedure to check which EI jobs that exist. 11
+3.4.3.2.2 Query EI job identifiers 12
+The operation to query EI job identifiers is based on HTTP GET. The resource to be read is identified within the URI 13
+while the message body is empty, and the response returns an array of identifiers representing all EI jobs in the 14
+collection. The operation can be performed for each EI type for which EI jobs have been created, or for all created EI 15
+jobs. 16
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. GET .../eijobs
+2. 200 OK (array(EiJobId))
+ 17
+Figure 3.4.3.2.2-1 Query EI job identifiers procedure. 18
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                24
+The procedure is as follows: 1
+1) The A1-EI Consumer sends a HTTP GET request to the A1-EI Producer. The target URI identifies the parent 2
+resource “/eijobs”. The message body is empty. 3
+2) The A1-EI Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 4
+carries an array of EI job identitiers representing all available EI jobs of the given EI type, or of all EI types. 5
+On failure, the appropriate error code is returned, and the message response body may contain additional error 6
+information.  7
+If the A1-EI Consumer likes to receive EI job identifiers only related to a specific EI type, it includes the eiTypeId as a 8
+query parameter in the GET request. 9
+3.4.3.3 Manage EI jobs 10
+3.4.3.3.1 General 11
+An EI job is created using a HTTP PUT request containing an EI job object in the payload. The format of the EI job 12
+object is checked, and the request is either accepted or rejected. If accepted, delivery of EI results will start based on the 13
+content and conditions defined in the EI job. 14
+The EI job can then be checked, updated and deleted. 15
+3.4.3.3.2 Create EI job 16
+The operation to create an EI job is based on HTTP PUT and an eiJobId created by the the A1-EI Consumer.  17
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. PUT   eijobs(EiJobObject)
+2. 201 Created OK (EiJobObject)
+ 18
+Figure 3.4.3.3.2-1 Create EI job procedure. 19
+The procedure is as follows: 20
+1) The A1-EI Consumer generates the eiJobId and sends a HTTP PUT request to the A1-EI Producer. The target 21
+URI identifies the resource (“/eijobs”) under which the new EI job shall be created. The message body carries an EI 22
+job object.  23
+2) The A1-EI Producer returns the HTTP PUT response. On success, “201 Created” is returned. The location 24
+header is present and carries the URI of the new EI job and the message body carries the complete EI job object. On 25
+failure, the appropriate error code is returned, and the message body may contain additional error information. 26
+As the A1-EI Producer has indicated which EI types it supports, when creating an EI job the A1-EI Consumer includes 27
+an eiTypeId in the EiJobObject. The eiTypeId is used by the A1-EI Producer to select the appropriate schemas to use 28
+for validation of the EI job object and for EI job status. 29
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                25
+If the provided eiTypeId is not supported or validation of the EI job object fails, “400 Bad Request” is returned and the 1
+message body may contain additional error information. 2
+If the A1-EI Consumer likes to receive EI job status updates related to the created EI job, it includes the 3
+jobStatusNotificationUri as a query paremeter in the EiJobObject. 4
+3.4.3.3.3 Query EI job 5
+The operation to query a single EI job is based on HTTP GET. The EI job to be read is identified with a URI that 6
+includes the eiJobId while the message body is empty, and the response returns the EI job object.  7
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. GET .../eijobs/{eiJobId}
+2. 200 OK (EiJobObject)
+ 8
+Figure 3.4.3.3.3-1 Query EI job procedure. 9
+The procedure is as follows: 10
+1) The A1-EI Consumer sends a HTTP GET request to the A1-EI Producer. The target URI identifies the EI job 11
+to be read based on the eiJobId under the parent resource “/eijobs”. The message body is empty. 12
+2) The A1-EI Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 13
+carries an EI job object representing the read EI job. On failure, the appropriate error code is returned , and the 14
+message response body may contain additional error information. 15
+3.4.3.3.4 Update EI job 16
+The operation to completely update a single EI job is based on HTTP PUT. The EI job to be updated is identified with a 17
+URI that includes the eiJobId and the message body contains the complete EI job object for the updated EI job. 18
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. PUT .../eijobs/{eiJobId}(EiJobObject)
+2. 200 OK (EiJobObject)
+ 19
+Figure 3.4.3.3.4-1 Update EI job procedure. 20
+The procedure is as follows: 21
+1) The A1-EI Consumer sends a HTTP PUT request to the A1-EI Producer. The target URI identifies the EI job 22
+to be updated based on the eiJobId under the parent resource “/eijobs”. The message body contains an EI Job 23
+object. 24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                26
+2) The A1-EI Producer returns the HTTP PUT response. On success, “200 OK” is returned. The message body 1
+carries an EI job object representing the updated EI job. On failure, the appropriate error code is returned, and 2
+the message response body may contain additional error information.  3
+NOTE: In case the EI job does not exist, “404 Not Found” is returned. 4
+3.4.3.3.5 Delete EI job 5
+The operation to delete an EI job s based on HTTP DELETE. The EI job to be deleted is identified with a URI that 6
+includes the eiJobId. Neither request nor response contain any EI job object in the message body.  7
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. DELETE .../eijobs/{eiJobId}
+2. 204 No content
+ 8
+Figure 3.4.3.3.5-1 Delete EI job procedure. 9
+The procedure is as follows: 10
+1) The A1-EI Consumer sends a HTTP DELETE request to the A1-EI Producer. The target URI identifies the EI 11
+job to be deleted based on the eiJobId under the parent resource “/eijobs”. The message body is empty. 12
+2)  The A1-EI Producer returns the HTTP DELETE response. On success, “204 No Content” is returned. The 13
+message body is empty. On failure, the appropriate error code is returned , and the message response body may 14
+contain additional error information.  15
+3.4.3.4 Status of EI jobs 16
+3.4.3.4.1 General 17
+The A1-EI Consumer can query the A1-EI Producer for the status of an EI job. The query is made by adding “/status” to 18
+the URI of the EI job resource. 19
+The A1-EI Producer uses the notify EI job status operation to notify the A1-EI Consumer about changes in status of an 20
+EI job. All notifications are sent to the URI for notification handling provided during EI job creation and the 21
+EiJobStatusObject contains the information about the status of the EI job. 22
+3.4.3.4.2 Query EI job status 23
+The operation to query status for an EI job is based on HTTP GET. The EI job for which status is to be read is identified 24
+with a URI that includes the eiJobId while the message body is empty, and the response returns an EI job status object.  25
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                27
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. GET .../eijobs/{eiJobId}/status
+2. 200 OK (EiJobStatusObject)
+ 1
+Figure 3.4.3.4.2-1 Query EI job status procedure. 2
+The procedure is as follows: 3
+1)  The A1-EI Consumer sends a HTTP GET request to the A1-EI Producer. The target URI identifies the EI job for 4
+which status is to be read based on the eiJobId under the parent resource “/eijobs”. The message body is empty. 5
+2)  The A1-EI Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 6
+carries an EI job status object representing the status of the EI job. On failure, the appropriate error code is returned, 7
+and the message response body may contain additional error information. 8
+3.4.3.4.3 Notify EI job status 9
+The operation to notify EI job status is based on HTTP POST. The URI contains the target resource for EI job 10
+notification handling. The notification content is represented in an EI job status object that is included in the message 11
+body and can contain one notification. 12
+The procedure is used to notify about a status change of an EI job. 13
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. POST {jobStatusNotificationUri}(EiJobStatusObject)
+2. 204 No Content
+ 14
+Figure 3.4.3.4.3-1 Notify EI job status procedure. 15
+The procedure is as follows: 16
+1) The A1-EI Producer sends a HTTP POST request to the A1-EI Consumer. The target URI 17
+(jobStatusNotificationUri) identifies the sink for EI job status notifications. The message body contains an EI job 18
+status object. 19
+2) The A1-EI Consumer returns the HTTP POST response with “204 No Content”. The message body is empty.  20
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                28
+3.4.4 EI Delivery Service Operations 1
+The following table describes the mapping between the A1 EI delivery procedures, and the HTTP methods used to 2
+realise them. 3
+A1 EI procedure HTTP method
+Deliver EI job result POST
+Table 3.4.4-1 A1 EI procedures to HTTP methods mapping. 4
+3.4.4.1 Introduction 5
+The following sections describe the EI delivery operations. For further information on the EI job result objects 6
+transferred in the HTTP message bodies, see chapter 4.3.7. 7
+The purpose of the EI delivery procedures is for the A1-EI Producer to set up appropriate connections and deliver EI 8
+job results according to the service description agreed during job creation. The URL to which the EI job result is 9
+delivered is transferred from the A1-EI consumer in the EI job object. 10
+3.4.4.2 Push based delivery 11
+3.4.4.2.1 General 12
+The push-based delivery method of EI is based on subscribe-notify paradigm where the EI job creation corresponds to 13
+the subscription and the EI delivery is made using HTTP POST in the same way as notifications.  14
+During an EI job, the EI job results can be delivered in a single push or in several that are repeated with regular 15
+intervals or irregularly based on events.   16
+3.4.4.2.2 Deliver EI job result 17
+The operation to deliver EI job result is based on HTTP POST. The URI contains the target resource for EI job result 18
+handling. The delivered content is represented by an EI job result object. 19
+A1-EI Producer
+ A1-EI Consumer
+A1-EI Producer
+ A1-EI Consumer
+1. POST {jobResultUri}(EIJobResultObject)
+2. 204 No Content
+ 20
+Figure 3.4.4.2.2-1 Deliver EI job result procedure. 21
+The procedure is as follows: 22
+1) The A1-EI Producer sends a HTTP POST request to the A1-EI Consumer. The target URI (jobResultUri) 23
+identifies the sink for EI job result delivieries. The message body contains an EI job result object. 24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                29
+2) The A1-EI Consumer returns the HTTP POST response with “204 No Content”. The message body is empty. 1
+Chapter 4 API Definitions 2
+4.1 Introduction 3
+4.1.1  Encoding of attributes in A1 data types 4
+Identifiers and parameters that has been defined as integers are, when used over the A1 interface, encoded as JSON 5
+"number". 6
+Identifiers that have a hexadecimal or octet string representation are, when used over the A1 interface, encoded as JSON 7
+"string" with character ordering preserved and zeros filling rules followed. 8
+4.1.2 Compatibility of API versions for A1 services 9
+The API version and API name for each of the A1 services are defined in the following chapters. The API version is a 10
+single digit that corresponds to the major version of the corresponding OpenAPI document in Annex A. Based on the 11
+versioning rules for the OpenAPI documents, this implies that implementations of an A1 service in the non/near -RT 12
+RICs are 13
+• compatible if the API version is the same and any difference between the sets of supported features is handled 14
+within the API version itself; 15
+• not compatible in case the API versions are different. 16
+Note: non/near-RT RIC products that implement various API versions of an A1 service can still be made compatible as 17
+is it possible to support several API versions of an A1 service at the same time since each version o f an A1 service is 18
+addressed by separate URIs. 19
+4.2 A1-P (policy management) 20
+This section contains the definition of the REST based API for the Policy Management Service referred to as A1-P. 21
+4.2.1 Introduction 22
+The A1-P service shall use the A1-P API. 23
+The request URI used in HTTP request from the A1-P consumer towards the A1-P producer shall have the structure 24
+defined in subclause 4.4.1 of 3GPP TS 29.501 [6], i.e.: 25
+{apiRoot}/<apiName>/{apiVersion}/<apiSpecificResourceUriPart> 26
+"apiRoot" shall be a concatenation of the following parts: 27
+- scheme ("https")  28
+NOTE: In this release of the specification, https scheme URIs are mandated. 29
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                30
+- the fixed string "://" 1
+- authority (host and optional port) as defined in IETF RFC 3986 [9]. 2
+"apiName" shall be “A1-P”. 3
+"apiVersion" shall be “v2”. 4
+"apiSpecificResourceUriPart" shall be as be defined in subclause 4.2.3. 5
+4.2.2 Usage of HTTP 6
+4.2.2.1 General 7
+The A1 Transport, HTTP protocol and security requirements, is described in [4]. 8
+4.2.2.2 HTTP standard headers 9
+Note: the encodings and applicable MIME media type for the related Content-Type header are not specified in the 10
+current version. 11
+4.2.2.3 HTTP custom headers 12
+No HTTP custom headers are introduced in this version of the specification.  13
+4.2.3 Resources  14
+4.2.3.1 Overview 15
+The resource URI structure for the A1-P API is illustrated in figure 4.2.3-1. 16
+{apiRoot}/A1-P/v2
+/policies
+/{policyId}
+/policytypes
+/{policyTypeId}
+/status
+ 17
+Figure 4.2.3-1: Resource URI structure of the A1-P API 18
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                31
+Table 4.2.3-1 provides an overview of the resources and applicable HTTP methods. 1
+Table 4.2.3-1: Resources and methods overview 2
+Resource name Resource URI
+HTTP method
+or custom
+operation
+Description
+All Policy Type
+Identifiers
+/policytypes GET Query all policy type identifiers
+Individual Policy
+Type Object
+/policytypes/{policyTypeId} GET Query policy type
+Individual Policy
+Object
+/policytypes/{policyTypeId}/policies/{policyId} PUT Create policy, Update policy
+GET Query policy
+DELETE Delete policy
+Individual Policy
+Status Object
+/policytypes/{policyTypeId}/policies/{policyId}/status GET Query policy status
+All Policy
+Identifiers
+/policytypes/{policyTypeId}/policies GET Query all policy identifiers
+Notify Policy
+Status
+{notificationDestination} POST Notify status
+ 3
+4.2.3.1.1 Policy type identifier 4
+The PolicyTypeId is constructed based on two parts separated by “_” (underscore):  5
+typename_version 6
+where 7
+typename is the unique label of the policy type; 8
+version is the version of the policy type defined as major.minor.patch 9
+The typename is assigned, and its uniqueness ensured, by the organizational entity that is responsible for the definition 10
+and maintenance of the policy type definition. 11
+Note: the typename can be based on a prefix that indicates the organizational entity (e.g. ORAN or a company 12
+designator) and a text string that can be descriptive of the class, use case or variant of the policy type.  13
+4.2.3.2 Individual Policy Object 14
+The name of resource is the PolicyId assigned by the A1-P Consumer when the policy is created. 15
+4.2.3.2.1 Description 16
+The resource represents an A1 policy. 17
+4.2.3.2.2 Resource Definition 18
+The Resource URI and the supported resource variables are as defined in previous sections. 19
+4.2.3.2.3 Resource Standard Methods 20
+The following subclauses specifies the standard methods supported by the resource. 21
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                32
+4.2.3.2.3.1 HTTP PUT 1
+This method shall support the request data structures specified in table 4.2.3.2.3.1-1 and the response data structures and 2
+response codes specified in table 4.2.3.2.3.1-2. 3
+Table 4.2.3.2.3.1-1: Data structures supported by the HTTP PUT Request Body on this resource  4
+Data type P Cardinality Description
+PolicyObject "M" "1" Create policy
+Table 4.2.3.2.3.1-2: Data structures supported by the HTTP PUT Response Body on this resource 5
+Data type P Cardinality Response
+codes
+Description
+PolicyObject "M"  "1" 201 Created
+200 OK
+
+Confirmation of created or updated policy
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 6
+This method shall support the URI query parameters specified in table 4.2.3.2.3.1-3. 7
+Table 4.2.3.2.3.1-3: URI query parameters supported by the HTTP PUT method on this resource   8
+Name Data type P Cardinality Description Applicability
+notificationDestination string "O" "0..1" Transfer of URL for notifications Status notifications
+4.2.3.2.3.2 HTTP GET 9
+This method shall support the request data structures specified in table 4.2.3.2.3.2-1 and the response data structures and 10
+response codes specified in table 4.2.3.2.3.2-2. 11
+Table 4.2.3.2.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  12
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.2.3.2.3.2-2: Data structures supported by the HTTP GET Response Body on this resource 13
+Data type P Cardinality Response
+codes
+Description
+PolicyObject "M" "1" 200 OK Requested policy object
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+4.2.3.2.3.3 (Void) 14
+4.2.3.2.3.4 HTTP DELETE 15
+This method shall support the request data structures specified in table 4.2.3.2.3.4-1 and the response data structures and 16
+response codes specified in table 4.2.3.2.3.4-2. 17
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                33
+Table 4.2.3.2.3.4-1: Data structures supported by the HTTP DELETE Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a DELETE request
+Table 4.2.3.2.3.4-2: Data structures supported by the HTTP DELETE Response Body on this resource 2
+Data type P Cardinality Response
+codes
+Description
+N/A  "0" 204 No content Confirmation of successful deletion
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  3
+4.2.3.2.3.5 HTTP POST 4
+This method is not supported on the resource. 5
+4.2.3.2.4 Resource Custom Operations 6
+No custom operations are defined. 7
+4.2.3.3 Individual Policy Status Object 8
+4.2.3.3.1 Description 9
+The resource represents the status of an A1 policy. 10
+4.2.3.3.2 Resource Definition 11
+The Resource URI and the supported resource variables are as defined in previous sections.  12
+4.2.3.3.3 Resource Standard Methods 13
+The following subclauses specifies the standard methods supported by the resource. 14
+Note: URI query parameters are not specified in the current version. 15
+4.2.3.3.3.1 HTTP PUT 16
+Method is not supported on this resource. 17
+4.2.3.3.3.2 HTTP GET 18
+This method shall support the request data structures specified in table 4.2.3.3.3.2-1 and the response data structures and 19
+response codes specified in table 4.2.3.3.3.2-2. 20
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                34
+Table 4.2.3.3.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.2.3.3.3.2-2: Data structures supported by the HTTP GET Response Body on this resource 2
+Data type P Cardinality Response
+codes
+Description
+PolicyStatusObject "M" "1" 200 OK Requested policy status object
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  3
+4.2.3.3.3.3 HTTP DELETE 4
+Method is not supported on this resource. 5
+4.2.3.3.3.4 HTTP POST 6
+Method is not supported on this resource. 7
+4.2.3.3.4 Resource Custom Operations 8
+No custom operations are defined. 9
+4.2.3.4 All Policy Identifiers 10
+4.2.3.4.1 Description 11
+The resource represents A1 policy identifiers. 12
+4.2.3.4.2 Resource Definition 13
+The Resource URI and the supported resource variables are as defined in previous sections. 14
+4.2.3.4.3 Resource Standard Methods 15
+The following subclauses specifies the standard methods supported by the resource. 16
+Note: URI query parameters are not specified in the current version. 17
+4.2.3.4.3.1 HTTP PUT 18
+Method is not supported on this resource. 19
+4.2.3.4.3.2 HTTP GET 20
+This method shall support the request data structures specified in table 4.2.3.6.3.2-1 and the response data structures and 21
+response codes specified in table 4.2.3.6.3.2-2. 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                35
+Table 4.2.3.4.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.2.3.4.3.2-2: Data structures supported by the HTTP GET Response Body on this resource 2
+Data type P Cardinality Response
+codes
+Description
+array(PolicyId) "M" "1" 200 OK All policy identifiers
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  3
+4.2.3.4.3.3 HTTP DELETE 4
+Method is not supported on this resource. 5
+4.2.3.4.3.4 HTTP POST 6
+Method is not supported on this resource. 7
+4.2.3.4.4 Resource Custom Operations 8
+No custom operations are defined. 9
+4.2.3.5 All Policy Type Identifiers 10
+4.2.3.5.1 Description 11
+The resource represents A1 policy type identifiers. 12
+4.2.3.5.2 Resource Definition 13
+The Resource URI and the supported resource variables are as defined in previous sections.  14
+4.2.3.5.3 Resource Standard Methods 15
+The following subclauses specifies the standard methods supported by the resource. 16
+Note: URI query parameters are not specified in the current version. 17
+4.2.3.5.3.1 HTTP PUT 18
+Method is not supported on this resource. 19
+4.2.3.5.3.2 HTTP GET 20
+This method shall support the request data structures specified in table 4.2.3.5.3.2-1 and the response data structures and 21
+response codes specified in table 4.2.3.5.3.2-2. 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                36
+Table 4.2.3.5.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.2.3.5.3.2-2: Data structures supported by the HTTP GET Response Body on this resource  2
+Data type P Cardinality Response
+codes
+Description
+array(PolicyTypeId) "M" "1" 200 OK All policy type identifiers
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  3
+4.2.3.5.3.3 HTTP DELETE 4
+Method is not supported on this resource. 5
+4.2.3.5.3.4 HTTP POST 6
+Method is not supported on this resource. 7
+4.2.3.5.4 Resource Custom Operations 8
+No custom operations are defined. 9
+4.2.3.6 Individual Policy Type Object 10
+4.2.3.6.1 Description 11
+The resource represents an A1 policy type. 12
+4.2.3.6.2 Resource Definition 13
+The Resource URI and the supported resource variables are as defined in previo us sections. 14
+4.2.3.6.3 Resource Standard Methods 15
+The following subclauses specifies the standard methods supported by the resource.  16
+4.2.3.6.3.1 HTTP PUT 17
+Method is not supported on this resource. 18
+4.2.3.6.3.2 HTTP GET 19
+This method shall support the request data structures specified in table 4.2.3.6.3.2-1 and the response data structures and 20
+response codes specified in table 4.2.3.6.3.2-2. 21
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                37
+Table 4.2.3.6.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.2.3.6.3.2-2: Data structures supported by the HTTP GET Response Body on this resource  2
+Data type P Cardinality Response
+codes
+Description
+PolicyTypeObject "M" "1" 200 OK Requested policy type object
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 3
+4.2.3.6.3.4 HTTP DELETE 4
+This method is not supported on the resource. 5
+4.2.3.6.3.5 HTTP POST 6
+This method is not supported on the resource. 7
+4.2.3.6.4 Resource Custom Operations 8
+No custom operations are defined. 9
+4.2.4 Custom Operations without associated resources  10
+No custom operations are defined. 11
+4.2.5 Notifications 12
+4.2.5.1 Notify Policy Status 13
+4.2.5.1.1 Description 14
+The resource represents the destination for policy status notifications. 15
+4.2.5.1.2 Resource Definition 16
+The Resource URI is a callback URI provided as a query parameter in URL when creating a policy.  17
+4.2.5.1.3 Resource Standard Methods 18
+The following subclauses specifies the standard methods supported by the resource. 19
+Note: URI query parameters are not specified in the current version. 20
+4.2.5.1.3.1 HTTP PUT 21
+Method is not supported on this resource. 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                38
+4.2.5.1.3.2 HTTP GET 1
+Method is not supported on this resource. 2
+4.2.5.1.3.3 HTTP DELETE 3
+Method is not supported on this resource. 4
+4.2.5.1.3.4 HTTP POST 5
+This method shall support the request data structures specified in table 4.2.5.1.3.4-1 and the response data structures and 6
+response codes specified in table 4.2.5.1.3.4-2. 7
+Table 4.2.5.1.3.4-1: Data structures supported by the HTTP POST Request Body on this resource  8
+Data type P Cardinality Description
+PolicyStatusObject "M"  "1" Notify policy
+Table 4.2.5.1.3.4-2: Data structures supported by the HTTP POST Response Body on this resource 9
+Data type P Cardinality Response codes Description
+N/A  "0" 204 No content Confirmation of received notification
+ 10
+4.2.6 Data Model 11
+This subclause specifies the application data model supported by the A1-P API. The data model is based on policy 12
+statements that include attributes and are combined with a scope identifier into policy objects. 13
+For policy objectives, policy statements for the following characteristics are defined: 14
+- QoS targets; 15
+- QoE targets. 16
+For policy resources, policy statements for the following characteristics are defined: 17
+-  Traffic steering optimization. 18
+4.2.6.1 Scope identifier (Structured data type) 19
+A1 policies are in [3] defined as containing a scope identifier and one or more policy statements where policy 20
+statements contain policy objectives and/or policy resources. This section defines the structured data type and attributes 21
+to be used as scope identifier. 22
+The ScopeIdentifier contains the following attributes: 23
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                39
+Table 4.2.6.1-1: Definition of statement type ScopeIdentifier 1
+Attribute
+Name
+Data Type P Cardinality Description Applicability
+ueId string "C" "0..1" UE identifier based on RAN UE Id
+[12]&[13]
+identifies a single UE
+groupId number "C" "0..1" identifier of a pre-defined group of UEs,
+SPID [17]
+identifies a group of UEs
+sliceId number "C" "0..1" network slice identifier, S-NSSAI [15] with
+both the SST and the SD fields included
+in the bitfield
+identifies a slice
+qosId number "C" "0..1" QoS identifier, 5QI [5] identifies a QoS Flow
+cellId number "C" "0..1" network resource identifier related to cells
+[15]
+identifies a cell
+Note1: Presence condition "C" means that least one attribute shall be included when the scope is defined. The allowed 2
+combinations of attributes depend on the policy statement that is combined with the scope identifier, see section 4.2.6.4.  3
+Note 2: Encoding of 3GPP identifiers and parameters into number and string is described in section 4.1.1. 4
+4.2.6.2 Policy statements (Structured data types) 5
+A1 policies in [3] are defined as containing a scope identifier and one or more policy statements where policy 6
+statements contain policy objectives and/or policy resources. This section defines the structured data types and 7
+attributes to be used for policy statements. 8
+4.2.6.2.1 Introduction 9
+Table 4.2.6.2.1-1 specifies the data types defined for policy objectives in the A1-P interface protocol. The possible 10
+combinations of these are defined in section 4.2.6.4. 11
+Table 4.2.6.2.1-1: policy statements (Data Types) for policy objectives 12
+Data type Section defined Description Applicability
+QosObjectives 4.2.6.2.2 Attributes related to QoS
+QoeObjectives 4.2.6.2.3 Attributes related to QoE
+ 13
+Table 4.2.6.2.2-2 specifies the data types defined for policy resources in the A1-P interface protocol. The usage of these 14
+are defined in section 4.2.6.4. 15
+Table 4.2.6.2.1-2: policy statements (Data Types) for policy resources 16
+Data type Section
+defined
+Description Applicability
+TspResources 4.2.6.2.4 Attributes used to schedule traffic on
+available cells in a different way than
+what would be through default behavior
+
+  17
+4.2.6.2.2 QoS target 18
+The QosObjectives statement contains the following attributes: 19
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                40
+Table 4.2.6.2.2-1: Definition of statement type QosObjectives 1
+Attribute name Data type P Cardinality Description Applicability
+gfbr number "C" "0..1" Guaranteed Flow Bit Rate,
+see [5]
+
+mfbr number "C" "0..1" Maximum Flow Bit Rate,
+see [5]
+
+priorityLevel number "C" "0..1" Priority Level, see [5]
+pdb number "C" "0..1" Packet Delay Budget, see
+[5]
+
+Note: Presence condition "C" means that least one attribute shall be included when this statement is used. 2
+4.2.6.2.3 QoE target 3
+The QoeObjectives statement contains the following attributes: 4
+Table 4.2.6.2.3-1: Definition of statement type QoeObjectives 5
+Attribute name Data type P Cardinality Description Applicability
+qoeScore number "C" "0..1" mean opinion score (MOS) value
+between 1 and 5,
+it can be either e.g. video MOS
+as specified in [16] or a
+customized MOS
+
+initialBuffering number "C" "0..1" refers to the time in seconds
+between the initiation of video
+playback by the user and the
+actual start of the playback as
+specified in [16]
+
+reBuffFreq number "C" "0..1" it can be calculated by taking the
+number of stalling events
+(excluding the initial buffering)
+and dividing by the length of
+media as specified in [16] or by a
+customized time window
+
+stallRatio number "C" "0..1" ratio of the sum of duration of the
+stalling events to the total media
+length as specified in [16] or by a
+customized time window.
+
+Note 1: Presence condition "C" means that least one attribute shall be included when this statement is used.  6
+Note 2: In this version of the specification, the QoE target is applicable to video streaming services . 7
+Application server will measure the QoE related attributes (e.g. MOS, initial buffering, reBuffFreq, stallRatio) for a 8
+specific service based on application info. However, it’s too late for network to optimize the radio resource when the 9
+application server find the QoE is too bad. The near-RT RIC could predict the QoE related attributes based on the 10
+network side info (e.g. QoS parameters, radio conditions, Packet measure report etc.) e.g. by performing model 11
+inference for a specific ML model received from the non-RT RIC. The predicted value is approximately the QoE related 12
+attribute which will be measured at application server later, but it’s estimated at the near-RT RIC in real time. So, the 13
+near-RT RIC could decide to optimize the radio resource based on the predicted value and the QoE target contained in 14
+the A1 policy.  15
+4.2.6.2.4 Traffic steering preference 16
+The TspResources statement contains the following attributes: 17
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                41
+Table 4.2.6.2.4-1: Definition of statement type TspResources 1
+Attribute name Data type P Cardinality Description Applicability
+cellIdList array(string) “M” "1..N" list of CellIDs, see section 4.2.6.1
+preference PreferenceType “M” "1" the preference of cell usage
+[SHALL/PREFER/AVOID/FORBID].
+
+primary boolean “O” "0..1" indicates applicability to the
+selection of primary cell
+
+ Note: Presence condition "M" means that the attribute shall be included when this statement is used while "O" means 2
+that it is optional to include. 3
+When the value of the preference attribute is set to PREFER or AVOID, the cellIdList contains cells in descending 4
+order of importance for how they should be preferred or avoided, e.g. the first entry is most preferred or most 5
+avoided.  When the preference value is set to SHALL or FORBID, the cellIdList contains cells that are of equal 6
+importance. 7
+When the value of the primary attribute is set to true, and the value of the preference attribute is set to SHALL, then 8
+only a cell in the cellIdList is to be used as primary cell. When the value of the primary attribute is set to true, and the 9
+value of the preference attribute is set to PREFER, then a cell in the cellIdList may be used as primary cell. When the 10
+value of the primary attribute is set to true, and the preference value is set to AVOID or FORBID, then no cell in the 11
+cellIdList is to be used as primary cell.  12
+When the value of the primary attribute is set to false, and the value of the preference attribute is set to SHALL, then 13
+only one or more cells in the cellIdList are to be used as secondary cell. When the value of the primary attribute is set to 14
+false, and the value of the preference attribute is set to PREFER, then one or more cells in the cellIdList may be used as 15
+secondary cell. When the value of the primary attribute is set to false, and the preference value is set to AVOID or 16
+FORBID, then no cell in the cellIdList is to be used as secondary cell.  17
+When the primary attribute is not included, the statement shall be handled in the same way as when the primary 18
+attribute is set to false. 19
+4.2.6.2.5 (Void) 20
+4.2.6.2.6 Problem details 21
+In case a policy request is not accepted, additional information can be provided in the response in addition to the normal 22
+HTTP status code. 23
+The ProblemDetails statement contains the following attributes: 24
+Table 4.2.6.2.6-1: Definition of statement type ProblemDetails 25
+Attribute name Data type P Cardinality Description Applicability
+type string “O” "0..1" a URI reference according
+to IETF RFC 3986 [18] that
+identifies the problem type
+
+title string “O” "0..1" human-readable summary
+of the problem type
+
+status number “O” "0..1" the HTTP status code
+detail string “O” "0..1" human-readable explanation
+instance string “O” "0..1" URI reference that
+identifies the specific
+occurrence of the problem
+
+NOTE: attribute names are as defined in IETF RFC 7807 [19]. 26
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                42
+4.2.6.3 Attributes (Simple data types and enumerations) 1
+This subsection defines attributes to be used for scope information and attributes that are not defined as part of the 2
+statements in the previous sections.  3
+4.2.6.3.1 Introduction 4
+This subclause defines simple data types and enumerations that can be referenced from data structures defined i n the 5
+previous subclauses. 6
+4.2.6.3.2 Simple data types  7
+The URI for policy operations containing a policy object contains a PolicyId attribute. 8
+Table 4.2.6.3.2-1: General definition of simple data types 9
+Type Name Type Definition Description Applicability
+PolicyTypeId string policy type identifier assigned by the owner of a
+policy type definition (see 4.2.3.1.x)
+used in URI
+PolicyId string policy identifier assigned by the A1-P Consumer
+when a policy is created
+used in URI
+ 10
+4.2.6.3.3 Enumerations 11
+4.2.6.3.3.1 (Void) 12
+4.2.6.3.3.2 PreferenceType 13
+The enumeration PreferenceType represents the preference of a specific network resource (e.g. cell usage). It shall 14
+comply with the provisions defined in table 4.2.6.3.3.2-1. 15
+Table 4.2.6.3.3.2-1: Enumeration PreferenceType 16
+Enumeration value Description Applicability
+SHALL equals to select the
+resource
+select the cell regardless if connection retainability might be at
+risk
+PREFER equals to favor the selection
+of the resource
+favor the selection of the cell even if it is not with the best radio
+quality if the connection retainability is not at risk.
+AVOID equals to avoid selecting
+the resource
+avoid selecting the cell unless the connection retainability is at
+risk
+FORBID equals to not select the
+resource
+not select the cell under any conditions
+ 17
+4.2.6.3.3.4 EnforcementStatusType 18
+The enumeration EnforcementStatusType represents if a policy is enforced or not. It shall comply with the provisions 19
+defined in table 4.2.6.3.3.4-1. 20
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                43
+Table 4.2.6.3.3.4-1: Enumeration EnforcementStatusType 1
+Enumeration value Description Applicability
+ENFORCED equals that the policy is enforced
+NOT_ENFORCED equals that the policy is NOT enforced
+UNDEFINED equals that the enforcement status is not known
+ 2
+4.2.6.3.3.5 EnforcementReasonType 3
+The enumeration EnforcementReasonType represents the reason why notification is sent (e.g. why enforcement status 4
+has changed). It shall comply with the provisions defined in table 4.2.6.3.3.5-1. 5
+Table 4.2.6.3.3.5-1: Enumeration EnforcementRreasonType 6
+Enumeration value Description Applicability
+SCOPE_NOT_APPLICABLE Scope identifier cannot be applied The scope provided can no longer be
+applied for enforcing the policy
+STATEMENT_NOT_APPLICABLE Policy statement(s) cannot be applied The statement(s) can no longer be
+applied due to other changes
+OTHER_REASON Any other reason Policy can no longer be enforced for
+other reasons than scope or statement
+becoming inapplicable.
+ 7
+4.2.6.3.3.6 (Void) 8
+4.2.6.4 Policy representations objects 9
+This section contains the formal representation definitions of the policy representation object types defined in 3.2.1.4. 10
+4.2.6.4.1 Policy object 11
+4.2.6.4.1.1 General 12
+A policy object is based on IETF RFC 8259 [10] (JSON) and it always contains one set of: 13
+- one scope identifier; 14
+and 15
+- one or more policy statements. 16
+The scope identifier can be either: 17
+- an identifier for a single UE (ueId); 18
+- an identifier for a group of UEs (groupId); 19
+- an identifier for a slice (sliceId); 20
+- an identifier for QoS (qosId); 21
+- an identifier for a cell (cellId). 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                44
+Table 4.2.6.4.1.1-1: General definition of PolicyObject 1
+Attribute
+name
+Data type P Cardinality Description Applicability
+scope ScopeIdentifier "M" "1" See section 4.2.6.1 scope identifier
+qosObjectives QosObjectives "C" "0..1" See section 4.2.6.2.2 QoS objectives
+qoeObjectives QoeObjectives "C" "0..1" See section 4.2.6.2.3 QoE objectives
+tspResources TspResources "C" "0..N" See section 4.2.6.2.4 Traffic steering preferences
+resources
+Note: Presence condition "M" means that the data type shall be included in a policy object. Allowed combinations are 2
+listed in table 4.2.6.4.1.2-1. Presence condition "C" means that at least one statement (objectives and/or resources) shall 3
+be included. 4
+4.2.6.4.1.2 Allowed combinations 5
+A policy statement can be applied together with scope identifiers containing different combinations of identifiers. Not 6
+all combinations are relevant. The following table indicates combinations that are allowed.  7
+Table 4.2.6.4.1.2-1: Allowed combinations of scope identifiers and policy statements  8
+Scope identifier
+Policy statement
+ueId groupId sliceId qosId cellId
+qosObjectives 1 0..1 0 1 0..1
+qosObjectives 1 0 0..1 1 0..1
+qosObjectives 0 1 0 1 0..1
+qosObjectives 0 0 1 1 0..1
+qosObjectives 0 0 0 1 0..1
+qoeObjectives 1 0 1 0..1 0..1
+qoeObjectives 1 0 0 1 0..1
+qoeObjectives 0 0 1 0..1 0..1
+qoeObjectives 0 0 0 1 0..1
+tspResources 1 0 0..1 0..1 0..1
+tspResources 0 0 1 0..1 0..1
+Note: on each row is listed a combination of identifiers that is allowed for the indicated statement. Notation is the same 9
+as for caridinality: "0" means the identifier shall not occur, "0..1" means the identifier may occur and "1" means the 10
+identifier shall occur. Only at most one occurance of an identifier is allowed in the present version. 11
+4.2.6.4.2 (Void) 12
+4.2.6.4.3 (Void) 13
+4.2.6.4.4 Policy status object 14
+4.2.6.4.4.1 General 15
+A policy status object is based on IETF RFC 8259 [10] (JSON) and always contains:  16
+- one enforcement status statement. 17
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                45
+4.2.6.4.4.2 Policy status object 1
+Table 4.2.6.4.4.2-1: General definition of PolicyStatusObject 2
+Attribute name Data type P Cardinality Description Applicability
+enforceStatus EnforcementStatusType "M" "1" See section 4.2.6.2 statement indicating
+enforcement status of
+policy
+enforceReason EnforcementReasonType "C" "0..1" See section 4.2.6.2 statement indicating
+reason for change of
+enforcement status
+Note: Presence condition "M" means that the data type shall be included in a policy status object used with the policy 3
+objects defined in current specification. Policy objects and policy status objects for future policy types may be defined 4
+based on other attributes. Presence condition "C" means that the enforceReason shall be included when the policy status 5
+object is used in the Policy Status Update procedure. 6
+4.2.6.4.5 (Void) 7
+4.2.6.4.6 Policy type object 8
+A policy type object is based on IETF RFC 8259 [10] (JSON) and it contains:  9
+- one JSON schema for policy object; 10
+and 11
+- one JSON schema for policy status object. 12
+The JSON schema [22] for a policy object is used by the A1-P Producer to validate policy objects during Create policy 13
+and Update policy procedures. The JSON schema [22] for a policy status object is used by the A1 -P Consumer to 14
+validate policy status objects during Query policy status and Policy status update procedures. The policy type object can 15
+be retrieved using the Query policy type procedure.  16
+4.2.6.5 Binary data 17
+Binary data is not applicable in this version of the specification. 18
+4.2.7 Error Handling 19
+4.2.7.1 General 20
+HTTP error handling shall be supported as specified in subclause 5.2.4 of 3GPP TS 29.500 [20] and according to the 21
+principles in 3GPP TS 29.501 [6]. 22
+4.2.7.2 Protocol Errors 23
+No protocol errors are described in this version of the specification. 24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                46
+4.2.7.3 Application Errors 1
+The application errors defined for the A1-P service are listed in Table 4.2.7.3-1. 2
+Table 4.2.7.3-1: Application errors 3
+Application Error HTTP status code Description
+Bad Request 400 Object in payload not properly formulated or not related to the
+method
+Not Found 404 No resource found at the URI
+Method Not Allowed 405 Method not allowed for the URI
+Conflict 409 Request could not be processed in the current state of the
+resource
+Too many requests 429 Too many requests in a given amount of time
+Service unavailable 503 Request cannot be handled (overloaded, maintenance).
+Insufficient storage 507 Unable to store the representation.
+  4
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                47
+4.3 A1-EI (enrichment information) 1
+This section contains the definition of the REST based API for the Enrichment Information Service referred to as A1-2
+EI. 3
+4.3.1 Introduction 4
+The A1-EI service shall use the A1-EI API. 5
+The request URI used in HTTP request from the A1-EI consumer towards the A1-EI producer shall have the structure 6
+defined in subclause 4.4.1 of 3GPP TS 29.501 [6], i.e.: 7
+{apiRoot}/<apiName>/{apiVersion}/<apiSpecificResourceUriPart> 8
+"apiRoot" shall be a concatenation of the following parts: 9
+- scheme ("https")  10
+NOTE: In this release of the specification, https scheme URIs are mandated. 11
+- the fixed string "://" 12
+- authority (host and optional port) as defined in IETF RFC 3986 [9]. 13
+"apiName" shall be “A1-EI”. 14
+"apiVersion" shall be “v1”. 15
+"apiSpecificResourceUriPart" shall be as be defined in subclause 4.3.3. 16
+4.3.2 Usage of HTTP 17
+4.3.2.1 General 18
+The A1 Transport, HTTP protocol and security requirements, is described in [4]. 19
+4.3.2.2 HTTP standard headers 20
+Note: the encodings and applicable MIME media type for the related Content-Type header are not specified in the 21
+current version. 22
+4.3.2.3 HTTP custom headers 23
+No HTTP custom headers are introduced in this version of the specification.  24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                48
+4.3.3 Resources  1
+4.3.3.1 Overview 2
+The resource URI structure for the A1-EI API is illustrated in figure 4.3.3.1-1. 3
+
+{apiRoot}/A1-EI/v1
+/eijobs
+/{eiJobId}
+/eitypes
+/{eiTypeId}
+/status  4
+Figure 4.3.3.1-1: Resource URI structure of the A1-EI API 5
+Table 4.3.3.1-1 provides an overview of the resources and applicable HTTP methods. 6
+Table 4.3.3.1-1: Resources and methods overview 7
+Resource name Resource URI
+HTTP method
+or custom
+operation
+Description
+All EI Type Identifiers /eitypes GET Query all EI type identifiers
+Individual EI Type /ietypes/{eiTypeId} GET Query EI type
+All EI Jobs /eijobs GET Query all EI job identifiers
+Individual EI Job /eijobs/{eiJobId} GET Query EI job
+PUT Create/Update EI job
+DELETE Delete EI job
+Individual EI Job Status /eijobs/{eiJobId}/status GET Query EI job status
+Notify EI Status {jobStatusNotificationUri} POST Notify EI job status
+Deliver EI {jobResultUri} POST Deliver EI job result
+ 8
+4.3.3.1.1 EI type identifier 9
+The EiTypeId is constructed based on two parts separated by “_” (underscore): 10
+typename_version 11
+where 12
+typename is the unique label of the EI type; 13
+version is the version of the EI type defined as major.minor.patch 14
+The typename is assigned, and its uniqueness ensured, by the organizational entity that is responsible for the definition 15
+and maintenance of the EI type definition. 16
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                49
+Note: the typename can be based on a prefix that indicates the organizational entity (e.g. ORAN or a company 1
+designator) and a text string that can be descriptive of the class, use case or variant of the EI type. 2
+4.3.3.1.2  EI job identifier 3
+An EiJobId is assigned by the near-RT RIC and is unique within the domain of operation of the non-RT RIC. 4
+4.3.3.2 All EI Type Identifiers 5
+4.3.3.2.1 Description 6
+The resource represents EI type identifiers. 7
+4.3.3.2.2 Resource Definition 8
+The Resource URI and the supported resource variables are as defined in previous sections. 9
+4.3.3.2.3 Resource Standard Methods 10
+The following subclauses specifies the standard methods supported by the resource. 11
+4.3.3.2.3.1 HTTP GET 12
+This method shall support the request data structures specified in table 4.3.3.2.3.1-1 and the response data structures and 13
+response codes specified in table 4.3.3.2.3.1-2. 14
+Table 4.3.3.2.3.1-1: Data structures supported by the HTTP GET Request Body on this resource  15
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.3.3.2.3.1-2: Data structures supported by the HTTP GET Response Body on this resource 16
+Data type P Cardinality Response
+codes
+Description
+Array(EiTypeId) "M" "1" 200 OK All EI type identifiers
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  17
+4.3.3.2.4 Resource Custom Operations 18
+No custom operations are defined. 19
+4.3.3.3 Individual EI Type 20
+4.3.3.3.1 Description 21
+The resource represents an EI type. 22
+4.3.3.3.2 Resource Definition 23
+The Resource URI and the supported resource variables are as defined in previous sections.  24
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                50
+4.3.3.3.3 Resource Standard Methods 1
+The following subclauses specifies the standard methods supported by the resource. 2
+4.3.3.3.3.1 HTTP GET 3
+This method shall support the request data structures specified in table 4.3.3.3.3.1-1 and the response data structures and 4
+response codes specified in table 4.3.3.3.3.1-2. 5
+Table 4.3.3.3.3.1-1: Data structures supported by the HTTP GET Request Body on this resource  6
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.3.3.3.3.1-2: Data structures supported by the HTTP GET Response Body on this resource 7
+Data type P Cardinality Response
+codes
+Description
+EiTypeObject "M" "1" 200 OK Requested EI type object
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 8
+4.3.3.3.4 Resource Custom Operations 9
+No custom operations are defined. 10
+4.3.3.4 All EI Jobs 11
+4.3.3.4.1 Description 12
+The resource represents EI job identifiers. 13
+4.3.3.4.2 Resource Definition 14
+The Resource URI and the supported resource variables are as defined in previous sections. 15
+4.3.3.4.3 Resource Standard Methods 16
+The following subclauses specifies the standard methods supported by the resource. 17
+Note: URI query parameters are not specified in the current version. 18
+4.3.3.4.3.1 HTTP GET 19
+This method shall support the request data structures specified in table 4.3.3.4.3.1-1 and the response data structures and 20
+response codes specified in table 4.3.3.4.3.1-2. 21
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                51
+Table 4.3.3.4.3.1-1: Data structures supported by the HTTP GET Request Body on this resource  1
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.3.3.4.3.1-2: Data structures supported by the HTTP GET Response Body on this resource 2
+Data type P Cardinality Response
+codes
+Description
+array(EiJobId) "M" "1" 200 OK All EI job identifiers
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 3
+This method shall support the URI query parameters specified in table 4.3.3.4.3.1-3. 4
+Table 4.3.3.4.3.1-3: URI query parameters supported by the HTTP GET method on this resource  5
+Name Data type P Cardinality Description Applicability
+eiTypeId string "O"  "0..1" eiTypeid for which EI Job
+identifiers are requested
+Retrieve Ei Job
+identifiers for a certain
+EI Type
+ 6
+4.3.3.5 Individual EI Job 7
+4.3.3.5.1 Description 8
+The resource represents an EI job. 9
+4.3.3.5.2 Resource Definition 10
+The Resource URI and the supported resource variables are as defined in previous sections.  11
+4.3.3.5.3 Resource Standard Methods 12
+The following subclauses specifies the standard methods supported by the resource. 13
+4.3.3.5.3.1 HTTP PUT 14
+This method shall support the request data structures specified in table 4.3.3.5.3.1 -1 and the response data structures and 15
+response codes specified in table 4.3.3.5.3.1-2. 16
+Table 4.3.3.5.3.1-1: Data structures supported by the HTTP PUT Request Body on this resource  17
+Data type P Cardinality Description
+EiJobObject "M" "1" Create or Update EI job
+Table 4.3.3.5.3.1-2: Data structures supported by the HTTP PUT Response Body on this resource 18
+Data type P Cardinality Response
+codes
+Description
+EiJobObject "M"  "1" 201 Created
+200 OK
+
+Confirmation of created or updated EI job
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 19
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                52
+4.3.3.5.3.2 HTTP GET 1
+This method shall support the request data structures specified in table 4.3.3.5.3.2-1 and the response data structures and 2
+response codes specified in table 4.3.3.5.3.2-2. 3
+Table 4.3.3.5.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  4
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.3.3.5.3.2-2: Data structures supported by the HTTP GET Response Body on this resource 5
+Data type P Cardinality Response
+codes
+Description
+EiJobObject "M" "1" 200 OK Requested EI job object
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 6
+4.3.3.5.3.3 HTTP DELETE 7
+This method shall support the request data structures specified in table 4.3.3.5.3.3-1 and the response data structures and 8
+response codes specified in table 4.3.3.5.3.3-2. 9
+Table 4.3.3.5.3.3-1: Data structures supported by the HTTP DELETE Request Body on this resource  10
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a DELETE request
+Table 4.3.3.5.3.3-2: Data structures supported by the HTTP DELETE Response Body on this resource 11
+Data type P Cardinality Response
+codes
+Description
+N/A  "0" 204 No content Confirmation of successful deletion
+
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  12
+4.3.3.5.4 Resource Custom Operations 13
+No custom operations are defined. 14
+4.3.3.6 Individual EI Job Status 15
+4.3.3.6.1 Description 16
+The resource represents the status of an EI job. 17
+4.3.3.6.2 Resource Definition 18
+The Resource URI and the supported resource variables are as defined in previous sections. 19
+4.3.3.6.3 Resource Standard Methods 20
+The following subclauses specifies the standard methods supported by the resource. 21
+Note: URI query parameters are not specified in the current version. 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                53
+4.3.3.6.3.1 HTTP GET 1
+This method shall support the request data structures specified in table 4.3.3.6.3.1-1 and the response data structures and 2
+response codes specified in table 4.3.3.6.3.1-2. 3
+Table 4.3.3.6.3.1-1: Data structures supported by the HTTP GET Request Body on this resource  4
+Data type P Cardinality Description
+N/A  "0" There is no object in the message body of a GET request
+Table 4.3.3.6.3.1-2: Data structures supported by the HTTP GET Response Body on this resource 5
+Data type P Cardinality Response
+codes
+Description
+EiJobStatusObject "M" "1" 200 OK Requested EI job status object
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+  6
+4.2.3.3.4 Resource Custom Operations 7
+No custom operations are defined. 8
+4.3.4 Custom Operations without associated resources  9
+No custom operations are defined. 10
+4.3.5 Notifications 11
+4.3.5.1 Notify EI Job Status 12
+4.3.5.1.1 Description 13
+The resource represents the destination for EI job status notifications. 14
+4.3.5.1.2 Resource Definition 15
+The Resource URI is a callback URI provided as a query parameter in URL when creating an EI job.  16
+4.3.5.1.3 Resource Standard Methods 17
+The following subclauses specifies the standard methods supported by the resource. 18
+Note: URI query parameters are not specified in the current version. 19
+4.3.5.1.3.1 HTTP POST 20
+This method shall support the request data structures specified in table 4.3.5.1.3.1-1 and the response data structures and 21
+response codes specified in table 4.3.5.1.3.1-2. 22
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                54
+Table 4.3.5.1.3.1-1: Data structures supported by the HTTP POST Request Body on this resource  1
+Data type P Cardinality Description
+EiJobStatusObject "M"  "1" Notify EI job status
+Table 4.3.5.1.3.1-2: Data structures supported by the HTTP POST Response Body on this resource 2
+Data type P Cardinality Response codes Description
+N/A  "0" 204 No content Confirmation of received notification
+ 3
+4.3.6 Delivery 4
+4.3.6.1 Deliver EI 5
+4.3.6.1.1 Description 6
+The resource represents the destination for EI delivery in the case of push-based delivery. 7
+4.3.6.1.2 Resource Definition 8
+The Resource URI is a target URI provided in the EI job object during EI job creation. 9
+4.3.6.1.3 Resource Standard Methods 10
+The following subclauses specifies the standard methods supported by the resource. 11
+4.3.6.1.3.1 HTTP POST 12
+This method shall support the request data structures specified in table 4.3.6.1.3.1-1 and the response data structures and 13
+response codes specified in table 4.3.6.1.3.1-2. 14
+Table 4.3.6.1.3.1-1: Data structures supported by the HTTP POST Request Body on this resource  15
+Data type P Cardinality Description
+EiJobResultObject "M"  "1" Carry EI payload, i.e. the result from an EI job
+Table 4.3.6.1.3.1-2: Data structures supported by the HTTP POST Response Body on this resource 16
+Data type P Cardinality Response codes Description
+N/A  "0" 204 No content Confirmation of received notification
+ProblemDetails "O" "0..1" 4xx/5xx Detailed problem description
+ 17
+4.3.7 Data model 18
+This subclause specifies the application data model supported by the A1 -EI API. The purpose of the data model is to be 19
+the basis for 20
+- Definition of EI Types; 21
+- The EI representation objects that are transported in the body of the A1 -EI procedures. 22
+There are two kinds of EI Types: those defined by O-RAN and those defined by another entity. EI Types need to define: 23
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                55
+- An EiTypeIdentifier for usage in the A1-EI procedures and URI structure; 1
+- The content to be transported in the body of the A1-EI procedures. 2
+The content is referred to as EI representation objects for the O-RAN defined EI Types and is defined by using the A1-3
+EI data model specified in this subclause. An EI Type defined outside of O-RAN may use the A1-EI data model or 4
+another model that covers the content corresponding to the schemas and objects. 5
+This specification covers the data model for O-RAN defined EI types. The O-RAN defined EI Types are based on the 6
+statements and attributes defined in the data model and may extend it with EI type specific rules and attributes.  7
+The O-RAN defined EI Types are defined based on JSON schemas [22]. An EI Type  is defined by three schemas for EI 8
+job, EI job status and EI job result. The schemas are used to validate the EI representation objects transferred in the 9
+body of the A1-EI procedures. 10
+Note: No O-RAN defined EI types have been specified at the release of this specification. 11
+4.3.7.1 Simple data types and enumerations 12
+4.3.7.1.1 Simple data types 13
+The URIs for policy operations contains an eiTypeId attribute and an eiJobId attribute.  14
+Table 4.3.7.1.1-1: General definition of simple data types for URI identifiers 15
+Type Name Type Definition Description Applicability
+EiTypeId string EI type identifier assigned by the owner of an EI
+type definition
+used in URI
+EiJobId string EI job identifier assigned by the A1-EI Consumer
+when an EI job is created
+used in URI
+ 16
+Table 4.3.7.1.1-2: General definition of simple data types for callback URIs 17
+Type Name Type Definition Description Applicability
+jobStatusNotificationUri string target URI for EI job status
+notifcations
+provided in EI Job object and
+used in job status notification
+procedure
+jobResultUri string target URI for EI job results provided in EI Job object and
+used in job result deliver
+procedure
+ 18
+4.3.7.1.2 Enumerations 19
+The enumeration JobStatusType represents if an EI job is confirmed to deliver EI results. It shall comply with the 20
+provisions defined in table 4.3.7.1.2-1. 21
+Table 4.3.7.1.2-1: Enumeration JobStatusType 22
+Enumeration value Description Applicability
+ENABLED the EI Job is enabled the A1-EI producer is able to
+deliver EI result for the EI Job
+DISABLED the EI Job is disabled the A1-EI producer is not able
+to deliver EI result for the EI
+Job
+ 23
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                56
+4.3.7.2 Structured data types 1
+4.3.7.2.1 Scope identifier 2
+The scope identifier is EI type specific. 3
+If the scope identifier statement contains attributes corresponding to the A1 policy scope identifier, they are the same as 4
+defined for A1-P, see chapter 4.2.6.1. 5
+4.3.7.2.2 Job definition 6
+The job definition is EI type specific. 7
+4.3.7.2.3 Result definition 8
+The result definition is EI type specific. 9
+4.3.7.2.4 Problem details 10
+The problem details statement is the same as defined for A1-P, see chapter 4.2.6.2.6. 11
+4.3.7.3 EI representation objects 12
+4.3.7.3.1 EI type object 13
+The EI type object can be retrieved using the Query EI type procedure.  14
+The EI type object can be empty or contain EI type specific information. 15
+Note: even if there are JSON schemas defined for EI job, EI job status and EI job result objects, they are not normally 16
+retrieved in run-time like the corresponding schemas for policy types. 17
+4.3.7.3.2 EI job object 18
+An EI job object is based on IETF RFC 8259 [10] (JSON) and contains: 19
+- one EI Type identifier; 20
+- one target URI for EI Job results; 21
+- one target URI for EI Job status notifications; 22
+- one EI type specific job definition. 23
+Table 4.3.7.3.2-1: General definition of EIJobObject 24
+Attribute name Data type P Cardinality Description Applicability
+eiTypeId string "M" "1" See section 4.3.7.1.1
+jobResultUri string "C" "0..1" See section 4.3.7.1.1
+jobStatusNotificationUri string "O" "0..1" See section 4.3.7.1.1
+jobDefinition JobDefinition "M" "1" EI type specific
+Note: Presence condition "M" means that the data type shall be included in an EI job status object for EI Types based on 25
+the current specification. Presence condition "C" means that the data type shall be included in an EI job object unless 26
+corresponding information is included in the jobDefinition. Additional attributes may be defined for a specific EI Type.  27
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                57
+4.3.7.3.3 EI job status object 1
+An EI job status object is based on IETF RFC 8259 [10] (JSON) and always contains: 2
+- one job status statement. 3
+Table 4.3.7.3.3-1: General definition of EIJobStatusObject 4
+Attribute name Data type P Cardinality Description Applicability
+jobStatus JobStatusType "M" "1" See section 4.3.7.1.2   statement indicating
+status of an EI job
+Note: Presence condition "M" means that the data type shall be included in an EI job status object for EI Types based on 5
+the current specification. Additional attributes may be defined for a specific EI Type.  6
+4.3.7.3.4 EI job result object 7
+An EI job result object is based on IETF RFC 8259 [10] (JSON) and its content is EI type specific. 8
+4.3.7.4 Binary data 9
+Binary data is not applicable in this version of the specification. 10
+4.3.8 Error handling 11
+4.3.8.1 General 12
+HTTP error handling shall be supported as specified in subclause 5.2.4 of 3GPP TS 29.500 [20] and according to the 13
+principles in 3GPP TS 29.501 [6]. 14
+4.3.8.2 Protocol Errors 15
+No protocol errors are described in this version of the specification. 16
+4.3.8.3 Application Errors 17
+The application errors defined for the A1-EI service are listed in Table 4.3.8.3-1. 18
+Table 4.3.8.3-1: Application errors 19
+Application Error HTTP status code Description
+Bad Request 400 Object in payload not properly formulated or not related to the
+method
+Not Found 404 No resource found at the URI
+Method Not Allowed 405 Method not allowed for the URI
+Conflict 409 Request could not be processed in the current state of the
+resource
+Too many requests 429 Too many requests in a given amount of time
+Service unavailable 503 Request cannot be handled (overloaded, maintenance).
+Insufficient storage 507 Unable to store the representation.
+ 20
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                58
+Annex A (normative): OpenAPI specification 1
+A.1 General  2
+This Annex specifies the formal definition of the A1 API(s). It consists of OpenAPI documents in YAML format that 3
+are based on the OpenAPI 3.0.0 Specification [23]. 4
+Informative copies of the OpenAPI documents contained in this O-RAN Technical Specification may be available at a 5
+later stage. 6
+A.1.1 Versioning of A1 OpenAPI documents 7
+The OpenAPI documents for the A1 services found in this chapter are versioned by Semantic Versioning 2.0.0 [24] as 8
+described in the OpenAPI Specification [23]. When included in the present specification, the OpenAPI documents are 9
+considered as released and are versioned using three digit major.minor.patch where the main compatibility expectations 10
+stated in [24] implies: 11
+major version is stepped up when incompatible API changes are made to the OpenAPI document. This corresponds 12
+to saying that implementations of an A1 service in non/near-RT RICs are incompatible in case the API version is 13
+different. The major version in the OpenAPI document corresponds to the A PI version in the URI for of the A1 14
+service defined in chapter 4. 15
+minor version is stepped up when features are added to the OpenAPI document in way that keeps implementations 16
+compatible although all features are not supported by both the service producer and the service consumer of the A1 17
+service. 18
+patch version is stepped up when errors are corrected in a backward compatible way, when or editorial changes are 19
+made to the OpenAPI document, but no features are added.  20
+Note: non/near-RT RIC products that implement various API versions of an A1 service can be compatible by 21
+supporting several API versions of an A1 service. The present specification specifies only one API version, and 22
+contains only one OpenAPI document, for each A1 service. 23
+A.2 Policy Management API 24
+openapi: 3.0.0 25
+info: 26
+  title: 'A1-P Policy Management Service' 27
+  version: 2.0.0 28
+  description: | 29
+    API for Policy Management Service. 30
+    © 2020, O-RAN Alliance. 31
+    All rights reserved. 32
+externalDocs: 33
+  description: 'O-RAN.WG2.A1AP-v02.00 A1 interface: Application Protocol' 34
+  url: 'https://www.o-ran.org/specifications' 35
+servers: 36
+  - url: '{apiRoot}/A1-P/v2' 37
+    variables: 38
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                59
+      apiRoot: 1
+        default: 'https://example.com' 2
+        description: 'apiRoot as defined in clause 4.2.1 in ORAN-WG2.A1.AP' 3
+paths: 4
+  '/policytypes': 5
+    get: 6
+      description: 'Get all policy type identifiers' 7
+      tags: 8
+      - All Policy Type Identifiers 9
+      responses: 10
+        200: 11
+          description: 'Array of all policy type identifiers' 12
+          content: 13
+            application/json: 14
+              schema: 15
+                type: array 16
+                items: 17
+                  "$ref": "#/components/schemas/PolicyTypeId" 18
+                minItems: 0 19
+        429: 20
+          "$ref": "#/components/responses/429-TooManyRequests" 21
+        503: 22
+          "$ref": "#/components/responses/503-ServiceUnavailable" 23
+ 24
+  '/policytypes/{policyTypeId}': 25
+    parameters: 26
+      - name: policyTypeId 27
+        in: path 28
+        required: true 29
+        schema: 30
+          "$ref": "#/components/schemas/PolicyTypeId" 31
+    get: 32
+      description: 'Get the schemas for a policy type' 33
+      tags: 34
+      - Individual Policy Type 35
+      responses: 36
+        200: 37
+          description: 'The policy type schemas' 38
+          content: 39
+            application/json: 40
+              schema: 41
+                "$ref": "#/components/schemas/PolicyTypeObject" 42
+        404: 43
+          "$ref": "#/components/responses/404-NotFound" 44
+        429: 45
+          "$ref": "#/components/responses/429-TooManyRequests" 46
+        503: 47
+          "$ref": "#/components/responses/503-ServiceUnavailable" 48
+ 49
+  '/policytypes/{policyTypeId}/policies': 50
+    get: 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                60
+      description: 'Get all policy identifiers' 1
+      tags: 2
+      - All Policy Identifiers 3
+      parameters: 4
+        - name: policyTypeId 5
+          in: path 6
+          required: true 7
+          schema: 8
+            "$ref": "#/components/schemas/PolicyTypeId" 9
+      responses: 10
+        200: 11
+          description: 'Array of all policy identifiers' 12
+          content: 13
+            application/json: 14
+              schema: 15
+                type: array 16
+                items: 17
+                  "$ref": "#/components/schemas/PolicyId" 18
+                minItems: 0 19
+        429: 20
+          "$ref": "#/components/responses/429-TooManyRequests" 21
+        503: 22
+          "$ref": "#/components/responses/503-ServiceUnavailable" 23
+ 24
+  '/policytypes/{policyTypeId}/policies/{policyId}': 25
+    parameters: 26
+      - name: policyTypeId 27
+        in: path 28
+        required: true 29
+        schema: 30
+          "$ref": "#/components/schemas/PolicyTypeId" 31
+      - name: policyId 32
+        in: path 33
+        required: true 34
+        schema: 35
+          "$ref": "#/components/schemas/PolicyId" 36
+    put: 37
+      description: 'Create, or update, a policy' 38
+      tags: 39
+      - Individual Policy Object 40
+      parameters: 41
+        - name: notificationDestination 42
+          in: query 43
+          required: false 44
+          schema: 45
+            "$ref": "#/components/schemas/NotificationDestination" 46
+      requestBody: 47
+        required: true 48
+        content: 49
+          application/json: 50
+            schema: 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                61
+              "$ref": "#/components/schemas/PolicyObject" 1
+      responses: 2
+        200: 3
+          description: 'The policy was updated' 4
+          content: 5
+            application/json: 6
+              schema: 7
+                "$ref": "#/components/schemas/PolicyObject" 8
+        201: 9
+          description: 'The policy was created' 10
+          content: 11
+            application/json: 12
+              schema: 13
+                "$ref": "#/components/schemas/PolicyObject" 14
+          headers: 15
+            Location: 16
+              description: 'Contains the URI of the created policy' 17
+              required: true 18
+              schema: 19
+                type: string 20
+        400: 21
+          "$ref": "#/components/responses/400-BadRequest" 22
+        409: 23
+          "$ref": "#/components/responses/409-Conflict" 24
+        429: 25
+          "$ref": "#/components/responses/429-TooManyRequests" 26
+        503: 27
+          "$ref": "#/components/responses/503-ServiceUnavailable" 28
+        507: 29
+          "$ref": "#/components/responses/507-InsufficientStorage" 30
+      callbacks: 31
+        policyStatusNotification: 32
+          '{$request.query.notificationDestination}': 33
+            post: 34
+              description: 'Notify about status changes for this policy' 35
+              requestBody: 36
+                required: true 37
+                content: 38
+                  application/json: 39
+                    schema: 40
+                      "$ref": "#/components/schemas/PolicyStatusObject" 41
+              responses: 42
+                204: 43
+                  description: 'Notification received' 44
+    get: 45
+      description: 'Query a policy' 46
+      tags: 47
+      - Individual Policy Object 48
+      responses: 49
+        200: 50
+          description: 'The requested policy' 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                62
+          content: 1
+            application/json: 2
+              schema: 3
+                "$ref": "#/components/schemas/PolicyObject" 4
+        404: 5
+          "$ref": "#/components/responses/404-NotFound" 6
+        409: 7
+          "$ref": "#/components/responses/409-Conflict" 8
+        429: 9
+          "$ref": "#/components/responses/429-TooManyRequests" 10
+        503: 11
+          "$ref": "#/components/responses/503-ServiceUnavailable" 12
+    delete: 13
+      description: 'Delete a policy' 14
+      tags: 15
+      - Individual Policy Object 16
+      responses: 17
+        204: 18
+          description: 'The policy was deleted' 19
+        404: 20
+          "$ref": "#/components/responses/404-NotFound" 21
+        429: 22
+          "$ref": "#/components/responses/429-TooManyRequests" 23
+        503: 24
+          "$ref": "#/components/responses/503-ServiceUnavailable" 25
+ 26
+  '/policytypes/{policyTypeId}/policies/{policyId}/status': 27
+    parameters: 28
+      - name: policyTypeId 29
+        in: path 30
+        required: true 31
+        schema: 32
+          "$ref": "#/components/schemas/PolicyTypeId" 33
+      - name: policyId 34
+        in: path 35
+        required: true 36
+        schema: 37
+          "$ref": "#/components/schemas/PolicyId" 38
+    get: 39
+      description: 'Query a policy status' 40
+      tags: 41
+      - Individual Policy Status Object 42
+      responses: 43
+        200: 44
+          description: 'The requested policy status' 45
+          content: 46
+            application/json: 47
+              schema: 48
+                "$ref": "#/components/schemas/PolicyStatusObject" 49
+        404: 50
+          "$ref": "#/components/responses/404-NotFound" 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                63
+        409: 1
+          "$ref": "#/components/responses/409-Conflict" 2
+        429: 3
+          "$ref": "#/components/responses/429-TooManyRequests" 4
+        503: 5
+          "$ref": "#/components/responses/503-ServiceUnavailable" 6
+ 7
+components: 8
+  schemas: 9
+    # 10
+    # Representation objects 11
+    # 12
+    PolicyObject: 13
+      description: 'A generic policy object that can be used to transport any policy. Additionally, 14
+a policy shall be valid according to the schema of its specific policy type.' 15
+      type: object 16
+ 17
+    PolicyStatusObject: 18
+      description: 'A generic policy status object that can be used to transport any policy status. 19
+Additionally, a policy status shall be valid according to the schema of its specific policy type.' 20
+      type: object 21
+ 22
+    PolicyTypeObject: 23
+      description: 'A definition of a policy type, i.e. the schemas for a policy respectively its 24
+status' 25
+      type: object 26
+      properties: 27
+        policySchema: 28
+          "$ref": "#/components/schemas/JsonSchema" 29
+        statusSchema: 30
+          "$ref": "#/components/schemas/JsonSchema" 31
+      required: 32
+        - policySchema 33
+ 34
+    ProblemDetails: 35
+      description: 'A problem detail to carry details in a HTTP response according to RFC 7807' 36
+      type: object 37
+      properties: 38
+        type: 39
+          type: string 40
+        title: 41
+          type: string 42
+        status: 43
+          type: number 44
+        detail: 45
+          type: string 46
+        instance: 47
+          type: string 48
+ 49
+    # 50
+    # Simple data types 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                64
+    # 1
+    JsonSchema: 2
+      description: 'A JSON schema following http://json-schema.org/draft-07/schema' 3
+      type: object 4
+ 5
+    NotificationDestination: 6
+      description: 'A complete callback URI defined according to IETF RFC 3986 where to send 7
+notifications' 8
+      type: string 9
+ 10
+    PolicyId: 11
+      description: 'Policy identifier assigned by the A1-P Consumer when a policy is created' 12
+      type: string 13
+ 14
+    PolicyTypeId: 15
+      description: 'Policy type identifier assigned by the A1-P Provider' 16
+      type: string 17
+ 18
+  responses: 19
+    400-BadRequest: 20
+      description: 'Object in payload not properly formulated or not related to the method' 21
+      content: 22
+        application/problem+json: 23
+          schema: 24
+            "$ref": "#/components/schemas/ProblemDetails" 25
+ 26
+    404-NotFound: 27
+      description: 'No resource found at the URI' 28
+      content: 29
+        application/problem+json: 30
+          schema: 31
+            "$ref": "#/components/schemas/ProblemDetails" 32
+ 33
+    405-MethodNotAllowed: 34
+      description: 'Method not allowed for the URI' 35
+      content: 36
+        application/problem+json: 37
+          schema: 38
+            "$ref": "#/components/schemas/ProblemDetails" 39
+ 40
+    409-Conflict: 41
+      description: 'Request could not be processed in the current state of the resource' 42
+      content: 43
+        application/problem+json: 44
+          schema: 45
+            "$ref": "#/components/schemas/ProblemDetails" 46
+ 47
+    429-TooManyRequests: 48
+      description: 'Too many requests have been sent in a given amount of time' 49
+      content: 50
+        application/problem+json: 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                65
+          schema: 1
+            "$ref": "#/components/schemas/ProblemDetails" 2
+ 3
+    503-ServiceUnavailable: 4
+      description: 'The provider is currently unable to handle the request due to a temporary 5
+overload' 6
+      content: 7
+        application/problem+json: 8
+          schema: 9
+            "$ref": "#/components/schemas/ProblemDetails" 10
+ 11
+    507-InsufficientStorage: 12
+      description: 'The method could not be performed on the resource because the provider is unable 13
+to store the representation needed to successfully complete the request' 14
+      content: 15
+        application/problem+json: 16
+          schema: 17
+            "$ref": "#/components/schemas/ProblemDetails" 18
+ 19
+A.3 Enrichment Information API 20
+openapi: 3.0.1 21
+info: 22
+  title: A1-EI Enrichment Information Service 23
+  description: | 24
+    API for Enrichment Information Service. 25
+    © 2020, O-RAN Alliance. 26
+    All rights reserved. 27
+  version: 1.0.0 28
+externalDocs: 29
+  description: 'O-RAN.WG2.A1AP-v03.00 A1 interface: Application Protocol' 30
+  url: https://www.o-ran.org/specifications 31
+servers: 32
+- url: //localhost:36353/ 33
+tags: 34
+- name: A1-EI (enrichment information) 35
+  description: "" 36
+paths: 37
+  /A1-EI/v1/eijobs/{eiJobId}: 38
+    get: 39
+      tags: 40
+      - A1-EI (enrichment information) 41
+      summary: Individual EI job 42
+      operationId: getIndividualEiJobUsingGET 43
+      parameters: 44
+      - name: eiJobId 45
+        in: path 46
+        description: eiJobId 47
+        required: true 48
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                66
+        schema: 1
+          type: string 2
+      responses: 3
+        200: 4
+          description: EI job 5
+          content: 6
+            application/json: 7
+              schema: 8
+                $ref: '#/components/schemas/EiJobObject' 9
+        401: 10
+          description: Unauthorized 11
+          content: {} 12
+        403: 13
+          description: Forbidden 14
+          content: {} 15
+        404: 16
+          description: Enrichment Information job is not found 17
+          content: 18
+            application/json: 19
+              schema: 20
+                $ref: '#/components/schemas/ProblemDetails' 21
+      deprecated: false 22
+    put: 23
+      tags: 24
+      - A1-EI (enrichment information) 25
+      summary: Individual EI job 26
+      operationId: putIndividualEiJobUsingPUT 27
+      parameters: 28
+      - name: eiJobId 29
+        in: path 30
+        description: eiJobId 31
+        required: true 32
+        schema: 33
+          type: string 34
+      requestBody: 35
+        description: eiJobObject 36
+        content: 37
+          application/json: 38
+            schema: 39
+              $ref: '#/components/schemas/EiJobObject' 40
+        required: true 41
+      responses: 42
+        200: 43
+          description: Job updated 44
+          content: {} 45
+        201: 46
+          description: Job created 47
+          content: {} 48
+        401: 49
+          description: Unauthorized 50
+          content: {} 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                67
+        403: 1
+          description: Forbidden 2
+          content: {} 3
+        404: 4
+          description: Enrichment Information type is not found 5
+          content: 6
+            application/json: 7
+              schema: 8
+                $ref: '#/components/schemas/ProblemDetails' 9
+      deprecated: false 10
+      x-codegen-request-body-name: eiJobObject 11
+      callbacks: 12
+       jobStatusNotification: 13
+          '{$request.body.jobStatusNotificationUri}': 14
+            post: 15
+              description: 'Notify about status changes for this EI job' 16
+              requestBody: 17
+                required: true 18
+                content: 19
+                  application/json: 20
+                    schema: 21
+                      "$ref": "#/components/schemas/EiJobStatusObject" 22
+              responses: 23
+                204: 24
+                  description: 'Notification received' 25
+          jobResult: 26
+          '{$request.body.jobResultUri}': 27
+            post: 28
+              description: 'Deliverance of EI' 29
+              requestBody: 30
+                required: true 31
+                content: 32
+                  application/json: 33
+                    schema: 34
+                      "$ref": "#/components/schemas/EiResultObject" 35
+              responses: 36
+                204: 37
+                  description: 'Information received' 38
+    delete: 39
+      tags: 40
+      - A1-EI (enrichment information) 41
+      summary: Individual EI job 42
+      operationId: deleteIndividualEiJobUsingDELETE 43
+      parameters: 44
+      - name: eiJobId 45
+        in: path 46
+        description: eiJobId 47
+        required: true 48
+        schema: 49
+          type: string 50
+      responses: 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                68
+        200: 1
+          description: Not used 2
+          content: {} 3
+        204: 4
+          description: Job deleted 5
+          content: {} 6
+        401: 7
+          description: Unauthorized 8
+          content: {} 9
+        403: 10
+          description: Forbidden 11
+          content: {} 12
+        404: 13
+          description: Enrichment Information job is not found 14
+          content: 15
+            application/json: 16
+              schema: 17
+                $ref: '#/components/schemas/ProblemDetails' 18
+      deprecated: false 19
+  /A1-EI/v1/eitypes/{eiTypeId}: 20
+    get: 21
+      tags: 22
+      - A1-EI (enrichment information) 23
+      summary: Individual EI type 24
+      operationId: getEiTypeUsingGET 25
+      parameters: 26
+      - name: eiTypeId 27
+        in: path 28
+        description: eiTypeId 29
+        required: true 30
+        schema: 31
+          type: string 32
+      responses: 33
+        200: 34
+          description: EI type 35
+          content: 36
+            application/json: 37
+              schema: 38
+                $ref: '#/components/schemas/EiTypeObject' 39
+        401: 40
+          description: Unauthorized 41
+          content: {} 42
+        403: 43
+          description: Forbidden 44
+          content: {} 45
+        404: 46
+          description: Enrichment Information type is not found 47
+          content: 48
+            application/json: 49
+              schema: 50
+                $ref: '#/components/schemas/ProblemDetails' 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                69
+      deprecated: false 1
+  /A1-EI/v1/eijobs: 2
+    get: 3
+      tags: 4
+      - A1-EI (enrichment information) 5
+      summary: EI job identifiers 6
+      description: query for EI job identifiers 7
+      operationId: getEiJobIdsUsingGET 8
+      parameters: 9
+      - name: eiTypeId 10
+        in: query 11
+        description: selects EI jobs of matching EI type 12
+        allowEmptyValue: false 13
+        schema: 14
+          type: string 15
+      - name: owner 16
+        in: query 17
+        description: selects EI jobs for one EI job owner 18
+        allowEmptyValue: false 19
+        schema: 20
+          type: string 21
+      responses: 22
+        200: 23
+          description: EI job identifiers 24
+          content: 25
+            application/json: 26
+              schema: 27
+                type: array 28
+                items: 29
+                  type: string 30
+        401: 31
+          description: Unauthorized 32
+          content: {} 33
+        403: 34
+          description: Forbidden 35
+          content: {} 36
+        404: 37
+          description: Enrichment Information type is not found 38
+          content: 39
+            application/json: 40
+              schema: 41
+                $ref: '#/components/schemas/ProblemDetails' 42
+      deprecated: false 43
+  /A1-EI/v1/eijobs/{eiJobId}/status: 44
+    get: 45
+      tags: 46
+      - A1-EI (enrichment information) 47
+      summary: EI job status 48
+      operationId: getEiJobStatusUsingGET 49
+      parameters: 50
+      - name: eiJobId 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                70
+        in: path 1
+        description: eiJobId 2
+        required: true 3
+        schema: 4
+          type: string 5
+      responses: 6
+        200: 7
+          description: EI job status 8
+          content: 9
+            application/json: 10
+              schema: 11
+                $ref: '#/components/schemas/EiJobStatusObject' 12
+        401: 13
+          description: Unauthorized 14
+          content: {} 15
+        403: 16
+          description: Forbidden 17
+          content: {} 18
+        404: 19
+          description: Enrichment Information job is not found 20
+          content: 21
+            application/json: 22
+              schema: 23
+                $ref: '#/components/schemas/ProblemDetails' 24
+      deprecated: false 25
+  /A1-EI/v1/eitypes: 26
+    get: 27
+      tags: 28
+      - A1-EI (enrichment information) 29
+      summary: EI type identifiers 30
+      operationId: getEiTypeIdentifiersUsingGET 31
+      responses: 32
+        200: 33
+          description: EI type identifiers 34
+          content: 35
+            application/json: 36
+              schema: 37
+                type: array 38
+                items: 39
+                  type: string 40
+        401: 41
+          description: Unauthorized 42
+          content: {} 43
+        403: 44
+          description: Forbidden 45
+          content: {} 46
+        404: 47
+          description: Not Found 48
+          content: {} 49
+      deprecated: false 50
+components: 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                71
+  schemas: 1
+    EiTypeObject: 2
+      title: EiTypeObject 3
+      type: object 4
+      description: Information for an EI type 5
+    ProblemDetails: 6
+      title: ProblemDetails 7
+      type: object 8
+      properties: 9
+        detail: 10
+          type: string 11
+          description: A human-readable explanation specific to this occurrence of 12
+            the problem. 13
+          example: EI job type not found 14
+        status: 15
+          type: integer 16
+          description: The HTTP status code generated by the origin server for this 17
+            occurrence of the problem. 18
+          format: int32 19
+          example: 404 20
+        type: 21
+          type: string 22
+        title: 23
+          type: string 24
+        instance: 25
+          type: string 26
+      description: A problem detail to carry details in a HTTP response according 27
+        to RFC 7807 28
+    EiJobStatusObject: 29
+      title: EiJobStatusObject 30
+      required: 31
+      - eiJobStatus 32
+      type: object 33
+      properties: 34
+        eiJobStatus: 35
+          type: string 36
+          description: |- 37
+            values: 38
+            ENABLED: the A1-EI producer is able to deliver EI result for the EI job 39
+            DISABLED: the A1-EI producer is unable to deliver EI result for the EI job 40
+          enum: 41
+          - ENABLED 42
+          - DISABLED 43
+      description: Status for an EI job 44
+    EiJobObject: 45
+      title: EiJobObject 46
+      required: 47
+      - eiTypeId 48
+      - jobDefinition 49
+      - jobResultUri 50
+      type: object 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                72
+      properties: 1
+        eiTypeId: 2
+          type: string 3
+          description: EI type Idenitifier of the EI job 4
+        jobResultUri: 5
+          type: string 6
+          description: The target URI of the EI data 7
+        jobStatusNotificationUri: 8
+          type: string 9
+          description: The target of EI job status notifications 10
+        jobDefinition: 11
+          type: object 12
+          properties: {} 13
+          description: EI type specific job data 14
+      description: Information for an Enrichment Information Job 15
+    EiResultObject: 16
+     title: EiResultObject 17
+  18
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                73
+Annex B: JSON objects 1
+B.1 JSON schemas 2
+B.1.1 QoS Target 3
+PolicyTypeId: ORAN_QoSTarget_1.0.1 4
+{ 5
+  "$schema": "http://json-schema.org/draft-07/schema#", 6
+  "description": "O-RAN standard QoS Target policy", 7
+  "type": "object", 8
+  "properties": { 9
+    "scope": { 10
+      "anyOf": [ 11
+        { 12
+          "type": "object", 13
+          "properties": { 14
+            "ueId": {"type": "string"}, 15
+            "groupId": {"type": "number"}, 16
+            "qosId": {"type": "number"}, 17
+            "cellId": {"type": "number"} 18
+          }, 19
+          "additionalProperties": false, 20
+          "required": ["ueId", "qosId"] 21
+        }, 22
+        { 23
+          "type": "object", 24
+          "properties": { 25
+            "ueId": {"type": "string"}, 26
+            "sliceId": {"type": "number"}, 27
+            "qosId": {"type": "number"}, 28
+            "cellId": {"type": "number"} 29
+          }, 30
+          "additionalProperties": false, 31
+          "required": ["ueId", "qosId"] 32
+        }, 33
+        { 34
+          "type": "object", 35
+          "properties": { 36
+            "groupId": {"type": "number"}, 37
+            "qosId": {"type": "number"}, 38
+            "cellId": {"type": "number"} 39
+          }, 40
+          "additionalProperties": false, 41
+          "required": ["groupId", "qosId"] 42
+        }, 43
+        { 44
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                74
+          "type": "object", 1
+          "properties": { 2
+            "sliceId": {"type": "number"}, 3
+            "qosId": {"type": "number"}, 4
+            "cellId": {"type": "number"} 5
+          }, 6
+          "additionalProperties": false, 7
+          "required": ["sliceId", "qosId"] 8
+        }, 9
+        { 10
+          "type": "object", 11
+          "properties": { 12
+            "qosId": {"type": "number"}, 13
+            "cellId": {"type": "number"} 14
+          }, 15
+          "additionalProperties": false, 16
+          "required": ["qosId"] 17
+        } 18
+      ] 19
+    }, 20
+    "qosObjectives": { 21
+      "type": "object", 22
+      "properties": { 23
+        "gfbr": {"type": "number"}, 24
+        "mfbr": {"type": "number"}, 25
+        "priorityLevel": {"type": "number"}, 26
+        "pdb": {"type": "number"} 27
+      }, 28
+      "minProperties": 1, 29
+      "additionalProperties": false 30
+    } 31
+  }, 32
+  "additionalProperties": false, 33
+  "required": ["scope", "qosObjectives"] 34
+} 35
+B.1.2 QoE Target  36
+PolicyTypeId: ORAN_QoETarget_1.0.1 37
+{ 38
+  "$schema": "http://json-schema.org/draft-07/schema#", 39
+  "description": "O-RAN standard QoE Target policy", 40
+  "type": "object", 41
+  "properties": { 42
+    "scope": { 43
+      "anyOf": [ 44
+        { 45
+          "type": "object", 46
+          "properties": { 47
+            "ueId": {"type": "string"}, 48
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                75
+            "sliceId": {"type": "number"}, 1
+            "qosId": {"type": "number"}, 2
+            "cellId": {"type": "number"} 3
+          }, 4
+          "additionalProperties": false, 5
+          "required": ["ueId", "sliceId"] 6
+        }, 7
+        { 8
+          "type": "object", 9
+          "properties": { 10
+            "ueId": {"type": "string"}, 11
+            "qosId": {"type": "number"}, 12
+            "cellId": {"type": "number"} 13
+          }, 14
+          "additionalProperties": false, 15
+          "required": ["ueId", "qosId"] 16
+        }, 17
+        { 18
+          "type": "object", 19
+          "properties": { 20
+            "sliceId": {"type": "number"}, 21
+            "qosId": {"type": "number"}, 22
+            "cellId": {"type": "number"} 23
+          }, 24
+          "additionalProperties": false, 25
+          "required": ["sliceId"] 26
+        }, 27
+        { 28
+          "type": "object", 29
+          "properties": { 30
+            "qosId": {"type": "number"}, 31
+            "cellId": {"type": "number"} 32
+          }, 33
+          "additionalProperties": false, 34
+          "required": ["qosId"] 35
+        } 36
+      ] 37
+    }, 38
+    "qoeObjectives": { 39
+      "type": "object", 40
+      "properties": { 41
+        "qoeScore": {"type": "number"}, 42
+        "initialBuffering": {"type": "number"}, 43
+        "reBuffFreq": {"type": "number"}, 44
+        "stallRatio": {"type": "number"} 45
+      }, 46
+      "minProperties": 1, 47
+      "additionalProperties": false 48
+    } 49
+  }, 50
+  "additionalProperties": false, 51
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                76
+  "required": ["scope", "qoeObjectives"] 1
+} 2
+B.1.3 Traffic Steering Preferences  3
+PolicyTypeId: ORAN_TrafficSteeringPreference_1.0.1 4
+{ 5
+  "$schema": "http://json-schema.org/draft-07/schema#", 6
+ 7
+  "description": "O-RAN standard Traffic Steering Preference policy", 8
+  "type": "object", 9
+  "properties": { 10
+    "scope": { 11
+      "anyOf": [ 12
+        { 13
+          "type": "object", 14
+          "properties": { 15
+            "ueId": {"type": "string"}, 16
+            "sliceId": {"type": "number"}, 17
+            "qosId": {"type": "number"}, 18
+            "cellId": {"type": "number"} 19
+          }, 20
+          "additionalProperties": false, 21
+          "required": ["ueId"] 22
+        }, 23
+        { 24
+          "type": "object", 25
+          "properties": { 26
+            "sliceId": {"type": "number"}, 27
+            "qosId": {"type": "number"}, 28
+            "cellId": {"type": "number"} 29
+          }, 30
+          "additionalProperties": false, 31
+          "required": ["sliceId"] 32
+        } 33
+      ] 34
+    }, 35
+    "tspResources": { 36
+      "type": "array", 37
+      "items": { 38
+        "type": "object", 39
+        "properties": { 40
+          "cellIdList": { 41
+            "type": "array", 42
+            "minItems": 1, 43
+            "uniqueItems": true, 44
+            "items": { 45
+              "type": "number" 46
+            } 47
+          }, 48
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                77
+          "preference": { 1
+            "type": "string", 2
+            "enum": [ 3
+              "SHALL", 4
+              "PREFER", 5
+              "AVOID", 6
+              "FORBID" 7
+            ] 8
+          }, 9
+          "primary": {"type": "boolean"} 10
+        }, 11
+        "required": ["cellIdList", "preference"], 12
+        "additionalProperties": false 13
+      }, 14
+      "minItems": 1 15
+    } 16
+  }, 17
+  "additionalProperties": false, 18
+  "required": ["scope", "tspResources"] 19
+} 20
+B.1.4 QoS optimization with resource directive  21
+PolicyTypeId: ORAN_QoSandTSP_1.0.1 22
+ { 23
+  "$schema": "http://json-schema.org/draft-07/schema#", 24
+ 25
+  "description": "O-RAN standard QoS Target and Traffic Steering Preference policy", 26
+  "type": "object", 27
+  "properties": { 28
+    "scope": { 29
+      "anyOf": [ 30
+        { 31
+          "type": "object", 32
+          "properties": { 33
+            "ueId": {"type": "string"}, 34
+            "sliceId": {"type": "number"}, 35
+            "qosId": {"type": "number"}, 36
+            "cellId": {"type": "number"} 37
+          }, 38
+          "additionalProperties": false, 39
+          "required": ["ueId", "qosId"] 40
+        }, 41
+        { 42
+          "type": "object", 43
+          "properties": { 44
+            "sliceId": {"type": "number"}, 45
+            "qosId": {"type": "number"}, 46
+            "cellId": {"type": "number"} 47
+          }, 48
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                78
+          "additionalProperties": false, 1
+          "required": ["sliceId", "qosId"] 2
+        } 3
+      ] 4
+    }, 5
+    "qosObjectives": { 6
+      "type": "object", 7
+      "properties": { 8
+        "gfbr": {"type": "number"}, 9
+        "mfbr": {"type": "number"}, 10
+        "priorityLevel": {"type": "number"}, 11
+        "pdb": {"type": "number"} 12
+      }, 13
+      "minProperties": 1, 14
+      "additionalProperties": false 15
+    }, 16
+    "tspResources": { 17
+      "type": "array", 18
+      "items": { 19
+        "type": "object", 20
+        "properties": { 21
+          "cellIdList": { 22
+            "type": "array", 23
+            "minItems": 1, 24
+            "uniqueItems": true, 25
+            "items": { 26
+              "type": "number" 27
+            } 28
+          }, 29
+          "preference": { 30
+            "type": "string", 31
+            "enum": [ 32
+              "SHALL", 33
+              "PREFER", 34
+              "AVOID", 35
+              "FORBID" 36
+            ] 37
+          }, 38
+          "primary": {"type": "boolean"} 39
+        }, 40
+        "required": ["cellIdList", "preference"], 41
+        "additionalProperties": false 42
+      }, 43
+      "minItems": 1 44
+    } 45
+  }, 46
+  "additionalProperties": false, 47
+  "required": ["scope", "qosObjectives", "tspResources"] 48
+} 49
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                79
+B.1.5 QoE optimization with resource directive  1
+PolicyTypeId: ORAN_QoEandTSP_1.0.1 2
+{ 3
+  "$schema": "http://json-schema.org/draft-07/schema#", 4
+  "description": "O-RAN standard QoE Target and Traffic Steering Preference policy", 5
+  "type": "object", 6
+  "properties": { 7
+    "scope": { 8
+      "anyOf": [ 9
+        { 10
+          "type": "object", 11
+          "properties": { 12
+            "ueId": {"type": "string"}, 13
+            "sliceId": {"type": "number"}, 14
+            "qosId": {"type": "number"}, 15
+            "cellId": {"type": "number"} 16
+          }, 17
+          "additionalProperties": false, 18
+          "required": ["ueId", "sliceId"] 19
+        }, 20
+        { 21
+          "type": "object", 22
+          "properties": { 23
+            "ueId": {"type": "string"}, 24
+            "qosId": {"type": "number"}, 25
+            "cellId": {"type": "number"} 26
+          }, 27
+          "additionalProperties": false, 28
+          "required": ["ueId", "qosId"] 29
+        }, 30
+        { 31
+          "type": "object", 32
+          "properties": { 33
+            "sliceId": {"type": "number"}, 34
+            "qosId": {"type": "number"}, 35
+            "cellId": {"type": "number"} 36
+          }, 37
+          "additionalProperties": false, 38
+          "required": ["sliceId"] 39
+        } 40
+      ] 41
+    }, 42
+    "qoeObjectives": { 43
+      "type": "object", 44
+      "properties": { 45
+        "qoeScore": {"type": "number"}, 46
+        "initialBuffering": {"type": "number"}, 47
+        "reBuffFreq": {"type": "number"}, 48
+        "stallRatio": {"type": "number"} 49
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                80
+      }, 1
+      "minProperties": 1, 2
+      "additionalProperties": false 3
+    }, 4
+    "tspResources": { 5
+      "type": "array", 6
+      "items": { 7
+        "type": "object", 8
+        "properties": { 9
+          "cellIdList": { 10
+            "type": "array", 11
+            "minItems": 1, 12
+            "uniqueItems": true, 13
+            "items": { 14
+              "type": "number" 15
+            } 16
+          }, 17
+          "preference": { 18
+            "type": "string", 19
+            "enum": [ 20
+              "SHALL", 21
+              "PREFER", 22
+              "AVOID", 23
+              "FORBID" 24
+            ] 25
+          }, 26
+          "primary": {"type": "boolean"} 27
+        }, 28
+        "required": ["cellIdList", "preference"], 29
+        "additionalProperties": false 30
+      }, 31
+      "minItems": 1 32
+    } 33
+  }, 34
+  "additionalProperties": false, 35
+  "required": ["scope", "qoeObjectives", "tspResources"] 36
+} 37
+B.1.6 Policy Status Object  38
+This is a generic policy status schema, it may be adjusted and be used together with a policy schema in a 39
+PolicyTypeObject and will then be identified by the same policy type identifier as the policy schema.  40
+{ 41
+  "$schema": "http://json-schema.org/draft-07/schema#", 42
+  "description": "O-RAN standard policy status", 43
+  "type": "object", 44
+  "properties": { 45
+    "enforceStatus": { 46
+      "type": "string", 47
+      "enum": [ 48
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                81
+        "ENFORCED", 1
+        "NOT_ENFORCED", 2
+        "UNDEFINED" 3
+      ] 4
+    }, 5
+    "enforceReason": { 6
+      "type": "string", 7
+      "enum": [ 8
+        "SCOPE_NOT_APPLICABLE", 9
+        "STATEMENT_NOT_APPLICABLE", 10
+        "OTHER_REASON" 11
+      ] 12
+    } 13
+  }, 14
+  "additionalProperties": false, 15
+  "required": ["enforceStatus"] 16
+} 17
+B.2 Policy examples in JSON format 18
+B.2.1 QoS 19
+B.2.1.1 QoS based resource optimization per-UE 20
+{ 21
+  "scope": { 22
+    "ueId": "855", 23
+    "qosId": 67 24
+  }, 25
+  "qosObjectives": { 26
+    "priorityLevel": 50 27
+  } 28
+} 29
+B.2.1.2 QoS based resource optimization per-slice 30
+{ 31
+  "scope": { 32
+    "sliceId": 11, 33
+    "qosId": 67, 34
+    "cellId": 24 35
+  }, 36
+  "qosObjectives": { 37
+    "gfbr": 1000, 38
+    "mfbr": 500, 39
+    "pdb": 120 40
+  } 41
+} 42
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                82
+B.2.2 QoE 1
+B.2.2.1 QoE based resource optimization per-UE 2
+{ 3
+  "scope": { 4
+    "ueId": "855", 5
+    "qosId": 67 6
+  }, 7
+  "qoeObjectives": { 8
+    "initialBuffering": 30, 9
+    "reBuffFreq": 5, 10
+    "stallRatio": 2 11
+  } 12
+} 13
+B.2.2.2 QoE based resource optimization per-slice 14
+{ 15
+  "scope": { 16
+    "sliceId": 11 17
+  }, 18
+  "qoeObjectives": { 19
+    "qoeScore": 4.25 20
+  } 21
+} 22
+B.2.3 TSP 23
+B.2.3.1 Traffic steering per-UE 24
+{ 25
+  "scope": { 26
+    "ueId": "855" 27
+  }, 28
+  "tspResources": [ 29
+    { 30
+      "cellIdList": [ 31
+        39, 32
+        40 33
+      ], 34
+      "preference": "PREFER" 35
+    }, 36
+    { 37
+      "cellIdList": [ 38
+        81, 39
+        82, 40
+        83 41
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                83
+      ], 1
+      "preference": "FORBID" 2
+    } 3
+  ] 4
+} 5
+B.2.3.2 Traffic steering per-slice 6
+{ 7
+  "scope": { 8
+    "sliceId": 11, 9
+    "qosId": 67 10
+  }, 11
+  "tspResources": [ 12
+    { 13
+      "cellIdList": [ 14
+        55, 15
+        65 16
+      ], 17
+      "preference": "SHALL" 18
+    }, 19
+    { 20
+      "cellIdList": [ 21
+        01, 22
+        02, 23
+        03 24
+      ], 25
+      "preference": "AVOID" 26
+    } 27
+  ] 28
+} 29
+B.2.4 QoS optimization with resource directive 30
+{ 31
+  "scope": { 32
+    "ueId": "855", 33
+    "qosId": 67 34
+  }, 35
+  "qosObjectives": { 36
+    "priorityLevel": 50 37
+  }, 38
+  "tspResources": [ 39
+    { 40
+      "cellIdList": [ 41
+        39, 42
+        40 43
+      ], 44
+      "preference": "PREFER" 45
+    }, 46
+    { 47
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                84
+      "cellIdList": [ 1
+        81, 2
+        82, 3
+        83 4
+      ], 5
+      "preference": "AVOID" 6
+    } 7
+  ] 8
+} 9
+B.2.5 QoE optimization with resource directive 10
+{ 11
+  "scope": { 12
+    "sliceId": 11 13
+  }, 14
+  "qoeObjectives": { 15
+    "qoeScore": 4.25 16
+  }, 17
+  "tspResources": [ 18
+    { 19
+      "cellIdList": [ 20
+        55, 21
+        65 22
+      ], 23
+      "preference": "SHALL" 24
+    }, 25
+    { 26
+      "cellIdList": [ 27
+        01, 28
+        02, 29
+        03 30
+      ], 31
+      "preference": "AVOID" 32
+    } 33
+  ] 34
+} 35
+B.2.6 Status object for notification 36
+{ 37
+  "enforceStatus": "NOT_ENFORCED", 38
+  "enforceReason": "SCOPE_NOT_APPLICABLE" 39
+} 40
+ 41
+  42
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                85
+Annex Z 1
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER AGREES TO 2
+THE TERMS OF THIS AGREEMENT.   3
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and 4
+the entity that downloads, uses or o therwise accesses any O -RAN Specification, including its Affiliates (the 5
+“Adopter”). 6
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7
+ 8
+SECTION 1:  DEFINITIONS 9
+ 10
+1.1  “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common 11
+control with another entity, so long as such control exists.  For the purpose of this Section, “Control” means 12
+beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 13
+1.2  “Compliant Portion” means only those specific portions of products (hardware, software or 14
+combinations thereof) that implement any O-RAN Specification. 15
+1.3   “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contr ibutors, 16
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 17
+1.4  “Minor Update” means an update or revision to an O -RAN Specification published by O-RAN Alliance 18
+that does not add any significant new features or  functionality and remains interoperable with the prior 19
+version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates. 20
+1.5  “Necessary Claims” means those claims of all present and future patents and patent applications, other 21
+than design patents and design registrations, throughout the world, which (i) are owned or otherwise 22
+licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or 23
+Academic Contributorship; (ii) such Member, Contr ibutor or Academic Contributor has the right to grant a 24
+license without the payment of consideration to a third party; and (iii) are necessarily infringed by 25
+implementation of a Final Specification (without considering any Contributions not included in the  Final 26
+Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) 27
+grounds, taking into account normal technical practice and the state of the art generally available at the date 28
+any Final Specification w as published by the O -RAN Alliance or the date the patent claim first came into 29
+existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate an 30
+implementation which complies with a Final Specification without infringing that claim. For the avoidance of 31
+doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of 32
+which infringe patent claims, all such patent claims shall be considered Necessary Claims. 33
+1.6  “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 34
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in 35
+their license a term allowing the licensor to suspend the l icense against a licensee who brings a patent 36
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their 37
+Affiliates. 38
+ 39
+SECTION 2: COPYRIGHT LICENSE 40
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                86
+ 1
+2.1  Subject to the terms and conditions of this Agreement,  O-RAN Alliance hereby grants to Adopter a 2
+nonexclusive, nontransferable, irrevocable, non -sublicensable, worldwide copyright license to obtain, use 3
+and modify O-RAN Specifications, but not to further distribute such O -RAN Specification in any modified or 4
+unmodified way, solely in furtherance of implementations of an O-RAN Specification. 5
+2.2  Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in a 6
+separate written agreement with O-RAN Alliance. 7
+ 8
+SECTION 3: FRAND LICENSE 9
+ 10
+3.1  Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on 11
+a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non -Discriminatory 12
+(FRAND) terms and conditions with or without c ompensation (royalties) a nonexclusive, non -transferable, 13
+irrevocable (but subject to Defensive Suspension), non -sublicensable,  worldwide license under their 14
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distri bute 15
+Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a 16
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to 17
+any Adopter if that Adopter is  not making a reciprocal grant to Members, Contributors and Academic 18
+Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the 19
+distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant 20
+Portions. 21
+3.2  Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 22
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to 23
+Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or 24
+Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 25
+3.3  Adopter, on behalf of itself and its Affiliates,  shall be prepared to grant based on a separate Patent 26
+License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates 27
+under FRAND terms and conditions with or without compensation (royalties) a nonexclusive, non -28
+transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable,  worldwide license under 29
+their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 30
+Compliant Portions; provided, however, that such license will not extend: (a) to any part or function of a 31
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to 32
+any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a 33
+reciprocal grant to Adopter, as set forth in Section 3.1.  For the avoidance of doubt, the foregoing license 34
+includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their 35
+Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and 36
+their Affiliates’ customers of such licensed Compliant Portions. 37
+ 38
+SECTION 4:  TERM AND TERMINATION 39
+ 40
+4.1  This Agreement shall remain in force, unless early terminated according to this Section 4. 41
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                87
+4.2  O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this 1
+Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such 2
+breach within thirty (30) days after being given notice specifying the breach. 3
+4.3  Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement.  Under surviving 4
+Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who 5
+become Adopters after the date of termination; and (b) for future versions of O-RAN Specifications that are 6
+backwards compatible with the version that was current as of the date of termination. 7
+ 8
+SECTION 5: CONFIDENTIALITY 9
+ 10
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 11
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than 12
+reasonable care.  Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to 13
+an obligation of confidentiality at least as restrictive as those contained in this Section.  The foregoing 14
+obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation 15
+on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully 16
+received without a duty of confidentiality; (4) disclosed by O -RAN Alliance or a Member, Contributor or 17
+Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently 18
+developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, 19
+or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and 20
+cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have 21
+the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN Alliance’s prior written 22
+approval.  23
+ 24
+SECTION 6:  INDEMNIFICATION 25
+ 26
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or 27
+Academic Contributors, and their employees, and agents and their respective successors, heirs and  assigns 28
+(the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and 29
+expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, 30
+investigations, actions, demands or j udgments arising out of Adopter’s use of the licensed O -RAN 31
+Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications. 32
+ 33
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY 34
+ 35
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S  BREACH OF SECTION 3, AND ADOPTER’S 36
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD 37
+PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING 38
+FROM ITS PERFORMANCE OR NON -PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER 39
+UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE 40
+NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 41
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                88
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHA TSOEVER, 1
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O -RAN ALLIANCE AND THE MEMBERS, 2
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF 3
+MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR 4
+PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 5
+ 6
+SECTION 8:  ASSIGNMENT 7
+ 8
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any 9
+grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first 10
+received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s 11
+sole discretion.  O-RAN Alliance may freely assign this Agreement. 12
+ 13
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS 14
+ 15
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future 16
+Members, Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under 17
+this Agreement, including as licensees under Section 3. 18
+ 19
+SECTION 10:  BINDING ON AFFILIATES 20
+ 21
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 22
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable 23
+to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 24
+ 25
+SECTION 11:  GENERAL 26
+ 27
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.   28
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and 29
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether 30
+written or oral, relating to the subject matter of this Agreement. 31
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 32
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without 33
+limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter 34
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 35
+By execution hereof, no form of any partnership, joint venture or other special relationship is created 36
+between Adopter, or O -RAN Alliance or its Members, Contributors or Academic Contributors.  Except as 37
+
+________________________________________________________________________________________________
+Copyright © 2021 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License
+Agreement in Annex Z.
+                89
+expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, 1
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. 2
+In the event that any provision of this Agreement conflicts with governing law or i f any provision is held to 3
+be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will 4
+be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of 5
+this Agreement will remain in full force and effect. 6
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of 7
+any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or  8
+otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or 9
+third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other 10
+instance; rather the same shall be and remain in full force and effect. 11

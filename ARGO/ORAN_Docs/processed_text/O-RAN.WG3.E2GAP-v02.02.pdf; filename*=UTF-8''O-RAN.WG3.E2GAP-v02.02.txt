@@ -1,0 +1,1291 @@
+O-RAN.WG3.E2GAP-v02.02
+Technical Specification
+O-RAN Working Group 3
+Near-Real-time RAN Intelligent Controller
+Architecture &
+E2 General Aspects and Principles
+This is a re-published version of the attached final specification.
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited,
+save that you may print or download extracts of the material on this site for your personal use, or copy
+the material on this site for the purpose of sending to individual third parties for their information provided
+that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third
+party that these conditions apply to them and that they must comply with them.
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the copyright statement on the cover page of this specification.
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  1
+ O-RAN.WG3.E2GAP-v02.02
+
+Technical Specification
+
+O-RAN Working Group 3
+Near-Real-time RAN Intelligent Controller
+Architecture &
+E2 General Aspects and Principles
+
+Prepared by the O-RAN ALLIANCE e.V. Copyright © 2022 by the O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or preparing
+derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in the Annex ZZZ of this specification. All
+other rights reserved.
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  2
+Revision History 1
+Date Revision Description
+2021.02.23 V02.00.01 Adding Security related CRs.
+2021.03.09 V02.00.02 TNL related CRs
+2021.06.03 V02.00.03 Merging CRs related to Control Service enhancements and RIC Subscription delete
+(WG3#100)
+2021.08.10 V02.00 TSC approved
+2021.11.02 V02.01.01 Added CRs <INT-2021.10.13-WG3-CR-0012-E2GAP-clarify_multipleTNLA_handling_vS >
+approved WG3#116
+< SAM-2021.10.13-WG3-CR-0001-E2GAP_E2Removal-v04 > approved WG#117
+2021.11.22 V02.01.02 Corrections based on WG3 approval review responses.
+2022.02.07 V02.01 Version ready for Nov 21 publication
+2022.03.23 V02.02.01 Added CR < NOK.AO-2022.02.11-WG3-CR-0008-E2GAP-Clarification for REPORT and
+INSERT in 5.3.3-v01 > approved WG3#137
+2022.04.04 V02.02.02 Editorial corrections based on feedback received during WG3 approval poll
+2022.06.29 V02.02 Version ready for March 22 publication
+
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+"© 2020. 3GPP™ TSs and TRs are the property of ARIB, ATIS, CCSA, ETSI, TSDSI, TTA and TTC who jointly own 22
+the copyright in them. They are subject to further modifications and are therefore provided to you "as is" for 23
+information purposes only. Further use is strictly prohibited."  24
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  3
+Contents 1
+Revision History ................................................................................................................................................. 2 2
+1 Introductory Material ............................................................................................................................... 5 3
+1.1 Scope ................................................................................................................................................................. 5 4
+2 References ................................................................................................................................................ 5 5
+3 Definitions and Abbreviations ................................................................................................................. 6 6
+3.1 Definitions ......................................................................................................................................................... 6 7
+3.2 Abbreviations ..................................................................................................................................................... 7 8
+4 Near-RT RIC Architecture ....................................................................................................................... 8 9
+4.1 General Architecture Principles ......................................................................................................................... 8 10
+4.2 Near-RT RIC Architecture Overview ................................................................................................................ 8 11
+4.3 Near-RT RIC Requirements .............................................................................................................................. 9 12
+4.4 Near-RT RIC functional architecture ............................................................................................................... 10 13
+4.4.1 General ....................................................................................................................................................... 10 14
+4.4.2 RRM Functional Allocation ....................................................................................................................... 10 15
+5 E2 Interface ............................................................................................................................................ 10 16
+5.1 E2 interface general principles ......................................................................................................................... 10 17
+5.2 E2 interface specification objectives................................................................................................................ 12 18
+5.3 Functions of the E2 Interface ........................................................................................................................... 12 19
+5.3.1 General ....................................................................................................................................................... 12 20
+5.3.2 RIC services and related procedures .......................................................................................................... 12 21
+5.3.3 Combining RIC services within a common Subscription........................................................................... 20 22
+5.3.4 Combining RIC services as a sequence of RIC services ............................................................................ 20 23
+5.4 RAN Function E2 Service Model .................................................................................................................... 21 24
+5.5 Near-RT RIC support functions ....................................................................................................................... 21 25
+5.5.1 General ....................................................................................................................................................... 21 26
+5.5.2 E2 Setup procedure .................................................................................................................................... 21 27
+5.5.3 E2 Reset procedure .................................................................................................................................... 22 28
+5.5.4 Near-RT RIC Service Update procedure .................................................................................................... 24 29
+5.5.5 E2 Node Configuration Update procedure ................................................................................................. 25 30
+5.5.6 E2 Removal procedure ............................................................................................................................... 26 31
+6 Services expected from signalling transport .................................................................................................... 27 32
+6.1 E2 Control Plane Protocol (E2AP) .................................................................................................................. 27 33
+6.2 Multiple TNLAs over E2 ................................................................................................................................. 27 34
+7 Security for the E2 interface ................................................................................................................... 31 35
+7.1 General ............................................................................................................................................................. 31 36
+7.2 Requirements for the E2 interfaces .................................................................................................................. 31 37
+7.3 Security mechanism for the E2 interface ......................................................................................................... 32 38
+8 Other E2 interface specifications ........................................................................................................... 32 39
+8.1 O-RAN E2 interface: E2 Application Protocol (E2AP) (ORAN-WG3.E2AP) ............................................... 32 40
+8.2 O-RAN E2 interface: E2 Service Model (E2SM) specifications ..................................................................... 32 41
+Annex A  Deployment considerations ......................................................................................................... 33 42
+A.1 Deployment use cases ...................................................................................................................................... 33 43
+Annex ZZZ : O-RAN Adopter License Agreement ......................................................................................... 35 44
+Section 1: DEFINITIONS ................................................................................................................................................ 35 45
+Section 2: COPYRIGHT LICENSE ................................................................................................................................. 35 46
+Section 3: FRAND LICENSE .......................................................................................................................................... 35 47
+Section 4: TERM AND TERMINATION ........................................................................................................................ 36 48
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 36 49
+Section 6: INDEMNIFICATION ..................................................................................................................................... 36 50
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 37 51
+Section 8: ASSIGNMENT ............................................................................................................................................... 37 52
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 37 53
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  4
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 37 1
+Section 11: GENERAL ..................................................................................................................................................... 37 2
+ 3
+  4
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  5
+1 Introductory Material 1
+1.1 Scope 2
+This Technical Specification has been produced by the O-RAN Alliance. 3
+The contents of the present document are subject to continuing work within O- RAN and may change following formal 4
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-5
+RAN with an identifying change of release date and an increase in version number as follows:  6
+Release x.y.z 7
+where: 8
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9
+etc. (the initial approved document will have x=01). 10
+y the second digit is incremented when editorial only changes have been incorporated in the document.  11
+z the third digit included only in working versions of the document indicating incremental changes during the 12
+editing process. 13
+The present document describes the overall architecture of the Near-RT-RIC (RAN Intelligent Controller) and the 14
+general aspects and principles of the E2 interface, including the interaction with applications hosted in the Near-RT 15
+RIC. 16
+2 References 17
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 18
+document. 19
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 20
+non-specific. 21
+- For a specific reference, subsequent revisions do not apply. 22
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 23
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in the same 24
+Release as the present document. 25
+[1] 3GPP TR 21.905: "Vocabulary for 3GPP Specifications". 26
+[2] O-RAN.WG3.E2AP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 27
+Application Protocol (E2AP)”. 28
+[3] O-RAN.WG2.A1.GA&P, “O-RAN Working Group 2, A1 interface: General Aspects and 29
+Principles”. 30
+[4] O-RAN.WG1.O1-Interface, “O-RAN Operations and Maintenance Interface Specification”. 31
+[5] 3GPP TS 36.401: "Evolved Universal Terrestrial Radio Access Network (E-UTRAN); 32
+Architecture Description". 33
+[6] 3GPP TS 38.401: "NG-RAN; Architecture description". 34
+[7] 3GPP TS 36.423: “Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 35
+application protocol (X2AP)”. 36
+[8] O-RAN-WG1.OAM Architecture, “O-RAN Operations and Maintenance Architecture”. 37
+[9] 3GPP TS 38.410 “NG general aspects and principles”. 38
+[10] 3GPP TS 38.420 “Xn general aspects and principles”. 39
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  6
+[11] 3GPP TS 38.470 “F1 general aspects and principles”. 1
+[12] IETF RFC 4960 (2007-09): “Stream Control Transmission Protocol”. 2
+[13] 3GPP TS 33.401 “3GPP System Architecture Evolution (SAE); Security architecture” . 3
+[14] 3GPP TS 33.501 “Security architecture and procedures for 5G System”. 4
+[15] O-RAN.WG2.UCR-v02.00 "O-RAN Working Group 2 Use Cases and Requirements v02.00". 5
+[16]  3GPP TS 38.300 NR; “NR and NG-RAN Overall Description; Stage 2”. 6
+[17] O-RAN.WG3.E2SM; “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 7
+Service Model (E2SM)”. 8
+[18] O-RAN.WG1.O-RAN-Architecture-Description-v04.00, “O-RAN Architecture Description”. 9
+[19]  O- RAN.WG3.RICARCH, “O-RAN Working Group 3, Near-Real-time RAN Intelligent 10
+Controller, Near-RT RIC Architecture” 11
+[20] IETF Network Working group, RFC 4303 (2005-12), IP Encapsulating Security Payload (ESP) 12
+[21] 3GPP TS 33.210: Technical Specification Group Services and System Aspects; Network Domain 13
+Security (NDS); IP network layer security 14
+[22] 3GPP TS 33.310: Technical Specification Group Service and System Aspects; Network Domain 15
+Security (NDS); Authentication Framework (AF) 16
+[23] IETF Network Working group, IETF RFC 6335 (2011-08), Internet Assigned Numbers Authority 17
+(IANA) Procedures for the Management of the Service Name and Trans port Protocol Port Number 18
+Registry 19
+[24] IETF Network Working group, IETF RFC 4960, Stream Control Transmission Protocol  20
+ 21
+ 22
+3 Definitions and Abbreviations 23
+3.1 Definitions 24
+For the purposes of the present document, the terms and definitions given in TR 21.905 [1] and the following apply.   25
+A term defined in the present document takes precedence over the definition of the same term, if any, in TR  21.905 [1]. 26
+O-CU (O-RAN Central Unit): a logical node hosting RRC, SDAP and PDCP protocols 27
+O-CU-CP (O-RAN Central Unit – Control Plane): a logical node hosting the RRC and the control plane part of the 28
+PDCP protocol 29
+O-CU-UP (O-RAN Central Unit – User Plane): a logical node hosting the user plane part of the PDCP protocol and the 30
+SDAP protocol 31
+O-DU (O-RAN Distributed Unit): a logical node hosting RLC/MAC/High-PHY layers based on a lower layer 32
+functional split. 33
+O-eNB (O-RAN eNB): an eNB Error! Reference source not found. or ng-eNB [16] that supports E2 interface. 34
+O-RU (O-RAN Radio Unit): a logical node hosting Low-PHY layer and RF processing based on a lower layer 35
+functional split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low -PHY layer 36
+(FFT/iFFT, PRACH extraction). 37
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  7
+Non-RT RIC(O-RAN non-real-time RAN Intelligent Controller): a logical function that enables non-real-time control 1
+and optimization of RAN elements and resources, AI/ML workflow including model training and updates, and policy-2
+based guidance of applications/features in Near-RT RIC. 3
+Near-RT RIC (O-RAN near-real-time RAN Intelligent Controller): a logical function that enables near-real-time 4
+control and optimization of RAN elements and resources via fine-grained (e.g. UE basis, Cell basis) data collection and 5
+actions over E2 interface. 6
+O1: Interface between orchestration & management entities (Orchestration/NMS) and O -RAN managed elements, for 7
+operation and management, by which FCAPS management, Software management, File management and other similar 8
+functions shall be achieved.  9
+A1: Interface between Non-RT RIC and Near-RT RIC to enable policy-driven guidance of Near-RT RIC 10
+applications/functions, and support AI/ML workflow.  11
+E2: Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, one or more O-DUs, 12
+and one or more O-eNBs. 13
+E2 Node: a logical node terminating E2 interface. In this version of the specification, O RAN nodes terminating E2 14
+interface are: 15
+- for NR access: O-CU-CP, O-CU-UP, O-DU or any combination as defined in [8];  16
+- for E-UTRA access: O-eNB. 17
+RAN Function: A specific Function in a E2 Node; examples include X2AP, F1AP, E1AP, S1AP, NGAP interfaces and 18
+RAN internal functions handling UEs, Cells, etc. 19
+xApp: An application designed to run on the Near-RT RIC. Such an application is likely to consist of one or more 20
+microservices and at the point of on-boarding will identify which data it consumes and which data it provides. The 21
+application is independent of the Near-RT RIC and may be provided by any third party. The E2 enables a direct 22
+association between the xApp and the RAN functionality.   23
+RIC Service: A Service provided on an E2 Node to provide access to messages and measurements and / or enable 24
+control of the E2 Node from the Near-RT RIC.  25
+SCTP association: as defined in IETF RFC 4960 [24]. In this version of the documentation, SCTP association is 26
+interchangeably used by TNL (Transport Network Layer) association.  27
+SCTP endpoint (or end-point): as defined in IETF RFC 4960 [24]. 28
+ 29
+3.2 Abbreviations 30
+For the purposes of the present document, the following abbreviations apply.  31
+O-CU  O- RAN Central Unit 32
+O-CU-CP O- RAN Central Unit – Control Plane 33
+O-CU-UP O- RAN Central Unit – User Plane 34
+O-DU O- RAN Distributed Unit 35
+O-eNB O- RAN eNB   36
+O-RU O- RAN Radio Unit  37
+Non-RT RIC non-real-time RAN Intelligent Controller: 38
+Near-RT RIC N ear-real-time RAN Intelligent Controller 39
+RAT Radio Access Technology 40
+TNL Transport Network Layer 41
+TNLA T NL association 42
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  8
+ 1
+ 2
+4 Near-RT RIC Architecture 3
+4.1 General Architecture Principles 4
+The general principles guiding the definition of Near-RT RIC architecture as well as the interfaces between Near-RT 5
+RIC, E2 Nodes and Service Management & Orchestration are the following: 6
+- Near-RT RIC and E2 Node functions are fully separated from transport functions. Addressing scheme used in 7
+Near-RT RIC and the E2 Nodes shall not be tied to the addressing schemes of transport functions.  8
+- The E2 Nodes support all protocol layers and interfaces defined within 3GPP radio access networks that include 9
+eNB for E-UTRAN [5] and gNB/ ng-eNB for NG-RAN [16].   10
+- Near-RT RIC and hosted “xApp” applications shall use a set of services exposed by an E2 Node that is described 11
+by a series of RAN function and Radio Access Technology (RAT) dependent “E2 Service Model s”. 12
+- The Near-RT RIC interfaces are defined along the following principles:  13
+- The functional division across the interfaces have as few options as possible.  14
+- Interfaces are based on a logical model of the entity controlled through this interface.  15
+- One physical network element can implement multiple logical nodes. 16
+4.2 Near-RT RIC Architecture Overview 17
+The Near-RT RIC is a logical network node placed between the Service Management & Orchestration layer [8], which 18
+hosts the Non-RT RIC, and the E2 Nodes.  19
+ 20
+Figure 4.2-1: O-RAN Architecture Overview showing Near-RT RIC interfaces 21
+The Near-RT-RIC logical architecture and related interfaces are shown in Figure 4.2-1: 22
+- The Near-RT RIC is connected to the Non-RT RIC through the A1 interface [3]; 23
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  9
+- A Near-RT RIC is connected to only one Non-RT RIC; 1
+-  E2 is a logical interface connecting the Near-RT RIC with an E2 Node; 2
+-  The Near-RT RIC is connected to the O-CU-CP; 3
+ - The Near-RT RIC is connected to the O-CU-UP; 4
+ - The Near-RT RIC is connected to the O-DU; 5
+-  The Near-RT RIC is connected to the O-eNB; 6
+- An E2 Node is connected to only one Near-RT RIC; 7
+- A Near-RT RIC can be connected to multiple E2 Nodes, i.e. multiple O-CU-CPs, O-CU-UPs, O-DUs and O-8
+eNBs. 9
+-  F1 (F1-C, F1-U) and E1 are logical 3GPP interfaces, whose protocols, termination points and cardinalities are 10
+specified in [6]. 11
+In addition, the near-RT RIC and other RAN nodes have O1 interfaces as defined in [8][18].  12
+The Near-RT RIC hosts one or more xApps that use E2 interface to collect near real-time information (e.g. UE basis, 13
+Cell basis) and provide value added services.  14
+The Near-RT RIC may receive declarative Policies and obtain Data Enrichment information over the A1 interface [3].  15
+The protocols over E2 interface are based exclusively on Control plane protocols  and are defined in [2]. 16
+On E2 or Near-RT RIC failure, the E2 Node will be able to provide services but there may be an outage for certain 17
+value-added services that may only be provided using the Near-RT RIC. 18
+4.3 Near-RT RIC Requirements 19
+The Near-RT RIC architecture shall support the following requirements: 20
+- The Near-RT RIC shall use a dedicated E2 connection that uniquely identifies each E2 Node configured to 21
+directly provide RIC Services to the Near-RT RIC.   22
+- A given Near-RT RIC may support E2 connections from multiple E2 Nodes, each supporting a specific RAT 23
+type. 24
+- The Near-RT RIC shall obtain from the E2 Nodes a list of functions supporting RIC Services and the 25
+corresponding E2 Service Model. 26
+- The Near-RT RIC shall host a set of applications, known as xApps. Individual xApp in Near -RT RIC may 27
+address specific RAN Functions in a specific E2 Node. 28
+- The Near-RT RIC shall, as per any other network element, provide an O1 interface towards the Service 29
+Management & Orchestration layer for element management and configuration  30
+- The Near-RT RIC shall provide an A1 interface [3] towards the Non-RT RIC.  The A1 interface is used to 31
+provide Policies to the Near-RT RIC which may be used to modify Near-RT RIC and Near-RT RIC hosted xApp 32
+behavior and hence modify E2 Node behavior. 33
+- The E2 node shall be able to function independently of the Near-RT RIC when and if the E2 interface and/or 34
+Near-RT RIC fails.  35
+-  The Near-RT RIC shall support latency requirements for near-real-time optimization, i.e. from 10 milliseconds 36
+up to 1 second [8]. 37
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  10
+4.4 Near-RT RIC functional architecture 1
+4.4.1 General 2
+The Near-RT RIC supports the following functions: 3
+- A1 interface termination 4
+- Terminates the A1 interface from the Non-RT RIC and forwards A1 messages. 5
+- O1 interface termination 6
+- Terminates the O1 interface from Service Management & Orchestration  layer and forwards management 7
+messages to the Near-RT RIC management function; 8
+- E2 interface termination 9
+- Terminates the E2 interface from an E2 Node; 10
+- Routes xApp-related messages to the target xApp; 11
+- Routes non xApp-related messages to the E2 Manager; 12
+- Hosted xApps 13
+- A llow RRM control functionalities to be executed at the Near-RT RIC and enforced in the E2 Nodes via E2 14
+interface, as described in Section 4.4.2; 15
+- Initiates xApp-related transactions over E2 interface; 16
+- Handles xApp-related responses from the E2 interface; 17
+Near-RT RIC Architecture is described in detail in [19] 18
+4.4.2 RRM Functional Allocation 19
+The RRM functional allocation between the Near-RT RIC and the E2 Node is subject to the capability of the E2 node 20
+exposed over the E2 interface by means of the E2 Service Model, in order to support the use cases such as in [ 15]. 21
+The E2 service model describes the functions in the E2 Node which may be controlled by the Near RT RIC and the 22
+related procedures, thus defining a function-specific RRM split between the E2 node and the Near RT RIC. 23
+ 24
+For a function exposed in the E2 service model, the Near-RT RIC may e.g. monitor, suspend/stop, override or control 25
+via policies the behavior of E2 node. 26
+ 27
+5 E2 Interface 28
+5.1 E2 interface general principles 29
+The general principles for the specification of the E2 interface are as follows: 30
+- the E2 interface is open; 31
+- the E2 interface supports the exchange of control signaling information between the endpoints; 32
+- from a logical standpoint, the E2 is a point-to-point interface between the endpoints; 33
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  11
+- E2 should reuse interface management procedures, as already defined for existing 3GPP RAN interfaces such as 1
+3GPP X2 [7]. 2
+- N ear-RT RIC shall provide flexibility by separating the O-RAN data collection (e.g. network measurements, 3
+context information, etc.) from the supported use cases. 4
+- E2 should provide the capability to send predefined information towards the N ear-RT RIC based on a pre-5
+configured trigger event 6
+- E2 should support the ability to provide UE ID information towards the Near -RT RIC based on a pre-configured 7
+trigger event. 8
+- E2 should enable the Near-RT-RIC to direct the E2 Node to suspend an RRM procedure by interrupting the E2 9
+Node local process and forwarding the relevant information to the Near-RT RIC for processing. 10
+- E2 should support the ability to send control messages (e.g. UE basis, Cell basis) to the E2 Node. 11
+- E2 should support the ability to provide the E2 Node with a set of policies to use when defined events occur.  12
+- E2 should support the ability for E2 Node to notify the Near-RT RIC of what functionality it supports. 13
+  14
+With respect to the E2 interface, the E2 Node consists of: 15
+- E2 Agent used to terminate the E2 interface and to forward/receive E2 messages.  16
+- One or more RAN functions that are controlled by the Near-RT RIC, i.e. supporting Near-RT RIC Services. 17
+- Other RAN functions that do not support Near-RT RIC Services. 18
+With respect to the E2 interface, the Near-RT RIC consists of: 19
+- Database holding data from xApp applications and E2 Node and providing data to xApp applications 20
+- E2 Termination function 21
+- One or more xApp applications  22
+NEAR-RT RIC
+xApp xApp xApp
+E2 Termination Database
+E2 Node
+E2 Agent
+Func(1) Func(N)
+Other functions
+E2E2
+ 23
+Figure 5.1-1: Relationship between Near-RT RIC and E2 Node 24
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  12
+5.2 E2 interface specification objectives 1
+The E2 interface specifications shall facilitate the following: 2
+Connectivity between Near-RT RIC and E2 Node supplied by different vendors; 3
+- Exposure of selected E2 Node data (e.g. configuration information (cell configuration, supported slices, PLMNs, 4
+etc.), network measurements, context information, etc.) towards the Near-RT RIC 5
+- Enables the Near-RT RIC to control selected functions on the E2 Node 6
+5.3 Functions of the E2 Interface 7
+5.3.1 General 8
+The E2 functions are grouped into the following categories: 9
+NEAR-RT RIC services:  10
+- Near-RT RIC Services (REPORT, INSERT, CONTROL and POLICY, as described in Section 5.3.2). 11
+NEAR-RT RIC support functions: 12
+- Interface Management (E2 Setup, E2 Reset, E2 Node Configuration Update, E2 Removal, Reporting of General 13
+Error Situations) 14
+- Near-RT RIC Service Update, i.e. a E2 Node initiated procedure to inform Near-RT RIC of changes to list of 15
+supported Near-RT RIC services and mapping of services to functions. 16
+ 17
+5.3.2 RIC services and related procedures 18
+5.3.2.1 RIC services 19
+Near-RT RIC may use the following RIC services provided by an E2 node: 20
+- REPORT: Near-RT RIC uses a RIC Subscription to request that E2 Node sends a REPORT message to Near-21
+RT RIC and the associated procedure continues in the E2 Node after each occurrence of a defined RIC 22
+Subscription procedure Event Trigger. 23
+- INSERT: Near-RT RIC uses a RIC Subscription to request that E2 Node sends an INSERT message to Near-24
+RT RIC and suspends the associated procedure in the E2 Node after each occurrence of a defined RIC 25
+Subscription procedure Event Trigger. 26
+- CONTROL: Near-RT RIC sends a CONTROL message to E2 Node to initiate a new associated procedure or 27
+resume a previously suspended associated procedure in the E2 Node. 28
+- POLICY: Near-RT RIC uses a RIC Subscription to request that E2 Node executes a specific POLICY  during 29
+functioning of the E2 Node after each occurrence of a defined RIC Subscription procedure Event Trigger.  30
+5.3.2.2 REPORT service 31
+The REPORT service involves following steps: 32
+1. Near-RT RIC configures a RIC Subscription in the E2 Node with information for Indication (Report) that is to 33
+be sent by the E2 Node with each occurrence of RIC trigger event condition 34
+2. During normal functioning of an associated procedure in the E2 Node, a RIC Event Trigger is detected.  35
+3.  E2 Node sends RIC INDICATION message to Near-RT RIC containing the requested REPORT information 36
+along with the originating Request ID. 37
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  13
+4. Associated procedure instance continues in the E2 Node. 1
+ 2
+Figure 5.3.2.2-1: Near-RT RIC REPORT Service 3
+ 4
+5.3.2.3 INSERT service 5
+The INSERT service involves following steps: 6
+1.   Near-RT RIC configures a RIC Subscription in the E2 Node with information for an INSERT action, along with 7
+an associated Subsequent Action Information (Subsequent Action type, Time to Wait timer), that is to be 8
+performed by E2 Node with each occurrence of Event 9
+2. During normal functioning of an associated procedure instance in the E2 Node, a trigger event is detected.  10
+3. E2 Node suspends associated procedure instance for up to a defined Time to Wait period.  11
+4.  E2 Node sends RIC INDICATION message to Near-RT RIC containing the requested INSERT information 12
+along with the originating Request ID and information to identify the suspended associated procedure instance.  13
+5. According to the Time to Wait timer state, arrival of RIC CONTROL procedure, and Subsequent Action 14
+parameter in the RIC Subscription, the E2 Node may then: 15
+a) RIC CONTROL REQUEST message arrives in time: 16
+This case is described in section 5.3.2.4.   17
+b) The associated Time to Wait timer expires and Subsequent Action Type set to Continue:  18
+Continue the original associated procedure instance if and when the associated Time to Wait timer expires. If the 19
+Near-RT RIC subsequently sends a RIC CONTROL REQUEST message with the Call Process ID for the same 20
+associated procedure, then the E2 Node shall respond with the RIC CONTROL FAILURE message with a cause 21
+to indicate that the timer has expired. See also section 5.3.2.4. 22
+c) The associated Time to Wait timer expires and Subsequent Action Type set to Halt:  23
+Halt the original associated procedure instance if and when the associated Time to Wait timer expires. If the 24
+Near-RT RIC subsequently sends a RIC CONTROL REQUEST message with the Call Process ID for the same 25
+associated procedure, then the E2 Node shall respond with the RIC CONTROL FAILURE message with a cause 26
+to indicate that the timer has expired. See also section 5.3.2.4. 27
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+1) RIC SUBSCRIPTION PROCEDURE (RIC Event Trigger, Action=REPORT)
+2) E2 Node detects
+RIC Event Trigger
+3) RIC INDICATION(REPORT)
+4) Associated procedure
+instance continues
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  14
+ 1
+Figure 5.3.2.3-1: Near-RT RIC INSERT Service with subsequent RIC CONTROL service responses  2
+ 3
+5.3.2.4 CONTROL service 4
+The CONTROL service involves following steps: 5
+Near-RT RIC detects an event trigger. This step may be triggered by either: 6
+a) a previous RIC INDICATION message sent by E2 Node 7
+b) internal to Near-RT RIC 8
+1. Near-RT RIC performs an action. 9
+2. Near-RT RIC sends a RIC CONTROL REQUEST message to E2 Node. This message may contain information 10
+to identify the previously suspended procedure instance, and may request acknowledgement from the E2 Node. 11
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+10 RIC SUBSCRIPTION PROCEDURE (RIC Event Trigger, Action=INSERT)
+2) E2 Node detects RIC Event Trigger
+3) Associated procedure instance suspended
+Start associated Time to Wait Timer
+4) RIC INDICATION(INSERT)
+alt [5a) Ne ar-RT RICresponds in time ]
+Near-RT RIC performs action
+RIC CONTROL REQUEST
+Handle request (see CONTROL service)
+[5b) Time to Wait timer E xpires and Subsequent Action = Continue ]
+Associated Time to Wait Timer expires
+Associated procedure instance res umes
+RIC CONTROL REQUEST
+RIC CONTROL FAILURE (Cause=Control timer expired)
+[5c) Time to wait timer E xpires and Subsequent Action = Halt]
+Associated Time to Wait Timer expires
+Associated procedure instance halted
+RIC CONTROL REQUEST
+RIC CONTROL FAILURE (Cause=Control timer expired)
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  15
+The Near-RT RIC shall set the timer TRICcontrol if either acknowledgement has been requested or the optional 1
+acknowledgement request was not present in the RIC CONTROL REQUEST message.  2
+3. The request is validated. The E2 Node cancels the associated Time to Wait timer if previously set, and initiates 3
+or resumes the associated procedure. 4
+4. E2 Node then: 5
+i) If the requested control service is successfully executed, and if acknowledgement was requested or if the 6
+optional RIC Control Ack Request was not present, the E2 Node sends the RIC CONTROL 7
+ACKNOWLEDGE message with the optional RIC Control Outcome providing information about the result 8
+of the request Control service. 9
+ii) If the requested control service fails to execute or the request is not validated, the E2 Node sends the RIC 10
+CONTROL FAILURE message with a cause indicating the reason for failure or rejection and the optional 11
+RIC Control outcome providing information about the reason for failure to execute.  12
+5. If previously set, the Near-RT RIC shall cancel the TRICcontrol timer  13
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  16
+ 1
+Figure 5.3.2.4-1: Near-RT RIC CONTROL Service as response to Near-RT RIC Insert Service 2
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+RIC SUBSCRIPTION PROCEDURE (RIC Event Trigger, Action=INSERT)
+E2 Node detects
+RIC Event Trigger
+Associated procedure
+instance suspended
+RIC INDICATION(INSERT)
+1) Near-RT RIC
+performs action
+2) RIC CONTROL REQUEST
+Set Timer RIC control
+3) Check request Call Process ID
+and associated Time to Wait timer
+alt [A) R equest with valid Call Process ID  received before associated Time to Wait timer expiry ]
+check request validity
+alt [a) R equest is accepted ]
+Cancel Wait Timer
+Associated procedure
+instance res umes
+alt [i) E2 Node successfully executes requested control procedure and "ack" response requested ]
+4 i) RIC CONTROL ACKNOWLEDGE
+[ii) E2 Node fails to execute requested control procedure and "nack" response requested ]
+4 ii) RIC CONTROL FAILURE (Cause = Failure to execute)
+[b) R equest is rejected ]
+4 ii) RIC CONTROL FAILURE (Cause provides reason for rejection)
+[B) R equest with valid Call Process ID  received after associated Time to Wait timer expiry ]
+Associated procedure instance
+previously Halted or Continued
+4 ii) RIC CONTROL FAILURE (Cause = Control timer expired )
+[C) R equest received with invalid Call Process ID ]
+4 ii) RIC CONTROL FAILURE (Cause = Call process ID invalid)
+Clear Timer RIC control
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  17
+ 1
+Figure 5.3.2.4-2: Near-RT RIC CONTROL Service initiated by NEAR-RT RIC 2
+ 3
+5.3.2.5 POLICY service 4
+The POLICY service involves following steps: 5
+1. Near-RT RIC configures a RIC Subscription in the E2 Node with information used to configure a POLICY  that 6
+is to be performed by E2 Node with each occurrence of trigger event 7
+2. During normal functioning of the E2 Node, a trigger event is detected. 8
+3.  E2 Node modifies ongoing call process according to information contained in the POLICY description 9
+statement  10
+4. Associated procedure instance continues in the E2 Node. 11
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+RIC internal event
+Near-RT RIC detects
+event trigger
+1) Near-RT RIC
+performs action
+2) RIC CONTROL REQUEST
+Set Timer RIC control
+3) Check request validity
+alt [a) R equest is accepted ]
+Associated procedure
+instance initiated
+alt [i) E2 Node successfully executes requested control procedure ]
+4 i) RIC CONTROL ACKNOWLEDGE
+[ii) E2 Node fails to execute requested control procedure ]
+4 ii) RIC CONTROL FAILURE (Cause = Failure to execute)
+[b) R equest is rejected ]
+4 ii) RIC CONTROL FAILURE (Cause provides reason for rejection)
+Clear Timer RIC control
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  18
+Note that if previously configured with a dedicated RIC Subscription, the E2 Node may send a REPORT used to 1
+provide information on the associated procedure outcome.  See section 5.3.2.2 for details.  2
+ 3
+Figure 5.3.2.5-1: Near-RT RIC POLICY Service 4
+ 5
+5.3.2.6 RIC service realization and relationship with E2AP procedures 6
+The RIC Services may be realized using the following E2AP procedures: 7
+E2AP RIC Subscription procedure (Near-RT RIC initiated) 8
+- Used to install Event Trigger and Actions corresponding to RIC services REPORT, INSERT and/or POLICY  9
+E2AP RIC Subscription Delete procedure (Near-RT RIC initiated) 10
+- Used to delete previously installed RIC Subscription 11
+E2AP RIC Subscription Delete Required procedure (E2 Node initiated) 12
+- Used to indicate that one or more previously installed RIC Subscriptions are required to be deleted 13
+E2AP RIC Indication procedure (E2 Node initiated) 14
+- Used to carry outcome of RIC services REPORT and INSERT  15
+E2AP RIC Control procedure (Near-RT RIC initiated) 16
+- Used to initiate RIC service CONTROL  17
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+RIC SUBSCRIPTION PROCEDURE (RIC Event Trigger, Action=REPORT)
+1) RIC SUBSCRIPTION PROCEDURE (RIC Event Trigger, Action=POLICY)
+2) E2 Node detects
+RIC Event Trigger
+3) E2 Node modifies
+ongoing process
+according to policy
+4) Associated procedure
+instance continues
+RIC INDICATION (Report)
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  19
+Table 5.3.2.6-1: Relationship between RIC Services and E2AP Procedures 1
+E2AP Procedure RIC service
+REPORT INSERT CONTROL POLICY
+RIC Subscription Installs RIC Service Installs RIC Service  Installs RIC Service
+RIC Subscription Delete Deletes RIC
+Service
+Deletes RIC
+Service
+ Deletes RIC
+Service
+RIC Subscription Delete
+Required
+Requests Near-RT
+RIC to delete one
+or more RIC
+Services
+Requests Near-RT
+RIC to delete one
+or more RIC
+Services
+ Requests Near-RT
+RIC to delete one
+or more RIC
+Services
+RIC Indication Carries outcome of
+RIC Service
+Carries outcome of
+RIC Service
+
+RIC Control   Initiates or modifies
+RIC Service
+
+ 2
+The RIC Subscription, RIC Subscription Delete, and RIC Subscription Delete Required procedures are used to esta blish 3
+or delete RIC subscriptions on the E2 Node. 4
+The RIC Subscription and RIC Subscription Delete procedures are initiated by the Near -RT RIC (Figure 5.3.2.6-1). In 5
+addition, the E2 Node may initiate a RIC subscription Delete Required procedure to request  removal of one or more 6
+existing RIC Subscriptions (Figure 5.3.2.6-2). 7
+8
+Figure 5.3.2.6-1: RIC Subscription and RIC Subscription Delete procedures  9
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  20
+1
+Figure 5.3.2.6-2: RIC Subscription Delete Required and RIC Subscription Delete procedures  2
+ 3
+5.3.3 Combining RIC services within a common Subscription 4
+RIC services defined in 5.3.2 may be combined within a common Subscription with each RIC Service implemented as 5
+part of a sequence of Actions. 6
+Where appropriate in these cases, successive REPORT or INSERT messages sent to Near-RT RIC under the same 7
+subscription event trigger would contain the same assigned Subscription Request identifier, the same optional sequence 8
+number and each message with the unique assigned Action identifier. 9
+Examples include: 10
+- POLICY then REPORT.  In this case, at each occurrence of the defined Event Trigger, the E2 Node would be 11
+instructed to first execute a defined POLICY and then send a defined REPORT message  12
+- REPORT then REPORT.  In this case, at each occurrence of the defined Event Trigger, the E2 Node would be 13
+instructed to first send a defined REPORT message to be followed by a second defined REPORT message 14
+containing normally different information. 15
+5.3.4 Combining RIC services as a sequence of RIC services 16
+RIC services defined in 5.3.2 may be combined using a sequence of different RIC services implemented using a 17
+procedure executed within the Near-RT RIC. 18
+Examples include: 19
+- REPORT followed by POLICY.  In this case, at each occurrence of the defined Event Trigger, the E2 Node 20
+would be instructed to send a defined REPORT message.  The Near-RT RIC would use the information from 21
+one or more successive REPORT messages as input to a procedure that may result in a change or establishment 22
+of a RIC POLICY service. 23
+- INSERT followed by CONTROL. In this case, at each occurrence of the defined Event Trigger, the E2 Node 24
+would be instructed to send a defined INSERT message containing information used to identify the suspended 25
+associated procedure instance and then the Near-RT RIC would send a corresponding CONTROL message 26
+containing information used to identify a previous suspended associated procedure instance.  27
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  21
+- REPORT followed by CONTROL. In this case, at each occurrence of the defined Event Trigger, the E2 Node 1
+would be instructed to send a defined REPORT message.  The Near-RT RIC would use the information from 2
+one or more successive REPORT messages as input to a procedure that may result in a RIC CONTROL  service 3
+message being sent to initiate an associated procedure instance in the E2 Node.  4
+ 5
+5.4 RAN Function E2 Service Model 6
+As described in section 5.1 the E2 interface is used to carry messages between a given RAN Function and N ear-RT 7
+RIC. These messages are RAN Function specific and are described in the corresponding RAN Function specific E2 8
+Service Model. 9
+Each RAN Function is described in the following terms: 10
+- RAN Function definition. Defines the RAN Function Name and describes the E2 services that the specific RAN 11
+Function is currently configured to present over the E2 interface. 12
+- RIC Event Trigger Definition approach. Describes the approach to be used in Near-RT RIC Subscription 13
+messages to set Near-RT RIC Event Trigger Definition in the RAN Function. 14
+- RIC Action Definition approach.  Describes the approach to be used in subsequent Near-RT RIC Subscription 15
+messages to set required sequence of Near-RT RIC Action in the RAN Function. 16
+- RIC Indication header and RIC Indication message approach.  Describes the approach to be used by RAN when 17
+composing Indication messages for Near-RT RIC REPORT and INSERT services. 18
+- RIC Control header and RIC Control message approach.  Describes the approach to be used by Near-RT RIC 19
+when composing CONTROL messages. 20
+- RAN Function Policies. Describes the set of policies that the RAN Function is configured to support and the 21
+corresponding Parameters that may be used to configure the policy using Near -RT RIC POLICY services 22
+5.5 Near-RT RIC support functions 23
+5.5.1 General 24
+The Near-RT RIC support functions facilitate the following: 25
+E2 Setup 26
+E2 Reset 27
+Near-RT RIC Service Update 28
+E2 Node Configuration Update 29
+E2 Removal 30
+Reporting of General Error Situations 31
+The E2 Setup, E2 Reset, Near-RT RIC Service Update, E2 Node Configuration Update and E2 removal procedures are 32
+described in further details below.  33
+5.5.2 E2 Setup procedure 34
+The E2 Setup procedure is used to establish the E2 interface between the Near -RT RIC and an E2 Node.  During this 35
+procedure the E2 Node provides: 36
+- List of supported Near-RT RIC services and mapping of services to functions within the E2 Node. This 37
+information is specific to each RAN Function in the E2 node and is defined by a specific E2 Service Model as 38
+described in section 5.4 39
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  22
+- List of E2 Node configuration information.  This information is specific to the E2 Node type (see section 4.2) 1
+and defined by the E2 Node system specifications 2
+If the E2 Setup procedure fails, the Near-RT RIC may provide an alternative Transport Layer Information for the E2 3
+Node to use when reinitiating the E2 Setup procedure. 4
+ 5
+Figure 5.5.2-1: E2 Setup procedure 6
+5.5.3 E2 Reset procedure 7
+The E2 Reset procedure is used by either the E2 Node or Near-RT RIC to reset the E2 interface. 8
+Information previous exchanged during E2 Setup, E2 Node Configuration Update  and RIC Service Update procedures 9
+shall be maintained however the outcome of all previous RIC Subscription shall be de leted from the E2 Node and E2 10
+Node gracefully terminates any ongoing Near-RT RIC call processes. 11
+The Near-RT RIC may then proceed to re-establish any RIC Subscriptions as required. 12
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+E2 Node preconfigured with
+Near-RT RIC address
+and RIC service information
+and E2 node configuration
+SCTP connection establishment
+E2 SETUP REQUEST
+(RIC service and E2 Node configuration information)
+Near-RT RIC extracts list of
+supported Near-RT RIC Services
+and mapping of services to
+functions and stores information
+Near-RT RIC extracts list of
+E2 Node configuration
+information and stores information
+E2 SETUP RESPONSE
+(RIC Service and E2 Node configuration Ack)
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  23
+ 1
+Figure 5.5.3-1: E2 Reset procedure (E2 Node initiated) 2
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+E2 Node detects abnormal failure
+RESET REQUEST (Cause)
+Near-RT RIC informs xApps of
+RESET from E2 Node
+E2 Node deletes any
+pre-established RIC
+Subscriptions
+E2 Node gracefully
+terminates any ongoing
+Near-RT RIC call processes
+RESET RESPONSE
+Near-RT RIC may re-establish
+RIC Subscriptions
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  24
+ 1
+Figure 5.5.3-2: E2 Reset procedure (Near-RT RIC initiated) 2
+5.5.4 Near-RT RIC Service Update procedure 3
+The Near-RT RIC Service Update procedure is used by the E2 Node to inform the Near-RT RIC of any change to the 4
+list of supported Near-RT RIC services and mapping of services to functions within the E2 Node. This information is 5
+specific to each RAN Function in the E2 node and is defined by a specific E2 Service Model as described in section 5.4  6
+This procedure may also be initiated by the Near-RT RIC sending a RIC SERVICE QUERY message. 7
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+Near-RT RIC detects abnormal failure
+RESET REQUEST (Cause)
+E2 Node deletes any
+pre-established RIC
+Subscriptions
+E2 Node gracefully
+terminates any ongoing
+Near-RT RIC call processes
+RESET RESPONSE
+Near-RT RIC informs xApps of
+RESET from E2 Node
+Near-RT RIC may re-establish
+RIC Subscriptions
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  25
+ 1
+Figure 5.5.4-1: RIC Service update procedure 2
+5.5.5 E2 Node Configuration Update procedure 3
+The E2 Node Configuration Update procedure is used by the E2 Node to inform the Near -RT RIC of any change to the 4
+configuration of the E2 Node and/or E2 Node initiated changes to E2 connections.  This information is specific to the 5
+E2 Node type and defined by the E2 Node system specifications as described in section 4.2.  6
+See section 6.2 for further details on E2 Node Configuration Update procedure usage for E2 Node initiated changes to 7
+E2 connections. 8
+ 9
+ 10
+Figure 5.5.5-1: E2 Node configuration update procedure 11
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+Near-RT RIC decides to query E2 Node
+RIC SERVICE QUERY
+Change to RIC service configuration on E2 Node
+RIC SERVICE UPDATE (RIC service information)
+Near-RT RIC extracts list of changes
+to supported Near-RT RIC Services
+and mapping of services to functions
+and updates stored information
+RIC SERVICE UPDATE ACKNOWLEDGE (RIC Service Ack)
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+Change to E2 node system configuration
+E2 NODE CONFIGURATION UPDATE
+(E2 node configuration information)
+Near-RT RIC extracts list of changes
+to E2 Node configuration information
+and updates stored information
+E2 NODE CONFIGURATION UPDATE ACKNOWLEDGE
+(E2 node configuration ack)
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  26
+5.5.6 E2 Removal procedure 1
+The E2 Removal procedure is used by either the E2 Node or Near-RT RIC to release the E2 signaling connection. 2
+If the procedure is E2 node initiated, after the E2 REMOVAL RESPONSE is received, the E2 node initiates termination 3
+of all TNL associations associated with this E2 interface. The Near-RT RIC and E2 nodes releases all resources 4
+associated with this E2 interface. If the E2 Removal procedure fails, the E2 node may retry the E2 Removal procedure.  5
+If the procedure is Near-RT RIC initiated, after the E2 REMOVAL RESPONSE is received, the Near -RT RIC initiates 6
+termination of all TNL associations associated with this E2 interface. The Near-RT RIC and E2 nodes releases all 7
+resources associated with this E2 interface. If the E2 Removal procedure fails, the Near-RT RIC may retry the E2 8
+Removal procedure. 9
+ 10
+Figure 5.5.6-1: E2 Removal procedure (E2 Node initiated) 11
+ 12
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  27
+Figure 5.5.6-1: E2 Removal procedure (Near-RT RIC initiated) 1
+6 Services expected from signalling transport 2
+6.1 E2 Control Plane Protocol (E2AP) 3
+The control plane protocol stack of the E2AP interface is shown on Figure 6.1-1. The transport network layer is built on 4
+IP transport. For the reliable transport of signaling messages, SCTP [12] is added on top of IP. When configurations 5
+with multiple SCTP associations are supported, the Near-RT RIC may request to dynamically add/remove SCTP 6
+associations between the E2 Node/Near-RT RIC pair. Within the set of SCTP associations established between one 7
+Near-RT RIC and E2 node pair, the Near-RT RIC may request the E2 Node to restrict the usage of SCTP association 8
+for certain types of E2 signaling. If no restriction information is provided for an SCTP association, any type of E2 9
+signaling is allowed via the SCTP association.  The application layer signaling  protocol is referred to as E2AP (E2 10
+Application Protocol). The Payload Protocol Identifier assigned by IANA to be used by SCTP for the application layer 11
+protocol E2AP is 70. This value is to be used for all deployment configurations described in this specification.  Payload 12
+Protocol Identifiers 71 and 72, also assigned by IANA for E2, are reserved for future use.  13
+No SCTP Destination Port number value was assigned by IANA for the E2AP protocol and so networks shall rely on 14
+E2 node and Near-RT RIC configuration to select a suitable port number. 15
+  16
+ 17
+Figure 6.1-1: E2AP protocol stack 18
+Note: The E2AP messages are transported over the E2 interfaces 19
+6.2 Multiple TNLAs over E2  20
+The Near-RT RIC and E2 Node supports multiple TNL associations over E2 interface. 21
+An initial TNL association is established during E2 Setup procedure with E2 Node initiating SCTP connection.  At this 22
+point the single TNL association is configured to be used for both RIC Services (section 5.3) and E2 Support functions 23
+(section 5.5). 24
+TNL associations may then be added, modified or removed during subsequent E2 Connection Update and E2 Node 25
+Configuration Update procedures with E2 Node initiating SCTP connections where required. 26
+When the Near-RT RIC requests to dynamically add additional SCTP associations between the Near-RT RIC/E2 Node 27
+pair, the Near-RT RIC sends additional SCTP endpoints using the E2 Connection Update procedure. The E2 Node shall 28
+establish the SCTP associations. The SCTP Destination Port number value may be the same port number used for the 29
+initial E2 Setup procedure, or any dynamic port value (IETF RFC 6335 [23]). 30
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  28
+Within the set of SCTP associations established between one Near-RT RIC and E2 node pair, a single SCTP association 1
+shall be employed for E2AP elementary procedures utilized for E2 Support Function signaling (i.e. defined in E2AP [2] 2
+Section 8.3) with the possibility of fail-over to a new association to enable robustness. 3
+When the configuration with multiple SCTP endpoints per E2 node is supported and E2 node wants to add an additional 4
+SCTP association, the E2 Node Configuration Update procedure shall be the first E2AP procedure triggered on an 5
+additional TNLA of an already setup E2 interface after the TNL association has become operational . The E2 Node uses 6
+a SCTP endpoint of the Near-RT RIC already in use for existing TNL associations between the Near -RT RIC/E2 Node 7
+pair when establishing the additional SCTP association, and the Near-RT RIC shall associate the TNLA to the E2 8
+interface using the included Global E2 Node ID. The E2 Node uses the E2 Node Configuration Update procedure when 9
+it wants to remove additional SCTP association. 10
+The RIC Subscription TNLA binding is a binding between a specific TNL association and RIC Service signaling (i.e. 11
+defined in E2AP [2] Section 8.2) of a specific RIC Subscription. After the RIC Subscription TNLA binding is created, 12
+the Near-RT RIC can update the RIC Subscription TNLA binding by sending the E2AP message for the RIC 13
+Subscription to the E2 Node via a different TNLA. The E2 Node shall update the RIC Subs cription TNLA binding with 14
+the new TNLA. The E2 Configuration Update procedure also allows the E2 Node to inform the Near -RT RIC that the 15
+indicated TNLA(s) will be removed by the E2 Node. 16
+Between one Near-RT RIC and E2 Node pair: 17
+- A single pair of stream identifiers shall be reserved over an SCTP association for the sole use of E2AP 18
+elementary procedures utilized for E2 Support Function signaling (i.e. defined in E2AP [2] Section 8.3). 19
+- At least one pair of stream identifiers over one or several SCTP associations shall be reserved for the sole use of 20
+E2AP elementary procedures utilized for RIC Service signaling (i.e. defined in E2AP [2] Section 8.2). However, 21
+a few pairs (i.e. more than one) should be reserved. 22
+- For any RIC service signaling (i.e. defined in E2AP [2] Section 8.2) of a single RIC Subscription, the E2 Node 23
+shall use one SCTP association and one SCTP stream, and the SCTP association/stream should not be changed 24
+until after the current SCTP association is failed, or the RIC Subscription TNLA binding update is performed. 25
+Transport network redundancy may be achieved by SCTP multi-homing between two end-points, of which one or both 26
+is assigned with multiple IP addresses. SCTP end-points shall support a multi-homed remote SCTP end-point. For 27
+SCTP endpoint redundancy an INIT may be sent from a Near-RT RIC or E2 Node, at any time for an already 28
+established SCTP association, which shall be handled as defined in IETF RFC 4960 [ 24] in sub clause 5.2. 29
+The SCTP congestion control may, using an implementation specific mechanism, initiate higher layer protocols to 30
+reduce the signaling traffic at the source and prioritize certain messages. 31
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  29
+ 1
+Figure 6.2-1: TNL management examples (E2 Setup and Near-RT RIC initiated Addition) 2
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+E2 Node obtains Near-RT RIC
+IP address and Port number
+SCTP INIT
+SCTP connection (TNLA1)
+E2 SETUP REQUEST
+E2 SETUP RESPONSE
+E2 interface using TNLA1
+E2 CONNECTION UPDATE (TNLA2 addition)
+SCTP INIT
+SCTP connection (TNLA2)
+E2 CONNECTION UPDATE ACKNOWLEDGE (Status TNLA1, TNLA2)
+E2 interface using TNLA1 and TNLA2
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  30
+ 1
+Figure 6.2-2: TNL management examples (Near-RT RIC initiated Modification and Removal) 2
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+E2 interface using TNLA1 and TNLA2
+E2 CONNECTION UPDATE (TNLA1 and TNLA2 modification)
+Modify usage assignments
+for TNLA1 and TNLA2
+E2 CONNECTION UPDATE ACKNOWLEDGE (Status TNLA1, TNLA2)
+E2 interface using TNLA1 and TNLA2 with modified usage
+E2 CONNECTION UPDATE (TNLA1 removal)
+SCTP connection removal (TNLA1)
+E2 CONNECTION UPDATE ACKNOWLEDGE (Status TNLA2)
+E2 interface using TNLA2
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  31
+ 1
+Figure 6.2-3: TNL management examples (E2 Node initiated Addition and Removal)  2
+ 3
+ 4
+7 Security for the E2 interface 5
+7.1 General 6
+The security requirements given in this section only apply to the E2 interface. 7
+7.2 Requirements for the E2 interfaces 8
+The requirements given below apply to E2 interface defined in this document:  9
+- E2 interface shall support confidentiality, integrity, replay protection and data origin authentication.  10
+Near-RT RIC
+Near-RT RIC
+E2 Node
+E2 Node
+E2 interface using TNLA1
+E2 Node decides to add TNLA2
+SCTP INIT
+SCTP connection (TNLA2)
+E2 NODE CONFIGURATION UPDATE (Global E2 Node ID)
+Near-RT RIC binds SCTP connection to E2 Node
+E2 NODE CONFIGURATION UPDATE ACKNOWLEDGE
+E2 interface using TNLA1 and TNLA2
+E2 NODE CONFIGURATION UPDATE (Remove TNLA1)
+E2 NODE CONFIGURATION UPDATE ACKNOWLEDGE
+SCTP connection removal (TNLA1)
+E2 interface using TNLA2
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  32
+7.3 Security mechanism for the E2 interface 1
+In order to protect the traffic on the E2 interface, IPsec ESP implementation shall be supported according to RFC 4303 2
+[20] as profiled by TS 33.210 [21]. For IPsec implementation, tunnel mode is mandatory to support while transport 3
+mode is optional. The multiple IKE Security Associations (SAs), multiple IPsec SAs and multiple IPsec SAs per IPsec 4
+tunnel (e.g. for rekeying) shall be supported. 5
+IKEv2 certificate-based authentication implementation shall be supported according to TS 33.310 [22]. The certificates 6
+shall be supported according to the profile described by TS 33.310 [22]. IKEv2 shall be supported conforming to the 7
+IKEv2 profile described in TS 33.310 [22]. 8
+ 9
+8 Other E2 interface specifications 10
+8.1 O-RAN E2 interface: E2 Application Protocol (E2AP) (ORAN-11
+WG3.E2AP) 12
+The technical specification ORAN.WG3.E2AP [2] specifies the signaling protocol between the Near-RT RIC and the 13
+E2 Node over the E2 interface. 14
+8.2 O-RAN E2 interface: E2 Service Model (E2SM) specifications 15
+The technical specification ORAN.WG3.E2SM [17] provides the list of the supported RAN Function- specific E2 16
+Service Models supported over the E2 interface and presents a recommended layout for additional E2SM specifications.  17
+18
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  33
+Annex A  Deployment considerations 1
+A.1 Deployment use cases 2
+The Near-RT RIC may be connected to range of different RAN configurations similar to the list of cases described in 3
+[8] for O&M architecture.  Examples include: 4
+- Standalone O-CU-CP connected to one or more standalone O-CU-UP and one or more standalone O-DU.  Each 5
+logical node is considered as an E2 Node that presents an E2 interface to the Near -RT RIC. 6
+- Combined O-CU-CP and O-CU-UP connected to one or more standalone O-DU. The combined O-CU-CP/O-7
+CU-UP may present either a common E2 interface or individual E2 interfaces corresponding to the individual O -8
+RAN components 9
+- Combined O-CU-CP, O-CU-UP and O-DU.  The combined node may present either a common E2 interface or 10
+individual E2 interfaces corresponding to the individual O-RAN components 11
+In all cases the different RAN components may initiate either independent E2 connections to the N ear-RT RIC for each 12
+logical O-RAN component or may present a shared E2 interface and hence present the combined RAN components as a 13
+common E2 Node supporting services appropriate to more than one logical O-RAN component. 14
+In all cases each E2 Node shall present a single E2 interface to the Near -RT RIC and shall announce which E2 Services 15
+supports for each logical O-RAN component. 16
+Example deployment use case are presented in figure A.1-1 and figure A.1-2. Note that in addition, the near-RT RIC 17
+and other RAN nodes have O1 interfaces as described in [8].  18
+ 19
+Figure A.1-1: Example deployment use case with single E2 Node supporting both O -CU-CP and O-20
+CU-UP roles 21
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  34
+ 1
+Figure A.1-2: Example deployment use case with single E2 Node supporting O-CU-CP, O-CU-UP and 2
+O-DU roles 3
+ 4
+  5
+
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  35
+Annex ZZZ : O-RAN Adopter License Agreement 1
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 2
+AGREES TO THE TERMS OF THIS AGREEMENT. 3
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 4
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6
+Section 1: DEFINITIONS 7
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9
+fifty (50%) percent or more of the voting stock or equity in an entity. 10
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 11
+software or combinations thereof) that fully conforms to a Final Specification. 12
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18
+patents and design registrations, throughout the world, which (i) are owned or otherwi se licensable by a Member, 19
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 24
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 25
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 27
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 28
+claims shall be considered Necessary Claims. 29
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 33
+Section 2: COPYRIGHT LICENSE 34
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37
+furtherance of implementations of an O-RAN 38
+Specification. 39
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40
+agreement with O-RAN Alliance. 41
+Section 3: FRAND LICENSE 42
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 43
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 44
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 45
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 46
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 47
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 48
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  36
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 1
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 2
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 3
+customers of such licensed Compliant Implementations. 4
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 5
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 6
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor  or Academic Contributor, Adopter and 7
+its Affiliates for its license of Necessary Claims to its licensees. 8
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 9
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 10
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 11
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 12
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 13
+Compliant Implementations; provided, however, that such license will not extend: (a) to any pa rt or function of a 14
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 15
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciproc al 16
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 17
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 18
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 19
+licensed Compliant Implementations. 20
+Section 4: TERM AND TERMINATION 21
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.  22
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 23
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 24
+(30) days after being given notice specifying the breach. 25
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 26
+after termination of this Agreement, Adopter will continue to grant licenses (a) to enti ties who become Adopters after 27
+the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the 28
+version that was current as of the date of termination. 29
+Section 5: CONFIDENTIALITY 30
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 31
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 32
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 33
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 34
+information which is: (1) rightfully known by Adopter without any limit ation on use or disclosure prior to disclosure; 35
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 36
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 37
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 38
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 39
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 40
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 41
+Alliance’s prior written approval. 42
+Section 6: INDEMNIFICATION 43
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 44
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 45
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 46
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 47
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 48
+products that comply with O-RAN Specifications. 49
+O-RAN.WG3.E2GAP-v02.02
+
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ
+  37
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 1
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S  2
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 3
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 4
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 5
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 6
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 7
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 8
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 9
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 10
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 11
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 12
+CONDITION FOR O-RAN SPECIFICATIONS. 13
+Section 8: ASSIGNMENT 14
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 15
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 16
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 17
+Alliance may freely assign this Agreement. 18
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 19
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 20
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 21
+including as licensees under Section 3. 22
+Section 10: BINDING ON AFFILIATES 23
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 24
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 25
+and are also entitled to the benefits of the rights of Adopter hereunder. 26
+Section 11: GENERAL 27
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  28
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 29
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 30
+to the subject matter of this Agreement.  31
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 32
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 33
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 34
+prohibits any communication that would violate the antitrust laws. 35
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 36
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 37
+Agreement, no party is authorized to make any commitment on behalf of Adopt er, or O-RAN Alliance or its Members, 38
+Contributors or Academic Contributors. 39
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 40
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 41
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 42
+full force and effect. 43
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 44
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 45
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 46
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 47
+force and effect.  48
