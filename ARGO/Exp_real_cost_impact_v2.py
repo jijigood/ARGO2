@@ -61,7 +61,8 @@ class RealCostImpactExperiment:
         llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct",
         embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
-        test_mode: str = "small",  # "small" (快速测试) 或 "full" (完整实验)
+        test_mode: str = "small",  # "small" (快速测试), "full" (完整实验), 或 "custom" (自定义)
+        n_test_questions: Optional[int] = None,  # 自定义问题数量（仅用于custom模式）
         difficulty: str = "hard",
         seed: int = 42,
         gpu_ids: List[int] = None
@@ -72,7 +73,8 @@ class RealCostImpactExperiment:
             llm_model_path: Qwen模型本地路径
             embedding_model_path: 嵌入模型本地路径
             chroma_db_path: Chroma数据库路径
-            test_mode: "small" (50题, 5个c_r点) 或 "full" (全部~12K题, 10个c_r点)
+            test_mode: "small" (10题, 5个c_r点), "full" (全部~12K题, 10个c_r点), 或 "custom" (自定义)
+            n_test_questions: 自定义问题数量 (仅当test_mode="custom"时使用)
             difficulty: 问题难度 ("easy", "medium", "hard")
             seed: 随机种子
             gpu_ids: 使用的GPU ID列表，如 [0,1,2,3]
@@ -86,8 +88,14 @@ class RealCostImpactExperiment:
             self.n_test_questions = None  # 使用全部数据集
             self.n_cost_steps = 10
             self.mode_desc = "完整实验模式 (全部数据)"
+        elif test_mode == "custom":
+            if n_test_questions is None:
+                raise ValueError("custom模式必须指定 n_test_questions 参数")
+            self.n_test_questions = n_test_questions
+            self.n_cost_steps = 10
+            self.mode_desc = f"自定义模式 ({n_test_questions}题)"
         else:
-            raise ValueError(f"test_mode必须是'small'或'full'，当前值: {test_mode}")
+            raise ValueError(f"test_mode必须是'small', 'full', 或 'custom'，当前值: {test_mode}")
         
         self.test_mode = test_mode
         
@@ -675,7 +683,15 @@ Answer with only the number (1, 2, 3, or 4):"""
         os.makedirs(output_dir, exist_ok=True)
         
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        mode_suffix = "small" if self.test_mode == "small" else "full"
+        
+        # 根据test_mode选择文件名后缀
+        if self.test_mode == "small":
+            mode_suffix = "small"
+        elif self.test_mode == "full":
+            mode_suffix = "full"
+        else:  # custom
+            mode_suffix = "custom"
+        
         filename = f"exp1_real_cost_impact_{mode_suffix}_{timestamp}.json"
         filepath = os.path.join(output_dir, filename)
         
@@ -686,6 +702,7 @@ Answer with only the number (1, 2, 3, or 4):"""
                 'n_questions': len(self.test_questions),
                 'difficulty': self.difficulty,
                 'n_cost_steps': self.n_cost_steps,
+                'seed': self.seed,  # ← 添加seed到元数据
                 'timestamp': timestamp
             },
             'results': self.results
@@ -785,8 +802,10 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='实验1: 检索成本影响 (真实LLM版本)')
-    parser.add_argument('--mode', type=str, default='small', choices=['small', 'full'],
-                       help='测试模式: small (50题, 快速验证) 或 full (全部~12K题, 完整实验)')
+    parser.add_argument('--mode', type=str, default='small', choices=['small', 'full', 'custom'],
+                       help='测试模式: small (10题, 快速验证), full (全部~12K题), custom (自定义)')
+    parser.add_argument('--n-questions', type=int, default=None,
+                       help='自定义问题数量 (仅用于 --mode custom)')
     parser.add_argument('--difficulty', type=str, default='hard', choices=['easy', 'medium', 'hard'],
                        help='问题难度')
     parser.add_argument('--gpus', type=str, default='0,1,2,3',
@@ -796,11 +815,17 @@ def main():
     
     args = parser.parse_args()
     
+    # 验证参数
+    if args.mode == 'custom' and args.n_questions is None:
+        parser.error("--mode custom 必须指定 --n-questions")
+    
     # 解析GPU列表
     gpu_ids = [int(x.strip()) for x in args.gpus.split(',')]
     
     print(f"\n启动参数:")
     print(f"  模式: {args.mode}")
+    if args.mode == 'custom':
+        print(f"  问题数: {args.n_questions}")
     print(f"  难度: {args.difficulty}")
     print(f"  GPU: {gpu_ids}")
     print(f"  种子: {args.seed}\n")
@@ -810,6 +835,7 @@ def main():
         llm_model_path="/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct",
         embedding_model_path="/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         test_mode=args.mode,
+        n_test_questions=args.n_questions,  # ← 传入自定义问题数
         difficulty=args.difficulty,
         seed=args.seed,
         gpu_ids=gpu_ids
@@ -831,7 +857,11 @@ def main():
     print(f"\n使用提示:")
     if args.mode == "small":
         print(f"  当前是小规模测试模式，如果运行成功，请使用以下命令运行完整实验:")
-        print(f"  python Exp_real_cost_impact_v2.py --mode full --difficulty {args.difficulty} --gpus {args.gpus}")
+        print(f"  python Exp_real_cost_impact_v2.py --mode custom --n-questions 100 --difficulty {args.difficulty} --gpus {args.gpus}")
+    elif args.mode == "custom":
+        print(f"  ✓ Custom模式运行成功")
+        print(f"  如需统计分析，请运行多个种子后使用:")
+        print(f"  python Exp1_aggregate_and_analyze.py")
 
 
 if __name__ == "__main__":

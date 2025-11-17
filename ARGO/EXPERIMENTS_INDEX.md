@@ -1,7 +1,7 @@
 # ARGO实验总索引
 
 **项目**: ARGO - Adaptive Retrieval with Guided Optimization  
-**日期**: 2025-10-29  
+**日期**: 2025-10-29 (更新: 2025-11-14)
 **环境**: ARGO conda环境
 
 ---
@@ -11,6 +11,39 @@
 本项目包含多个系统性实验,用于验证ARGO的核心优势:自适应检索策略优于静态基线。
 
 ### 已完成的实验
+
+#### ✅ Experiment 0: 阈值结构验证 (理论基础) 🆕
+**文件**: `Exp0_threshold_structure_validation.py`  
+**运行脚本**: `run_exp0.py`  
+**快速测试**: `test_exp0_quick.py`  
+**文档**: `EXPERIMENT0_README.md`  
+**图表**: `figs/exp0_*.png`  
+**数据**: `results/exp0_threshold_validation/`
+
+**核心目标**:
+- 验证 Theorem 1: 两级阈值结构
+- 证明 Θ_cont 和 Θ* 的存在性和唯一性
+- 验证策略单调性: Retrieve → Reason → Terminate
+- 测试阈值对参数的自适应性
+
+**核心发现**:
+- ✓ 价值函数 V*(U) 单调递增
+- ✓ 优势函数 A(U) 单交叉性质
+- ✓ 阈值随成本理性调整
+- ✓ 所有参数集验证通过
+
+**关键图表**:
+- `exp0_threshold_structure_*.png`: 4个参数集的策略结构 ⭐ **论文 Figure 1**
+- `exp0_threshold_sensitivity.png`: 阈值敏感性分析
+
+**运行时间**: ~2-3分钟 (纯数值计算，无需LLM)
+
+**重要性**: 
+- 这是**第一个必须运行的实验**
+- 验证理论基础，为后续实验提供信心
+- 提供论文的核心理论验证图
+
+---
 
 #### ✅ Experiment 1: 检索成本 ($c_r$) 的影响
 **文件**: `Exp_retrieval_cost_impact.py`  
