@@ -251,19 +251,25 @@ class MDPSolver:
         """
         Compute optimal thresholds from Q-function
         
+        FIX: 正确计算θ* - 从U=0往上找第一个终止最优的点
+        
         Returns:
             theta_cont: Continuation threshold (Retrieve vs Reason)
             theta_star: Termination threshold
         """
-        # Find termination threshold: θ* where Q(U,2) becomes optimal
-        theta_star = None
-        for i in range(self.grid_size - 1, -1, -1):
-            if self.Q[i, 2] >= max(self.Q[i, 0], self.Q[i, 1]):
+        # FIX: Find termination threshold - 从U=0往上扫描
+        # θ* = inf{U: Q(U, terminate) >= max(Q(U, retrieve), Q(U, reason))}
+        theta_star = self.U_max  # 默认值
+        
+        for i in range(self.grid_size):
+            Q_retrieve = self.Q[i, 0]
+            Q_reason = self.Q[i, 1]
+            Q_terminate = self.Q[i, 2]
+            
+            # 如果终止动作在这个状态变得最优
+            if Q_terminate >= max(Q_retrieve, Q_reason):
                 theta_star = self.U_grid[i]
                 break
-        
-        if theta_star is None:
-            theta_star = self.U_max
         
         # Find continuation threshold: θ_cont where Q(U,0) = Q(U,1) for U < θ*
         theta_cont = 0.0
