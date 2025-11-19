@@ -304,9 +304,17 @@ Answer:"""
         if 'U_grid_size' not in mdp_config and 'grid_size' in mdp_config:
             mdp_config['U_grid_size'] = mdp_config['grid_size']
         
+        # 构建质量函数配置 (从MDP配置读取，不再硬编码)
+        quality_config = {
+            'mode': mdp_config.get('quality_function', 'linear'),
+            'k': mdp_config.get('quality_k', 1.0)
+        }
+        
+        # 构建求解器配置
         solver_config = {
             'mdp': mdp_config,
-            'quality': self.config.get('quality', {'mode': 'linear', 'k': 1.0}),
+            'quality': quality_config,
+            'reward_shaping': mdp_config.get('reward_shaping', {'enabled': False, 'k': 1.0}),
             'solver': {
                 'max_iterations': 1000,
                 'convergence_threshold': 1e-6,
@@ -325,11 +333,10 @@ Answer:"""
             V_at_half = mdp_solver.V[n_states // 2]
             V_at_max = mdp_solver.V[-1]
             
-            # 计算终止奖励
+            # 计算终止奖励 (使用实际的质量函数)
             U_max = mdp_config.get('U_max', 1.0)
-            k = self.config.get('quality', {}).get('k', 1.0)
-            reward_at_09 = k * 0.9
-            reward_at_10 = k * U_max
+            reward_at_09 = mdp_solver.quality_function(0.9 * U_max)
+            reward_at_10 = mdp_solver.quality_function(U_max)
             
             # 估算从0.9到1.0的成本
             steps_needed = 0.1 / mdp_config.get('delta_r', 0.25)
