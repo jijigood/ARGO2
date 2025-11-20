@@ -23,15 +23,61 @@
 
 import os
 import sys
+import argparse
 
 # 添加路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from Exp_real_pareto_frontier import RealParetoFrontierExperiment
+try:
+    from Exp_real_pareto_frontier_v2 import ParetoFrontierExperimentV2
+except ImportError:
+    ParetoFrontierExperimentV2 = None
 
 
 def main():
     """运行完整实验3"""
+    parser = argparse.ArgumentParser(description='Run Experiment 3: Pareto Frontier Analysis')
+    parser.add_argument('--v2', action='store_true', help='Run enhanced V2 experiment')
+    parser.add_argument('--n-questions', type=int, default=100, help='Number of questions')
+    parser.add_argument('--mu-min', type=float, default=0.0, help='Minimum mu value')
+    parser.add_argument('--mu-max', type=float, default=2.0, help='Maximum mu value')
+    parser.add_argument('--n-mu-steps', type=int, default=20, help='Number of mu steps')
     
+    args = parser.parse_args()
+
+    if args.v2:
+        if ParetoFrontierExperimentV2 is None:
+            print("Error: Exp_real_pareto_frontier_v2.py not found!")
+            return
+            
+        print("=" * 80)
+        print("Experiment 3 V2: Enhanced Pareto Frontier Analysis")
+        print("=" * 80)
+        
+        exp = ParetoFrontierExperimentV2(
+            n_test_questions=args.n_questions,
+            difficulty='medium',
+            seed=42,
+            gpu_ids=[0, 1, 2, 3, 4, 5, 6, 7]
+        )
+        
+        exp.run_experiment(
+            mu_min=args.mu_min,
+            mu_max=args.mu_max,
+            n_mu_steps=args.n_mu_steps
+        )
+        
+        exp.validate_threshold_monotonicity()
+        exp.validate_pareto_dominance()
+        exp.validate_mu_range()
+        exp.compute_quality_accuracy_correlation()
+        
+        exp.save_results()
+        exp.plot_pareto_with_efficiency_gap()
+        exp.plot_threshold_evolution()
+        exp.plot_pareto_accuracy()
+        return
+
     print("=" * 80)
     print("完整实验3: Pareto边界 - 成本质量权衡 (真实LLM)")
     print("=" * 80)
@@ -48,15 +94,15 @@ def main():
         'embedding_model_path': '/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2',
         'chroma_db_path': '/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store',
         'difficulty': 'medium',
-        'n_test_questions': 100,
+        'n_test_questions': args.n_questions,
         'gpu_ids': [0, 1, 2, 3, 4, 5, 6, 7],  # 8张GPU
         'seed': 42
     }
     
     # 实验参数: μ从低到高扫描 (FIX v11: 聚焦有效操作区)
-    mu_min = 0.0   # 只关注质量
-    mu_max = 1.0   # 聚焦在[0, 1] - 根据诊断，μ>1时θ*=0
-    n_mu_steps = 20  # 20个点以捕捉平滑过渡（密度提高）
+    mu_min = args.mu_min   # 只关注质量
+    mu_max = args.mu_max   # 聚焦在[0, 1] - 根据诊断，μ>1时θ*=0
+    n_mu_steps = args.n_mu_steps  # 20个点以捕捉平滑过渡（密度提高）
     
     print("\n实验设计:")
     print("-" * 80)
