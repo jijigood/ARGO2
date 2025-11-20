@@ -245,46 +245,117 @@ Answer:"""
     
     def evaluate_answer(self, question: str, answer: str, ground_truth: str) -> bool:
         """
-        评估答案正确性 (严格版本)
+        Evaluate answer correctness for multiple-choice questions.
         
-        FIX: 提高评估标准，避免将部分正确标记为完全正确
+        Extraction Strategy:
+        1. Structured format: <choice>X</choice> (most reliable)
+        2. Explicit patterns: "Answer: X", "Option X" (very reliable)
+        3. Contextual patterns: "X is correct" (reliable)
+        4. Conservative fallback: reject if unclear
+        
+        Args:
+            question: The question text (not used for evaluation)
+            answer: LLM-generated answer text
+            ground_truth: Correct option number as string (e.g., "2")
+        
+        Returns:
+            True if answer indicates correct option, False otherwise
         """
         import re
         
-        answer_lower = answer.lower().strip()
-        gt_lower = ground_truth.lower().strip()
+        # Normalize
+        answer = answer.strip()
+        gt = ground_truth.strip()
         
-        # 1. 精确子串匹配 (最严格)
-        if gt_lower in answer_lower:
-            return True
+        # Validate ground truth
+        if gt not in ['1', '2', '3', '4']:
+            print(f"⚠️ Invalid ground truth: '{gt}' (expected '1', '2', '3', or '4')")
+            return False
         
-        # 2. 数值答案匹配 (用于技术规范问题)
-        answer_numbers = re.findall(r'\d+\.?\d*', answer)
-        gt_numbers = re.findall(r'\d+\.?\d*', ground_truth)
-        if gt_numbers:
-            # 要求所有ground truth中的数字都出现在答案中
-            for gt_num in gt_numbers:
-                if gt_num not in answer_numbers:
-                    return False
-            if len(gt_numbers) > 0:  # 至少有一个数字匹配
+        # ===================================================================
+        # Strategy 1: Structured Output (Highest Priority)
+        # ===================================================================
+        # Check for XML-style tags: <choice>X</choice>
+        structured_match = re.search(r'<choice>\s*([1-4])\s*</choice>', answer, re.IGNORECASE)
+        if structured_match:
+            prediction = structured_match.group(1)
+            return prediction == gt
+        
+        # ===================================================================
+        # Strategy 2: Explicit Option Selection Patterns
+        # ===================================================================
+        # These patterns strongly indicate the model is selecting an option
+        explicit_patterns = [
+            # "Answer: 2", "Answer is 2", "The answer: 2"
+            r'(?:the\s+)?answer\s*(?:is\s*)?[:\s]+([1-4])\b',
+            
+            # "Option 2", "Option is 2", "Select option 2"
+            r'(?:select\s+)?option\s*(?:is\s*)?[:\s]*([1-4])\b',
+            
+            # "Choice 2", "Choose 2"
+            r'(?:choose\s+)?choice\s*(?:is\s*)?[:\s]*([1-4])\b',
+            
+            # "2 is correct", "2 is the correct answer"
+            r'\b([1-4])\s+is\s+(?:the\s+)?correct',
+            
+            # "Correct answer is 2", "Correct option is 2"
+            r'correct\s+(?:answer|option|choice)\s+is\s+([1-4])\b',
+            
+            # "Therefore, 2", "So, 2", "Thus, 2"
+            r'(?:therefore|thus|so|hence)[,\s]+([1-4])\b',
+            
+            # Starts with "2." or "2)"
+            r'^([1-4])[\.\)]',
+            
+            # Exact match on single line (when answer is just "2")
+            r'^([1-4])$',
+            
+            # "[2]" or "(2)"
+            r'[\[\(]([1-4])[\]\)]',
+            
+            # "The correct answer: 2" or "Answer → 2"
+            r'(?:answer|option|choice)\s*[:\→→]\s*([1-4])\b',
+        ]
+        
+        for pattern in explicit_patterns:
+            matches = re.findall(pattern, answer, re.IGNORECASE | re.MULTILINE)
+            if matches:
+                # Take the LAST match (models often reason first, then conclude)
+                prediction = matches[-1]
+                return prediction == gt
+        
+        # ===================================================================
+        # Strategy 3: Negative Filtering (Rejection Patterns)
+        # ===================================================================
+        # Check if model explicitly rejected the ground truth option
+        rejection_patterns = [
+            rf'\b(?:option|choice)\s*{gt}\s+is\s+(?:incorrect|wrong|false)',
+            rf'{gt}\s+is\s+not\s+(?:the\s+)?(?:correct|right)',
+            rf'not\s+(?:option|choice)\s*{gt}\b',
+        ]
+        
+        for pattern in rejection_patterns:
+            if re.search(pattern, answer, re.IGNORECASE):
+                return False  # Model explicitly rejected this option
+        
+        # ===================================================================
+        # Strategy 4: Last Resort - End of Answer Check
+        # ===================================================================
+        # Only if answer ends with the GT number in isolation
+        # Example: "...based on the specifications, the answer is 2"
+        # This matches "2" at the very end, possibly with punctuation
+        end_pattern = rf'\b{gt}\s*[\.!]?\s*$'
+        if re.search(end_pattern, answer):
+            # Additional check: answer should be reasonably long (not just "2")
+            if len(answer) > 20:
                 return True
         
-        # 3. 高关键词重叠 (提高阈值从0.5到0.8)
-        gt_keywords = set(gt_lower.split())
-        answer_keywords = set(answer_lower.split())
-        
-        # 过滤停用词
-        stopwords = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
-                    'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were'}
-        gt_keywords = gt_keywords - stopwords
-        answer_keywords = answer_keywords - stopwords
-        
-        if len(gt_keywords) == 0:
-            return False  # 空的ground truth无法判断
-        
-        overlap = len(gt_keywords & answer_keywords) / len(gt_keywords)
-        
-        return overlap > 0.8  # 提高阈值从0.5到0.8
+        # ===================================================================
+        # Default: Conservative Rejection
+        # ===================================================================
+        # If we can't confidently extract the choice, mark as incorrect
+        # This is better than false positives
+        return False
     
     def solve_mdp(self, mu: float) -> Tuple[float, float]:
         """
@@ -304,9 +375,16 @@ Answer:"""
         if 'U_grid_size' not in mdp_config and 'grid_size' in mdp_config:
             mdp_config['U_grid_size'] = mdp_config['grid_size']
         
+        # 从MDP配置构建quality字典 (FIX: 使用配置的quality_function和quality_k)
+        quality_config = {
+            'mode': mdp_config.get('quality_function', 'linear'),
+            'k': mdp_config.get('quality_k', 1.0)
+        }
+        
         solver_config = {
             'mdp': mdp_config,
-            'quality': self.config.get('quality', {'mode': 'linear', 'k': 1.0}),
+            'quality': quality_config,
+            'reward_shaping': mdp_config.get('reward_shaping', {'enabled': False, 'k': 1.0}),
             'solver': {
                 'max_iterations': 1000,
                 'convergence_threshold': 1e-6,
@@ -327,7 +405,7 @@ Answer:"""
             
             # 计算终止奖励
             U_max = mdp_config.get('U_max', 1.0)
-            k = self.config.get('quality', {}).get('k', 1.0)
+            k = mdp_config.get('quality_k', 1.0)
             reward_at_09 = k * 0.9
             reward_at_10 = k * U_max
             
@@ -345,34 +423,24 @@ Answer:"""
     
     def _compute_quality(self, U: float, correct: bool) -> float:
         """
-        计算质量分数
+        Calculate information quality (Option B: pure information metric)
         
-        两个维度:
-        1. 信息完整性: Q(U) = U/U_max (MDP优化的目标)
-        2. 任务成功: 答案正确性
+        Quality = information completeness = U/U_max
+        This aligns with paper's Q(O) = σ(U_T/U_max) and MDP optimization target.
+        
+        Answer correctness is tracked separately.
         
         Args:
-            U: 当前不确定性降低程度
-            correct: 答案是否正确
+            U: Current progress/uncertainty reduction
+            correct: Answer correctness (NOT used in quality computation)
         
         Returns:
-            质量分数 (0-1)
+            Information quality ∈ [0, 1]
         """
-        # 信息完整性 (归一化)
         U_max = self.config['mdp'].get('U_max', 1.0)
         info_quality = U / U_max
         
-        # 任务成功权重
-        # 选项A: 二进制 (0或1)
-        # correctness_weight = 1.0 if correct else 0.0
-        
-        # 选项B: 部分分数 (推荐，更平滑的Pareto曲线)
-        correctness_weight = 1.0 if correct else 0.6
-        
-        # 组合质量
-        quality = info_quality * correctness_weight
-        
-        return quality
+        return info_quality
     
     def simulate_argo_policy(
         self,
@@ -494,13 +562,12 @@ Answer:"""
         final_answer = self.generate_answer(question, context)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         
-        # 质量计算 (使用新的分离式度量)
-        quality = self._compute_quality(U, correct)
+        # 计算信息质量 (Option B: pure information metric)
+        info_quality = self._compute_quality(U, correct)
         
         return {
-            'quality': quality,
-            'information_completeness': U / U_max,  # 分离的度量
-            'answer_correctness': correct,  # 分离的度量
+            'information_quality': info_quality,  # ← Renamed from 'quality'
+            'accuracy': correct,                   # ← Renamed from 'answer_correctness'
             'cost': total_cost,
             'retrieval_count': retrieval_count,
             'successful_retrieval_count': successful_retrieval_count,
@@ -508,7 +575,7 @@ Answer:"""
             'reason_count': reason_count,
             'final_U': U,
             'num_steps': len(history),
-            'correct': correct,
+            'correct': correct,  # Keep for compatibility
             'final_answer': final_answer,
             'history': history,
             
@@ -566,12 +633,11 @@ Answer:"""
         total_latency = time.time() - start_time
         final_answer = self.generate_answer(question, context)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
-        quality = self._compute_quality(U, correct)
+        info_quality = self._compute_quality(U, correct)
         
         return {
-            'quality': quality,
-            'information_completeness': U / U_max,
-            'answer_correctness': correct,
+            'information_quality': info_quality,
+            'accuracy': correct,
             'cost': total_cost,
             'retrieval_count': retrieval_count,
             'successful_retrieval_count': successful_retrieval_count,
@@ -626,12 +692,11 @@ Answer:"""
         total_latency = time.time() - start_time
         final_answer = self.generate_answer(question, "")
         correct = self.evaluate_answer(question, final_answer, ground_truth)
-        quality = self._compute_quality(U, correct)
+        info_quality = self._compute_quality(U, correct)
         
         return {
-            'quality': quality,
-            'information_completeness': U / U_max,
-            'answer_correctness': correct,
+            'information_quality': info_quality,
+            'accuracy': correct,
             'cost': total_cost,
             'retrieval_count': 0,
             'successful_retrieval_count': 0,
@@ -703,12 +768,11 @@ Answer:"""
         
         final_answer = self.generate_answer(question, context)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
-        quality = self._compute_quality(U, correct)
+        info_quality = self._compute_quality(U, correct)
         
         return {
-            'quality': quality,
-            'information_completeness': U / U_max,
-            'answer_correctness': correct,
+            'information_quality': info_quality,
+            'accuracy': correct,
             'cost': total_cost,
             'retrieval_count': retrieval_count,
             'successful_retrieval_count': successful_retrieval_count,
@@ -773,12 +837,11 @@ Answer:"""
         
         final_answer = self.generate_answer(question, context)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
-        quality = self._compute_quality(U, correct)
+        info_quality = self._compute_quality(U, correct)
         
         return {
-            'quality': quality,
-            'information_completeness': U / U_max,
-            'answer_correctness': correct,
+            'information_quality': info_quality,
+            'accuracy': correct,
             'cost': total_cost,
             'retrieval_count': retrieval_count,
             'successful_retrieval_count': successful_retrieval_count,
@@ -835,37 +898,45 @@ Answer:"""
                 if j % 10 == 0:
                     print(f"    进度: {j}/{len(self.test_questions)}")
             
-            # 聚合结果
-            avg_quality = np.mean([r['quality'] for r in argo_results])
+            # 聚合结果 (Option B: separate info quality and accuracy)
+            avg_info_quality = np.mean([r['information_quality'] for r in argo_results])
+            avg_accuracy = np.mean([r['accuracy'] for r in argo_results])
             avg_cost = np.mean([r['cost'] for r in argo_results])
             avg_retrievals = np.mean([r['retrieval_count'] for r in argo_results])
-            accuracy = np.mean([r['correct'] for r in argo_results])
             
             # 计算置信区间 (95%)
-            std_quality = np.std([r['quality'] for r in argo_results])
-            quality_ci = 1.96 * std_quality / np.sqrt(len(argo_results))
+            std_info_quality = np.std([r['information_quality'] for r in argo_results])
+            info_quality_ci = 1.96 * std_info_quality / np.sqrt(len(argo_results))
+            
+            std_accuracy = np.std([r['accuracy'] for r in argo_results])
+            accuracy_ci = 1.96 * std_accuracy / np.sqrt(len(argo_results))
+            
             std_cost = np.std([r['cost'] for r in argo_results])
             cost_ci = 1.96 * std_cost / np.sqrt(len(argo_results))
             
             # 额外的度量
-            avg_info_completeness = np.mean([r['information_completeness'] for r in argo_results])
             avg_latency = np.mean([r.get('total_latency', 0) for r in argo_results])
             
-            print(f"  ARGO: Quality={avg_quality:.3f}±{quality_ci:.3f}, Cost={avg_cost:.3f}±{cost_ci:.3f}, "
-                  f"Retrievals={avg_retrievals:.1f}, Accuracy={accuracy:.1%}")
+            print(f"  ARGO: Info_Quality={avg_info_quality:.3f}±{info_quality_ci:.3f}, "
+                  f"Accuracy={avg_accuracy:.1%}±{accuracy_ci:.1%}, "
+                  f"Cost={avg_cost:.3f}±{cost_ci:.3f}, "
+                  f"Retrievals={avg_retrievals:.1f}")
             
             argo_pareto_points.append({
                 'mu': mu,
                 'theta_cont': theta_cont,
                 'theta_star': theta_star,
-                'quality': avg_quality,
+                'information_quality': avg_info_quality,      # ← New name
+                'accuracy': avg_accuracy,                      # ← New name  
                 'cost': avg_cost,
                 'retrievals': avg_retrievals,
-                'accuracy': accuracy,
-                # 新增的度量
-                'quality_ci': quality_ci,
+                
+                # Confidence intervals
+                'info_quality_ci': info_quality_ci,
+                'accuracy_ci': accuracy_ci,
                 'cost_ci': cost_ci,
-                'information_completeness': avg_info_completeness,
+                
+                # Other metrics
                 'avg_latency': avg_latency,
             })
         
@@ -884,7 +955,8 @@ Answer:"""
             always_retrieve_results.append(result)
         
         baseline_points['Always-Retrieve'] = self._aggregate_results(always_retrieve_results)
-        print(f"  Quality={baseline_points['Always-Retrieve']['quality']:.3f}, "
+        print(f"  Info_Quality={baseline_points['Always-Retrieve']['information_quality']:.3f}, "
+              f"Accuracy={baseline_points['Always-Retrieve']['accuracy']:.3f}, "
               f"Cost={baseline_points['Always-Retrieve']['cost']:.3f}")
         
         # Always-Reason
@@ -895,7 +967,8 @@ Answer:"""
             always_reason_results.append(result)
         
         baseline_points['Always-Reason'] = self._aggregate_results(always_reason_results)
-        print(f"  Quality={baseline_points['Always-Reason']['quality']:.3f}, "
+        print(f"  Info_Quality={baseline_points['Always-Reason']['information_quality']:.3f}, "
+              f"Accuracy={baseline_points['Always-Reason']['accuracy']:.3f}, "
               f"Cost={baseline_points['Always-Reason']['cost']:.3f}")
         
         # Fixed-Threshold (NEW)
@@ -906,7 +979,8 @@ Answer:"""
             fixed_results.append(result)
         
         baseline_points['Fixed-Threshold'] = self._aggregate_results(fixed_results)
-        print(f"  Quality={baseline_points['Fixed-Threshold']['quality']:.3f}, "
+        print(f"  Info_Quality={baseline_points['Fixed-Threshold']['information_quality']:.3f}, "
+              f"Accuracy={baseline_points['Fixed-Threshold']['accuracy']:.3f}, "
               f"Cost={baseline_points['Fixed-Threshold']['cost']:.3f}")
         
         # Random (NEW)
@@ -917,7 +991,8 @@ Answer:"""
             random_results.append(result)
         
         baseline_points['Random'] = self._aggregate_results(random_results)
-        print(f"  Quality={baseline_points['Random']['quality']:.3f}, "
+        print(f"  Info_Quality={baseline_points['Random']['information_quality']:.3f}, "
+              f"Accuracy={baseline_points['Random']['accuracy']:.3f}, "
               f"Cost={baseline_points['Random']['cost']:.3f}")
         
         print(f"\n{'='*80}")
@@ -933,24 +1008,29 @@ Answer:"""
         }
     
     def _aggregate_results(self, results: List[Dict]) -> Dict:
-        """聚合指标的辅助函数"""
-        # 提取数据
-        qualities = [r['quality'] for r in results]
+        """Aggregate metrics (Option B: separate info quality and accuracy)"""
+        info_qualities = [r['information_quality'] for r in results]
+        accuracies = [r['accuracy'] for r in results]
         costs = [r['cost'] for r in results]
         
-        # 计算置信区间
-        quality_ci = 1.96 * np.std(qualities) / np.sqrt(len(qualities)) if len(qualities) > 1 else 0.0
+        # Compute confidence intervals
+        info_quality_ci = 1.96 * np.std(info_qualities) / np.sqrt(len(info_qualities)) if len(info_qualities) > 1 else 0.0
+        accuracy_ci = 1.96 * np.std(accuracies) / np.sqrt(len(accuracies)) if len(accuracies) > 1 else 0.0
         cost_ci = 1.96 * np.std(costs) / np.sqrt(len(costs)) if len(costs) > 1 else 0.0
         
         return {
-            'quality': np.mean(qualities),
+            'information_quality': np.mean(info_qualities),    # ← New name
+            'accuracy': np.mean(accuracies),                   # ← New name
             'cost': np.mean(costs),
             'retrievals': np.mean([r['retrieval_count'] for r in results]),
-            'accuracy': np.mean([r['correct'] for r in results]),
             'retrieval_success_rate': np.mean([r.get('retrieval_success_rate', 0) for r in results]),
-            # 新增度量
-            'quality_ci': quality_ci,
+            
+            # Confidence intervals
+            'info_quality_ci': info_quality_ci,
+            'accuracy_ci': accuracy_ci,
             'cost_ci': cost_ci,
+            
+            # Other metrics
             'avg_latency': np.mean([r.get('total_latency', 0) for r in results]),
         }
     
@@ -974,29 +1054,29 @@ Answer:"""
         return filepath
     
     def plot_pareto_frontier(self, output_dir: str = "figs"):
-        """绘制Pareto边界 (核心图表 - 带误差条)"""
+        """Plot Pareto frontier: Cost vs Information Quality (what MDP optimizes)"""
         os.makedirs(output_dir, exist_ok=True)
         
-        # 提取ARGO的Pareto边界
+        # Extract ARGO data
         argo_costs = [p['cost'] for p in self.argo_pareto_points]
-        argo_qualities = [p['quality'] for p in self.argo_pareto_points]
+        argo_info_qualities = [p['information_quality'] for p in self.argo_pareto_points]  # ← Changed
         cost_cis = [p.get('cost_ci', 0) for p in self.argo_pareto_points]
-        quality_cis = [p.get('quality_ci', 0) for p in self.argo_pareto_points]
+        info_quality_cis = [p.get('info_quality_ci', 0) for p in self.argo_pareto_points]  # ← Changed
         
-        # 创建图表
+        # Create figure
         plt.figure(figsize=(12, 8))
         
-        # 绘制ARGO的Pareto边界曲线 (带误差条)
+        # Plot ARGO Pareto frontier
         plt.errorbar(
-            argo_costs, argo_qualities,
-            xerr=cost_cis, yerr=quality_cis,
+            argo_costs, argo_info_qualities,  # ← Changed
+            xerr=cost_cis, yerr=info_quality_cis,  # ← Changed
             fmt='o-', linewidth=3, markersize=10,
             color='#1f77b4', label='ARGO (Pareto Frontier)',
             capsize=5, capthick=2, elinewidth=2,
             zorder=3
         )
         
-        # 绘制基线策略的单点
+        # Plot baselines
         colors = {
             'Always-Retrieve': '#ff7f0e',
             'Always-Reason': '#2ca02c',
@@ -1012,9 +1092,9 @@ Answer:"""
         
         for policy_name, point in self.baseline_points.items():
             plt.errorbar(
-                point['cost'], point['quality'],
+                point['cost'], point['information_quality'],  # ← Changed
                 xerr=point.get('cost_ci', 0),
-                yerr=point.get('quality_ci', 0),
+                yerr=point.get('info_quality_ci', 0),  # ← Changed
                 fmt=markers.get(policy_name, 'o'),
                 markersize=12,
                 color=colors.get(policy_name, 'gray'),
@@ -1024,18 +1104,85 @@ Answer:"""
                 zorder=4
             )
         
-        plt.xlabel('Average Total Cost ($E[C_T]$)', fontsize=14)
-        plt.ylabel('Average Answer Quality ($E[Q(O)]$)', fontsize=14)
-        plt.title('Experiment 3: Pareto Frontier with 95% Confidence Intervals', 
+        plt.xlabel('Average Total Cost ($E[C_T]$)', fontsize=14, fontweight='bold')
+        plt.ylabel('Information Quality ($E[Q_{info}]$)', fontsize=14, fontweight='bold')  # ← Changed
+        plt.title('Experiment 3: Pareto Frontier (Cost vs Information Quality)', 
                  fontsize=16, fontweight='bold')
         plt.legend(fontsize=12, loc='lower right')
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
         
-        fig_path = os.path.join(output_dir, 'exp3_real_pareto_frontier.png')
+        fig_path = os.path.join(output_dir, 'exp3_pareto_info_quality.png')
         plt.savefig(fig_path, dpi=300, bbox_inches='tight')
         plt.close()
-        print(f"✓ Pareto边界图已保存: {fig_path}")
+        print(f"✓ Pareto frontier (Info Quality) saved: {fig_path}")
+        
+        return fig_path
+    
+    def plot_pareto_accuracy(self, output_dir: str = "figs"):
+        """Plot second Pareto frontier: Cost vs Accuracy (what users care about)"""
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Extract ARGO data
+        argo_costs = [p['cost'] for p in self.argo_pareto_points]
+        argo_accuracies = [p['accuracy'] for p in self.argo_pareto_points]
+        cost_cis = [p.get('cost_ci', 0) for p in self.argo_pareto_points]
+        accuracy_cis = [p.get('accuracy_ci', 0) for p in self.argo_pareto_points]
+        
+        # Create figure
+        plt.figure(figsize=(12, 8))
+        
+        # Plot ARGO accuracy frontier
+        plt.errorbar(
+            argo_costs, argo_accuracies,
+            xerr=cost_cis, yerr=accuracy_cis,
+            fmt='o-', linewidth=3, markersize=10,
+            color='#2ca02c', label='ARGO',
+            capsize=5, capthick=2, elinewidth=2,
+            zorder=3
+        )
+        
+        # Plot baselines
+        colors = {
+            'Always-Retrieve': '#ff7f0e',
+            'Always-Reason': '#2ca02c',
+            'Fixed-Threshold': '#d62728',
+            'Random': '#9467bd'
+        }
+        markers = {
+            'Always-Retrieve': 's',
+            'Always-Reason': '^',
+            'Fixed-Threshold': 'D',
+            'Random': 'v'
+        }
+        
+        for policy_name, point in self.baseline_points.items():
+            plt.errorbar(
+                point['cost'], point['accuracy'],
+                xerr=point.get('cost_ci', 0),
+                yerr=point.get('accuracy_ci', 0),
+                fmt=markers.get(policy_name, 'o'),
+                markersize=12,
+                color=colors.get(policy_name, 'gray'),
+                label=policy_name,
+                capsize=4, capthick=1.5,
+                markeredgecolor='black', markeredgewidth=2,
+                zorder=4
+            )
+        
+        plt.xlabel('Average Total Cost ($E[C_T]$)', fontsize=14, fontweight='bold')
+        plt.ylabel('Answer Accuracy', fontsize=14, fontweight='bold')
+        plt.title('Experiment 3: Cost vs Accuracy (End-User Performance)', 
+                 fontsize=16, fontweight='bold')
+        plt.legend(fontsize=12, loc='lower right')
+        plt.grid(True, alpha=0.3)
+        plt.ylim([0, 1.05])
+        plt.tight_layout()
+        
+        fig_path = os.path.join(output_dir, 'exp3_pareto_accuracy.png')
+        plt.savefig(fig_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"✓ Pareto frontier (Accuracy) saved: {fig_path}")
         
         return fig_path
     
@@ -1096,7 +1243,7 @@ Answer:"""
         return fig_path
     
     def plot_comprehensive_dashboard(self, output_dir: str = "figs"):
-        """创建综合 2x2 仪表板"""
+        """创建综合 2x2 仪表板 (Option B: separate info quality and accuracy)"""
         os.makedirs(output_dir, exist_ok=True)
         
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
@@ -1104,13 +1251,13 @@ Answer:"""
         # 提取数据
         mu_values = [p['mu'] for p in self.argo_pareto_points]
         costs = [p['cost'] for p in self.argo_pareto_points]
-        qualities = [p['quality'] for p in self.argo_pareto_points]
+        info_qualities = [p['information_quality'] for p in self.argo_pareto_points]  # ← Changed
         retrievals = [p['retrievals'] for p in self.argo_pareto_points]
         accuracies = [p['accuracy'] for p in self.argo_pareto_points]
         
-        # (0,0) Pareto边界
+        # (0,0) Pareto边界 - Information Quality
         ax = axes[0, 0]
-        ax.plot(costs, qualities, 'o-', linewidth=3, markersize=10,
+        ax.plot(costs, info_qualities, 'o-', linewidth=3, markersize=10,  # ← Changed
                color='#1f77b4', label='ARGO', zorder=3)
         
         # 添加基线
@@ -1120,14 +1267,14 @@ Answer:"""
                   'Fixed-Threshold': 'D', 'Random': 'v'}
         
         for name, point in self.baseline_points.items():
-            ax.scatter(point['cost'], point['quality'],
+            ax.scatter(point['cost'], point['information_quality'],  # ← Changed
                       s=200, marker=markers.get(name, 'o'),
                       color=colors.get(name, 'gray'),
                       label=name, edgecolors='black', linewidths=2, zorder=4)
         
         ax.set_xlabel('Cost', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Quality', fontsize=12, fontweight='bold')
-        ax.set_title('(a) Pareto Frontier', fontsize=14, fontweight='bold')
+        ax.set_ylabel('Information Quality', fontsize=12, fontweight='bold')  # ← Changed
+        ax.set_title('(a) Pareto Frontier (Info Quality)', fontsize=14, fontweight='bold')  # ← Changed
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         
@@ -1151,7 +1298,7 @@ Answer:"""
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         
-        # (1,0) 准确率 vs 成本
+        # (1,0) 准确率 vs 成本 (NEW PANEL)
         ax = axes[1, 0]
         ax.plot(costs, accuracies, 'o-', linewidth=3, markersize=10,
                color='#2ca02c', label='ARGO')
@@ -1168,17 +1315,18 @@ Answer:"""
         ax.set_title('(c) Accuracy vs Cost', fontsize=14, fontweight='bold')
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
+        ax.set_ylim([0, 1.05])
         
-        # (1,1) 质量分解
+        # (1,1) Dual Quality Metrics vs μ (UPDATED PANEL)
         ax = axes[1, 1]
-        ax.plot(mu_values, qualities, 'o-', linewidth=3, markersize=10,
-               color='#1f77b4', label='Overall Quality')
+        ax.plot(mu_values, info_qualities, 'o-', linewidth=3, markersize=10,  # ← Changed
+               color='#1f77b4', label='Information Quality')
         ax.plot(mu_values, accuracies, '^--', linewidth=2, markersize=8,
-               color='#2ca02c', label='Answer Correctness', alpha=0.7)
+               color='#2ca02c', label='Answer Accuracy', alpha=0.7)
         
         ax.set_xlabel('Cost Weight μ', fontsize=12, fontweight='bold')
         ax.set_ylabel('Metric Value', fontsize=12, fontweight='bold')
-        ax.set_title('(d) Quality Decomposition', fontsize=14, fontweight='bold')
+        ax.set_title('(d) Information Quality vs Accuracy', fontsize=14, fontweight='bold')  # ← Changed
         ax.legend(fontsize=10)
         ax.grid(True, alpha=0.3)
         ax.set_ylim([0, 1.05])

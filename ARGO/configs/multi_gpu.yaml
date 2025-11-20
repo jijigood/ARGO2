@@ -92,16 +92,16 @@ mdp:
   # 状态空间
   U_max: 1.0
   
-  # 状态转移参数
-  delta_r: 0.25      # Retrieve时U的增量 (调整: 0.15→0.25 使MDP执行Retrieve)
-  delta_p: 0.08      # Reason时U的增量
+  # 状态转移参数 (FIX v10: 让检索明显优于推理)
+  delta_r: 0.15      # Retrieve时U的增量 (提高检索效率)
+  delta_p: 0.03      # Reason时U的增量 (降低推理效率)
   
   # 检索成功率 (Phase2实现)
   p_s: 0.8           # 检索成功概率 (符合规范)
   
-  # 成本参数 (FIX v3: 平衡调整以产生平滑的Pareto曲线)
-  c_r: 0.8           # Retrieve成本 (降低到0.8以产生更平滑的过渡)
-  c_p: 0.3           # Reason成本 (降低到0.3)
+  # 成本参数 (FIX v10: 让检索成本相对更低)
+  c_r: 0.12          # Retrieve成本
+  c_p: 0.06          # Reason成本 (推理成本是检索的一半)
   
   # MDP求解参数
   mu: 0.6            # 质量函数参数 (仅作为默认值，实验时会扫描)
@@ -114,7 +114,7 @@ mdp:
   # - "saturating": σ(x) = 1 - e^(-αx)  (Phase2.3新增，α由quality_k控制)
   # - "sigmoid": σ(x) = 1 / (1 + e^{-k(x-0.5)})
   quality_function: "linear"
-  quality_k: 0.6     # 提高到0.6以产生更好的质量激励
+  quality_k: 1.5     # 适度提高以平衡更多步数的成本
   
   # Reward Shaping (Phase2.2实现)
   reward_shaping:

@@ -36,9 +36,9 @@ def main():
     print("完整实验3: Pareto边界 - 成本质量权衡 (真实LLM)")
     print("=" * 80)
     print("模型: Qwen2.5-3B-Instruct")
-    print("参数: 100道Medium题, 20个μ点 (聚焦过渡区0-2), 8张GPU")
+    print("参数: 100道Medium题, 30个μ点 (聚焦过渡区0-3), 8张GPU")
     print("目标: 追踪ARGO的Pareto最优边界")
-    print("预计时间: ~4-5小时")
+    print("预计时间: ~6-8小时")
     print("=" * 80)
     print()
     
@@ -53,10 +53,10 @@ def main():
         'seed': 42
     }
     
-    # 实验参数: μ从低到高扫描 (FIX v3: 更密集地采样过渡区)
+    # 实验参数: μ从低到高扫描 (FIX v11: 聚焦有效操作区)
     mu_min = 0.0   # 只关注质量
-    mu_max = 2.0   # 聚焦在过渡区 [0, 2] - θ*从0.98降到0
-    n_mu_steps = 20  # 增加到20个点以捕捉平滑过渡
+    mu_max = 1.0   # 聚焦在[0, 1] - 根据诊断，μ>1时θ*=0
+    n_mu_steps = 20  # 20个点以捕捉平滑过渡（密度提高）
     
     print("\n实验设计:")
     print("-" * 80)
@@ -111,16 +111,19 @@ def main():
     print("\n生成可视化图表...")
     print("-" * 80)
     
-    # 1. Pareto边界图
-    fig_path = exp.plot_pareto_frontier()
+    # 1. Pareto frontier - Information Quality (what MDP optimizes)
+    fig_info_path = exp.plot_pareto_frontier()
     
-    # 2. 阈值演化图
+    # 2. Pareto frontier - Accuracy (what users care about)
+    fig_acc_path = exp.plot_pareto_accuracy()
+    
+    # 3. 阈值演化图
     threshold_fig_path = exp.plot_threshold_evolution()
     
-    # 3. 综合仪表板
+    # 4. 综合仪表板 (includes both metrics)
     dashboard_fig_path = exp.plot_comprehensive_dashboard()
     
-    # 4. 延迟分析图
+    # 5. 延迟分析图
     latency_fig_path = exp.plot_latency_analysis()
     
     print("\n" + "=" * 80)
@@ -128,18 +131,20 @@ def main():
     print("=" * 80)
     print(f"结果已保存: {save_path}")
     print(f"\n生成的图表:")
-    print(f"  1. Pareto边界图 (带置信区间): {fig_path}")
-    print(f"  2. 阈值演化图: {threshold_fig_path}")
-    print(f"  3. 综合仪表板: {dashboard_fig_path}")
-    print(f"  4. 延迟分析图 (O-RAN合规性): {latency_fig_path}")
+    print(f"  1. Pareto边界 (信息质量): {fig_info_path}")
+    print(f"  2. Pareto边界 (准确率): {fig_acc_path}")
+    print(f"  3. 阈值演化图: {threshold_fig_path}")
+    print(f"  4. 综合仪表板: {dashboard_fig_path}")
+    print(f"  5. 延迟分析图 (O-RAN合规性): {latency_fig_path}")
     print()
     print("核心发现:")
     print("  1. ARGO形成Pareto边界 - 任何成本下都是最优质量")
-    print("  2. 基线策略是次优点 - 落在ARGO曲线下方")
-    print("  3. μ提供调节能力 - 从快速/便宜到慢速/高质量")
-    print("  4. 阈值随μ单调变化 - 验证了定理1的双层阈值结构")
-    print("  5. 所有方法都支持95%置信区间 - 统计学严格性")
-    print("  6. 延迟追踪显示O-RAN合规性")
+    print("  2. 信息质量 vs 准确率 - 分离MDP优化目标和用户关心指标")
+    print("  3. 基线策略是次优点 - 落在ARGO曲线下方")
+    print("  4. μ提供调节能力 - 从快速/便宜到慢速/高质量")
+    print("  5. 阈值随μ单调变化 - 验证了定理1的双层阈值结构")
+    print("  6. 所有方法都支持95%置信区间 - 统计学严格性")
+    print("  7. 延迟追踪显示O-RAN合规性")
     print()
     print("这是最重要的图表,证明了ARGO不是单一策略,")
     print("而是所有最优策略的集合!")

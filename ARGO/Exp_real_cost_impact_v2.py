@@ -57,7 +57,7 @@ class RealCostImpactExperiment:
     
     def __init__(
         self,
-        config_path: str = "configs/multi_gpu.yaml",
+        config_path: str = "configs/multi_gpu_data_calibrated.yaml",
         llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct",
         embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
@@ -205,8 +205,13 @@ class RealCostImpactExperiment:
         print(f"\n✓ 预计算完成!")
         print(f"  - 问题数: {len(self.query_embeddings)}")
         print(f"  - 耗时: {elapsed:.1f}秒 ({elapsed/60:.1f}分钟)")
-        print(f"  - 平均: {elapsed/len(self.query_embeddings)*1000:.1f}ms/问题")
-        print(f"  - 内存占用: ~{len(self.query_embeddings) * 384 * 4 / 1024 / 1024:.2f} MB")
+        
+        if len(self.query_embeddings) > 0:
+            print(f"  - 平均: {elapsed/len(self.query_embeddings)*1000:.1f}ms/问题")
+            print(f"  - 内存占用: ~{len(self.query_embeddings) * 384 * 4 / 1024 / 1024:.2f} MB")
+        else:
+            print(f"  ⚠️  警告: 没有预计算任何embeddings")
+        
         print(f"{'='*80}\n")
         
         # 加载Chroma检索库
@@ -812,6 +817,10 @@ def main():
                        help='使用的GPU ID列表，逗号分隔，例如: 0,1,2,3')
     parser.add_argument('--seed', type=int, default=42,
                        help='随机种子')
+    parser.add_argument('--model-path', type=str, default=None,
+                       help='LLM模型路径 (可选，用于覆盖默认的14B模型)')
+    parser.add_argument('--config-path', type=str, default='configs/multi_gpu_data_calibrated.yaml',
+                       help='MDP配置文件路径 (默认使用data_calibrated版本，c_p=0.02)')
     
     args = parser.parse_args()
     
@@ -822,17 +831,25 @@ def main():
     # 解析GPU列表
     gpu_ids = [int(x.strip()) for x in args.gpus.split(',')]
     
+    # 确定模型路径
+    if args.model_path:
+        llm_model_path = args.model_path
+    else:
+        llm_model_path = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct"
+    
     print(f"\n启动参数:")
     print(f"  模式: {args.mode}")
     if args.mode == 'custom':
         print(f"  问题数: {args.n_questions}")
     print(f"  难度: {args.difficulty}")
     print(f"  GPU: {gpu_ids}")
-    print(f"  种子: {args.seed}\n")
+    print(f"  种子: {args.seed}")
+    print(f"  模型: {Path(llm_model_path).name}\n")
     
     # 配置
     experiment = RealCostImpactExperiment(
-        llm_model_path="/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct",
+        config_path=args.config_path,
+        llm_model_path=llm_model_path,
         embedding_model_path="/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         test_mode=args.mode,
         n_test_questions=args.n_questions,  # ← 传入自定义问题数

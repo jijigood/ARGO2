@@ -25,7 +25,9 @@ def run_multi_seed_experiment(
     base_seed: int = 42,
     n_questions: int = 100,
     difficulties: list = ['easy', 'medium', 'hard'],
-    gpus: str = '0,1,2,3,4,5,6,7'
+    gpus: str = '0,1,2,3,4,5,6,7',
+    model_path: str = None,
+    config_path: str = 'configs/multi_gpu_data_calibrated.yaml'
 ):
     """运行多种子实验"""
     
@@ -36,6 +38,9 @@ def run_multi_seed_experiment(
     print(f"每难度问题数: {n_questions}")
     print(f"难度级别: {difficulties}")
     print(f"使用GPU: {gpus}")
+    if model_path:
+        model_name = Path(model_path).name
+        print(f"LLM模型: {model_name}")
     print(f"总运行次数: {n_seeds * len(difficulties)}")
     print("="*80)
     print()
@@ -70,6 +75,13 @@ def run_multi_seed_experiment(
                 '--gpus', gpus,
                 '--seed', str(seed)
             ]
+            
+            # 如果指定了模型路径，添加到命令中
+            if model_path:
+                cmd.extend(['--model-path', model_path])
+            
+            # 添加配置文件路径
+            cmd.extend(['--config-path', config_path])
             
             print(f"执行命令: {' '.join(cmd)}\n")
             
@@ -182,6 +194,10 @@ def main():
                        help='难度级别，逗号分隔 (默认: easy,medium,hard)')
     parser.add_argument('--gpus', type=str, default='0,1,2,3,4,5,6,7',
                        help='使用的GPU ID (默认: 0,1,2,3,4,5,6,7)')
+    parser.add_argument('--model-path', type=str, default=None,
+                       help='LLM模型路径 (可选，用于覆盖默认模型)')
+    parser.add_argument('--config-path', type=str, default='configs/multi_gpu_data_calibrated.yaml',
+                       help='MDP配置文件路径 (默认使用data_calibrated版本，c_p=0.02)')
     
     args = parser.parse_args()
     
@@ -200,7 +216,9 @@ def main():
         base_seed=args.base_seed,
         n_questions=args.n_questions,
         difficulties=difficulties,
-        gpus=args.gpus
+        gpus=args.gpus,
+        model_path=args.model_path,
+        config_path=args.config_path
     )
     
     # 返回退出码
