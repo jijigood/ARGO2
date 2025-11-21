@@ -37,6 +37,8 @@ from typing import Dict, List, Tuple, Optional
 import logging
 import time
 from .prompts import ARGOPrompts, PromptConfig
+from .progress import ProgressTracker
+from .complexity import QuestionComplexityClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +67,127 @@ class ARGO_System:
     3. 渐进式推理：根据历史调整查询策略
     4. 可追溯性：完整记录推理链
     """
+
+    @staticmethod
+    def _deep_update(base: Dict, updates: Dict) -> Dict:
+        for key, value in updates.items():
+            if isinstance(value, dict) and isinstance(base.get(key), dict):
+                ARGO_System._deep_update(base[key], value)
+            else:
+                base[key] = value
+        return base
+
+    def _build_policy_config(self, overrides: Optional[Dict], default_max_steps: int) -> Dict:
+        config: Dict = {
+            'theta_star': None,
+            'theta_cont': None,
+            'theta_star_by_complexity': {
+                'simple': 0.68,
+                'medium': 0.75,
+                'complex': 0.82
+            },
+            'theta_cont_by_complexity': {
+                'simple': 0.30,
+                'medium': 0.40,
+                'complex': 0.45
+            },
+            'max_steps': max(5, default_max_steps),
+            'max_steps_by_complexity': {
+                'simple': max(4, default_max_steps - 4),
+                'medium': max(5, default_max_steps),
+                'complex': default_max_steps + 2
+            },
+            'hard_cap_steps': default_max_steps + 4,
+            'progress': {
+                'enabled': True,
+                'base_retrieval_gain': None,
+                'base_reason_gain': None,
+                'coverage_weight': 0.5,
+                'novelty_weight': 0.3,
+                'confidence_weight': 0.4,
+                'min_gain': 0.015,
+                'max_gain': 0.35,
+                'gain_multipliers': {
+                    'simple': 1.15,
+                    'medium': 1.0,
+                    'complex': 0.85
+                }
+            },
+            'complexity': {}
+        }
+
+        if overrides:
+            config = self._deep_update(config, overrides)
+
+        config['max_steps'] = max(3, int(config['max_steps']))
+        config['hard_cap_steps'] = max(
+            config['max_steps'], int(config.get('hard_cap_steps', config['max_steps']))
+        )
+
+        for label, value in list(config.get('max_steps_by_complexity', {}).items()):
+            config['max_steps_by_complexity'][label] = max(
+                1, min(int(value), config['hard_cap_steps'])
+            )
+
+        for label, value in list(config.get('theta_star_by_complexity', {}).items()):
+            config['theta_star_by_complexity'][label] = max(0.4, min(float(value), 0.99))
+
+        for label, value in list(config.get('theta_cont_by_complexity', {}).items()):
+            config['theta_cont_by_complexity'][label] = max(0.0, min(float(value), 0.95))
+
+        return config
+
+    def _resolve_thresholds(self, complexity: str) -> Tuple[float, float]:
+        base_theta_star = self.mdp_solver.theta_star if self.use_mdp else 0.75
+        base_theta_cont = self.mdp_solver.theta_cont if self.use_mdp else 0.35
+
+        theta_star = self.policy_config.get('theta_star', base_theta_star)
+        theta_cont = self.policy_config.get('theta_cont', base_theta_cont)
+
+        theta_star = self.policy_config.get('theta_star_by_complexity', {}).get(
+            complexity,
+            theta_star
+        )
+        theta_cont = self.policy_config.get('theta_cont_by_complexity', {}).get(
+            complexity,
+            theta_cont
+        )
+
+        theta_star = max(0.4, min(theta_star, 0.99))
+        theta_cont = max(0.0, min(theta_cont, theta_star - 0.05))
+
+        return theta_cont, theta_star
+
+    def _resolve_max_steps(self, complexity: str) -> int:
+        base_steps = int(self.policy_config.get('max_steps', self.base_max_steps))
+        comp_override = self.policy_config.get('max_steps_by_complexity', {}).get(
+            complexity
+        )
+        if comp_override is not None:
+            base_steps = comp_override
+        hard_cap = int(max(base_steps, self.policy_config.get('hard_cap_steps', base_steps)))
+        return max(1, min(base_steps, hard_cap))
+
+    def _build_progress_tracker(self, question: str, complexity: str) -> Optional[ProgressTracker]:
+        if not self.progress_enabled:
+            return None
+
+        cfg = self.progress_config
+        gain_multiplier = cfg.get('gain_multipliers', {}).get(complexity, 1.0)
+        base_retrieval_gain = cfg.get('base_retrieval_gain', self.delta_r)
+        base_reason_gain = cfg.get('base_reason_gain', self.delta_p)
+
+        return ProgressTracker(
+            question=question,
+            base_retrieval_gain=base_retrieval_gain,
+            base_reason_gain=base_reason_gain,
+            coverage_weight=cfg.get('coverage_weight', 0.5),
+            novelty_weight=cfg.get('novelty_weight', 0.3),
+            confidence_weight=cfg.get('confidence_weight', 0.4),
+            min_gain=cfg.get('min_gain', 0.015),
+            max_gain=cfg.get('max_gain', 0.35),
+            gain_multiplier=gain_multiplier
+        )
     
     def __init__(
         self,
@@ -72,6 +195,7 @@ class ARGO_System:
         tokenizer,
         use_mdp: bool = True,
         mdp_config: Optional[Dict] = None,
+        policy_config: Optional[Dict] = None,
         retriever_mode: str = "mock",  # "mock" or "chroma"
         chroma_dir: Optional[str] = None,
         collection_name: str = "oran_specs",
@@ -84,6 +208,7 @@ class ARGO_System:
             tokenizer: 对应的tokenizer
             use_mdp: 是否使用MDP策略（否则使用固定策略）
             mdp_config: MDP配置字典
+            policy_config: 自适应终止策略与进度跟踪配置
             retriever_mode: "mock"（测试用）或"chroma"（真实检索）
             chroma_dir: Chroma数据库路径
             collection_name: Chroma集合名称
@@ -93,8 +218,16 @@ class ARGO_System:
         self.model = model
         self.tokenizer = tokenizer
         self.use_mdp = use_mdp and MDP_AVAILABLE
-        self.max_steps = max_steps
+        self.base_max_steps = max_steps
+        self.policy_config = self._build_policy_config(policy_config, max_steps)
+        self.max_steps = int(self.policy_config['max_steps'])
+        self.hard_cap_steps = int(max(self.max_steps, self.policy_config.get('hard_cap_steps', self.max_steps)))
         self.verbose = verbose
+        self.progress_config = self.policy_config.get('progress', {})
+        self.progress_enabled = self.progress_config.get('enabled', True)
+        self.complexity_classifier = QuestionComplexityClassifier(
+            self.policy_config.get('complexity')
+        )
         
         # 设备
         self.device = next(model.parameters()).device
@@ -217,6 +350,14 @@ class ARGO_System:
             include_sources=True
         )
         logger.info("✅ AnswerSynthesizer initialized")
+
+        if self.use_mdp:
+            self.delta_r = getattr(self.mdp_solver, 'delta_r', 0.25)
+            self.delta_p = getattr(self.mdp_solver, 'delta_p', 0.08)
+        else:
+            progress_cfg = self.policy_config.get('progress', {})
+            self.delta_r = progress_cfg.get('base_retrieval_gain') or 0.25
+            self.delta_p = progress_cfg.get('base_reason_gain') or 0.08
     
     def answer_question(
         self,
@@ -246,25 +387,26 @@ class ARGO_System:
             print(f"ARGO System Processing Question")
             print(f"{'='*80}")
             print(f"Question: {question}")
-            print(f"Max Steps: {self.max_steps}")
+            print(f"Base Max Steps: {self.max_steps}")
             print(f"Strategy: {'MDP-Guided' if self.use_mdp else 'Fixed'}")
             print(f"{'='*80}\n")
         
-        # 初始化
-        history = []
-        U_t = 0.0  # 初始知识完整度
+        # 初始化状态
+        history: List[Dict] = []
         t = 0
+        complexity_label = self.complexity_classifier.classify(question)
+        theta_cont, theta_star = self._resolve_thresholds(complexity_label)
+        per_question_max_steps = self._resolve_max_steps(complexity_label)
+        progress_tracker = self._build_progress_tracker(question, complexity_label)
+        U_t = progress_tracker.current_progress if progress_tracker else 0.0
         
-        # 获取阈值
-        if self.use_mdp:
-            theta_star = self.mdp_solver.theta_star
-            theta_cont = self.mdp_solver.theta_cont
-        else:
-            theta_star = 0.9  # 固定策略：达到90%就停止
-            theta_cont = 0.5  # 固定策略：50%以下检索，否则推理
+        if self.verbose:
+            print(f"Complexity: {complexity_label}")
+            print(f"θ_cont={theta_cont:.2f}, θ*={theta_star:.2f}")
+            print(f"Max Steps (cap): {per_question_max_steps}")
         
         # 主循环
-        while U_t < theta_star and t < self.max_steps:
+        while U_t < theta_star and t < per_question_max_steps:
             t += 1
             
             if self.verbose:
@@ -285,14 +427,11 @@ class ARGO_System:
             if action == 'retrieve':
                 step_data = self._execute_retrieve(question, history, U_t)
                 
-                if step_data['retrieval_success']:
-                    U_t += self.mdp_solver.delta_r if self.use_mdp else 0.25
-                    if self.verbose:
-                        print(f"✓ Retrieval successful, U_t → {U_t:.3f}")
-                else:
-                    if self.verbose:
-                        print(f"✗ Retrieval failed, U_t unchanged")
-                
+                if self.verbose and step_data['retrieval_success']:
+                    print("✓ Retrieval successful")
+                elif self.verbose and not step_data['retrieval_success']:
+                    print("✗ Retrieval failed")
+
                 self.stats['retrieve_actions'] += 1
                 if step_data['retrieval_success']:
                     self.stats['successful_retrievals'] += 1
@@ -300,25 +439,40 @@ class ARGO_System:
             else:  # reason
                 step_data = self._execute_reason(question, history, U_t)
                 
-                U_t += self.mdp_solver.delta_p if self.use_mdp else 0.08
-                if self.verbose:
-                    print(f"Reasoning complete, U_t → {U_t:.3f}")
-                
                 self.stats['reason_actions'] += 1
             
             # 记录到历史
+            step_data['progress_before'] = U_t
+            if progress_tracker:
+                U_t = progress_tracker.update(action, step_data)
+            else:
+                if action == 'retrieve' and step_data.get('retrieval_success'):
+                    U_t += self.delta_r
+                elif action == 'reason':
+                    U_t += self.delta_p
+            U_t = min(U_t, 1.0)
+            step_data['progress_after'] = U_t
+            step_data['progress'] = U_t
             history.append(step_data)
             
-            # 确保U_t不超过1
-            U_t = min(U_t, 1.0)
+            if self.verbose:
+                print(f"Updated U_t → {U_t:.3f}")
+            
+            if U_t >= theta_star:
+                if self.verbose:
+                    print(f"✓ Early termination triggered at step {t}")
+                break
         
         # 合成最终答案
+        terminated_early = U_t >= theta_star
         if self.verbose:
             print(f"\n{'='*80}")
             print(f"Synthesizing Final Answer")
             print(f"{'='*80}")
             print(f"Final U_t: {U_t:.3f}")
             print(f"Total Steps: {t}")
+            if not terminated_early and t >= per_question_max_steps:
+                print("Reached step cap before hitting θ*")
         
         final_answer, choice, sources = self.synthesizer.synthesize(
             question, 
@@ -340,7 +494,14 @@ class ARGO_System:
             'successful_retrievals': sum(1 for s in history 
                                         if s['action'] == 'retrieve' and s.get('retrieval_success', False)),
             'elapsed_time': elapsed_time,
-            'sources': sources
+            'sources': sources,
+            'theta_star': theta_star,
+            'theta_cont': theta_cont,
+            'max_steps_cap': per_question_max_steps,
+            'complexity': complexity_label,
+            'terminated_early': terminated_early,
+            'step_cap_hit': (not terminated_early and t >= per_question_max_steps),
+            'progress_mode': 'dynamic' if progress_tracker else 'static'
         }
         
         if self.verbose:

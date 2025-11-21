@@ -1,5 +1,49 @@
 # ARGO系统更新日志
 
+## Version 2.2 - Adaptive Depth (2025-11-21)
+
+### ✨ 新功能
+
+- **自适应终止策略**：`ARGO_System` 现在根据问题复杂度动态调整 θ_cont / θ* 和最大步数，避免固定20步上限。
+- **动态进度估计**：新增 `ProgressTracker`，基于检索/推理内容的覆盖度与新颖度计算 U_t，支持早停。
+- **复杂度分类器**：`QuestionComplexityClassifier` 为每道题打标签（simple/medium/complex），驱动阈值和分析。
+- **实验脚本**：`Exp_adaptive_depth.py` 复现“复杂度分层”实验，输出均值/方差及 ANOVA 检验，并可生成柱状图。
+
+### 🔧 核心修改
+
+- `src/argo_system.py`
+  - 新增 `policy_config` 参数，支持 per-question θ 和步数上限。
+  - 集成 `ProgressTracker` 与复杂度分类逻辑，metadata 暴露终止原因。
+- `src/progress.py`（新建）
+  - 关键词覆盖 + 置信度驱动的进度增量，区分检索/推理增益。
+- `src/complexity.py`（新建）
+  - 轻量词法启发式，含 dataset 难度提示融合。
+- `Exp_adaptive_depth.py`（新建）
+  - 采样 simple/medium/complex 题目，运行 ARGO 并输出 CSV/JSON + 可选图表。
+- `src/__init__.py`
+  - 导出新工具以便其他模块调用。
+
+### 🧪 推荐验证
+
+```bash
+python Exp_adaptive_depth.py \
+  --model-name Qwen/Qwen2.5-1.5B-Instruct \
+  --retriever-mode mock \
+  --num-simple 30 --num-medium 40 --num-complex 30 \
+  --output-dir results/complexity_adaptive
+```
+
+输出包括：
+
+- `adaptive_depth_results.csv/json`：逐题统计（步数、retrieval/reason、准确率、θ、终止原因）。
+- `adaptive_depth_summary.json`：按复杂度的均值 ± 标准差及 ANOVA F/p 值。
+- `steps_by_complexity.png`：平均步数 vs 复杂度柱状图。
+
+### 🎯 影响
+
+- 简单问题平均 2-4 步即可终止，复杂问题可用更深链路（<=12 步）。
+- 报告可直接用于论文“可变推理深度”章节，提供统计显著性证据。
+
 ## Version 2.1 - 选择题支持 (2024-11-03)
 
 ### ✨ 新功能

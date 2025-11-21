@@ -22,6 +22,8 @@ from .decomposer import QueryDecomposer
 from .retriever import Retriever, MockRetriever
 from .synthesizer import AnswerSynthesizer
 from .argo_system import ARGO_System
+from .progress import ProgressTracker
+from .complexity import QuestionComplexityClassifier
 from .baseline_strategies import (
     AlwaysReasonStrategy,
     RandomStrategy,
@@ -34,6 +36,8 @@ __all__ = [
     'MockRetriever',
     'AnswerSynthesizer',
     'ARGO_System',
+    'ProgressTracker',
+    'QuestionComplexityClassifier',
     'AlwaysReasonStrategy',
     'RandomStrategy',
     'FixedThresholdStrategy'
