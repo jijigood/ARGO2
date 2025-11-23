@@ -14,14 +14,25 @@ class QuestionComplexityClassifier:
         re.IGNORECASE,
     )
     MULTI_HOP_KEYWORDS = (
-        'compare', 'difference', 'relationship', 'sequence', 'impact', 'interaction', 'combination'
+        'compare', 'difference', 'relationship', 'sequence', 
+        'impact', 'interaction', 'combination',
+        'architecture', 'deployment', 'optimization',
+        'procedure', 'workflow', 'lifecycle',
+        'trade-off', 'tradeoff', 'advantage', 'disadvantage',
+        'between', 'versus', 'affects', 'enables', 'explain', 'how', 'support'
+    )
+
+    TECHNICAL_DEPTH_KEYWORDS = (
+        'protocol', 'algorithm', 'mechanism', 'implementation',
+        'specification', 'standard', 'architecture', 'framework',
+        'latency', 'throughput', 'scalability', 'performance'
     )
 
     def __init__(self, config: Optional[Dict] = None) -> None:
         config = config or {}
-        self.simple_length = config.get('simple_length', 12)
-        self.medium_length = config.get('medium_length', 24)
-        self.simple_score_max = config.get('simple_score_max', 1)
+        self.simple_length = config.get('simple_length', 10)
+        self.medium_length = config.get('medium_length', 20)
+        self.simple_score_max = config.get('simple_score_max', 0)
         self.medium_score_max = config.get('medium_score_max', 3)
         self.use_difficulty_hint = config.get('use_difficulty_hint', True)
         self.difficulty_mapping = config.get(
@@ -52,6 +63,8 @@ class QuestionComplexityClassifier:
         hop_keywords = sum(1 for kw in self.MULTI_HOP_KEYWORDS if kw in lower)
         question_marks = sanitized.count('?')
 
+        tech_depth = sum(1 for kw in self.TECHNICAL_DEPTH_KEYWORDS if kw in lower)
+
         score = 0
         if length > self.medium_length:
             score += 2
@@ -60,6 +73,8 @@ class QuestionComplexityClassifier:
 
         score += max(0, connectors - 1)
         score += hop_keywords
+        if tech_depth >= 2:
+            score += 1
         if enumerations >= 2:
             score += 1
         if numerics >= 3:
@@ -68,7 +83,7 @@ class QuestionComplexityClassifier:
             score += 1
         score += min(clauses, 2)
 
-        if length <= self.simple_length and connectors == 0 and hop_keywords == 0:
+        if length <= self.simple_length and connectors == 0 and hop_keywords == 0 and tech_depth == 0:
             label = 'simple'
         elif score <= self.simple_score_max:
             label = 'simple'

@@ -16,7 +16,21 @@ from typing import Dict, Iterable, List, Optional
 class ProgressTracker:
     """Estimate information progress based on accumulated evidence."""
 
+    # Enhanced pattern to capture O-RAN terms
     TOKEN_PATTERN = re.compile(r"[A-Za-z0-9]+")
+    
+    # Define important O-RAN short-form terms to preserve
+    ORAN_TECHNICAL_TERMS = {
+        'oran', 'o-ran', 'ran',
+        'e2', 'a1', 'o1', 'o2',
+        'ric', 'cu', 'du', 'ru', 'cp', 'up',
+        'ue', 'ng', 'f1', 'n1', 'n2', 'n3',
+        'phy', 'mac', 'rlc', 'pdcp', 'rrc',
+        'smo', 'rapp', 'xapp',
+        'qos', 'kpm', 'rc', 'mro',
+        '5g', '4g', 'lte', 'nr',
+        'api', 'sdk', 'ai', 'ml',
+    }
 
     def __init__(
         self,
@@ -75,7 +89,7 @@ class ProgressTracker:
 
         novel_tokens = tokens - self.seen_tokens
         novelty_gain = 0.0
-        denominator = max(len(question_tokens), 20)
+        denominator = max(len(question_tokens), len(tokens) // 3, 10)
         if denominator:
             novelty_gain = len(novel_tokens) / denominator
 
@@ -84,10 +98,12 @@ class ProgressTracker:
 
         confidence = step_data.get('confidence', 0.5)
         confidence = max(0.0, min(1.0, confidence))
-        confidence_term = 0.5 + self.confidence_weight * (confidence - 0.5)
+        
+        confidence_multiplier = 0.5 + 0.8 * (confidence - 0.5)
+        confidence_multiplier = max(0.2, min(1.2, confidence_multiplier))
 
         base_gain = self.base_retrieval_gain if action == 'retrieve' else self.base_reason_gain
-        base_gain *= max(0.2, confidence_term)
+        base_gain *= confidence_multiplier
 
         delta = base_gain
         delta += self.coverage_weight * coverage_gain
@@ -97,8 +113,16 @@ class ProgressTracker:
         self.current_progress = min(1.0, self.current_progress + delta)
         return self.current_progress
 
-    @staticmethod
-    def _extract_tokens(text: str) -> List[str]:
-        tokens = ProgressTracker.TOKEN_PATTERN.findall(text.lower())
-        return [t for t in tokens if len(t) >= 4 and not t.isdigit()]
+    @classmethod
+    def _extract_tokens(cls, text: str) -> List[str]:
+        raw_tokens = cls.TOKEN_PATTERN.findall(text.lower())
+        
+        filtered = []
+        for token in raw_tokens:
+            if token in cls.ORAN_TECHNICAL_TERMS:
+                filtered.append(token)
+            elif len(token) >= 4 and not token.isdigit():
+                filtered.append(token)
+        
+        return filtered
 

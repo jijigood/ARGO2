@@ -27,7 +27,8 @@ def run_multi_seed_experiment(
     difficulties: list = ['easy', 'medium', 'hard'],
     gpus: str = '0,1,2,3,4,5,6,7',
     model_path: str = None,
-    config_path: str = 'configs/multi_gpu_data_calibrated.yaml'
+    config_path: str = 'configs/multi_gpu_data_calibrated.yaml',
+    policy_config_path: str = 'configs/adaptive_policy.yaml'
 ):
     """运行多种子实验"""
     
@@ -82,6 +83,10 @@ def run_multi_seed_experiment(
             
             # 添加配置文件路径
             cmd.extend(['--config-path', config_path])
+            
+            # 添加策略配置文件路径
+            if policy_config_path:
+                cmd.extend(['--policy-config-path', policy_config_path])
             
             print(f"执行命令: {' '.join(cmd)}\n")
             
@@ -198,6 +203,8 @@ def main():
                        help='LLM模型路径 (可选，用于覆盖默认模型)')
     parser.add_argument('--config-path', type=str, default='configs/multi_gpu_data_calibrated.yaml',
                        help='MDP配置文件路径 (默认使用data_calibrated版本，c_p=0.02)')
+    parser.add_argument('--policy-config-path', type=str, default='configs/adaptive_policy.yaml',
+                       help='自适应策略配置文件路径')
     
     args = parser.parse_args()
     
@@ -218,7 +225,8 @@ def main():
         difficulties=difficulties,
         gpus=args.gpus,
         model_path=args.model_path,
-        config_path=args.config_path
+        config_path=args.config_path,
+        policy_config_path=args.policy_config_path
     )
     
     # 返回退出码

@@ -47,10 +47,21 @@ python -u Exp1_multi_seed_wrapper.py \
     --n-seeds 3 \
     --base-seed 42 \
     --n-questions 100 \
-    --difficulties medium \
+    --difficulties easy,medium,hard \
     --gpus 0,1,2,3,4,5,6,7 \
     --model-path "$MODEL_PATH" \
-    --config-path "$CONFIG_PATH"
+    --config-path "$CONFIG_PATH" \
+    --policy-config-path configs/adaptive_policy.yaml
+
+echo ""
+echo "================================================================================"
+echo "运行分析脚本..."
+echo "================================================================================"
+python Exp1_analyze_by_complexity.py
+
+echo ""
+echo "实验全部完成!"
+echo "结果保存在 draw_figs/data 和 figs 目录中"
 
 if [ $? -ne 0 ]; then
     echo ""

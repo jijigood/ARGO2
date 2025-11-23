@@ -28,11 +28,18 @@ import yaml
 import json
 import random
 import matplotlib.pyplot as plt
-from pathlib import Path
-from typing import Dict, List, Optional
 from datetime import datetime
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from pathlib import Path
+from typing import List, Dict, Tuple, Optional
 from sentence_transformers import SentenceTransformer
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import argparse
+
+# 添加src路径
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+from progress import ProgressTracker
+from complexity import QuestionComplexityClassifier
+from oran_benchmark_loader import ORANBenchmark
 
 # 尝试导入chromadb (可能失败)
 try:
@@ -58,6 +65,7 @@ class RealCostImpactExperiment:
     def __init__(
         self,
         config_path: str = "configs/multi_gpu_data_calibrated.yaml",
+        policy_config_path: Optional[str] = None,
         llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-14B-Instruct",
         embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
@@ -70,6 +78,7 @@ class RealCostImpactExperiment:
         """
         Args:
             config_path: MDP配置文件路径
+            policy_config_path: 自适应策略配置文件路径
             llm_model_path: Qwen模型本地路径
             embedding_model_path: 嵌入模型本地路径
             chroma_db_path: Chroma数据库路径
@@ -79,6 +88,7 @@ class RealCostImpactExperiment:
             seed: 随机种子
             gpu_ids: 使用的GPU ID列表，如 [0,1,2,3]
         """
+        self.policy_config_path = policy_config_path
         # 根据测试模式设置参数
         if test_mode == "small":
             self.n_test_questions = 10
@@ -136,6 +146,13 @@ class RealCostImpactExperiment:
         # 加载配置
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
+            
+        # 加载策略配置
+        self.policy_config = None
+        if self.policy_config_path:
+            print(f"加载自适应策略配置: {self.policy_config_path}")
+            with open(self.policy_config_path, 'r') as f:
+                self.policy_config = yaml.safe_load(f)
         
         # 设置随机种子
         random.seed(seed)
@@ -170,6 +187,15 @@ class RealCostImpactExperiment:
         self.embedding_model = self.embedding_model.to(f'cuda:{self.gpu_ids[0]}')
         print(f"✓ 嵌入模型加载成功 (GPU {self.gpu_ids[0]})\n")
         
+        # 初始化自适应组件
+        if self.policy_config:
+            print("初始化自适应组件 (ComplexityClassifier)...")
+            # ProgressTracker 将在每个问题中实例化
+            self.classifier = QuestionComplexityClassifier()
+            print("✓ 自适应组件已就绪")
+        else:
+            self.classifier = None
+
         # 🆕 预计算所有问题的embeddings (优化检索速度)
         print(f"{'='*80}")
         print(f"预计算问题embeddings (优化检索性能)...")
@@ -277,8 +303,17 @@ class RealCostImpactExperiment:
         if 'U_grid_size' not in mdp_config and 'grid_size' in mdp_config:
             mdp_config['U_grid_size'] = mdp_config['grid_size']
         
+        # 加载自适应策略配置
+        policy_config = None
+        if self.policy_config_path and os.path.exists(self.policy_config_path):
+            with open(self.policy_config_path, 'r') as f:
+                policy_config = yaml.safe_load(f)
+                # Extract the 'policy' section
+                policy_config = policy_config.get('policy', policy_config)
+        
         return {
             'mdp': mdp_config,
+            'policy': policy_config,
             'quality': self.config.get('quality', {'mode': 'linear', 'k': 5.0}),
             'solver': {
                 'max_iterations': 1000,
@@ -332,7 +367,7 @@ class RealCostImpactExperiment:
         """使用LLM生成答案
         
         Returns:
-            (answer_index, confidence)
+            (answer_index, confidence, response_text)
         """
         prompt = self._create_prompt(question, context)
         
@@ -362,7 +397,7 @@ class RealCostImpactExperiment:
         # 简单的置信度估计
         confidence = 0.7 if context else 0.5
         
-        return answer, confidence
+        return answer, confidence, response
     
     def _create_prompt(self, question: Dict, context: Optional[str] = None) -> str:
         """创建提示词"""
@@ -405,6 +440,10 @@ Answer with only the number (1, 2, 3, or 4):"""
     
     def simulate_argo_policy(self, question: Dict, theta_cont: float, theta_star: float, c_r: float) -> Dict:
         """执行ARGO策略"""
+        # 如果启用了自适应策略配置，使用新逻辑
+        if self.policy_config:
+            return self._simulate_adaptive_policy(question, c_r)
+
         U = 0.0
         C = 0.0
         retrieval_count = 0
@@ -434,9 +473,9 @@ Answer with only the number (1, 2, 3, or 4):"""
                 # 用检索成功率模拟
                 if random.random() < p_s:
                     U += delta_r
-                    final_answer, _ = self.generate_answer(question, context)
+                    final_answer, _, _ = self.generate_answer(question, context)
                 else:
-                    final_answer, _ = self.generate_answer(question, context)
+                    final_answer, _, _ = self.generate_answer(question, context)
             else:
                 # Reason
                 reason_count += 1
@@ -444,7 +483,7 @@ Answer with only the number (1, 2, 3, or 4):"""
                 U += delta_p
                 
                 # 无检索推理
-                final_answer, _ = self.generate_answer(question, "")
+                final_answer, _, _ = self.generate_answer(question, "")
         
         # 最终质量
         quality = min(U / 1.0, 1.0)
@@ -458,6 +497,92 @@ Answer with only the number (1, 2, 3, or 4):"""
             'reason_count': reason_count,
             'steps': step + 1,
             'correct': correct
+        }
+    
+    def _simulate_adaptive_policy(self, question: Dict, c_r: float) -> Dict:
+        """使用自适应策略配置执行 (ProgressTracker + ComplexityClassifier)"""
+        q_text = question['question']
+        
+        # 1. 分类复杂度
+        complexity = self.classifier.classify(q_text)
+        policy_params = self.policy_config['policy'][complexity]
+        
+        theta_star = policy_params['theta_star']
+        theta_cont = policy_params['theta_cont']
+        max_steps = policy_params['max_steps']
+        
+        # 2. 初始化状态
+        tracker = ProgressTracker(q_text)
+        U = 0.0
+        C = 0.0
+        retrieval_count = 0
+        reason_count = 0
+        accumulated_context = ""
+        current_answer = ""
+        
+        c_p = self.config['mdp']['c_p']
+        
+        # 3. 逐步执行
+        final_step = 0
+        for step in range(max_steps):
+            final_step = step + 1
+            
+            # 检查终止
+            if U >= theta_star:
+                break
+                
+            # 决策
+            if U < theta_cont:
+                # Action: Retrieve
+                retrieval_count += 1
+                C += c_r
+                
+                # 检索
+                new_docs = self.retrieve_documents(q_text, top_k=3)
+                new_context = " ".join(new_docs)
+                # 简单拼接，实际应用可能需要去重或摘要
+                accumulated_context = (accumulated_context + " " + new_context).strip()
+                
+                # 生成答案
+                ans_idx, _, ans_text = self.generate_answer(question, accumulated_context)
+                current_answer = ans_text
+                
+                # 更新进度
+                step_data = {
+                    'intermediate_answer': current_answer,
+                    'retrieved_docs': new_docs,
+                    'confidence': 0.6
+                }
+                U = tracker.update('retrieve', step_data)
+                
+            else:
+                # Action: Reason
+                reason_count += 1
+                C += c_p
+                
+                # 推理 (使用已有上下文)
+                ans_idx, _, ans_text = self.generate_answer(question, accumulated_context)
+                current_answer = ans_text
+                
+                # 更新进度
+                step_data = {
+                    'intermediate_answer': current_answer,
+                    'confidence': 0.7
+                }
+                U = tracker.update('reason', step_data)
+        
+        # 最终结果
+        final_ans_idx = self._extract_answer(current_answer)
+        correct = (final_ans_idx == question['correct_answer'])
+        
+        return {
+            'quality': min(U, 1.0),
+            'cost': C,
+            'retrieval_count': retrieval_count,
+            'reason_count': reason_count,
+            'steps': final_step,
+            'correct': correct,
+            'complexity': complexity
         }
     
     def simulate_always_retrieve_policy(self, question: Dict, c_r: float, theta_star: float) -> Dict:
@@ -485,7 +610,7 @@ Answer with only the number (1, 2, 3, or 4):"""
             if random.random() < p_s:
                 U += delta_r
             
-            final_answer, _ = self.generate_answer(question, context)
+            final_answer, _, _ = self.generate_answer(question, context)
         
         quality = min(U / 1.0, 1.0)
         correct = (final_answer == question['correct_answer']) if final_answer else False
@@ -519,7 +644,7 @@ Answer with only the number (1, 2, 3, or 4):"""
             C += c_p
             U += delta_p
             
-            final_answer, _ = self.generate_answer(question, "")
+            final_answer, _, _ = self.generate_answer(question, "")
         
         quality = min(U / 1.0, 1.0)
         correct = (final_answer == question['correct_answer']) if final_answer else False
@@ -561,13 +686,13 @@ Answer with only the number (1, 2, 3, or 4):"""
                 context = " ".join(docs)
                 if random.random() < p_s:
                     U += delta_r
-                final_answer, _ = self.generate_answer(question, context)
+                final_answer, _, _ = self.generate_answer(question, context)
             else:
                 # Reason
                 reason_count += 1
                 C += c_p
                 U += delta_p
-                final_answer, _ = self.generate_answer(question, "")
+                final_answer, _, _ = self.generate_answer(question, "")
         
         quality = min(U / 1.0, 1.0)
         correct = (final_answer == question['correct_answer']) if final_answer else False
@@ -639,6 +764,7 @@ Answer with only the number (1, 2, 3, or 4):"""
         print(f"{'='*80}\n")
         
         all_results = []
+        self.raw_results = []  # 🆕 初始化详细结果列表
         
         for i, c_r in enumerate(c_r_values, 1):
             print(f"\n[{i}/{self.n_cost_steps}] c_r = {c_r:.4f} ({c_r/c_p:.1f}x c_p)")
@@ -649,6 +775,12 @@ Answer with only the number (1, 2, 3, or 4):"""
             
             # 评估所有策略
             results = self.evaluate_all_policies(c_r, theta_cont, theta_star)
+            
+            # 🆕 保存详细结果
+            self.raw_results.append({
+                'c_r': c_r,
+                'details': results
+            })
             
             # 聚合结果
             aggregated = {
@@ -710,7 +842,8 @@ Answer with only the number (1, 2, 3, or 4):"""
                 'seed': self.seed,  # ← 添加seed到元数据
                 'timestamp': timestamp
             },
-            'results': self.results
+            'results': self.results,
+            'raw_results': self.raw_results
         }
         
         with open(filepath, 'w') as f:
@@ -821,6 +954,8 @@ def main():
                        help='LLM模型路径 (可选，用于覆盖默认的14B模型)')
     parser.add_argument('--config-path', type=str, default='configs/multi_gpu_data_calibrated.yaml',
                        help='MDP配置文件路径 (默认使用data_calibrated版本，c_p=0.02)')
+    parser.add_argument('--policy-config-path', type=str, default=None,
+                       help='自适应策略配置文件路径')
     
     args = parser.parse_args()
     
@@ -849,6 +984,7 @@ def main():
     # 配置
     experiment = RealCostImpactExperiment(
         config_path=args.config_path,
+        policy_config_path=args.policy_config_path,
         llm_model_path=llm_model_path,
         embedding_model_path="/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         test_mode=args.mode,
