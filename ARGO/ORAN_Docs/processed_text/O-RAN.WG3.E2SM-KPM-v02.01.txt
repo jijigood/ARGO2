@@ -1,0 +1,2466 @@
+O-RAN.WG3.E2SM-KPM-v02.01 
+Technical Specification  
+O-RAN Working Group 3
+Near-Real-time RAN Intelligent Controller 
+E2 Service Model (E2SM) 
+KPM 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the 
+third party that these conditions apply to them and that they must comply with them.
+
+  
+ O-RAN.WG3.E2SM-KPM-v02.01 
+ 
+ 
+Technical Specification  
+ 
+O-RAN Working Group 3  
+Near-Real-time RAN Intelligent Controller 
+E2 Service Model (E2SM) 
+KPM 
+ 
+ 
+Prepared by the O-RAN ALLIANCE e.V. Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving, distributing, displaying or preparing 
+derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in the Annex ZZZ of this specification. All other 
+rights reserved. 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+VAT ID DE321720189 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ. 1 
+ 
+ 
+ 
+ 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    2 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Revision History   1 
+Date Revision Description 
+2018.11.25 00.00.0 Applied skeleton 00.01.04 to build KPM Monitor E2SM 
+2018.12.01 00.00.1 Applied change from E2SM-NI-v000.01.05 
+2018.12.09 00.00.2 Removed Policy section, specifies detail list of container IE 
+2018.12.11 00.00.3 Align with E2SM-NI as per comments from A. Urie 
+2018.12.12 00.00.4 Add E2 Node ID, O-CU-CP/O-CU-UP container as per comments from WG3 
+2018.12.18 00.00.5 Updated Style Type and Format Type definition aligned with Nokia E2SM-NI v00.01.08 
+2019.01.14 00.00.6 Change name from KPIMON to KPMMON, additional alignment with Nokia E2SM-NI 
+v00.01.08 and ASN.1 message addition 
+2019.01.16 00.00.7 ASN.1 update 
+2019.01.17 00.00.8 Add RIC Style Type in RIC Indication message IE with a corresponding change to the 
+ASN.1 encoding 
+2019.01.19 00.00.9 Change the name to E2SM-KPM, add Action Definition with RIC style list, made section 
+7.8 update for additional alignment with E2SM-NI, add Annex A. 
+2019.01.20 00.00.10 Update Scope, rename Slice ID to S-NSSAI, add Action Definition to each style 
+definition, remove EPC and 5GC style, add CU-CP EPC style, fix the use of 5QI and 
+QCI for E2 indication header, and correctly reference 28.552 for 5GC IEs 
+2019.01.20 00.00.11 Remove Report Period IE Test Condition and Report Period IE Value from trigger 
+definition and ASN.1. Reference 28.552 for Active UE and PDCP DL/UL data volume 
+2019.01.22 00.00.11a Removed en-gNB definition 
+2019.01.22 00.00.12 E2SM-KPM-IEs { 
+iso(1) identified-organization(3) dod(6) internet(1) private(4) enterprise(1) 53148 e2(1) 
+version1 (1) e2sm(2) e2sm-KPM-IEs (2)} 
+2019.01.22 00.00.13 Section 6.1 update, Change E2 Node ID to KPM Node ID 
+2019.01.22 00.00.13a Change E2SM-NI-IndicationMessage to E2SM-KPM-IndicationMessage 
+2020.01.29 v01.00 Adopt Jio’s comments, change the number of NR DL/UL PRB from 100 to 273. 
+2020.12.16 02.00.00 Adopt INTEL.AO’s CR-0001 and CR-0002 for E2SM-KPM with cleaning up old texts 
+and ASN.1 in v01.00 
+2021.02.24 02.00.01 Adopt ATT.AO’s CR-0001 for UE-level measurements subscription and retrieval 
+2021.03.03 02.00.02 Adopt CSP.AO’s CR-0001 for Incomplete Flag 
+2021.03.30 02.00.03 Adopt INTEL’s CR-0003 for clean-up 
+2021.06.09 02.00.04 Adopt (1) INT’s CR-0006; (2) INT’s CR-0008; (3) RSYS’s CR-0004 
+2021.07.09 02.00.05 Adopt (1) INT’s CR-0009; (2) NEU.AO’s CR-0001 
+2021.08.10 02.00 TSC Approved 
+2021.10.13 02.01.00 Adopt (1) INTEL.AO's CR-0011; (2) RSYS.AO's CR-0002 
+2021.10.27 02.01.01 Adopt KDDI's CR-0001.  
+2021.11.22 02.01.02 Editorial Updates based on review comments during WG3 approval process 
+2022.02.07 02.01 Version ready for Nov21 publication 
+ 2 
+ 3 
+ 4 
+"© 2019. 3GPP™ TSs and TRs are the property of ARIB, ATIS, CCSA, ETSI, TSDSI, TTA and TTC who jointly own 5 
+the copyright in them. They are subject to further modifications and are therefore provided to you "as is" for 6 
+information purposes only. Further use is strictly prohibited." 7 
+ 8 
+"© 2020. 3GPP™ TSs and TRs are the property of ARIB, ATIS, CCSA, ETSI, TSDSI, TTA and TTC who jointly own 9 
+the copyright in them. They are subject to further modifications and are therefore provided to you "as is" for 10 
+information purposes only. Further use is strictly prohibited." 11 
+ 12 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    3 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Contents   1 
+Revision History ................................................................................................................................................. 2 2 
+1 Introductory Material ............................................................................................................................... 5 3 
+1.1 Scope ................................................................................................................................................................. 5 4 
+2 References ................................................................................................................................................ 5 5 
+3 Definitions and Abbreviations ................................................................................................................. 6 6 
+3.1 Definitions ......................................................................................................................................................... 6 7 
+3.2 Abbreviations ..................................................................................................................................................... 6 8 
+4 General ..................................................................................................................................................... 6 9 
+4.1 Forwards and Backwards Compatibility ............................................................................................................ 6 10 
+4.2 Specification Notations ...................................................................................................................................... 7 11 
+4.3 Identifiers ........................................................................................................................................................... 7 12 
+5 E2SM Services ......................................................................................................................................... 7 13 
+6 RAN Function Service Model Description .............................................................................................. 9 14 
+6.1 RAN Function Overview ................................................................................................................................... 9 15 
+6.2 Supported RIC Services ..................................................................................................................................... 9 16 
+6.2.1 REPORT ...................................................................................................................................................... 9 17 
+7 RAN Function Description ....................................................................................................................... 9 18 
+7.1 Description ......................................................................................................................................................... 9 19 
+7.2 RAN Function Name ......................................................................................................................................... 9 20 
+7.3 Supported RIC Event Trigger Styles ............................................................................................................... 10 21 
+7.3.1 Event Trigger Style Types .......................................................................................................................... 10 22 
+7.3.2 Event Trigger Style 1: Periodic Report ...................................................................................................... 10 23 
+7.4 Supported RIC REPORT Service Styles ......................................................................................................... 10 24 
+7.4.1 REPORT Service Style Type ..................................................................................................................... 10 25 
+7.4.2 REPORT Service Style 1: E2 Node Measurement ..................................................................................... 10 26 
+7.4.3 REPORT Service Style 2: E2 Node Measurement for a single UE............................................................ 11 27 
+7.4.4 REPORT Service Style 3: Condition-based, UE-level E2 Node Measurement ......................................... 12 28 
+7
+.4.5 REPORT Service Style 4: Common condition-based, UE-level Measurement ......................................... 12 29 
+7.4.6 REPORT Service Style 5: E2 Node Measurement for Multiple UEs......................................................... 13 30 
+7.5 Supported RIC INSERT Service Styles ........................................................................................................... 13 31 
+7.6 Supported RIC CONTROL Service Styles ...................................................................................................... 13 32 
+7.7 Supported RIC POLICY Service Styles .......................................................................................................... 14 33 
+7.8 Supported RIC Styles and E2SM IE Formats .................................................................................................. 14 34 
+7.9 Conversion for UE-level and QoS flow-level measurements derived from 3GPP defined measured 35 
+values ............................................................................................................................................................... 14 36 
+7.9.1 Changes in the units of measurements while adopting for E2SM-KPM .................................................... 15 37 
+7.10 O-RAN specific Performance Measurement ................................................................................................... 17 38 
+7.10.1 DL Transmitted Data Volume .................................................................................................................... 17 39 
+7.10.2 UL Transmitted Data Volume .................................................................................................................... 18 40 
+7.10.3 Distribution of Percentage of DL Transmitted Data Volume to Incoming Data Volume  .......................... 19 41 
+7.10.4 Distribution of Percentage of UL Transmitted Data Volume to Incoming Data Volume .......................... 20 42 
+7.10.5 Distribution of DL Packet Drop Rate ......................................................................................................... 21 43 
+7.10.6 Distribution of UL Packet Loss Rate ......................................................................................................... 22 44 
+8 Elements for E2SM Service Model ........................................................................................................ 22 45 
+8.1 General ............................................................................................................................................................. 22 46 
+8.2 Message Functional Definition and Content .................................................................................................... 23 47 
+8.2.1 Messages for RIC Functional procedures................................................................................................... 23 48 
+8.2.2 Messages for RIC Global Procedures ........................................................................................................ 29 49 
+8.3 Information Element definitions ...................................................................................................................... 30 50 
+8.3.1 General ....................................................................................................................................................... 30 51 
+8.3.2 RAN Function Name .................................................................................................................................. 30 52 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    4 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.3.3 RIC Style Type ........................................................................................................................................... 30 1 
+8.3.4 RIC Style Name ......................................................................................................................................... 30 2 
+8.3.5 RIC Format Type ....................................................................................................................................... 31 3 
+8.3.6 Void ............................................................................................................................................................ 31 4 
+8.3.7 Void ............................................................................................................................................................ 31 5 
+8.3.8 Granularity Period ...................................................................................................................................... 31 6 
+8.3.9 Measurement Type Name .......................................................................................................................... 32 7 
+8.3.10 Measurement Type ID ................................................................................................................................ 32 8 
+8.3.11 Measurement Label .................................................................................................................................... 32 9 
+8.3.12 Time Stamp ................................................................................................................................................ 34 10 
+8.3.13 Void ............................................................................................................................................................ 34 11 
+8.3.14 S-NSSAI ..................................................................................................................................................... 34 12 
+8.3.15 PLMN Identity ........................................................................................................................................... 34 13 
+8.3.16 Void ............................................................................................................................................................ 34 14 
+8.3.17 5QI ............................................................................................................................................................. 34 15 
+8.3.18 QCI ............................................................................................................................................................. 34 16 
+8.3.19 Void ............................................................................................................................................................ 34 17 
+8.3.20 Cell Global ID ............................................................................................................................................ 34 18 
+8.3.21 QFI ............................................................................................................................................................. 34 19 
+8.3.22 Test Condition Information ........................................................................................................................ 34 20 
+8.3.23 Test Condition Value .................................................................................................................................  35 21 
+8.3.24 UE ID ......................................................................................................................................................... 35 22 
+8.4 Information Element Abstract Syntax (with ASN.1) ....................................................................................... 36 23 
+8.4.1 General ....................................................................................................................................................... 36 24 
+8.4.2 Information Element definitions ................................................................................................................ 36 25 
+9 Handling of Unknown, Unforeseen and Erroneous Protocol Data ........................................................ 45 26 
+Annex A Further information on RAN Function Network KPM Monitor .................................................. 46 27 
+A.1 Background Information .................................................................................................................................. 46 28 
+Annex ZZZ : O-RAN Adopter License Agreement ......................................................................................... 47 29 
+Section 1: DEFINITIONS ................................................................................................................................................ 47 30 
+Section 2: COPYRIGHT LICENSE .................................................................................................................................  47 31 
+Section 3: FRAND LICENSE .......................................................................................................................................... 47 32 
+Section 4: TERM AND TERMINATION ........................................................................................................................ 48 33 
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 48 34 
+Section 6: INDEMNIFICATION ..................................................................................................................................... 48 35 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 49 36 
+Section 8: ASSIGNMENT ............................................................................................................................................... 49 37 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 49 38 
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 49 39 
+Section 11: GENERAL ..................................................................................................................................................... 49 40 
+ 41 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    5 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+1 Introductory Material 1 
+1.1 Scope 2 
+This Technical Specification has been produced by the O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 4 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-5 
+RAN with an identifying change of release date and an increase in version number as follows:  6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+The present document specifies the E2 Service Model (E2SM) “Key Performance Measurement” (KPM) for the RAN 14 
+function handling reporting of the cell-level performance measurements for 5G networks defined in TS 28.552 [4] and 15 
+for EPC networks defined in TS 32.425 [8], and their possible adaptation of UE-level or QoS flow-level measurements. 16 
+ 17 
+2 References 18 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 19 
+document. 20 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 21 
+non-specific. 22 
+- For a specific reference, subsequent revisions do not apply. 23 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 24 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document. 25 
+ 26 
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”. 27 
+[2]  O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, Architecture & E2 General 28 
+Aspects and Principles (E2GAP) 29 
+[3] ORAN WG3, O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 30 
+Application Protocol (E2AP). 31 
+[4]  3GPP TS 28.552: "Management and orchestration 5G performance measurements".  32 
+[5] ITU-T Recommendation X.680 (2002-07): "Information technology – Abstract Syntax Notation 33 
+One (ASN.1): Specification of basic notation". 34 
+[6] ITU-T Recommendation X.681 (2002-07): "Information technology – Abstract Syntax Notation 35 
+One (ASN.1): Information object specification". 36 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    6 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+[7] ITU-T Recommendation X.691 (2002-07): "Information technology - ASN.1 encoding rules - 1 
+Specification of Packed Encoding Rules (PER)". 2 
+[8] 3GPP TS 32.425: "Telecommunication management Performance Management Performance 3 
+managements". 4 
+[9] IETF RFC 5905 (2010-06): "Network Time Protocol Version 4: Protocol and Algorithms 5 
+Specification". 6 
+[10] 3GPP TS 32.404: “Telecommunication management; Performance Management (PM); 7 
+Performance measurements; Definitions and template”. 8 
+[11] 3GPP TR 25.921: “Guidelines and principles for protocol description and error handling” . 9 
+[12] O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 Service Model (E2SM) 10 
+[13] 3GPP TS 36.413: “E-UTRAN; S1 Application Protocol (S1AP)” 11 
+ 12 
+3 Definitions and Abbreviations 13 
+3.1 Definitions 14 
+E2 Node: as defined in E2GAP [2].  15 
+ 16 
+RAN Function: as defined in E2GAP [2] 17 
+E2 Service Model: The description of the Services exposed by a specific RAN function within a n E2 Node over the E2 18 
+interface towards the Near-RT RIC. 19 
+KPM Report: The performance measurements for 4G LTE and 5G NR Network Functions.  20 
+3.2 Abbreviations 21 
+For the purposes of the present document, the following abbreviations apply.  22 
+O-CU  O- RAN Central Unit 23 
+O-CU-CP O- RAN Central Unit – Control Plane 24 
+O-CU-UP O- RAN Central Unit – User Plane 25 
+O-DU O- RAN Distributed Unit   26 
+Near-RT RIC Near-real-time RAN Intelligent Controller 27 
+Non-RT-RIC Non-real-time RAN Intelligent Controller 28 
+EN-DC E- UTRA-NR Dual Connectivity 29 
+MR-DC Multi-Radio Dual Connectivity 30 
+4 General  31 
+4.1 Forwards and Backwards Compatibility 32 
+The forwards and backwards compatibility of the protocol is assured by a mechanism where all current and future 33 
+messages, and IEs or groups of related IEs, include ID and criticality fields that are coded in a standard format that will 34 
+not be changed in the future. These parts can always be decoded regardless of the standard version. 35 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    7 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+4.2 Specification Notations 1 
+For the purposes of the present document, the following notations apply: 2 
+Service W hen referring to a Service in the specification the SERVICE NAME is written with upper case 3 
+characters and in bold followed by the word "service", e.g. REPORT service. 4 
+Procedure When referring to an elementary procedure in the specification the Procedure Name is written  with 5 
+the first letters in each word in upper case characters followed by the word "procedure ", e.g. 6 
+Handover Preparation procedure. 7 
+Message When referring to a message in the specification the MESSAGE NAME is written with all letters 8 
+in upper case characters followed by the word "message", e.g. HANDOVER REQUEST message. 9 
+IE When referring to an information element (IE) in the specification the Information Element Name  10 
+is written with the first letters in each word in upper case characters and all letters in Italic font 11 
+followed by the abbreviation "IE", e.g. E-RAB ID IE. 12 
+Value of an IE When referring to the value of an information element (IE) in the specification  the "Value" is 13 
+written as it is specified in the specification enclosed by quotation marks, e.g. "Value". 14 
+4.3 Identifiers 15 
+For the purposes of the present document, the following identifiers are defined: 16 
+Style Type The identifier used to nominate a specific approach or Style used to exposing a given RIC Service 17 
+(REPORT, INSERT, CONTROL and POLICY).  The same E2SM may support more than one 18 
+Style for each RIC Service. 19 
+Format Type The identifier used to nominate a specific formatting approach used to encode one of the E2AP IEs 20 
+defined in this E2SM.  The same E2SM may support more than one encoding Formats for each 21 
+E2AP IE and each E2AP IE message encoding Format may be used by one or more RIC Service 22 
+Styles. 23 
+5 E2SM Services 24 
+As defined in E2 General Aspects and Principles [2], a given RAN Function offers a set of services to be exposed over 25 
+the E2 (REPORT, INSERT, CONTROL and/or POLICY) using E2AP [3] defined procedures.  Each of the E2AP 26 
+Procedures listed in table 5-1 contains specific E2 Node RAN Function dependent Information Elements (IEs).  27 
+Table 5-1: Relationship between E2SM services and E2AP Information elements 28 
+RAN Function specific E2SM 
+Information Elements 
+E2AP Information 
+Element reference 
+Related E2AP Procedures 
+RIC Event Trigger Definition E2AP [3] section 9.2.9 RIC SUBSCRIPTION 
+RIC Action Definition E2AP [3] section 9.2.12 RIC SUBSCRIPTION 
+RIC Indication Header E2AP [3] section 9.2.17 RIC INDICATION 
+RIC Indication Message E2AP [3] section 9.2.16 RIC INDICATION 
+RIC Call Process ID E2AP [3] section 9.2.18 RIC INDICATION 
+RIC CONTROL 
+RIC Control Header E2AP [3] section 9.2.20 RIC CONTROL 
+RIC Control Message E2AP [3] section 9.2.19 RIC CONTROL 
+RAN Function Definition IE E2AP [3] section 9.2.23 E2 SETUP 
+RIC SERVICE UPDATE 
+ 29 
+All of these RAN Function specific IEs are defined in E2AP [3] as “OCTET STRING”.  30 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    8 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+The purpose of this specification is to define the contents of these fields for the specific RAN Function “KPM 1 
+Monitor”.  2 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    9 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+6 RAN Function Service Model Description 1 
+6.1 RAN Function Overview 2 
+E2 Service Model KPM (E2SM-KPM) supports O-CU-CP, O-CU-UP, and O-DU as part of NG-RAN connected to 3 
+5GC or as part of E-UTRAN connected to EPC. 4 
+The E2 Node shall host the RAN Function “KPM Monitor” which performs the following functionalities: 5 
+- Exposure of available measurements from O-DU, O-CU-CP, and/or O-CU-UP via the RAN Function Definition IE. 6 
+- Periodic reporting of measurements subscribed from Near-RT RIC. 7 
+This E2SM specification also exposes a set of services described in clause 6.2. 8 
+6.2 Supported RIC Services 9 
+6.2.1 REPORT  10 
+The “KPM Monitor” RAN Function provides the following REPORT services: 11 
+- E2 Node Measurement 12 
+- E2 Node Measurement for a single UE 13 
+- C ondition-based, UE-level E2 Node Measurement 14 
+- Common Condition-based, UE-level E2 Node Measurement 15 
+- E2 Node Measurements for multiple UEs 16 
+These services may be initiated according to: 17 
+- Periodical event. 18 
+7 RAN Function Description 19 
+7.1 Description 20 
+The E2AP [3] procedures, E2 SETUP and RIC SERVICE UPDATE, are used to transport the RAN Function Definition 21 
+IE.   22 
+In this E2SM-KPM, the RAN Function Definition IE shall provide the following information: 23 
+- RAN Function name along with associated information on E2SM definition 24 
+- Event trigger styles list along with the corresponding encoding type for each associated E2AP IE.  25 
+- RIC REPORT Service styles list along with the corresponding encoding type for each associated E2AP IE.  26 
+7.2 RAN Function Name 27 
+RAN Function Short Name “ORAN-E2SM-KPM” 28 
+RAN Function Description “KPM Monitor” 29 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    10 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+RAN Function Instance, required when and if an E2 Node exposes more than one instance of a RAN Function based on 1 
+this E2SM. 2 
+ 3 
+7.3 Supported RIC Event Trigger Styles 4 
+7.3.1 Event Trigger Style Types 5 
+RIC 
+Style 
+Type 
+Style Name Supported RIC Service Style Style Description 
+Report Insert Policy 
+1 Periodic Report 1 - - RIC Event Trigger Definition IE based on reporting 
+period 
+ 6 
+7.3.2 Event Trigger Style 1: Periodic Report 7 
+This Event Trigger style 1 is to set the KPM report period and uses the RIC Event Trigger Definition IE Format 1 8 
+(8.2.1.1.1) 9 
+7.4 Supported RIC REPORT Service Styles 10 
+7.4.1 REPORT Service Style Type 11 
+RIC 
+Style 
+Type 
+Style Name Style Type Description 
+1 E2 Node Measurement Used to carry measurement report from a target E2 Node 
+2 E2 Node Measurement for a 
+single UE 
+Used to carry measurement report for a single UE of interest from a target 
+E2 Node 
+3 Condition-based, UE-level 
+E2 Node Measurement 
+Used to carry UE-level measurement report for a group of UEs per 
+measurement type matching subscribed conditions from a target E2 Node 
+4 Common Condition-based, 
+UE-level Measurement 
+Used to carry measurement report for a group of UEs across a set of 
+measurement types satisfying common subscribed conditions from a target 
+E2 Node 
+5 E2 Node Measurement for 
+multiple UEs 
+Used to carry measurement report for multiple UE of interest from a target 
+E2 Node 
+ 12 
+7.4.2 REPORT Service Style 1: E2 Node Measurement 13 
+7.4.2.1 REPORT Service Style description 14 
+The REPORT Service style 1 provides the performance measurement information collection from an E2 Node.  15 
+7.4.2.2 REPORT Service RIC Action Definition IE contents 16 
+This REPORT Service style aims to subscribe to the measurements defined in TS 28.552 [4] and TS 32.425 [8], and 17 
+uses the RIC Action Definition IE Format 1 (8.2.1.2.1). 18 
+The REPORT Service RIC Action Definition IE contains measurement types that Near-RT RIC is requesting to 19 
+subscribe followed by a list of subcounters to be measured for each measurement type, and a granularity period 20 
+indicating collection interval of those measurements. 21 
+For the measurement types that belong to a measurement object class confined in a single cell (e.g. " EUtranCellFDD" in 22 
+TS 32.425 [8] or "NRCellDU" in TS 28.552 [4]), the Cell Global ID IE shall be included in the IE to point to a specific 23 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    11 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+cell for collecting measurements within the E2 Node. The Cell Global ID IE may not be included if all the subscribed 1 
+measurement types are cell agnostic, i.e. belonging to measurement object classes not confined in a single cell (e.g. 2 
+"GNBCUUPFunction" in TS 28.552 [4]). In case that both single-cell-confined and cell agnostic measurement types are 3 
+subscribed together, the Cell Global ID IE shall be included in the IE and the E2 Node shall ignore the included Cell 4 
+Global ID IE for those cell agnostic measurement types. 5 
+A measurement ID can be used for subscription instead of a measurement type if an identifier of a certain measurement 6 
+type was exposed by an E2 Node via the RAN Function Definition IE.  7 
+7.4.2.3 REPORT Service RIC Indication Header IE contents 8 
+This REPORT Service style uses the RIC Indication Header IE Format 1 (8.2.1.3.1), which contains a measurement 9 
+collection start time as UTC format.  10 
+The REPORT Service RIC Indication Header IE may carry file format version, sender name, sender type, and vendor 11 
+name as printable strings. 12 
+7.4.2.4 REPORT Service RIC Indication Message IE contents 13 
+This REPORT Service style uses the RIC Indication Message IE Format 1 (8.2.1.4.1). 14 
+The REPORT Service RIC Indication Message IE carries a set of measurement data reported from an E2 Node . The 15 
+reported data contains a set of measurement records, each collected at every granularity period during the reporting 16 
+period. In case the E2 Node is not able to provide reliable data for a granularity period during the reporting period, it 17 
+may include the optional Incomplete Flag IE, which indicates that the corresponding measurements record in the 18 
+reported data is not reliable. 19 
+The REPORT Service RIC Indication Message IE optionally carry subscription information, i.e. Measurement 20 
+Information List IE that indicates the order of measured values for each measurement record in the reported data, or 21 
+their granularity period. If not present, the original subscription information shall apply.  22 
+7.4.3 REPORT Service Style 2: E2 Node Measurement for a single UE 23 
+7.4.3.1 REPORT Service Style description 24 
+The REPORT Service style 2 provides the performance measurement information collection for a single UE of interest 25 
+from an E2 Node.  26 
+7.4.3.2 REPORT Service RIC Action Definition IE contents 27 
+This REPORT Service style uses the RIC Action Definition IE Format 2 (8.2.1.2.2), where the included UE ID indicates 28 
+a specific UE of interest for measurement collection.  29 
+The rest of the subscription information follows the same as described in 7.4.2.2.  30 
+7.4.3.3 REPORT Service RIC Indication Header IE contents 31 
+This REPORT Service style uses the RIC Indication Header IE Format 1 (8.2.1.3.1) as described in 7.4.2.3. 32 
+7.4.3.4 REPORT Service RIC Indication Message IE contents 33 
+This REPORT Service style uses the RIC Indication Message IE Format 1 (8.2.1.4.1) as described in 7.4.2.4, where the 34 
+measurement data reported is associated only to a specific UE that was subscribed.  35 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    12 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.4.4 REPORT Service Style 3: Condition-based, UE-level E2 Node 1 
+Measurement 2 
+7.4.4.1 REPORT Service Style description 3 
+The REPORT Service style 3 provides the UE-level performance measurement information collection for a group of 4 
+UEs per measurement type matching subscribed conditions from an E2 Node.  5 
+7.4.4.2 REPORT Service RIC Action Definition IE contents 6 
+This REPORT Service style uses the RIC Action Definition IE Format 3 (8.2.1.2.3), where, for each requested 7 
+measurement within the Measurement Information Condition List IE, the Matching Condition IE serves as a condition 8 
+to include the matched UEs’ measurement values into the reporting. The Matching Condition IE can be expressed by a 9 
+list of subcounters to be measured (i.e. as a list of labels), or by a list of test conditions that need to be passed, or by a 10 
+combination of both.   11 
+The rest of the subscription information follows the same as described in 7.4.2.2.  12 
+7.4.4.3 REPORT Service RIC Indication Header IE contents 13 
+This REPORT Service style uses the RIC Indication Header IE Format 1 (8.2.1.3.1) as described in 7.4.2.3. 14 
+7.4.4.4 REPORT Service RIC Indication Message IE contents 15 
+This REPORT Service style uses the RIC Indication Message IE Format 2 (8.2.1.4.2). 16 
+The REPORT Service RIC Indication Message IE carries a set of UE-level measurement data matching subscribed 17 
+conditions. The included Measurement Information Condition UE List IE indicates the order of measured values for 18 
+each measurement record in the reported data – a list of UE IDs satisfying the subscribed Matching Condition IE for 19 
+each requested measurement.  20 
+In every granularity period during which a UE matching a subscribed condition stays in the E2 Node and maintains the  21 
+RRC_CONNECTED or RRC_INACTIVE state, the E2 Node collects the related data and reports it at the end of the 22 
+reporting period. In the granularity periods where the UE does not appear in the RRC_CONNECTED or 23 
+RRC_INACTIVE state (e.g. transitioned to RRC_IDLE or UE identity track is lost), the E2 Node does not collect the 24 
+related data and NULL is reported for those granularity periods until the end of the Reporting Period.  In this case, the 25 
+E2 Node stops reporting measurements related to this UE in the subsequent reporting periods. 26 
+The list of matched UE IDs can be omitted for a certain subscribed measurement type if none of the UEs were matched 27 
+during the reporting period.  28 
+The rest of the information follows the same as described in 7.4.2.4.  29 
+7.4.5 REPORT Service Style 4: Common condition-based, UE-level 30 
+Measurement 31 
+7.4.5.1 REPORT Service Style description 32 
+The REPORT Service style 4 provides the UE-level performance measurement information collection for a group of 33 
+UEs across a set of measurement types matching common subscribed conditions from an E2 Node.  34 
+7.4.5.2 REPORT Service RIC Action Definition IE contents 35 
+This REPORT Service style uses the RIC Action Definition IE Format 4 (8.2.1.2.4), where a Matching Condition IE 36 
+serves as a condition to include the matched UEs’ measurement values into the reporting, common for each requested 37 
+measurement within the Measurement Information List IE. The Matching Condition IE is expressed by a list of test 38 
+conditions to filter matching UEs. 39 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    13 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+The rest of the subscription information follows the same as described in 7.4.2.2.  1 
+7.4.5.3 REPORT Service RIC Indication Header IE contents 2 
+This REPORT Service style uses the RIC Indication Header IE Format 1 (8.2.1.3.1) as described in 7.4.2.3. 3 
+7.4.5.4 REPORT Service RIC Indication Message IE contents 4 
+This REPORT Service style uses the RIC Indication Message IE Format 3 (8.2.1.4.3). 5 
+The REPORT Service RIC Indication Message IE Format 3 carries a list of measurement data for UE(s) matching 6 
+subscribed conditions.  7 
+In every granularity period during which a UE matching a subscribed condition stays in the E2 Node and maintains the  8 
+RRC_CONNECTED or RRC_INACTIVE state, the E2 Node collects the related data and reports it at the end of the 9 
+reporting period. In the granularity periods where the UE does not appear in the RRC_CONNECTED or 10 
+RRC_INACTIVE state (e.g. transitioned to RRC_IDLE or UE identity track is lost), the E2 Node does not collect the 11 
+related data and NULL is reported for those granularity periods until the end of the Reporting Period. In this case, the 12 
+E2 Node stops reporting measurements related to this UE in the subsequent reporting periods.  13 
+If none of the UEs were matched during the reporting period, then E2 Node does not report measurem ents for that 14 
+reporting period.   15 
+The rest of the information follows the same as described in 7.4.2.4.  16 
+7.4.6 REPORT Service Style 5: E2 Node Measurement for Multiple UEs 17 
+7.4.6.1 REPORT Service Style description 18 
+The REPORT Service style 5 provides the performance measurement information collection for multiple UEs of 19 
+interest from an E2 Node.  20 
+7.4.6.2 REPORT Service RIC Action Definition IE contents 21 
+This REPORT Service style uses the RIC Action Definition IE Format 5 (8.2.1.2.5), where the included UE Identifiers 22 
+indicates UEs of interest for measurement collection.  23 
+The rest of the subscription information follows the same as described in 7.4.2.2.  24 
+7.4.6.3 REPORT Service RIC Indication Header IE contents 25 
+This REPORT Service style uses the RIC Indication Header IE Format 1 (8.2.1.3.1) as described in 7.4.2.3. 26 
+7.4.6.4 REPORT Service RIC Indication Message IE contents 27 
+This REPORT Service style uses the RIC Indication Message IE Format 3 (8.2.1.4.3) as described in 7.4.5.4, where the 28 
+measurement data reported is associated to multiple UEs that was subscribed and available in the system.  29 
+7.5 Supported RIC INSERT Service Styles 30 
+Note: Not used in this service model 31 
+7.6 Supported RIC CONTROL Service Styles 32 
+Note: Not used in this service model 33 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    14 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.7 Supported RIC POLICY Service Styles 1 
+Note: Not used in this service model 2 
+7.8 Supported RIC Styles and E2SM IE Formats 3 
+Table 7.8-1 and 7.8-2 provide a summary of the E2SM IE Formats defined to support this E2SM specification. 4 
+Table 7.8-1: Summary of the E2SM IE Formats defined to support RIC Event Trigger Styles 5 
+RIC Event 
+Trigger Style 
+Event Trigger 
+Definition Format 
+Style 1 1 
+  
+ 6 
+Table 7.8-1: Summary of the E2SM IE Formats defined to support RIC Service Styles  7 
+RIC 
+Service 
+Style 
+Action 
+Definition 
+Format 
+Indication 
+Header 
+Format 
+Indication 
+Message 
+Format 
+Call 
+Process ID 
+Format 
+Control 
+Header 
+Format 
+Control 
+Message 
+Format 
+Control 
+Outcome 
+Format 
+REPORT  
+Style 1 1 1 1     
+Style 2 2 1 1     
+Style 3 3 1 2     
+Style 4 4 1 3     
+Style 5 5 1 3     
+        
+INSERT  
+        
+CONTROL  
+        
+POLICY  
+        
+ 8 
+7.9 Conversion for UE-level and QoS flow-level measurements 9 
+derived from 3GPP defined measured values 10 
+The conversion of the measurements’ definitions provided in TS 28.552 [4], TS 32.425 [8], and O-RAN specific 11 
+measurement defined in Section 7.10 is performed according to the following rules: 12 
+The type of the original 
+measurements 
+The corresponding per-
+UE and per-UE-per-slice 
+measurements 
+The corresponding per-
+QoS flow and per-slice-
+per-QoS flow 
+measurements 
+Notes 
+Throughput 
+Delay 
+Data volume 
+In-session activity time 
+Measured per UE  Measured per QoS flow For the Throughput and 
+Data volume 
+measurements, the 
+formulas specified in 
+3GPP are used with 
+restriction to the individual 
+UE or individual QoS flow 
+, and also based on Section 
+7.9.1. 
+PDCP drop rate 
+IP latency 
+Measured per UE Measured per QoS flow For the Throughput and  
+Data volume 
+measurements, the 
+formulas specified in 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    15 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+3GPP are used with 
+restriction to the individual 
+UE or individual QoS 
+flow. 
+Radio resource utilization Measured per UE N/A The formulas specified in 
+3GPP are used with 
+restriction to the individual 
+UE.  
+RRC connections related 
+PDU sessions related 
+DRBs related  
+QoS flows related 
+Measured per UE N/A  
+Mobility management Measured per UE N/A  
+CQI related  
+MCS related 
+Measured per UE N/A  
+PEE related N/A N/A  
+Distribution of 
+Normally/Abnormally  
+Released Calls 
+Measured per UE N/A  
+ 1 
+7.9.1 Changes in the units of measurements while adopting for E2SM-KPM 2 
+The units of the following measurements in TS 28.552 [4] and TS 32.425 [8] are replaced with newer units, as shown in 3 
+the table below. 4 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    16 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Measurement Type Measurement Name Data Type Unit used 
+in 3GPP 
+Unit used 
+in E2SM-
+KPM  
+DL Cell PDCP SDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.2.1.2.1. 
+DRB.PdcpSduVolumeDL_Filter INTEGER Mbit Kbit 
+UL Cell PDCP SDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.2.1.2.2. 
+DRB.PdcpSduVolumeUL_Filter INTEGER Mbit Kbit 
+DL PDCP PDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.3.6.1.1. 
+QosFlow.PdcpPduVolumeDL_Filter INTEGER Mbit Kbit 
+UL PDCP PDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.3.6.1.2. 
+QosFlow.PdcpPduVolumeUL_Filter INTEGER Mbit Kbit 
+DL PDCP SDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.3.6.2.1. 
+QosFlow.PdcpSduVolumeDl_Filter INTEGER Mbit Kbit 
+UL PDCP SDU Data Volume, 
+defined in TS 28.552 [4] clause 
+5.1.3.6.2.2. 
+QosFlow.PdcpSduVolumeUl_Filter INTEGER Mbit Kbit 
+DL Cell PDCP SDU Data Volume on 
+X2 interface, defined in TS 28.552 
+[4] clause 5.1.2.1.1.2. 
+DRB.PdcpSduVolumeX2DL_Filter INTEGER Mbit Kbit 
+UL Cell PDCP SDU Data Volume on 
+X2 interface, defined in TS 28.552 
+[4] clause 5.1.2.1.2.2. 
+DRB.PdcpSduVolumeX2UL_Filter INTEGER Mbit Kbit 
+DL Cell PDCP SDU Data Volume on 
+Xn interface, defined in TS 28.552 
+[4] clause 5.1.2.1.1.3. 
+DRB.PdcpSduVolumeXnDL_Filter INTEGER Mbit Kbit 
+UL Cell PDCP PDU Data Volume on 
+Xn interface, defined in TS 28.552 
+[4] clause 5.1.2.1.2.3. 
+DRB.PdcpSduVolumeXnUL_Filter INTEGER Mbit Kbit 
+DL PDCP SDU Data Volume per 
+interface, defined in TS 28.552 [4] 
+clause 5.1.3.6.2.3.  
+DRB.F1uPdcpSduVolumeDl.QoS, 
+DRB.X2uPdcpSduVolumeDl.QoS, 
+DRB.XnuPdcpSduVolumeDl.QoS 
+INTEGER Mbit Kbit 
+UL PDCP SDU Data Volume per 
+interface, defined in TS 28.552 [4] 
+clause 5.1.3.6.2.4.  
+DRB.F1uPdcpSduVolumeUl.QoS, 
+DRB.X2uPdcpSduVolumeUl.QoS, 
+DRB.XnuPdcpSduVolumeUl.QoS 
+INTEGER Mbit Kbit 
+DL cell PDCP SDU Data Volume, 
+defined in TS 32.425 [8] clause 
+4.4.7.1. 
+DRB.PdcpSduVolumeDl_Filter INTEGER Mbit Kbit 
+UL cell PDCP SDU Data Volume, 
+defined in TS 32.425 [8] clause 
+4.4.7.2. 
+DRB.PdcpSduVolumeUl_Filter INTEGER Mbit Kbit 
+In-session activity time for UE, 
+defined in TS 28.552 [4] clause 
+5.1.1.13.2.2. 
+QF.SessionTimeUE INTEGER s ms 
+In-session activity time for DRB, 
+defined in TS 28.552 [4] clause 
+5.1.1.10.4. 
+DRB.SessionTime.5QI, 
+DRB.SessionTime.SNSSAI 
+INTEGER s ms 
+In-session activity time for QoS flow, 
+defined in TS 28.552 [4] clause 
+5.1.1.13.2.1. 
+QF.SessionTimeQoS.QoS INTEGER s ms 
+In-session activity time for UE, 
+defined in TS 32.425 [8] clause 
+4.2.4.1. 
+ERAB.SessionTimeUE INTEGER s ms 
+In-session activity time for E-RABs, 
+defined in TS 32.425 [8] clause 
+4.2.4.2. 
+ERAB.SessionTimeQCI.QCI INTEGER s ms 
+IP throughput in UL, defined in TS 
+32.425 [8] clause 4.4.6.2. 
+DRB.IPThpUl.QCI REAL Kbit Kbit/s 
+ 1 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    17 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+The changes in the units of the measurements shown in the above table are to prevent the reported values from being 1 
+reported as 0 caused by rounding off the precision in the decimals to report them as INTEGER, except the last row of 2 
+“IP throughput in UL”, which is to fix the erroneous unit. 3 
+7.10 O-RAN specific Performance Measurement 4 
+7.10.1 DL Transmitted Data Volume 5 
+Measurement Name DL Transmitted Data Volume 
+a) Description This measurement provides the transmitted data volume in the downlink in a 
+measurement time. The measurement is split into subcounters per QoS level 
+(mapped 5QI or QCI in NR option 3), and subcounters per supported S-NSSAI.  
+The unit is kbit. 
+b) Collection Method CC 
+c) Condition This measurement is obtained by counting the data volume counted on RLC SDU 
+level, in kbit successfully transmitted (acknowledged by UE) in DL for one DRB 
+during measurement time T. Separate counters are maintained for each mapped 5QI 
+(or QCI for option 3) and for each supported S-NSSAI. 
+d) Measurement Result Each measurement is an integer value representing the number of bits measured in 
+kbits (1kbits=1000 bits). The number of measurements is equal to the number of 
+PLMNs multiplied by the number of QoS levels multiplied by the number of S-
+NSSAIs. 
+e) Measurement Type The measurement name has the form DRB.RlcSduTransmittedVolumeDL_Filter. 
+Where filter is a combination of PLMN ID and QoS level and S-NSSAI. 
+Where PLMN ID represents the PLMN ID, QoS represents the mapped 5QI or the 
+QCI level, and SNSSAI represents S-NSSAI. 
+f) Measurement Object Class NRCellDU 
+g) Switching Technology Valid for packet switched traffic 
+h) Generation 5GS 
+i) Purpose One usage of this measurement is for performance assurance within integrity area 
+(user plane connection quality). 
+ 6 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    18 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.10.2 UL Transmitted Data Volume 1 
+Measurement Name UL Transmitted Data Volume 
+a) Description This measurement provides the transmitted data volume in the uplink in a certain 
+period. The measurement is split into subcounters per QoS level (mapped 5QI or QCI 
+in NR option 3), and subcounters per supported S-NSSAI.  
+The unit is kbit. 
+b) Collection Method CC 
+c) Condition This measurement is obtained by counting the data volume counted on RLC SDU 
+level, in kbit successfully transmitted (acknowledged by E2 Node) in UL for one DRB 
+during measurement time T. Separate counters are maintained for each mapped 5QI 
+(or QCI for option 3) and for each supported S-NSSAI. 
+d) Measurement Result Each measurement is an integer value representing the number of bits measured in 
+kbits (1kbits=1000 bits). The number of measurements is equal to the number of 
+PLMNs multiplied by the number of QoS levels multiplied by the number of S-
+NSSAIs. 
+e) Measurement Type The measurement name has the form DRB.RlcSduTransmittedVolumeUL_Filter. 
+Where filter is a combination of PLMN ID and QoS level and S-NSSAI. 
+Where PLMN ID represents the PLMN ID, QoS represents the mapped 5QI or the 
+QCI level, and SNSSAI represents S-NSSAI. 
+f) Measurement Object Class NRCellDU 
+g) Switching Technology Valid for packet switched traffic 
+h) Generation 5GS 
+i) Purpose One usage of this measurement is for performance assurance within integrity area 
+(user plane connection quality). 
+ 2 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    19 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.10.3 Distribution of Percentage of DL Transmitted Data Volume to Incoming 1 
+Data Volume 2 
+Measurement Name Distribution of Percentage of DL Transmitted Data Volume to Incoming Data 
+Volume 
+a) Description This measurement provides the distribution of the percentage of successfully 
+transmitted data volume to incoming data volume in downlink for UEs. The 
+measurement is split into subcounters per QoS level (mapped 5QI or QCI in NR 
+option 3), and subcounters per supported S-NSSAI. 
+b) Collection Method CC 
+c) Condition The Measurement is calculated by 100*x/y for each UE. 
+x is incremented by counting the number of bits counted on RLC SDU level  
+successfully transmitted (acknowledged by UE) in DL for one DRB during 
+measurement time T. 
+y is incremented by counting the number of bits entering the RLC layers in DL for one 
+DRB during measurement time T. 
+For each UE, the bin corresponding to the percentage of transmitted data volume to 
+incoming data volume (100*x/y) experienced by the UE is incremented by one. 
+Separate counters are maintained for each mapped 5QI (or QCI for option 3) and for 
+each supported S-NSSAI. 
+d) Measurement Result A set of integers, each representing the (integer) number of samples with a 
+percentage of DL transmitted data volume to incoming data volume in the range 
+represented by that bin. If the optional QoS level subcounter and S-NSSAI 
+subcounter and PLMN ID subcounter measurements are performed, the number of 
+measurements is equal to the number of mapped 5QIs and the number of supported 
+S-NSSAIs, and the number of PLMN IDs. 
+e) Measurement Type The measurement name has the form DRB.PerDataVolumeDLDist.Bin where Bin 
+represents the bin, or optionally DRB.PerDataVolumeDLDist.Bin.QOS, where QOS 
+identifies the target quality of service class, and 
+DRB.PerDataVolumeDLDist.Bin.SNSSAI, where SNSSAI identifies the S-NSSAI, and 
+DRB.PerDataVolumeDLDist.Bin.PLMN, where PLMN identifies the PLMN ID. 
+f) Measurement Object Class NRCellDU 
+g) Switching Technology Packet Switched 
+h) Generation 5GS 
+i) Purpose Network Operator’s Traffic Engineering Community 
+ 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    20 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.10.4 Distribution of Percentage of UL Transmitted Data Volume to Incoming 1 
+Data Volume 2 
+Measurement Name Distribution of Percentage of UL Transmitted Data Volume to Incoming Data 
+Volume 
+a) Description This measurement provides the distribution of the percentage of successfully 
+transmitted data volume to incoming data volume in uplink for UEs. The 
+measurement is split into subcounters per QoS level (mapped 5QI or QCI in NR 
+option 3), and subcounters per supported S-NSSAI. 
+b) Collection Method CC 
+c) Condition The Measurement is calculated by 100*x/y for each UE. 
+x is incremented by counting the number of bits counted on RLC SDU level 
+successfully transmitted (acknowledged by E2 Node) in UL for one DRB during 
+measurement time T. 
+y is incremented by counting the number of bits entering the RLC layers in UL for one 
+DRB during measurement time T. It is up to implementation how to measure y 
+reliably during T. 
+For each UE, the bin corresponding to the percentage of transmitted data volume to 
+incoming data volume (100*x/y) experienced by the UE is incremented by one. 
+Separate counters are maintained for each mapped 5QI (or QCI for option 3) and for 
+each supported S-NSSAI. 
+d) Measurement Result A set of integers, each representing the (integer) number of samples with a 
+percentage of UL transmitted data volume to incoming data volume in the range 
+represented by that bin. If the optional QoS level subcounter and S-NSSAI 
+subcounter and PLMN ID subcounter measurements are performed, the number of 
+measurements is equal to the number of mapped 5QIs and the number of supported 
+S-NSSAIs, and the number of PLMN IDs. 
+e) Measurement Type The measurement name has the form DRB.PerDataVolumeULDist.Bin where Bin 
+represents the bin, or optionally DRB.PerDataVolumeULDist.Bin.QOS, where QOS 
+identifies the target quality of service class, and 
+DRB.PerDataVolumeULDist.Bin.SNSSAI, where SNSSAI identifies the S-NSSAI, and 
+DRB.PerDataVolumeUlDist.Bin.PLMN, where PLMN identifies the PLMN ID. 
+f) Measurement Object Class NRCellDU 
+g) Switching Technology Packet Switched 
+h) Generation 5GS 
+i) Purpose Network Operator’s Traffic Engineering Community 
+ 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    21 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.10.5 Distribution of DL Packet Drop Rate 1 
+Measurement Name Distribution of DL Packet Drop Rate 
+a) Description This measurement provides the fraction of RLC SDU packets which are dropped on 
+the downlink, due to high traffic load, traffic management etc in the gNB-DU. Only 
+user-plane traffic (DTCH) is considered. A dropped packet is one without any part of 
+it having been transmitted on the air interface. The measurement is optionally split 
+into subcounters per QoS level (mapped 5QI or QCI in NR option 3), and 
+subcounters per supported S-NSSAI. 
+b) Collection Method SI 
+c) Condition This attribute is created by counting the number of UEs experiencing a certain packet 
+loss rate in each range. 
+d) Measurement Result Each measurement is an integer value representing the drop rate multiplied by 1E6 
+of each UE within the range of the bin. The number of measurements is equal to one. 
+If the optional QoS and S-NSSAI level measurement are performed, the 
+measurements are equal to the number of mapped 5QIs and the number of 
+supported S-NSSAIs. 
+e) Measurement Type The measurement name has the form DRB.RlcPacketDropRateDLDist and optionally 
+DRB.RlcPacketDropRateDLDist.QOS where QOS identifies the target quality of 
+service class, and DRB.RlcPacketDropRateDLDist.SNSSAI where SNSSAI identifies 
+the S-NSSAI. 
+f) Measurement Object Class NRCellDU 
+g) Switching Technology Valid for packet switched traffic 
+h) Generation 5GS 
+i) Purpose One usage of this measurement is for performance assurance within integrity area 
+(user plane connection quality). 
+ 2 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    22 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+7.10.6 Distribution of UL Packet Loss Rate 1 
+Measurement Name Distribution of UL Packet Loss Rate 
+a) Description This measurement provides the distribution of the fraction of PDCP SDU packets 
+which are not successfully received at gNB-CU-UP. It is a measure of the UL packet 
+loss including any packet losses in the air interface, in the gNB-CU and on the F1-U 
+interface. Only user-plane traffic (DTCH) and only PDCP SDUs that have entered 
+PDCP (and given a PDCP sequence number) are considered.  The measurement is 
+optionally split into subcounters per QoS level (mapped 5QI or QCI in NR option 3), 
+and subcounters per supported S-NSSAI. 
+b) Collection Method SI 
+c) Condition This attribute is created by counting the number of UEs experiencing a certain packet 
+loss rate in each range. 
+d) Measurement Result Each measurement is an integer value representing the loss rate multiplied by 1E6 of 
+each UE within the range of the bin. If the optional QoS and S-NSSAI level 
+measurement are performed, the measurements are equal to the number of mapped 
+5QIs and the number of supported S-NSSAIs. 
+e) Measurement Type The measurement name has the form DRB.PacketLossRateULDist and optionally 
+DRB.PacketLossRateULDist.QOS where QOS identifies the target quality of service 
+class, and DRB. PacketLossRateULDist.SNSSAI where SNSSAI identifies the S-
+NSSAI. 
+f) Measurement Object Class GNBCUUPFunction. 
+NRCellCU. 
+g) Switching Technology Valid for packet switched traffic. 
+h) Generation 5GS. 
+i) Purpose One usage of this measurement is for performance assurance within integrity area 
+(user plane connection quality). 
+ 2 
+8 Elements for E2SM Service Model 3 
+8.1 General 4 
+Sub-clause 8.2 describes the structure of the information elements as required for E2SM-KPM in tabular format. Sub-5 
+clause 8.3 presents individual information elements. Sub-clause 8.4 provides the corresponding ASN.1 definition of 6 
+each information element. 7 
+The following attributes are used for the tabular description of the messages and information elements:  8 
+NOTE: The messages have been defined by the guidelines specified in 3GPP TR 25.921 [11]. 9 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    23 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.2 Message Functional Definition and Content 1 
+8.2.1 Messages for RIC Functional procedures 2 
+8.2.1.1 RIC EVENT TRIGGER DEFINITION IE 3 
+This information element is part of the RIC SUBSCRIPTION REQUEST message sen t by the Near-RT RIC to an E2 4 
+Node and is required for event triggers used to initiate REPORT actions. 5 
+Direction: NEAR-RT RIC → E2 Node. 6 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+CHOICE Event Trigger Format     
+>E2SM-KPM Event Trigger 
+Definition Format 1 
+M  8.2.1.1.1  
+ 7 
+8.2.1.1.1 E2SM-KPM Event Trigger Definition Format 1 8 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+Reporting Period M  INTEGER 
+(1..42949672
+95) 
+The reporting period is expressed in 
+unit of 1 millisecond. 
+ 9 
+8.2.1.2 RIC ACTION DEFINITION IE 10 
+This information element is part of the RIC SUBSCRIPTION REQUEST message sent by the Near -RT RIC to an E2 11 
+Node. In this service model, this information element provides additional information for the nominated Action 12 
+(Report).  13 
+Direction: NEAR-RT RIC → E2 Node. 14 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics 
+description 
+RIC Style Type M  8.3.3  
+CHOICE Action Definition 
+Format 
+    
+>E2SM-KPM Action Definition 
+Format 1 
+M  8.2.1.2.1  
+>E2SM-KPM Action Definition 
+Format 2 
+M  8.2.1.2.2  
+>E2SM-KPM Action Definition 
+Format 3 
+M  8.2.1.2.3  
+>E2SM-KPM Action Definition 
+Format 4 
+M  8.2.1.2.4  
+>E2SM-KPM Action Definition 
+Format 5 
+M  8.2.1.2.5  
+ 15 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    24 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.2.1.2.1 E2SM-KPM Action Definition Format 1 1 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurement Information List  1.. 
+<maxnoofMeas
+urementInfo> 
+  
+>CHOICE Measurement Type     
+>>Measurement Name M  8.3.9 
+Measurement Type 
+Name 
+ 
+>>Measurement ID M  8.3.10 
+Measurement Type ID 
+ 
+>List of Labels  1.. 
+<maxnoofLabelI
+nfo> 
+  
+>>Label Information M  8.3.11 
+Measurement Label 
+ 
+Granularity Period M  8.3.8 
+Granularity Period 
+Collection interval of 
+measurements 
+Cell Global ID O  8.3.20 Cell Global ID Points to a specific 
+cell for generating 
+measurements 
+subscribed by the 
+Measurement 
+Information List IE 
+ 2 
+Range bound Explanation 
+maxnoofMeasurementInfo Maximum no. of measurement types that can be reported by a 
+single report. Value is <65535>. 
+maxnoofLabelInfo Maximum no. of measurements values that can be reported for a 
+single measurement type. Value is <2147483647>. 
+ 3 
+8.2.1.2.2 E2SM-KPM Action Definition Format 2 4 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+UE ID M  8.3.24 Points to a specific 
+UE of interest 
+Subscription Information M  8.2.1.2.1 E2SM-KPM 
+Action Definition 
+Format 1 
+ 
+ 5 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    25 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.2.1.2.3 E2SM-KPM Action Definition Format 3 1 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurement Information List  1.. 
+<maxnoofMeas
+urementInfo> 
+  
+>CHOICE Measurement Type     
+>>Measurement Name M  8.3.9 
+Measurement Type 
+Name 
+ 
+>>Measurement ID M  8.3.10 
+Measurement Type ID 
+ 
+>Matching Condition  1.. 
+<maxnoofCondi
+tionInfo> 
+ The Matching 
+Condition represents 
+the Boolean 
+expression, the 
+components of which 
+are connected with 
+logical AND 
+>>CHOICE Condition Type M    
+>>>Label Information   8.3.11 
+Measurement Label 
+ 
+>>>Test Information    8.3.22 Test Condition 
+Information 
+ 
+Granularity Period M  8.3.8 
+Granularity Period 
+Collection interval of 
+measurements 
+Cell Global ID O  8.3.20 Cell Global ID Points to a specific 
+cell for generating 
+measurements 
+subscribed by the 
+Measurement 
+Information List IE 
+ 2 
+Range bound Explanation 
+maxnoofMeasurementInfo Maximum no. of measurement types that can be reported by a 
+single report. Value is <65535>. 
+maxnoofConditionInfo Maximum no. of conditions that can be subscribed for a single 
+measurement type. Value is <32768>. 
+ 3 
+8.2.1.2.4 E2SM-KPM Action Definition Format 4 4 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Matching Condition  1.. 
+<maxnoofCondi
+tionInfoPerSub> 
+ The Matching 
+Condition represents 
+the Boolean 
+expression, the 
+components of which 
+are connected with 
+logical AND 
+>Test Information  M  8.3.22 Test Condition 
+Information 
+Provides test 
+condition to filter 
+matching UEs 
+ 
+Subscription Information M  8.2.1.2.1 E2SM-KPM 
+Action Definition 
+Format 1 
+ 
+ 5 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    26 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Range bound Explanation 
+maxnoofConditionInfoPerSub Maximum no. of conditions that can be subscribed for a single 
+subscription. Value is <32768>. 
+ 1 
+8.2.1.2.5 E2SM-KPM Action Definition Format 5 2 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+List of Subscribed UE IDs  2.. 
+<maxnoofUEID
+PerSub> 
+ Points to a list of UEs 
+of interest 
+ >UE ID M  8.3.24  
+Subscription Information M  8.2.1.2.1 E2SM-KPM 
+Action Definition 
+Format 1 
+ 
+ 3 
+Range bound Explanation 
+maxnoofUEIDPerSub Maximum no. of UE IDs that can be subscribed for a single 
+subscription. Value is <65535>. 
+ 4 
+8.2.1.3 RIC INDICATION HEADER IE 5 
+This information element is part of the RIC INDICATION message sent by the E2 Node to the Near-RT RIC and is 6 
+required for REPORT action. 7 
+Direction: E2 Node → NEAR-RT RIC. 8 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+CHOICE Indication Header 
+Format 
+    
+>E2SM-KPM Indication 
+Header Format 1 
+M  8.2.1.3.1  
+ 9 
+8.2.1.3.1 E2SM-KPM Indication Header Format 1 10 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Collection Start Time M  8.3.12 Time Stamp  
+File Format Version O  PrintableString (SIZE (0..15), …)  
+Sender Name O  PrintableString (SIZE (0..400), …)  
+Sender Type O  PrintableString (SIZE (0..8), …)  
+Vendor Name O  PrintableString (SIZE (0..32), …)  
+ 11 
+8.2.1.4 RIC INDICATION MESSAGE IE 12 
+This information element is part of the RIC INDICATION message sent by the E2 Node  to the Near-RT RIC and is 13 
+required for REPORT action. 14 
+Direction: E2 Node → NEAR-RT RIC. 15 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    27 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+CHOICE Indication Message 
+Format 
+    
+>E2SM-KPM Indication 
+Message Format 1 
+M  8.2.1.4.1  
+>E2SM-KPM Indication 
+Message Format 2 
+M  8.2.1.4.2  
+>E2SM-KPM Indication 
+Message Format 3 
+M  8.2.1.4.3  
+ 1 
+8.2.1.4.1 E2SM-KPM Indication Message Format 1 2 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurements Data   1.. 
+<maxnoofMeas
+urementRecord
+> 
+ Contains a set of 
+Measurement 
+Records, each 
+collected at each 
+Granularity Period. 
+>Measurements Record  1.. 
+<maxnoofMeas
+urementValue> 
+ Contains measured 
+values in same order 
+as in the  
+Measurements 
+Information List IE if 
+present, otherwise in 
+the order defined in 
+the subscription. 
+>>CHOICE Measured Value     
+>>>Integer Value M  INTEGER 
+(0..4294967295) 
+ 
+>>>Real Value M  REAL  
+>>>No Value M  NULL  
+>Incomplete Flag O  ENUMERATED (true, 
+…) 
+Indicates that the 
+measurements 
+record is not reliable. 
+Measurement Information List  0.. 
+<maxnoofMeas
+urementInfo> 
+  
+>CHOICE Measurement Type     
+>>Measurement Name M  8.3.9 
+Measurement Type 
+Name 
+ 
+>>Measurement ID M  8.3.10 
+Measurement Type ID 
+ 
+>List of Labels  1.. 
+<maxnoofLabelI
+nfo> 
+  
+>>Label Information M  8.3.11 
+Measurement Label 
+ 
+Granularity Period O  8.3.8 
+Granularity Period 
+Collection interval of 
+measurements 
+ 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    28 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Range bound Explanation 
+maxnoofMeasurementInfo Maximum no. of measurement types that can be reported by a single 
+report. Value is <65535>. 
+maxnoofLabelInfo Maximum no. of measurements values that can be reported for a 
+single measurement type. Value is <2147483647>. 
+maxnoofMeasurementRecord Maximum no. of measurement records that can be reported by a single 
+report. Value is <65535>. 
+maxnoofMeasurementValue Maximum no. of measurement values that can be carried by a single 
+measurement record. Value is <2147483647>. 
+ 1 
+8.2.1.4.2 E2SM-KPM Indication Message Format 2 2 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurements Data   1.. 
+<maxnoofMeas
+urementRecord
+> 
+ Contains a set of 
+Measurement 
+Records, each 
+collected at each 
+Granularity Period. 
+>Measurements Record  1.. 
+<maxnoofMeas
+urementValue> 
+ Contains measured 
+values in same order 
+as in the  
+Measurements 
+Information Condition 
+UE List IE. 
+>>CHOICE Measured Value     
+>>>Integer Value M  INTEGER 
+(0..4294967295) 
+ 
+>>>Real Value M  REAL  
+>>>No Value M  NULL  
+>Incomplete Flag O  ENUMERATED (true, 
+…) 
+Indicates that the 
+measurements 
+record is not reliable. 
+Measurement Information 
+Condition UE List 
+ 1.. 
+<maxnoofMeas
+urementInfo> 
+  
+>CHOICE Measurement Type     
+>>Measurement Name M  8.3.9 
+Measurement Type 
+Name 
+ 
+>>Measurement ID M  8.3.10 
+Measurement Type ID 
+ 
+>Matching Condition  1.. 
+<maxnoofCondi
+tionInfo> 
+  
+>>CHOICE Condition Type M    
+>>>Label Information   8.3.11 
+Measurement Label 
+ 
+>>>Test Information    8.3.22 Test Condition 
+Information 
+ 
+>List of matched UE IDs  0.. 
+<maxnoofUEID
+> 
+  
+>>UE ID M  8.3.24  
+Granularity Period O  8.3.8 
+Granularity Period 
+Collection interval of 
+measurements 
+ 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    29 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Range bound Explanation 
+maxnoofMeasurementInfo Maximum no. of measurement types that can be reported by a single 
+report. Value is <65535>. 
+maxnoofConditionInfo Maximum no. of conditions that can be subscribed for a single 
+measurement type. Value is <32768>. 
+maxnoofUEID Maximum no. of UE IDs that can be reported for a single condition. 
+Value is <65535>. 
+maxnoofMeasurementRecord Maximum no. of measurement records that can be reported by a single 
+report. Value is <65535>. 
+maxnoofMeasurementValue Maximum no. of measurement values that can be carried by a single 
+measurement record. Value is <2147483647>. 
+ 1 
+8.2.1.4.3 E2SM-KPM Indication Message Format 3 2 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+List of UE Measurement 
+Reports 
+ 1.. 
+<maxnoofUEMe
+asReport> 
+  
+>UE ID M  8.3.24  
+>Measurements Report  M  8.2.1.4.1 E2SM-KPM 
+Indication Message 
+Format 1 
+Contains 
+Measurement Data 
+for a UE for a 
+Reporting Period. 
+ 
+ 3 
+Range bound Explanation 
+maxnoofUEMeasReport Maximum no. of UE Measurement Reports that can be reported. Value 
+is <65535>. 
+ 4 
+8.2.1.5 RIC CALL PROCESS ID 5 
+Note: Not used in this service model 6 
+8.2.1.6 RIC CONTROL HEADER IE 7 
+Note: Not used in this service model 8 
+8.2.1.7 RIC CONTROL MESSAGE IE 9 
+Note: Not used in this service model 10 
+8.2.1.8 RIC CONTROL OUTCOME IE 11 
+Note: Not used in this service model 12 
+8.2.2 Messages for RIC Global Procedures 13 
+8.2.2.1 RAN Function Definition IE 14 
+This information element is part of the E2 SETUP REQUEST, and RIC SERVICE UPDATE message sent by the E2 15 
+Node to the Near-RT RIC and is used to provide all required information for the Near-RT RIC to determine how a 16 
+given E2 Node has been configured to support a given RAN Function specific E2SM. 17 
+Direction: E2 Node → NEAR-RT RIC. 18 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    30 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics 
+description 
+RAN Function Name M  8.3.2  
+Sequence of Event Trigger styles  0.. <maxnoofRICStyles>   
+>RIC Event Trigger Style Type M  8.3.3  
+>RIC Event Trigger Style Name M  8.3.4  
+>RIC Event Trigger Format Type M  8.3.5  
+Sequence of Report styles  0.. <maxnoofRICStyles>   
+>RIC Report Style Type M  8.3.3  
+>RIC Report Style Name M  8.3.4  
+>RIC Report Action Format Type M  8.3.5  
+>Sequence of Measurement Info 
+for Action 
+ 1.. 
+<maxnoofMeasurementIn
+fo> 
+  
+>>Measurement Type Name M  8.3.9  
+>>Measurement Type ID O  8.3.10  
+>RIC Indication Header Format 
+Type 
+M  8.3.5 Indication header 
+type used by Report 
+style 
+>RIC Indication Message Format 
+Type 
+M  8.3.5 Indication message 
+type used by Report 
+style 
+ 1 
+Range bound Explanation 
+maxnoofCells Maximum no. of cells supported by an E2 Node component. The 
+value is <16384>.  
+maxnoofRICstyle Maximum no. of Style of Report, Insert, Control or Policy actions 
+supported by RAN Function. The value is <63>. 
+maxnoofMeasurementInfo Maximum no. of measurement types that can be reported by a 
+single report. The value is <65535>. 
+ 2 
+8.3 Information Element definitions 3 
+8.3.1 General 4 
+When specifying information elements which are to be represented by bit strings, if not otherwise specifically stated in 5 
+the semantics description of the concerned IE or elsewhere, the following principle applies with regards to the ordering 6 
+of bits: 7 
+- The first bit (leftmost bit) contains the most significant bit (MSB); 8 
+- The last bit (rightmost bit) contains the least significant bit (LSB); 9 
+- When importing bit strings from other specifications, the first bit of the bit string contains the first bit of the 10 
+concerned information. 11 
+8.3.2 RAN Function Name 12 
+This IE is defined in [12] clause 6.2.2.1. 13 
+8.3.3 RIC Style Type 14 
+This IE is defined in [12] clause 6.2.2.2. 15 
+8.3.4 RIC Style Name 16 
+This IE is defined in [12] clause 6.2.2.3. 17 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    31 
+ 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.3.5 RIC Format Type 1 
+This IE is defined in [12] clause 6.2.2.4. 2 
+8.3.6 Void 3 
+8.3.7 Void 4 
+8.3.8 Granularity Period  5 
+This IE defines the measurement collection interval within a reporting period. 6 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+Granularity Period M  INTEGER 
+(1..4294967295) 
+Measurement collection interval 
+expressed in unit of 1 millisecond. 
+7 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    32 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.3.9 Measurement Type Name 1 
+This IE defines the name of a given measurement type. 2 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurement Name M  PrintableString(SIZE(1.. 
+150, ...)) 
+One of the 
+measurement 
+names specified in 
+TS 28.552 [4], TS 
+32.425 [8], or 
+Section 7.10. The 
+subcounters are 
+represented by the 
+Measurement 
+Labels defined in 
+8.3.11. 
+ 3 
+8.3.10 Measurement Type ID 4 
+This IE defines the identifier of a given measurement type. 5 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+Measurement ID M  INTEGER (1.. 65535, ...)  
+ 6 
+8.3.11 Measurement Label 7 
+This IE defines values of necessary subcounters applicable to an associated measurement type. 8 
+IE/Group Name Presence Range IE type and reference Semantics description 
+No Label O  ENUMERATED (true, 
+…) 
+Indicates the associated 
+measurement type without any 
+subcounter. If included, other IEs in 
+8.3.11 shall not be included in the 
+same Measurement Label (and 
+vice versa).  
+PLMN ID O   8.3.15 Represents the PLMN subcounter 
+Slice ID O  8.3.14 Represents the SNSSAI 
+subcounter 
+5QI O  8.3.17 Represents the 5QI subcounter 
+QFI O  8.3.21 Represents the QFI subcounter 
+QCI O  8.3.18 Represents the QCI subcounter 
+QCImax O  8.3.18 Used only when the name of the 
+associated measurement type ends 
+with ‘_Filter’ 
+QCImin O  8.3.18 Used only when the name of the 
+associated measurement type ends 
+with ‘_Filter’ 
+ARPmax O  INTEGER (1.. 15, …) Used only when the name of the 
+associated measurement type ends 
+with ‘_Filter’ 
+ARPmin O  INTEGER (1.. 15, …) Used only when the name of the 
+associated measurement type ends 
+with ‘_Filter’ 
+Bitrate Range O  INTEGER (1.. 
+65535, ...) 
+Used only when the name of the 
+associated measurement type ends 
+with ‘_Filter’ 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    33 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Layer at MU-MIMO O  INTEGER (1.. 
+65535, ...) 
+Represents the MIMO layer 
+subcounter 
+Sum O  ENUMERATED (true, 
+…) 
+Sum is calculated as cumulative 
+sum from the start of the 
+measurement. 
+Distribution Bin X O  INTEGER (1.. 
+65535, ...) 
+An index of Bin X. Only applicable 
+to distribution type measurement 
+information. 
+Distribution Bin Y O  INTEGER (1.. 
+65535, ...) 
+An index of Bin Y. Only applicable 
+to distribution type measurement 
+information. This IE may be present 
+only when Distribution Bin X is 
+present. 
+Distribution Bin Z O  INTEGER (1.. 
+65535, ...) 
+An index of Bin Z. Only applicable 
+to distribution type measurement 
+information. This IE may be present 
+only when Distribution Bin X and 
+Distribution Bin Y are present. 
+Precedent Label Override 
+Indication 
+O  ENUMERATED (true, 
+…) 
+Indicates that subcounters and 
+their values of the precedent label 
+applies in the same way except for 
+the included subcounters. For 
+included subcounters, new values 
+shall apply. 
+Start End Indication O  ENUMERATED (start, 
+end, …) 
+Used to indicate a range of values. 
+If “start” is used for a label, the 
+subsequent label should include 
+this IE with “end”.  
+If included together with 
+Distribution Bin type subcounter(s), 
+it can be used to indicate a range 
+of multi-dimensional values in the 
+ascending order of numbers from 
+Bin Z (if included), then from Bin Y 
+(if included), then from Bin X (if 
+included). In this case, information 
+of a label with “start” should be 
+identical to that of the subsequent 
+label with “end”, except Distribution 
+Bin type subcounter(s) used. 
+Otherwise (included together with 
+subcounter other than Distribution 
+Bin type subcounter), it can be 
+used to indicate one-dimensional 
+range of values in the ascending 
+order, and information of a label 
+with “start” should be identical to 
+that of the subsequent label with 
+“end”, except only one subcounter. 
+Min O  ENUMERATED (true, 
+…) 
+Minimum of the measured values 
+over a granularity period. 
+Max O  ENUMERATED (true, 
+…) 
+Maximum of the measured values 
+over a granularity period. 
+Avg O  ENUMERATED (true, 
+…) 
+Average of the measured values 
+over a granularity period. 
+ 1 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    34 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.3.12 Time Stamp 1 
+This IE contains UTC time information 2 
+IE/Group Name Presence Range IE type and 
+reference 
+Semantics description 
+Time Stamp M  OCTET STRING 
+(SIZE(4)) 
+Encoded in the same format as the first four 
+octets of the 64-bit timestamp format as defined 
+in section 6 of IETF RFC 5905 [13]. 
+ 3 
+8.3.13 Void 4 
+8.3.14 S-NSSAI 5 
+This IE is defined in [12] clause 6.2.3.12. 6 
+8.3.15 PLMN Identity 7 
+This IE is defined in [12] clause 6.2.3.1. 8 
+8.3.16 Void 9 
+8.3.17 5QI 10 
+This IE is defined in [12] clause 6.2.3.13. 11 
+8.3.18 QCI 12 
+This IE is defined in [12] clause 6.2.3.14. 13 
+8.3.19 Void 14 
+8.3.20 Cell Global ID 15 
+This IE is defined in [12] clause 6.2.2.5. 16 
+8.3.21 QFI 17 
+This IE is defined in [12] clause 6.2.3.15. 18 
+8.3.22 Test Condition Information 19 
+This IE defines a test condition for identifying UEs. 20 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    35 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+IE/Group Name Presence Range IE type and reference Semantics description 
+CHOICE Test 
+Condition Type  
+M    
+>GBR   ENUMERATED (true, …) Identifies UEs with the GBR flows or 
+within the specified bitrate range 
+>AMBR   ENUMERATED (true, …) Identifies UEs with the AMBR within the 
+specified bitrate range 
+>IsStat   ENUMERATED (true, …) Identifies UEs which are stationary 
+>IsCatM   ENUMERATED (true, …) Identifies UEs of Category M 
+>RSRP   ENUMERATED (true, …) Identifies UEs with the latest reported 
+RSRP measurement for this cell within 
+the specified range 
+>RSRQ   ENUMERATED (true, …) Identifies UEs with the latest reported 
+RSRQ measurement for this cell within 
+the specified range 
+Test Condition O  ENUMERATED (equal, 
+greaterthan, lessthan, 
+contains, present, …) 
+ 
+Test Condition 
+Value 
+O  8.3.23  
+ 1 
+8.3.23 Test Condition Value 2 
+This IE defines the target value for a particular Test Condition Type IE element . 3 
+IE/Group Name Presence Range IE type and reference Semantics 
+description 
+CHOICE Test Value M    
+>INTEGER   INTEGER  
+>ENUMERATED   INTEGER  
+>BOOLEAN   BOOLEAN  
+>BIT STRING   BIT STRING  
+>OCTET STRING   OCTET STRING  
+>PRINTABLE STRING   PrintableString  
+ 4 
+8.3.24 UE ID 5 
+This IE is defined in [12] clause 6.2.2.6. 6 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    36 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+8.4 Information Element Abstract Syntax (with ASN.1) 1 
+8.4.1 General 2 
+E2SM-KPM ASN.1 definition conforms to ITU-T Rec. X.680 [5] and ITU-T Rec. X.681 [6]. 3 
+Sub clause 8.4.2 presents the Abstract Syntax of the E2SM information elements to be carried within the E2AP [3] protocol messages with ASN.1. In case there is contradiction 4 
+between the ASN.1 definition in this sub clause and the tabular format in sub clause 8.2 and 8.3, the ASN.1 shall take precedence, except for the defi nition of conditions for the 5 
+presence of conditional elements, in which the tabular format shall take precedence. 6 
+If an E2SM information element carried as an OCTET STRING in an E2AP [3] message that is not constructed as defined above is received, this sh all be considered as Abstract 7 
+Syntax Error, and the message shall be handled as defined for Abstract Syntax Error in clause 9.  8 
+8.4.2 Information Element definitions 9 
+-- ASN1START 10 
+-- ************************************************************** 11 
+-- E2SM-KPM Information Element Definitions 12 
+-- ************************************************************** 13 
+ 14 
+E2SM-KPM-IEs { 15 
+iso(1) identified-organization(3) dod(6) internet(1) private(4) enterprise(1) oran(53148) e2(1) version2(2) e2sm(2) e2sm-KPMMON-IEs (2)} 16 
+ 17 
+DEFINITIONS AUTOMATIC TAGS ::=  18 
+ 19 
+BEGIN 20 
+ 21 
+-- ************************************************************** 22 
+--   IEs 23 
+-- ************************************************************** 24 
+ 25 
+IMPORTS 26 
+ CGI, 27 
+ FiveQI, 28 
+ PLMNIdentity, 29 
+ QCI, 30 
+ QosFlowIdentifier, 31 
+ RANfunction-Name, 32 
+ RIC-Format-Type, 33 
+ RIC-Style-Name, 34 
+ RIC-Style-Type, 35 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    37 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ S-NSSAI, 1 
+ UEID 2 
+FROM E2SM-COMMON-IEs; 3 
+ 4 
+TimeStamp ::= OCTET STRING (SIZE(4)) 5 
+ 6 
+GranularityPeriod ::= INTEGER (1.. 4294967295) 7 
+ 8 
+MeasurementType ::= CHOICE { 9 
+ measName    MeasurementTypeName, 10 
+ measID    MeasurementTypeID, 11 
+ ... 12 
+} 13 
+ 14 
+MeasurementTypeName ::= PrintableString(SIZE(1.. 150, ...)) 15 
+ 16 
+MeasurementTypeID ::= INTEGER (1.. 65536, ...) 17 
+ 18 
+MeasurementLabel ::= SEQUENCE { 19 
+ noLabel     ENUMERATED {true, ...}    OPTIONAL, 20 
+ plmnID     PLMNIdentity       OPTIONAL, 21 
+ sliceID     S-NSSAI         OPTIONAL, 22 
+ fiveQI     FiveQI         OPTIONAL, 23 
+ qFI      QosFlowIdentifier      OPTIONAL, 24 
+ qCI      QCI          OPTIONAL, 25 
+ qCImax     QCI          OPTIONAL, 26 
+ qCImin     QCI          OPTIONAL, 27 
+ aRPmax     INTEGER (1.. 15, ...)    OPTIONAL, 28 
+ aRPmin     INTEGER (1.. 15, ...)    OPTIONAL, 29 
+ bitrateRange   INTEGER (1.. 65535, ...)   OPTIONAL, 30 
+ layerMU-MIMO   INTEGER (1.. 65535, ...)   OPTIONAL, 31 
+ sUM      ENUMERATED {true, ...}    OPTIONAL, 32 
+ distBinX     INTEGER (1.. 65535, ...)   OPTIONAL, 33 
+ distBinY     INTEGER (1.. 65535, ...)   OPTIONAL, 34 
+ distBinZ     INTEGER (1.. 65535, ...)   OPTIONAL, 35 
+ preLabelOverride  ENUMERATED {true, ...}    OPTIONAL, 36 
+ startEndInd    ENUMERATED {start, end, ...}  OPTIONAL, 37 
+ min      ENUMERATED {true, ...}    OPTIONAL, 38 
+ max      ENUMERATED {true, ...}    OPTIONAL, 39 
+ avg      ENUMERATED {true, ...}    OPTIONAL, 40 
+ ... 41 
+} 42 
+ 43 
+TestCondInfo ::= SEQUENCE{ 44 
+ testType    TestCond-Type, 45 
+ testExpr    TestCond-Expression, 46 
+ testValue   TestCond-Value, 47 
+ ... 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    38 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+} 1 
+ 2 
+TestCond-Type ::= CHOICE{ 3 
+ gBR     ENUMERATED {true, ...}, 4 
+ aMBR     ENUMERATED {true, ...}, 5 
+ isStat    ENUMERATED {true, ...}, 6 
+ isCatM    ENUMERATED {true, ...}, 7 
+ rSRP     ENUMERATED {true, ...}, 8 
+ rSRQ     ENUMERATED {true, ...}, 9 
+ ... 10 
+} 11 
+ 12 
+TestCond-Expression ::= ENUMERATED { 13 
+equal,  14 
+greaterthan,  15 
+lessthan,  16 
+contains,  17 
+present,  18 
+... 19 
+} 20 
+ 21 
+TestCond-Value ::= CHOICE{ 22 
+ valueInt    INTEGER, 23 
+ valueEnum   INTEGER, 24 
+ valueBool   BOOLEAN, 25 
+ valueBitS   BIT STRING, 26 
+ valueOctS   OCTET STRING,  27 
+ valuePrtS   PrintableString, 28 
+ ... 29 
+} 30 
+ 31 
+-- ************************************************************** 32 
+--   Lists 33 
+-- ************************************************************** 34 
+ 35 
+maxnoofCells     INTEGER ::= 16384 36 
+maxnoofRICStyles    INTEGER ::= 63 37 
+maxnoofMeasurementInfo  INTEGER ::= 65535 38 
+maxnoofLabelInfo    INTEGER ::= 2147483647 39 
+maxnoofMeasurementRecord INTEGER ::= 65535 40 
+maxnoofMeasurementValue  INTEGER ::= 2147483647 41 
+maxnoofConditionInfo   INTEGER ::= 32768 42 
+maxnoofUEID      INTEGER ::= 65535 43 
+maxnoofConditionInfoPerSub INTEGER ::= 32768 44 
+maxnoofUEIDPerSub    INTEGER ::= 65535 45 
+maxnoofUEMeasReport   INTEGER ::= 65535 46 
+ 47 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    39 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ 1 
+MeasurementInfoList ::= SEQUENCE (SIZE(1..maxnoofMeasurementInfo)) OF MeasurementInfoItem 2 
+ 3 
+MeasurementInfoItem ::= SEQUENCE { 4 
+ measType    MeasurementType, 5 
+ labelInfoList  LabelInfoList, 6 
+ ... 7 
+} 8 
+ 9 
+LabelInfoList ::= SEQUENCE (SIZE(1..maxnoofLabelInfo)) OF LabelInfoItem 10 
+ 11 
+LabelInfoItem ::= SEQUENCE { 12 
+ measLabel   MeasurementLabel, 13 
+ ... 14 
+} 15 
+ 16 
+MeasurementData ::= SEQUENCE (SIZE(1..maxnoofMeasurementRecord)) OF MeasurementDataItem 17 
+ 18 
+MeasurementDataItem ::= SEQUENCE { 19 
+measRecord    MeasurementRecord, 20 
+incompleteFlag   ENUMERATED {true, ...}     OPTIONAL, 21 
+... 22 
+} 23 
+ 24 
+MeasurementRecord ::= SEQUENCE (SIZE(1..maxnoofMeasurementValue)) OF MeasurementRecordItem 25 
+ 26 
+MeasurementRecordItem ::= CHOICE { 27 
+ integer    INTEGER (0.. 4294967295), 28 
+ real     REAL, 29 
+ noValue    NULL, 30 
+ ... 31 
+}   32 
+ 33 
+MeasurementInfo-Action-List ::= SEQUENCE (SIZE(1..maxnoofMeasurementInfo)) OF MeasurementInfo-Action-Item 34 
+ 35 
+MeasurementInfo-Action-Item ::= SEQUENCE { 36 
+ measName    MeasurementTypeName, 37 
+ measID    MeasurementTypeID    OPTIONAL, 38 
+ ... 39 
+} 40 
+ 41 
+MeasurementCondList ::= SEQUENCE (SIZE(1..maxnoofMeasurementInfo)) OF MeasurementCondItem 42 
+ 43 
+MeasurementCondItem ::= SEQUENCE { 44 
+ measType    MeasurementType, 45 
+ matchingCond  MatchingCondList, 46 
+ ... 47 
+} 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    40 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ 1 
+MeasurementCondUEidList ::= SEQUENCE (SIZE(1..maxnoofMeasurementInfo)) OF MeasurementCondUEidItem 2 
+ 3 
+MeasurementCondUEidItem ::= SEQUENCE { 4 
+ measType     MeasurementType, 5 
+ matchingCond   MatchingCondList, 6 
+ matchingUEidList  MatchingUEidList   OPTIONAL, 7 
+ ... 8 
+} 9 
+ 10 
+MatchingCondList ::= SEQUENCE (SIZE(1..maxnoofConditionInfo)) OF MatchingCondItem 11 
+ 12 
+MatchingCondItem ::= CHOICE{ 13 
+ measLabel   MeasurementLabel, 14 
+ testCondInfo  TestCondInfo, 15 
+ ... 16 
+} 17 
+ 18 
+MatchingUEidList ::= SEQUENCE (SIZE(1..maxnoofUEID)) OF MatchingUEidItem 19 
+ 20 
+MatchingUEidItem ::= SEQUENCE{ 21 
+ ueID     UEID, 22 
+ ... 23 
+} 24 
+ 25 
+MatchingUeCondPerSubList ::= SEQUENCE (SIZE(1..maxnoofConditionInfoPerSub)) OF MatchingUeCondPerSubItem 26 
+ 27 
+MatchingUeCondPerSubItem ::= SEQUENCE{ 28 
+ testCondInfo  TestCondInfo, 29 
+ ... 30 
+} 31 
+ 32 
+MatchingUEidPerSubList ::= SEQUENCE (SIZE(2..maxnoofUEIDPerSub)) OF MatchingUEidPerSubItem 33 
+ 34 
+MatchingUEidPerSubItem ::= SEQUENCE{ 35 
+ ueID     UEID, 36 
+ ... 37 
+} 38 
+ 39 
+UEMeasurementReportList ::= SEQUENCE (SIZE(1..maxnoofUEMeasReport)) OF UEMeasurementReportItem 40 
+ 41 
+UEMeasurementReportItem ::= SEQUENCE{ 42 
+ ueID    UEID, 43 
+ measReport  E2SM-KPM-IndicationMessage-Format1, 44 
+ ... 45 
+} 46 
+ 47 
+ 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    41 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ 1 
+-- ************************************************************** 2 
+-- E2SM-KPM Service Model IEs 3 
+-- ************************************************************** 4 
+ 5 
+-- ************************************************************** 6 
+--   Event Trigger Definition OCTET STRING contents 7 
+-- ************************************************************** 8 
+ 9 
+E2SM-KPM-EventTriggerDefinition ::= SEQUENCE{ 10 
+ eventDefinition-formats   CHOICE{ 11 
+  eventDefinition-Format1   E2SM-KPM-EventTriggerDefinition-Format1, 12 
+  ... 13 
+ }, 14 
+ ... 15 
+} 16 
+ 17 
+E2SM-KPM-EventTriggerDefinition-Format1 ::= SEQUENCE{ 18 
+ reportingPeriod     INTEGER (1.. 4294967295), 19 
+ ... 20 
+} 21 
+ 22 
+-- ************************************************************** 23 
+--   Action Definition OCTET STRING contents 24 
+-- ************************************************************** 25 
+ 26 
+E2SM-KPM-ActionDefinition ::= SEQUENCE{ 27 
+ ric-Style-Type     RIC-Style-Type, 28 
+ actionDefinition-formats  CHOICE{ 29 
+  actionDefinition-Format1  E2SM-KPM-ActionDefinition-Format1, 30 
+  actionDefinition-Format2  E2SM-KPM-ActionDefinition-Format2, 31 
+  actionDefinition-Format3  E2SM-KPM-ActionDefinition-Format3, 32 
+  ..., 33 
+  actionDefinition-Format4  E2SM-KPM-ActionDefinition-Format4, 34 
+  actionDefinition-Format5  E2SM-KPM-ActionDefinition-Format5 35 
+ }, 36 
+ ... 37 
+} 38 
+ 39 
+E2SM-KPM-ActionDefinition-Format1 ::= SEQUENCE { 40 
+ measInfoList     MeasurementInfoList, 41 
+ granulPeriod     GranularityPeriod, 42 
+ cellGlobalID     CGI       OPTIONAL, 43 
+ ... 44 
+} 45 
+ 46 
+E2SM-KPM-ActionDefinition-Format2 ::= SEQUENCE { 47 
+ ueID        UEID, 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    42 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ subscriptInfo     E2SM-KPM-ActionDefinition-Format1, 1 
+ ... 2 
+} 3 
+ 4 
+E2SM-KPM-ActionDefinition-Format3 ::= SEQUENCE { 5 
+ measCondList     MeasurementCondList, 6 
+ granulPeriod     GranularityPeriod, 7 
+ cellGlobalID     CGI       OPTIONAL, 8 
+ ... 9 
+} 10 
+ 11 
+E2SM-KPM-ActionDefinition-Format4 ::= SEQUENCE { 12 
+ matchingUeCondList   MatchingUeCondPerSubList, 13 
+ subscriptionInfo    E2SM-KPM-ActionDefinition-Format1, 14 
+ ... 15 
+} 16 
+ 17 
+E2SM-KPM-ActionDefinition-Format5 ::= SEQUENCE { 18 
+ matchingUEidList    MatchingUEidPerSubList, 19 
+ subscriptionInfo    E2SM-KPM-ActionDefinition-Format1, 20 
+ ... 21 
+} 22 
+ 23 
+ 24 
+-- ************************************************************** 25 
+--   Indication Header OCTET STRING contents 26 
+-- ************************************************************** 27 
+ 28 
+E2SM-KPM-IndicationHeader ::= SEQUENCE{ 29 
+ indicationHeader-formats  CHOICE{ 30 
+  indicationHeader-Format1  E2SM-KPM-IndicationHeader-Format1, 31 
+  ... 32 
+ }, 33 
+ ... 34 
+} 35 
+ 36 
+E2SM-KPM-IndicationHeader-Format1 ::= SEQUENCE{ 37 
+ colletStartTime    TimeStamp, 38 
+ fileFormatversion    PrintableString (SIZE (0..15), ...)  OPTIONAL, 39 
+ senderName      PrintableString (SIZE (0..400), ...) OPTIONAL, 40 
+ senderType      PrintableString (SIZE (0..8), ...)  OPTIONAL, 41 
+ vendorName      PrintableString (SIZE (0..32), ...)  OPTIONAL, 42 
+ ... 43 
+} 44 
+ 45 
+-- ************************************************************** 46 
+--   Indication Message OCTET STRING contents 47 
+-- ************************************************************** 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    43 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ 1 
+E2SM-KPM-IndicationMessage ::= SEQUENCE{ 2 
+ indicationMessage-formats  CHOICE{ 3 
+  indicationMessage-Format1  E2SM-KPM-IndicationMessage-Format1, 4 
+  indicationMessage-Format2  E2SM-KPM-IndicationMessage-Format2, 5 
+  ..., 6 
+  indicationMessage-Format3  E2SM-KPM-IndicationMessage-Format3 7 
+ }, 8 
+ ... 9 
+} 10 
+ 11 
+E2SM-KPM-IndicationMessage-Format1 ::= SEQUENCE { 12 
+ measData       MeasurementData, 13 
+ measInfoList     MeasurementInfoList      OPTIONAL, 14 
+ granulPeriod     GranularityPeriod       OPTIONAL, 15 
+ ... 16 
+} 17 
+ 18 
+E2SM-KPM-IndicationMessage-Format2 ::= SEQUENCE { 19 
+ measData       MeasurementData, 20 
+ measCondUEidList    MeasurementCondUEidList, 21 
+ granulPeriod     GranularityPeriod       OPTIONAL, 22 
+ ... 23 
+} 24 
+ 25 
+E2SM-KPM-IndicationMessage-Format3 ::= SEQUENCE { 26 
+ ueMeasReportList    UEMeasurementReportList, 27 
+ ... 28 
+} 29 
+ 30 
+ 31 
+-- *************************************************************** 32 
+--   RAN Function Definition OCTET STRING contents 33 
+-- *************************************************************** 34 
+ 35 
+E2SM-KPM-RANfunction-Description ::= SEQUENCE{ 36 
+ ranFunction-Name     RANfunction-Name, 37 
+ ric-EventTriggerStyle-List  SEQUENCE (SIZE(1..maxnoofRICStyles)) OF RIC-EventTriggerStyle-Item   OPTIONAL, 38 
+ ric-ReportStyle-List    SEQUENCE (SIZE(1..maxnoofRICStyles)) OF RIC-ReportStyle-Item     OPTIONAL, 39 
+ ... 40 
+} 41 
+ 42 
+RIC-EventTriggerStyle-Item ::= SEQUENCE{ 43 
+ ric-EventTriggerStyle-Type   RIC-Style-Type, 44 
+ ric-EventTriggerStyle-Name   RIC-Style-Name, 45 
+ ric-EventTriggerFormat-Type  RIC-Format-Type, 46 
+ ... 47 
+} 48 
+
+ 
+ 
+________________________________________________________________________________________________ Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject 
+to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    44 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+ 1 
+RIC-ReportStyle-Item ::= SEQUENCE{ 2 
+ ric-ReportStyle-Type      RIC-Style-Type, 3 
+ ric-ReportStyle-Name      RIC-Style-Name, 4 
+ ric-ActionFormat-Type     RIC-Format-Type, 5 
+ measInfo-Action-List      MeasurementInfo-Action-List,  6 
+ ric-IndicationHeaderFormat-Type  RIC-Format-Type, 7 
+ ric-IndicationMessageFormat-Type  RIC-Format-Type, 8 
+ ... 9 
+} 10 
+ 11 
+END 12 
+ 13 
+-- ASN1STOP 14 
+ 15 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    45 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+9 Handling of Unknown, Unforeseen and Erroneous 1 
+Protocol Data 2 
+Section 10 of TS 36.413 [13] is applicable for the purposes of the present document. 3 
+  4 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    46 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Annex A Further information on RAN Function Network KPM 1 
+Monitor  2 
+A.1 Background Information 3 
+The RAN function “Key Performance Measurement” is used to provide RIC Service exposure of the performance 4 
+measurement logical function of the E2 Nodes. Based on the O-RAN deployment architecture, available measurements 5 
+could be different. Figure A.1-1 shows the target deployment architecture for E2SM-KPM. 6 
+7 
+Figure A.1-1 E2SM-KPM Architecture 8 
+For each logical function the E2 Node shall use the RAN Function Definition IE to declare the list of available 9 
+measurements and a set of supported RIC Services (REPORT). 10 
+
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    47 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Annex ZZZ : O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 11 
+software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other t han design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 24 
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in  exceptional cases where a 27 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 28 
+claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an O-RAN 38 
+Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40 
+agreement with O-RAN Alliance. 41 
+Section 3: FRAND LICENSE 42 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 43 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 44 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 45 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    48 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 1 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however , that such 2 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 3 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 4 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 5 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 6 
+customers of such licensed Compliant Implementations. 7 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 8 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 9 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 10 
+its Affiliates for its license of Necessary Claims to its licensees. 11 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 12 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 13 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 14 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 15 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 16 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 17 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 18 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 19 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 20 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 21 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 22 
+licensed Compliant Implementations. 23 
+Section 4: TERM AND TERMINATION 24 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.  25 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 26 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 27 
+(30) days after being given notice specifying the breach. 28 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 29 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 30 
+the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the 31 
+version that was current as of the date of termination. 32 
+Section 5: CONFIDENTIALITY 33 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 34 
+Specifications to third parties, as Adopter employs with its own confidential informati on, but no less than reasonable 35 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 36 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 37 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 38 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) discl osed 39 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 40 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 41 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 42 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 43 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 44 
+Alliance’s prior written approval. 45 
+Section 6: INDEMNIFICATION 46 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 47 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 48 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 49 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    49 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 1 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 2 
+products that comply with O-RAN Specifications. 3 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 4 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 5 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 6 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 7 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 8 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 9 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 10 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 11 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 12 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 13 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 14 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 15 
+CONDITION FOR O-RAN SPECIFICATIONS. 16 
+Section 8: ASSIGNMENT 17 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 18 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 19 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 20 
+Alliance may freely assign this Agreement. 21 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 22 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 23 
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 24 
+including as licensees under Section 3. 25 
+Section 10: BINDING ON AFFILIATES 26 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 27 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 28 
+and are also entitled to the benefits of the rights of Adopter hereunder. 29 
+Section 11: GENERAL 30 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  31 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 32 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 33 
+to the subject matter of this Agreement.  34 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 35 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 36 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 37 
+prohibits any communication that would violate the antitrust laws. 38 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 39 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth i n this 40 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 41 
+Contributors or Academic Contributors. 42 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 43 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 44 
+
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.    50 
+ 
+O-RAN.WG3.E2SM-KPM-v02.00.03 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 1 
+full force and effect. 2 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 3 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 4 
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 5 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in  full 6 
+force and effect.  7 

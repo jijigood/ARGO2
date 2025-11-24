@@ -1,0 +1,1449 @@
+O-RAN.WG7.IPC-HRD-Opt6.0-v02.00
+       Technical Specification  
+O-RAN White Box Hardware Working Group
+Hardware Reference Design Specification for Indoor Pico Cell 
+with Fronthaul Split Option 6 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RA N Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of par
+t or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to indiv idual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that y ou inform 
+the third party that these conditions apply to them and that they must comply with them.
+
+ 
+ 
+ 
+ 
+          O-RAN.WG7.IPC-HRD-Opt6.0-v02.00  
+             
+ 
+ Technical Specification  
+O-RAN White Box Hardware Working Group 
+Hardware Reference Design Specification for Indoor Pico Cell 
+with Fronthaul Split Option 6  
+ 
+ 
+ 
+  
+ 
+ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+ 
+By using, accessing or downloading any part of this O-RAN specification document, including by 
+copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to the 
+terms of the O-RAN Adopter License Agreement contained in Annex ZZZ of this specification. All other 
+rights reserved.  
+ 
+O-RAN ALLIANCE e.V.  
+Buschkauler Weg 27, 53347 Alfter, Germany  
+Register of Associations, Bonn VR 11238  
+VAT ID DE321720189 
+ 
+           1 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________ 
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ         2 
+   
+ 
+Revision History   1 
+Date Revision Author Description 
+2021.07.08 02.00 WG7 Final version for publication  
+ 2 
+ 3 
+  4 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        3 
+   
+ 
+Contents   1 
+Revision History ......................................................................................................................................... 2 2 
+Chapter 1 Introductory Material ............................................................................................................. 6 3 
+1.1 Scope ......................................................................................................................................................... 6 4 
+1.2 References ................................................................................................................................................. 6 5 
+1.3 Definitions and Abbreviations ................................................................................................................... 7 6 
+1.3.1 Definitions ............................................................................................................................................ 7 7 
+1.3.2 Abbreviations ....................................................................................................................................... 7 8 
+Chapter 2 Hardware Reference Design ................................................................................................ 10 9 
+2.1 O-CU Hardware Reference Design ......................................................................................................... 10 10 
+2.2 O-DU Hardware Reference Design ......................................................................................................... 10 11 
+2.2.1 O-DU High-Level Functional Block Diagram ................................................................................... 10 12 
+2.2.2 O-DU6 Hardware Components ........................................................................................................... 11 13 
+2.2.2.1 Digital Processing Unit ................................................................................................................. 11 14 
+ Memory Channel Interfaces .................................................................................................... 12 15 
+ PCIe ........................................................................................................................................ 12 16 
+ Ethernet ................................................................................................................................... 12 17 
+2.2.2.2 Hardware Accelerator ................................................................................................................... 13 18 
+2.2.3 Synchronization and Timing .............................................................................................................. 13 19 
+2.2.3.1 Synchronization and Timing Design 1 ......................................................................................... 13 20 
+2.2.4 External Interface Ports ...................................................................................................................... 14 21 
+2.2.5 Mechanical ......................................................................................................................................... 15 22 
+ Mother Board .......................................................................................................................... 15 23 
+ Cooling ................................................................................................................................... 17 24 
+2.2.6 Power Unit ......................................................................................................................................... 17 25 
+2.2.7 Thermal .............................................................................................................................................. 18 26 
+2.2.8 Environmental and Regulations ......................................................................................................... 18 27 
+2.3 O-RU6 Hardware Reference Design ........................................................................................................ 18 28 
+2.3.1 O-RU6 High-Level Functional Block Diagram .................................................................................. 19 29 
+2.3.2 O-RU6 Hardware Components ........................................................................................................... 19 30 
+2.3.3 O-RU6 Functional Module Description .............................................................................................. 20 31 
+2.3.3.1 Network Processing Unit (NPU) .................................................................................................. 21 32 
+2.3.3.1.1 Networking I/O ....................................................................................................................... 21 33 
+2.3.3.1.2 Low-speed connectivity and boot ........................................................................................... 22 34 
+2.3.3.1.3 DDR ........................................................................................................................................ 23 35 
+2.3.3.1.4 Processor subsystem ............................................................................................................... 24 36 
+2.3.3.1.5 Modem I/O .............................................................................................................................. 24 37 
+2.3.3.1.6 Security ................................................................................................................................... 25 38 
+2.3.3.2 PHY Layer ASIC .......................................................................................................................... 25 39 
+2.3.3.3 RF Front End ................................................................................................................................ 27 40 
+2.3.3.4 Power Management ...................................................................................................................... 27 41 
+2.3.4 Synchronization and Timing .............................................................................................................. 28 42 
+2.3.4.1 Hardware Requirements ............................................................................................................... 28 43 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        4 
+   
+ 
+2.3.4.2 Synchronization and Timing Design 1 ......................................................................................... 28 1 
+2.3.4.3 Synchronization and Timing Design 2 ......................................................................................... 29 2 
+2.3.5 External Interface Ports ...................................................................................................................... 30 3 
+2.3.6 Power Unit ......................................................................................................................................... 30 4 
+2.3.7 Environmental and Regulations ......................................................................................................... 31 5 
+2.4 Integrated gNB-DU Reference Design Solution ...................................................................................... 31 6 
+2.4.1 Power Unit ......................................................................................................................................... 32 7 
+2.4.1.1 Power Management ...................................................................................................................... 32 8 
+2.4.2 Synchronization and Timing .............................................................................................................. 32 9 
+2.4.3 External Interface Ports ...................................................................................................................... 32 10 
+2.4.4 Power Unit ......................................................................................................................................... 32 11 
+2.4.5 Environmental and Regulations ......................................................................................................... 32 12 
+2.5 FHGW Hardware Reference Design ....................................................................................................... 32 13 
+Annex 1: Example Hardware Bill of Materials ........................................................................................ 33 14 
+Annex 2: ................................................................................................................................................... 35 15 
+Annex ZZZ: O-RAN Adopter License Agreement .................................................................................. 36 16 
+Section 1: DEFINITIONS ........................................................................................................................................ 36 17 
+Section 2: COPYRIGHT LICENSE ......................................................................................................................... 37 18 
+Section 3: FRAND LICENSE .................................................................................................................................. 37 19 
+Section 4: TERM AND TERMINATION ................................................................................................................ 38 20 
+Section 5: CONFIDENTIALITY ............................................................................................................................. 38 21 
+Section 6: INDEMNIFICATION ............................................................................................................................. 38 22 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ............................................................................ 39 23 
+Section 8: ASSIGNMENT ....................................................................................................................................... 39 24 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS ............................................................................................ 39 25 
+Section 10: BINDING ON AFFILIATES ................................................................................................................ 39 26 
+Section 11: GENERAL ............................................................................................................................................ 39 27 
+ 28 
+Tables 29 
+Table 2-1: Processor Feature List .................................................................................................................... 11 30 
+Table 2-2: Memory Channel Feature List ....................................................................................................... 12 31 
+Table 2-3 External Port List ............................................................................................................................ 14 32 
+Table 2-4 Power Supply Features .................................................................................................................... 18 33 
+ 34 
+Figures 35 
+Figure 2-1 O-DU6 Architecture Diagram ........................................................................................................ 11 36 
+Figure 2-2 Digital Processing Unit Block Diagram ........................................................................................ 13 37 
+Figure 2-3 O-DU6 Timing Synchronization .................................................................................................... 14 38 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        5 
+   
+ 
+Figure 2-4 Mother Board Layout .................................................................................................................... 16 1 
+Figure 2-5 Chassis Mechanical Diagram ........................................................................................................ 17 2 
+Figure 2-6 General Block Diagram for O-RU6 ............................................................................................... 19 3 
+Figure 2-7 O-RU6 Architecture Diagram ........................................................................................................ 19 4 
+Figure 2-8 O-RU6 Functional Module Diagram .............................................................................................. 20 5 
+Figure 2-9 Sub-6 GHz Indoor Pico O-RU6 Functional Modules (Split Option 6) .......................................... 21 6 
+Figure 2-10 O-RU6 Networking I/O ................................................................................................................ 22 7 
+Figure 2-11 O-RU6 SFP Connectivity ............................................................................................................. 22 8 
+Figure 2-12 O-RU6 Low-speed NPU Connectivity ......................................................................................... 23 9 
+Figure 2-13 O-RU6 DDR ................................................................................................................................. 24 10 
+Figure 2-14 O-RU6 Modem I/O ...................................................................................................................... 24 11 
+Figure 2-15 O-RU6 NPU Security ................................................................................................................... 25 12 
+Figure 2-16 O-RU6 PHY ASIC block diagram ............................................................................................... 26 13 
+Figure 2-17 O-RU6 5G Modem Subsystem ..................................................................................................... 27 14 
+Figure 2-18 Timing Modules........................................................................................................................... 28 15 
+Figure 2-19 Ethernet Synchronization I .......................................................................................................... 29 16 
+Figure 2-20 Ethernet Synchronization II ......................................................................................................... 30 17 
+Figure 2-21 Sub-6 GHz Indoor Pico Integrated O-DU&O-RU Functional Modules ..................................... 31 18 
+Figure A-1: Sub-6 Split (O-RU6) and Integrated Picocell Reference Design ................................................. 33 19 
+ 20 
+  21 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        6 
+   
+ 
+Chapter 1 Introductory Material 1 
+1.1 Scope 2 
+This Technical Specification has been produced by the O-RAN ALLIANCE. 3 
+In the main body of this specification (in any “chapter”) the information contained therein is 4 
+informative, unless explicitly described as  normative. Information contained in an “Annex” to this 5 
+specification is always informative unless otherwise marked as normative. 6 
+The contents of the present document are subject to continuing work within O -RAN WG7 and may 7 
+change following formal O-RAN approval. Should the O-RAN.org modify the contents of the present 8 
+document, it will be re -released by O-RAN ALLIANCE with an identifying change of release date 9 
+and an increase in version number as follows: 10 
+Release x.y.z 11 
+where: 12 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 13 
+etc. (the initial approved document will have x=01). 14 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  15 
+z the third digit included only in working versions of the document indicating incremental changes during the 16 
+editing process. This variable is for internal WG7 use only. 17 
+The present document specifies system requirements and high-level architecture for the Indoor Pico 18 
+Cell Hardware Reference Design with Fronthaul Split Option 6 deployment scenario as specified in 19 
+the Deployment Scenarios and Base Station Classes document [1]. 20 
+1.2 References  21 
+The following documents contain provisions which, through reference in this text, constitute 22 
+provisions of the present document. 23 
+[1] ORAN-WG7.DSC.0-V01.00 Technical Specification, Deployment Scenarios and Base Station Classes for 24 
+White Box Hardware 25 
+[2] 3GPP TR 21.905: Vocabulary for 3GPP Specifications 26 
+[3] 3GPP TR 38.104: NR; Base Station (BS) radio transmission and reception 27 
+[4] 3GPP TR 38.913: Study on Scenarios and Requirements for Next Generation Access Technologies 28 
+[5] 3GPP TS 38.401: NG-RAN; Architecture description 29 
+[6] ORAN-WG7.IPC.HAR-v01.00 Technical Specification: O -RAN Indoor Pico Cell Hardware Architecture 30 
+and Requirement Specification 31 
+[7] SCF 222.10.03: 5G FAPI PHY API Specification 32 
+[8] SCF 082.09.05: nFAPI and FAPI Specifications 33 
+[9] SCF 223.10.02: RF and Digital Front End Control API 34 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        7 
+   
+ 
+[10] SCF 224.10.01: 5G FAPI Network Monitor Mode API 1 
+[11] SCF 225.2.0: 5G nFAPI Specifications https://scf.io/en/documents/225_5G_nFAPI_specifications.php 2 
+1.3 Definitions and Abbreviations 3 
+1.3.1 Definitions 4 
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] 5 
+and the following apply. A term defined in the present document takes precedence over the 6 
+definition of the same term, if any, in 3GPP TR 21.905 [2]. For the base station classes of Pico, 7 
+Micro and Macro, the definitions are given in 3GPP TR 38.104 [3]. 8 
+ 9 
+Carrier Frequency:  Center frequency of the cell.  10 
+F1 interface:  The open interface between O-CU and O-DU defined by 3GPP TS 38.473.  11 
+Integrated architecture:  In the integrated architecture, the O-RU and O-DU are implemented on 12 
+one platform. Each O-RU and RF front end is associated with one O-DU. They are then aggregated 13 
+to O-CU and connected by F1 interface. 14 
+Split architecture:  The O-RU and O-DU are physically separated from one another in this 15 
+architecture. A switch may aggregate multiple O-RUs to one O-DU.  O-DU, switch and O-RUs are 16 
+connected by the fronthaul interface. 17 
+Transmission Reception Point (TRxP):  Antenna array with one or more antenna elements 18 
+available to the network located at a specific geographical location for a specific area. 19 
+ 20 
+1.3.2 Abbreviations 21 
+For the purposes of the present document, the abbreviations given in [2] and the following apply.  22 
+An abbreviation defined in the present document takes precedence over the definition of the same 23 
+abbreviation, if any, as in [2]. 24 
+ 25 
+3GPP Third Generation Partnership Project 26 
+5G Fifth-Generation Mobile Communications 27 
+ADC Analog to Digital Converter 28 
+ASIC Application Specific Integrated Circuit 29 
+BS Base Station 30 
+CFR Crest Factor Reduction 31 
+CISPR Comité International Spécial des Perturbations Radioélectriques 32 
+CU Centralized Unit as defined by 3GPP 33 
+DAC Digital to Analog Converter 34 
+DDC Digital Down Conversion 35 
+DDR Double Data Rate 36 
+DL Downlink 37 
+DPD Digital Pre-Distortion 38 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        8 
+   
+ 
+DPU Digital Processing Unit 1 
+DSP Digital Signal Processor 2 
+DU Distributed Unit as defined by 3GPP 3 
+DUC Digital Up Conversion 4 
+ECC Error-Correcting Code 5 
+FAPI Functional Application Platform Interface  6 
+FCC Federal Communications Commission 7 
+FDD Frequency Division Duplex 8 
+FFT Fast Fourier Transform 9 
+FH Fronthaul 10 
+FHGW Fronthaul Gateway 11 
+FPGA Field Programmable Gate Array 12 
+GbE Gigabit Ethernet 13 
+GMC Grand Master Clock 14 
+GNSS Global Navigation Satellite System 15 
+GPS Global Positioning System 16 
+HSUART  High-Speed Universal Asynchronous Receiver/Transmitter 17 
+IEEE Institute of Electrical and Electronics Engineers 18 
+IMC Integrated Memory Controller 19 
+I/O Input/Output 20 
+JTAG Joint Test Action Group 21 
+L2 Layer 2 22 
+L3 Layer 3 23 
+LDPC Low-Density Parity-Check 24 
+LTE Long Term Evolution 25 
+LRDIMM  Load-Reduced Dual In-Line Memory Module  26 
+MAC Media Access Control 27 
+MIMO Multiple Input Multiple Output 28 
+MCP Multi-Chip Package 29 
+MU-MIMO Multiple User MIMO 30 
+nFAPI network Functional Application Platform Interface  31 
+NFV Network Function Virtualization 32 
+NMEA  National Marine Electronics Association 33 
+NPU Network Processing Unit 34 
+NR New Radio 35 
+O-CU O-RAN Centralized Unit as defined by O-RAN 36 
+O-DU6 A specific O-RAN Distributed Unit having fronthaul split option 6 37 
+O-RU6 A specific O-RAN Radio Unit having fronthaul split option 6    38 
+PCIe Peripheral Component Interface Express 39 
+PCH Platform Controller Hub 40 
+PDCP Packet Data Convergence Protocol 41 
+PHY Physical layer 42 
+PLL Phase Locked Loop 43 
+PMBus Power Management Bus 44 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        9 
+   
+ 
+PoE Power over Ethernet 1 
+PWM Pulse Width Modulation 2 
+RAN Radio Access Network 3 
+RDIMM  Registered Dual In-Line Memory Module 4 
+RFFE Radio Frequency Front End 5 
+RGMII Reduced Gigabit Media-Independent Interface     6 
+RF Radio Frequency 7 
+RFFE RF Front End 8 
+RoHS Restriction of Hazardous Substances 9 
+RU Radio Unit as defined by 3GPP 10 
+RX Receiver 11 
+SFP Small Form-factor Pluggable 12 
+SFP+ Small Form-factor Pluggable Transceiver 13 
+SOC System On Chip 14 
+SPI Serial Peripheral Interface 15 
+TDP Thermal Design Power 16 
+TR Technical Report  17 
+TS Technical Specification 18 
+TX Transmitter 19 
+UART  Universal Asynchronous Receiver/Transmitter 20 
+UL Uplink 21 
+USB Universal Serial Bus 22 
+WG Working Group 23 
+ 24 
+  25 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        10 
+   
+ 
+Chapter 2 Hardware Reference Design  1 
+2.1 O-CU Hardware Reference Design  2 
+The O-CU white box is the hardware platform that performs the CU function of upper L2 and L3. 3 
+The hardware systems specified in this document meet the computing, power and environmental 4 
+requirements for O-RAN deployment scenarios. These requirements are described in the hardware 5 
+requirement specification as well as in the deployment scenarios. The O-CU hardware includes the 6 
+chassis platform, mother board, peripheral devices and cooling devices. The mother board contains 7 
+processing unit, memory, the internal I/O interfaces, and external connection ports. The midhaul 8 
+and backhaul interfaces are used to carry the traffic between O-CU and O-DU6 as well as O-CU and 9 
+core network. Other hardware functional components include storage for software, debugging 10 
+interfaces, and board management controller just to name a few.  The O-CU designer will make 11 
+decisions based on the specific needs of the implementation. 12 
+As discussed in the hardware architecture requirements [6], the O-CU white box hardware is similar 13 
+to O-DU6 on interfaces and processing unit. Rather than specifying a dedicated O-CU reference 14 
+design, we reuse O-DU6 hardware reference design for O-CU.   15 
+ 16 
+2.2 O-DU Hardware Reference Design  17 
+The terms “O-DU6” and “O-RU6” are used here for O-DU and O-RU that use split option 6.  O-DU6 18 
+hardware systems specified in this document meet the computing, power and environmental 19 
+requirements of the indoor picocell deployment scenario configuration. The O-DU6 hardware 20 
+includes the chassis platform, mother board, peripheral devices and cooling devices. The mother 21 
+board contains processing unit, memory, the internal I/O interfaces, and external connection ports. 22 
+The front haul and back haul interface are used to carry the traffic between O-DU6 and O-RU6 as 23 
+well as O-CU and O-DU6.  24 
+ 25 
+The O-DU6 white box is the hardware platform that performs MAC functions while PHY is done in 26 
+the O-RU6. The O-DU6 design may also provide an interface for hardware accelerator(s) if that 27 
+option is preferred.  However, this design does not specify accelerator hardware.  Other hardware 28 
+functional components include storage for software, debugging interfaces, and board management 29 
+controller.  The O-DU6 designer will make decisions based on the specific needs of the 30 
+implementation. 31 
+ 32 
+Note that the O-DU6 HW reference design is also reusable for O-CU and integrated O-CU/ O-DU6. 33 
+ 34 
+2.2.1 O-DU High-Level Functional Block Diagram 35 
+O-DU6 and O-RU6 are connected via nFAPI interfaces over fiber/ethernet transport. With an option 36 
+6 MAC/PHY fronthaul split, the O-RU6 includes complete physical layer processing functions and 37 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        11 
+   
+ 
+the O-DU6 handles higher layer processing functions. The O-DU6 hardware architecture is shown in 1 
+Error! Reference source not found..  Note that O-DU6 does not require an accelerator module 2 
+since physical layer functions are handled by O-RU6. 3 
+ 4 
+Figure 2-1 O-DU6 Architecture Diagram 5 
+ 6 
+2.2.2 O-DU6 Hardware Components  7 
+The sections below describe the functionality, interface and performance for each respective block 8 
+of the O-DU6.  As device integration is an ongoing activity, chip boundaries may be fluid and some 9 
+functionalities may move from one block to another or entire functionalities may be absorbed into 10 
+other blocks.  The sections below describe the functional blocks independent of which physical 11 
+device they may reside in. 12 
+2.2.2.1 Digital Processing Unit 13 
+a. Digital Processing Unit Requirement 14 
+ 15 
+General purpose processor performance and other related information are listed in Table 2-1. 16 
+Table 2-1: Processor Feature List 17 
+Item Name Description 
+# of  Cores 16 
+# of  Threads 32 
+Base Frequency 2.20 GHZ 
+Max Turbo Frequency 3.00 GHz 
+Cache 22 MB 
+TDP 100W 
+Max Memory Size (dependent on memory 
+type) 
+512 GB 
+Memory Types DDR4 
+Max # of Memory Channels 4 
+ 18 
+Interfaces 19 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        12 
+   
+ 
+The interface specification in main board are as follows: 1 
+ Memory Channel Interfaces 2 
+The system memory capacity, type and related information are described in Table 2-2. 3 
+Table 2-2: Memory Channel Feature List 4 
+Item Name Description 
+Memory Types DDR4 
+# of Memory Channels 4 
+ECC LRDIMM Up to 512GB 
+ECC RDIMM Up to 256GB 
+Memory Speed 2666/2400/2133MHz 
+DIMM Sizes 128GB, 64GB, 32GB, 16GB 
+Memory Voltage 1.2 V 
+ 5 
+ PCIe 6 
+PCIe Gen 3 is supported by the processor.  There are a total of 32 PCIe lanes with 128 Gb/s 7 
+bandwidth. The 32 PCIe lanes can be divided into two x16 slots by using a riser card.  8 
+ Ethernet 9 
+The system should be capable to offer aggregated 48 Gb/s Ethernet bandwidth. When higher 10 
+Ethernet bandwidth is required, an Ethernet card can be installed in one of the PCIe slots.  11 
+ 12 
+b. Digital Processing Unit Design 13 
+ 14 
+The digital processing unit is a system-on-a-chip (SOC) device which is a 64-bit, multi-core server 15 
+class processor. This SoC includes an integrated Platform Controller Hub (PCH), integrated high-16 
+speed I/O, Integrated Memory Controllers (IMC), and four integrated 10 Gigabit Ethernet ports. 17 
+The SOC supports 512-bit wide vector processing instruction set. It also supports hardware 18 
+virtualization to enable dynamic provisioning of services as communication service providers 19 
+extend network function virtualization (NFV). Error! Reference source not found. shows the 20 
+major functional blocks of the digital processing unit. 21 
+ 22 
+ 23 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        13 
+   
+ 
+ 1 
+Figure 2-2 Digital Processing Unit Block Diagram 2 
+ 3 
+2.2.2.2 Hardware Accelerator 4 
+Hardware accelerators may be used in O-DU6 to offload computationally intensive functions and to 5 
+optimize the performance under varying traffic and loading conditions. The acceleration functional 6 
+requirements and implementation are system designer’s choice; however, the O-DU6 shall meet the 7 
+minimum system performance requirements under various loading and deployment conditions. In 8 
+most cases, an FPGA or ASIC based PCIe card can be used to optimize the system performance. 9 
+Examples for O-DU6 could be security, network interface controller, and general packet 10 
+acceleration.  Specific accelerator designs are not called out in this specification.  11 
+ 12 
+2.2.3 Synchronization and Timing 13 
+2.2.3.1 Synchronization and Timing Design 1 14 
+The timing synchronization of O-DU6 is achieved by utilizing IEEE1588 via Ethernet ports. The 15 
+Network Interface Controllers (NIC) that are used for fronthaul and backhaul support the IEEE1588 16 
+protocol.  17 
+ 18 
+a. Hardware Requirements 19 
+ 20 
+The O-DU6 shall support at least one of following timing synchronization methods: 21 
+1. Ethernet based IEEE1588 22 
+2. GNSS based timing synchronization. 23 
+  24 
+b. Hardware Design  25 
+ 26 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        14 
+   
+ 
+Depending on the timing distribution topologies used, the O-DU6 system clock is able to 1 
+synchronize with the Grand Master Clock (GMC) using IEEE1588 via either the fronthaul NIC or 2 
+backhaul NIC, or synchronizing timing using Global Navigation Satellite System (GNSS). In the 3 
+case of IEEE1588, the Physical Hardware Clock (PHC) within the NIC is synchronized with the 4 
+GMC first, then the O-DU6 system clock is synchronized with the PHC. The O-DU6 is also capable 5 
+to provide clock to the O-RU6 via fronthaul if needed. When GNSS is available to O-DU6, it is able 6 
+to synchronize the system clock to Coordinated Universal Time (UTC).   Figure 2-3 outlines the O-7 
+DU6 timing synchronization mechanisms. 8 
+ 9 
+ 10 
+ 11 
+Figure 2-3 O-DU6 Timing Synchronization 12 
+ 13 
+ 14 
+2.2.4 External Interface Ports 15 
+a. Hardware Requirements 16 
+Table 2-3 External Port List 2-3 shows the external ports or slots that the system provides. 17 
+Table 2-3 External Port List 18 
+ 19 
+ 20 
+ 21 
+b. Hardware Design 22 
+The digital processing unit is a SOC device which provides all the external ports described in the 23 
+hardware requirement section. The system includes 2 USB 3.0 ports, and the serial RS232 port that 24 
+Port Name Feature Description 
+Ethernet Octave Gigabit Ethernet LAN connectors   
+Dual 10GbE Base-T Ethernet connectors 
+Dual 10GbE SFP + Fiber Ethernet connectors 
+ 
+USB 2 USB 3.0 ports 
+Serial Port 1 COM port via RJ45 
+Antenna port 1 SMA connector for GNSS 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        15 
+   
+ 
+can be used for Console Redirection, e.g. Out-of-Band Management/Windows Emergency 1 
+Management Services (EMS). There are a total of four 10G Ethernet ports in system, among them 2 
+are two RJ45 10GbE and two 10G SFP+ ports. The system also provides a RF interface to connect 3 
+GNSS antenna.  4 
+ 5 
+2.2.5 Mechanical 6 
+ 7 
+ Mother Board 8 
+ 9 
+The mechanical layout of the mother board in Figure 2-4 shows the location of major components 10 
+and interface ports, and the dimension of the board. 11 
+ 12 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        16 
+   
+ 
+ 1 
+Figure 2-4 Mother Board Layout 2 
+ 3 
+ Chassis 4 
+The 1U rack mount chassis contains the layout of the power supply, SSD and fans. The chassis 5 
+dimension is shown in Figure 2-5. 6 
+ 7 
+8'’
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        17 
+   
+ 
+ 1 
+Figure 2-5 Chassis Mechanical Diagram 2 
+ 3 
+ Cooling 4 
+The system has 4x 40x28mm PWM fans for cooling. Up to 6 fans can be installed if needed. 5 
+2.2.6 Power Unit 6 
+In a fully loaded system with two PCIe slots populated with 75W each, the system power 7 
+consumption should be less than 400W.  The total system power shall be kept to less than 80% of 8 
+the power supply capacity.  9 
+ 10 
+a. Hardware Requirements 11 
+ 12 
+The power is provided by 500W High-Efficiency power supply with PMBus 1.2. The power 13 
+support input and output power rails are listed below. 14 
+AC Input:  100-240V, 50-60Hz, 6.6A max 15 
+DC Output:  +3.3V: 12A 16 
++5V: 15A 17 
++5V standby: 3A 18 
++12V: 41A 19 
+-12V: 0.2A 20 
+ 21 
+b. Hardware Design 22 
+ 23 
+The O-DU6 chassis includes one 500W power supply unit. The power supply unit is auto-switching 24 
+capable, which enables it to automatically sense and operate at a 100v to 240v input voltage. The 25 
+power supply unit features are listed in Table 2-4. 26 
+ 27 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        18 
+   
+ 
+Table 2-4 Power Supply Features 1 
+Features Parameters 
+Output connectors 24pin/8pin/4+4pin/HDD/I2C 
+Dimension (W x D x H) 3.9 x 7.1 x 1.6 inch  
+Maximum Output Power 
+ 
++3.3V: 12A  
++5V: 15A  
++12V: 41A  
+-12V: 0.2A  
++5Vsb: 3A 
+Rated Input Voltage/Current 100-240Vac / 6.6A max 
+Rated Input Frequency  50-60HZ 
+Inrush current   Less than 30A 
+ 2 
+2.2.7 Thermal 3 
+Active cooling with up to 6 fans integrated in chassis. 4 
+2.2.8 Environmental and Regulations 5 
+The O-DU6 hardware system is RoHS Compliant. The power supply unit is EMC FCC/CISPR 6 
+Class B compliant. Table 2-5 lists the environmental related features and parameters.   7 
+ 8 
+Table 2-5 Environmental Features 9 
+ 10 
+Features Description 
+Operating Temperature -5°C to 55°C  
+Non-operating Temperature -40°C to 70°C (-40°F to 158°F) 
+Operating Relative Humidity 8% to 90% (non-condensing) 
+Non-operating Relative Humidity 5% to 95% (non-condensing) 
+ 11 
+ 12 
+2.3 O-RU6 Hardware Reference Design  13 
+This section provides a hardware reference design for O-RU6, that is an O-RU built using the 14 
+MAC/PHY split and interfaces defined in the Small Cell Forum.  See references [7], [8], [9], [10] 15 
+and [11].  16 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        19 
+   
+ 
+2.3.1 O-RU6 High-Level Functional Block Diagram 1 
+Figure 2-6 shows a high-level functional block diagram depicting the major HW/SW components 2 
+and internal/external interfaces for O-RU6.  In this design, PHY processing in the O-RU6 is handled 3 
+by a specialized ASIC. O-RU6 can handle fiber or metallic ethernet transport interface ports. 4 
+ 5 
+ 6 
+ 7 
+Figure 2-6 General Block Diagram for O-RU6 8 
+ 9 
+2.3.2 O-RU6 Hardware Components 10 
+The generic hardware architecture for O-RU6 consists of three major parts: digital processing unit, 11 
+RF processing unit and a timing unit as shown in Figure 2-7.  In the next section there is a brief 12 
+mapping of modules within these major blocks of O-RU6. 13 
+ 14 
+ 15 
+Figure 2-7 O-RU6 Architecture Diagram 16 
+ 17 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        20 
+   
+ 
+Dissimilar to option 7-2 or option 8, all L1 processing is performed by O-RU6. The processing unit 1 
+handles transport and interface processing as well as all L1 modem processing. The DPU in O-RU6 2 
+is composed of an NPU to terminate transport layer and a PHY ASIC for L1 processing.  Figure 2-3 
+8Error! Reference source not found. shows the major components used in O-RU6. 4 
+ 5 
+The digital processing unit handles transport/interface processing, complete PHY ( low and high 6 
+PHY functions) modem processing, Digital Down Converter (DDC), Digital Up Converter (DUC), 7 
+Crest Factor Reduction (CFR) and Digital Pre-Distortion (DPD). 8 
+ 9 
+The RF processing unit is comprised of the transceiver block which is responsible for functions 10 
+such as Analog to Digital Converter (ADC), Digital to Analog Converter (DAC) and mixer; an 11 
+amplification block which contains Power Amplifier (PA)/ Low Noise Amplifier (LNA), etc; and 12 
+antenna subsystem that captures and/or transmits radio electromagnetic waves. O-RU
+6 may use 13 
+Power over Ethernet (PoE) to simplify deployment complexity. 14 
+ 15 
+The Timing Unit may include Phase Locked Loop (PLL), local oscillator and timing 16 
+synchronization circuitry. 17 
+ 18 
+ 19 
+Figure 2-8 O-RU6 Functional Module Diagram 20 
+ 21 
+ 22 
+2.3.3 O-RU6 Functional Module Description 23 
+ 24 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        21 
+   
+ 
+ 1 
+Figure 2-9 Sub-6 GHz Indoor Pico O-RU6 Functional Modules (Split Option 6) 2 
+ 3 
+Mapping the generic hardware architecture to this hardware reference design, the DPU is split to an 4 
+NPU and PHY ASIC, with an internal interface using FAPI over a PCIe interface. 5 
+ 6 
+Functional blocks shown in Figure 2-9 are discussed below. 7 
+ 8 
+2.3.3.1 Network Processing Unit (NPU)  9 
+The Network Processing Unit (NPU) for O-RU6 terminates the external nFAPI interfaces and 10 
+provides the internal FAPI interface to the PHY ASIC. 11 
+2.3.3.1.1 Networking I/O  12 
+• Minimum I/O is a single 10GbE port that can be used with electrical or optical I/O 13 
+• Optionally, support can be added for  14 
+• OAM / maintenance port (1GbE) connecting over RGMII to the NPU 15 
+• An additional 10GbE port for chaining or failover connectivity. By implication, the 16 
+NPU needs to support efficient local switch/routing functionality 17 
+  18 
+Networking side connectivity is shown as below: 19 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        22 
+   
+ 
+ 1 
+Figure 2-10 O-RU6 Networking I/O 2 
+ 3 
+ Example SFP connectivity is shown below: 4 
+ 5 
+ 6 
+Figure 2-11 O-RU6 SFP Connectivity  7 
+ 8 
+  9 
+2.3.3.1.2 Low-speed connectivity and boot  10 
+This picture shows typical low-speed I/O associated with the NPU 11 
+ 12 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        23 
+   
+ 
+ 1 
+Figure 2-12 O-RU6 Low-speed NPU Connectivity  2 
+ 3 
+ 4 
+In addition, the device can optionally be configured for secure boot. 5 
+ 6 
+2.3.3.1.3 DDR  7 
+• Assuming a telecommunications-tuned Linux image and virtualization through 8 
+containerization, accommodate for 512Mbyte for hosting the Linux OS from DDR 9 
+• Buffering needs to be provided for FAPI messages, but this is expected to be limited to few 10 
+Mbyte (marginal) as well as debug / OAM logging functionality 11 
+• In aggregate, assume ~1Gbyte aggregate DDR dimensioning 12 
+• For bandwidth estimation, assume ~5Gbps of Ethernet throughput with 2 paths to/from the 13 
+DDR interface  14 
+• Receive / Transmit from / to Ethernet MAC to DDR 15 
+• Receive / Transmit from / to DDR to PCIe 16 
+Aggregate is ~10Gbps or 15Gbps with margin. Given a maximum utilization of the DDR 17 
+interface of 50%, we require 30Gbps of raw memory throughput. A 1.6GTPS DDR memory 18 
+controller with 32bits memory bus width provides 50Gbps throughput and is thus enough to 19 
+support this use-case as well as additional bandwidth requirements for switch/routing 20 
+functions to optional Ethernet ports. 21 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        24 
+   
+ 
+• ECC is assumed to be a required for a telecom-grade application. 1 
+  2 
+ 3 
+Figure 2-13 O-RU6 DDR  4 
+ 5 
+2.3.3.1.4 Processor subsystem  6 
+• The NPU needs to incorporate a processor subsystem that is capable of processing 7 
+networked FAPI messages and convert them to PCI messages. Dimensioning of the CPU is 8 
+outside of the scope. 9 
+2.3.3.1.5 Modem I/O  10 
+• For bandwidth estimation, assume ~5Gbps of throughput. Adding 20% of signaling 11 
+overhead, this becomes ~6Gbps.  12 
+• Assuming PCIe gen3 operation, 2 lanes of PCIe @8Gbps provide sufficient overhead above 13 
+this bandwidth. 14 
+ 15 
+ 16 
+ 17 
+Figure 2-14 O-RU6 Modem I/O  18 
+ 19 
+  20 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        25 
+   
+ 
+2.3.3.1.6 Security  1 
+• The NPU needs to support high-speed ciphering and protocol processing capabilities to 2 
+support a (IPSec) secured backhaul interface. This can be achieved through integrated 3 
+networking acceleration or an external accelerator as shown below. 4 
+ 5 
+ 6 
+ 7 
+Figure 2-15 O-RU6 NPU Security 8 
+ 9 
+2.3.3.2 PHY Layer ASIC 10 
+The PHY Layer ASIC is an application specific integrated circuit that provides a highly integrated 11 
+and power-efficient solution implementing the complete 5G-NR PHY layer.  It includes variants for 12 
+both sub-6 GHz (FR1) and mmWave (FR2) frequency ranges. These ASICs can be used to 13 
+implement self-contained, all-in-one small cells, as well as Option 6 radio units (RU) for 14 
+disaggregated RAN systems. In either case, the ASIC connects to a co-located network processing 15 
+unit (NPU) via a PCIe interface. In the case of a self-contained small cell, the NPU hosts the full 16 
+L2/L3 protocol stack (i.e., RLC, MAC, PDCP) which connects to the PHY via the 5G FAPI logical 17 
+interface over PCIe. In the case of an Option 6 RU, the NPU terminates the 5G nFAPI fronthaul 18 
+connection between the CU/DU and the RU and connects to the PHY via the aforementioned 5G 19 
+FAPI logical interface (over PCIe.) 20 
+ 21 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        26 
+   
+ 
+ 1 
+ 2 
+Figure 2-16 O-RU6 PHY ASIC block diagram  3 
+ 4 
+Figure above provides a high-level diagram of the functional blocks that make up the PHY ASIC. 5 
+External interfaces, including PCIe, USB, HS-UART, and GPIOs, are shown on the left-hand side. 6 
+There are two embedded general-purpose CPUs available as well as a power management 7 
+subsystem. The most important block is the 5G-NR Modem Subsystem. 8 
+  9 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        27 
+   
+ 
+ 1 
+ 2 
+Figure 2-17 O-RU6 5G Modem Subsystem  3 
+ 4 
+Figure above depicts a block diagram of the Modem Subsystem within the ASIC, which is 5 
+predominantly software defined, leveraging a number of embedded DSPs and CPUs which together 6 
+implement the transmit and receive functionalities of the 5G modem. The modem also includes 7 
+hardware accelerators for computationally intensive tasks such as FFTs, demapping, and LDPC 8 
+encoding/decoding. The various functional blocks are interconnected via a network-on-chip (NOC). 9 
+The modem subsystem also includes a digital front-end responsible for signal conditioning in both 10 
+the transmit (downlink) and receive (uplink) directions. 11 
+ 12 
+2.3.3.3 RF Front End 13 
+The Radio Frequency Front End (RFFE) is made up of all components between the modem and 14 
+antennas.  These include RF transceivers, RF switches, filters, duplexers, power amplifiers, and 15 
+low-noise amplifiers. 16 
+ 17 
+2.3.3.4 Power Management 18 
+The Power Management functional module controls the flow of electrical power to other parts of 19 
+the O-RU6. 20 
+ 21 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        28 
+   
+ 
+2.3.4 Synchronization and Timing 1 
+2.3.4.1 Hardware Requirements 2 
+O-RU timing synchronization sources include: 3 
+• Ethernet based IEEE1588 4 
+• Ethernet based Synchronous Ethernet 5 
+• Optional Global Navigation Satellite System (GNSS) based timing synchronization 6 
+ 7 
+Timing functionality is shown in the diagram below: 8 
+Ethernet
+Interface
+Digital 
+Processing 
+Unit
+Timing
+Unit
+10MHz, PPS, 
+NMEA (GPS)
+(optional)
+Recovered 
+Clock
+1588 &
+PPS
+Time of Day
+Frame/Slot 
+Timing
+RF Processing 
+Unit
+ADC/DAC, RF 
+Reference Clock 
+O-CU/
+O-DU6/
+FHGW6
+ 9 
+Figure 2-18 Timing Modules 10 
+ 11 
+ 12 
+ 13 
+IEEE1588 time stamping can be done at the Ethernet PHY level (model 1 below) or at the Ethernet 14 
+MAC/Network Processing Unit (NPU) level (model 2 below). Model 1 is expected to provide 15 
+incremental precision. 16 
+ 17 
+2.3.4.2 Synchronization and Timing Design 1 18 
+Timing synchronization on Ethernet PHY based 1588 and Synchronous Ethernet received clock 19 
+extraction support.  20 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        29 
+   
+ 
+Ethernet
+PHY
+Network 
+Processing Unit
+PHY Layer 
+ASIC
+PPS
+GPS 
+Module
+mux
+10MHz
+Clock 
+Synth
+PPS
+PPS
+rec_clk
+3GPP
+clock
+3GPP
+clock
+3GPP_clk
+servo
+nmea
+O-CU/
+O-DU6/
+FHGW6
+ 1 
+Figure 2-19 Ethernet Synchronization I 2 
+ 3 
+Notes: 4 
+• Either (depending on mux / input control) GPS 10MHz or Synchronous Ethernet recovered 5 
+output clock (ref_clk) are input to a clock synthesizer (fractional PLL) to generate the 38.4, 6 
+122.88 MHz (or similar) MHz reference clock (Frequency Synchronization) 7 
+• The PPS pulse from the GPS provides a mechanism to manage local 122.88 (or similar) 8 
+3GPP clock through use of a Software PLL (servo) in absence of GPS/Synchronous 9 
+Ethernet extracted reference frequency 10 
+• On top of the GPS PPS pulse, the GPS UART output provides time synchronization to a 11 
+universal clock through NMEA messages 12 
+• The mux in the system allows the Network Processing Unit to control which input is used as 13 
+PPS source (GPS module or Ethernet PHY) 14 
+• All dashed lines are indicating optionality – GPS support is optional for this system 15 
+• IEEE1588 provides both time synchronization and frequency synchronization of a local 16 
+122.88MHz clock through Ethernet time stamping such as supported in Layerscape devices. 17 
+Synchronous Ethernet can be used in conjunction with this for local 3GPP clock generation. 18 
+ 19 
+2.3.4.3 Synchronization and Timing Design 2 20 
+Timing synchronization on Network Processing Unit based 1588 and Synchronous Ethernet 21 
+received clock extraction support. 22 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        30 
+   
+ 
+Ethernet
+PHY
+Network 
+Processing Unit
+PHY Layer 
+ASIC
+PPS
+GPS 
+Module
+mux
+10MHz
+Clock 
+Synth
+PPS
+PPS
+rec_clk
+3GPP
+clock
+3GPP
+clock
+servo
+nmea
+O-CU/
+O-DU6/
+FHGW6
+ 1 
+Figure 2-20 Ethernet Synchronization II 2 
+ 3 
+Notes: 4 
+• Either (depending on mux / input control) GPS 10MHz or Synchronous Ethernet recovered 5 
+output clock (ref_clk) are input to a clock synthesizer (fractional PLL) to generate the 38.4, 6 
+122.88 MHz (or similar) MHz reference clock (Frequency Synchronization) 7 
+• The PPS pulse from the GPS provides a mechanism to manage local 122.88 (or similar) 8 
+3GPP clock through use of a Software PLL (servo) in absence of GPS/Synchronous 9 
+Ethernet extracted reference frequency 10 
+• On top of the GPS PPS pulse, the GPS UART output provides time synchronization to a 11 
+universal clock through NMEA messages 12 
+• All dashed lines are indicating optionality – GPS support is optional for this system 13 
+• IEEE1588 provides both time synchronization and frequency synchronization of a local 14 
+122.88MHz clock through Ethernet time stamping such as supported in Layerscape devices. 15 
+Synchronous Ethernet can be used in conjunction with this for local 3GPP clock generation. 16 
+ 17 
+2.3.5 External Interface Ports 18 
+The O-RU6 must have at least one RJ45 10 gigabit per second (Gbps) Ethernet interface or at least 19 
+one 10 Gbps optical interface. In some cases, depending on the fronthaul throughput associated 20 
+with smaller air interface bandwidths, a 1 or 2.5 Gbps Ethernet or optical interface may be 21 
+sufficient, depending on system operator requirements. SCF 5G nFAPI should be supported. 22 
+At full load, the power consumption must not exceed the limit allowed by IEEE802.3at/PoE+, 23 
+which is 25.5W. 24 
+2.3.6 Power Unit 25 
+O-RU6 can use power over Ethernet (PoE) to simplify deployment complexity. 26 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        31 
+   
+ 
+2.3.7 Environmental and Regulations 1 
+O-RU6 IPC design is for indoor environments (nominal ambient temperature, humidity, altitude).  2 
+Suppliers must comply with any local regulatory requirements. 3 
+2.4 Integrated gNB-DU Reference Design Solution 4 
+This Section includes a reference design for an all-in-one, integrated gNB-DU solution.  5 
+This section provides an example white box design for integrated indoor picocells, using FAPI as 6 
+the internal interface between PHY and MAC.   Typically, the MAC will run on an NPU while the 7 
+PHY resides in a PHY Layer ASIC, connected via a PCIe interface. 8 
+ 9 
+ 10 
+Figure 2-21 Sub-6 GHz Indoor Pico Integrated O-DU&O-RU Functional Modules 11 
+ 12 
+Functional modules shown in Figure 2-21 for the integrated case are essentially the same as those in 13 
+the O-RU6 split option.  The main difference is in the NPU, which now terminates the O-CU/gNB-14 
+DU interface.   15 
+ 16 
+The integrated gNB-DU may also include a GPS receiver to locally provide location and precise 17 
+timing (as opposed to depending on the O-CU for those functions.)  18 
+ 19 
+The integrated Option 6 design does not require an accelerator. 20 
+ 21 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        32 
+   
+ 
+As in the split design, the DPU is a combination of NPU and PHY ASIC (same parts whether split 1 
+or integrated.) 2 
+ 3 
+2.4.1 Power Unit 4 
+If PoE is used, At full load, the power consumption must not exceed the limit allowed 5 
+by IEEE802.3at/PoE+, which is 25.5W. 6 
+ 7 
+2.4.1.1 Power Management 8 
+The Power Management functional module controls the flow of electrical power to other parts of 9 
+the integrated O-DU/O-RU.   10 
+ 11 
+2.4.2 Synchronization and Timing 12 
+Local 1588v2 or GPS Slave interfaces for acquiring timing and synchronization can be included 13 
+according to operator use case and deployment environment. 14 
+2.4.3 External Interface Ports 15 
+The integrated O-DU/O-RU must have at least one RJ45 10 gigabit per second (Gbps) Ethernet 16 
+interface or at least one 10 Gbps optical interface. In some cases, depending on the fronthaul 17 
+throughput associated with smaller air interface bandwidths, a 1 or 2.5 Gbps Ethernet or optical 18 
+interface may be sufficient, depending on system operator requirements. SCF 5G nFAPI should be 19 
+supported. 20 
+2.4.4 Power Unit 21 
+Integrated O-DU/O-RU can use power over Ethernet (PoE) to simplify deployment complexity. At 22 
+full load, the power consumption must not exceed the limit allowed by IEEE802.3at/PoE+, which is 23 
+25.5W. 24 
+2.4.5 Environmental and Regulations 25 
+Integrated O-DU/O-RU IPC design is for indoor environments (nominal ambient temperature, 26 
+humidity, altitude).  Suppliers must comply with any local regulatory requirements. 27 
+ 28 
+2.5 FHGW Hardware Reference Design  29 
+A FHGW is not required for option 6 hardware reference design.  30 
+  31 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        33 
+   
+ 
+ 1 
+ 2 
+Annex 1: Example Hardware Bill of Materials 3 
+This annex shows example components used to build the reference design described above for split 4 
+and integrated option 6 designs (note that the same components are used for either scenario.) 5 
+ 6 
+   7 
+Figure A-1: Sub-6 Split (O-RU6) and Integrated Picocell Reference Design  8 
+ 9 
+ 10 
+Figure A-1 shows an example hardware design based on the FSM100xx ASIC for a sub-6 Ghz Split 11 
+(O-RU6) and Integrated picocell.  In both cases, this design implements the SCF FAPI protocol over 12 
+an internal PCIe interface.  13 
+ 14 
+In the split Option 6 picocell case, the NPU implements the nFAPI control and data plane protocol 15 
+encapsulation/decapsulation functions to provide the transport interface from the picocell to the O-16 
+DU
+6.  See SCF 225.1.0 [11]. 17 
+
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        34 
+   
+ 
+ 1 
+In the integrated picocell case, the NPU implements higher layer protocol functions (L3 and 2 
+portions or all of L2.)   3 
+ 4 
+ 5 
+ 6 
+ 7 
+  8 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        35 
+   
+ 
+ 1 
+Annex 2: 2 
+ 3 
+This document references the following specifications from the Small Cell Forum available at 4 
+https://scf.io/en/documents/all_documents.php 5 
+ 6 
+SCF 222.10.03: 5G FAPI PHY API Specification 7 
+SCF 082.09.05: nFAPI and FAPI Specifications 8 
+SCF 223.10.02: RF and Digital Front End Control API 9 
+SCF 224.10.01: 5G FAPI Network Monitor Mode API 10 
+SCF 225.2.0: 5G nFAPI Specifications. 11 
+ 12 
+ 13 
+  14 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        36 
+   
+ 
+Annex ZZZ: O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, 2 
+ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN 4 
+ALLIANCE and the entity that downloads, uses or otherwise accesses any O-RAN Specification, 5 
+including its Affiliates (the “Adopter”). 6 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7 
+Section 1: DEFINITIONS 8 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under 9 
+common control with another entity, so long as such control exists. For the purpose of this Section, 10 
+“Control” means beneficial ownership of fifty (50%) percent or more of the voting stock or equity 11 
+in an entity. 12 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether 13 
+implemented in hardware, software or combinations thereof) that fully conforms to a Final 14 
+Specification. 15 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, 16 
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 17 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN 18 
+ALLIANCE that does not add any significant new features or functionality and remains 19 
+interoperable with the prior version of an O-RAN Specification. The term “O-RAN Specifications” 20 
+includes Minor Updates. 21 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent 22 
+applications, other than design patents and design registrations, throughout the world, which (i) are 23 
+owned or otherwise licensable by a Member, Contributor or Academic Contributor during the term 24 
+of its Member, Contributor or Academic Contributorship; (ii) such Member, Contributor or 25 
+Academic Contributor has the right to grant a license without the payment of consideration to a 26 
+third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 27 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only 28 
+when it is not possible on technical (but not commercial) grounds, taking into account normal 29 
+technical practice and the state of the art generally available at the date any Final Specification was 30 
+published by the O-RAN ALLIANCE or the date the patent claim first came into existence, 31 
+whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a 32 
+Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional 33 
+cases where a Final Specification can only be implemented by technical solutions, all of which 34 
+infringe patent claims, all such patent claims shall be considered Necessary Claims. 35 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, 36 
+Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the 37 
+discretion to include in their license a term allowing the licensor to suspend the license against a 38 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        37 
+   
+ 
+licensee who brings a patent infringement suit against the licensing Member, Contributor, 1 
+Academic Contributor, Adopter, or any of their Affiliates. 2 
+Section 2: COPYRIGHT LICENSE 3 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN ALLIANCE hereby grants to 4 
+Adopter a nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright 5 
+license to obtain, use and modify O-RAN Specifications, but not to further distribute such O-RAN 6 
+Specification in any modified or unmodified way, solely in furtherance of implementations of an 7 
+ORAN 8 
+Specification. 9 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or 10 
+in a separate written agreement with O-RAN ALLIANCE. 11 
+Section 3: FRAND LICENSE 12 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant 13 
+based on a separate Patent License Agreement to each Adopter under Fair Reasonable And Non- 14 
+Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 15 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-16 
+sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, 17 
+import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, 18 
+however, that such license shall not extend: (a) to any part or function of a product in which a 19 
+Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; 20 
+or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and 21 
+Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the foregoing 22 
+licensing commitment includes the distribution by the Adopter’s distributors and the use by the 23 
+Adopter’s customers of such licensed Compliant Implementations. 24 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or 25 
+their Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of 26 
+Necessary Claims to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to 27 
+such Member, Contributor or Academic Contributor, Adopter and its Affiliates for its license of 28 
+Necessary Claims to its licensees. 29 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate 30 
+Patent License Agreement to each Members, Contributors, Academic Contributors, Adopters and 31 
+their Affiliates under Fair Reasonable And Non-Discriminatory (FRAND) terms and conditions 32 
+with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject 33 
+to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary 34 
+Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant 35 
+Implementations; provided, however, that such license will not extend: (a) to any part or function of 36 
+a product in which a Compliant Implementation is incorporated that is not itself part of the 37 
+Compliant Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters 38 
+and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3.1. For 39 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        38 
+   
+ 
+the avoidance of doubt, the foregoing licensing commitment includes the distribution by the 1 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and 2 
+the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ 3 
+customers of such licensed Compliant Implementations. 4 
+Section 4: TERM AND TERMINATION 5 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 6 
+4.2 O-RAN ALLIANCE on behalf of its Members, Contributors and Academic Contributors may 7 
+terminate this Agreement if Adopter materially breaches this Agreement and does not cure or is not 8 
+capable of curing such breach within thirty (30) days after being given notice specifying the breach. 9 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under 10 
+surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) 11 
+to entities who become Adopters after the date of termination; and (b) for future versions of ORAN 12 
+Specifications that are backwards compatible with the version that was current as of the date of 13 
+termination. 14 
+Section 5: CONFIDENTIALITY 15 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of 16 
+O-RAN Specifications to third parties, as Adopter employs with its own confidential information, 17 
+but no less than reasonable care. Any disclosure by Adopter to its Affiliates, contractors and 18 
+consultants should be subject to an obligation of confidentiality at least as restrictive as those 19 
+contained in this Section. The foregoing obligation shall not apply to any information which is: (1) 20 
+rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) 21 
+publicly available through no fault of Adopter; (3) rightfully received without a duty of 22 
+confidentiality; (4) disclosed by O-RAN ALLIANCE or a Member, Contributor or Academic 23 
+Contributor to a third party without a duty of confidentiality on such third party; (5) independently 24 
+developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 25 
+governmental body, or as required by law, provided that Adopter provides reasonable prior written 26 
+notice to O-RAN ALLIANCE, and cooperates with O-RAN ALLIANCE and/or the applicable 27 
+Member, Contributor or Academic Contributor to have the opportunity to oppose any such order; or 28 
+(7) disclosed by Adopter with O-RAN ALLIANCE’s prior written approval. 29 
+Section 6: INDEMNIFICATION 30 
+Adopter shall indemnify, defend, and hold harmless the O-RAN ALLIANCE, its Members, 31 
+Contributors or Academic Contributors, and their employees, and agents and their respective 32 
+successors, heirs and assigns (the “Indemnitees”), against any liability, damage, loss, or expense 33 
+(including reasonable attorneys’ fees and expenses) incurred by or imposed upon any of the 34 
+Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments 35 
+arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization 36 
+of products that comply with O-RAN Specifications. 37 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        39 
+   
+ 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 1 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, 2 
+AND ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY 3 
+PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, 4 
+SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM 5 
+ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH 6 
+CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND 7 
+WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF 8 
+SUCH DAMAGES. O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO 9 
+WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, 10 
+STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE MEMBERS, 11 
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY 12 
+WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY 13 
+QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-14 
+FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN 15 
+SPECIFICATIONS. 16 
+Section 8: ASSIGNMENT 17 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or 18 
+make any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, 19 
+without having first received the prior, written consent of the O-RAN ALLIANCE, which consent 20 
+may be withheld in O-RAN ALLIANCE’s sole discretion. O-RAN ALLIANCE may freely assign 21 
+this Agreement. 22 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 23 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors 24 
+(including future Members, Contributors and Academic Contributors) are entitled to rights as a 25 
+third-party beneficiary under this Agreement, including as licensees under Section 3. 26 
+Section 10: BINDING ON AFFILIATES 27 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes 28 
+that legal entity’s or association’s agreement that its Affiliates are likewise bound to the obligations 29 
+that are applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter 30 
+hereunder. 31 
+Section 11: GENERAL 32 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law 33 
+provisions.  34 
+
+ O-RAN.WG7.IPC-HRD-Opt6.0-v02.00 
+ 
+ 
+________________________________________________________________________________________________  
+Copyright 2021 O-RAN ALLIANCE e.V.                     
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ        40 
+   
+ 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter 1 
+and expressly supersedes and replaces any prior or contemporaneous agreements between the 2 
+parties, whether written or oral, relating to the subject matter of this Agreement.  3 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, 4 
+rules and regulations with respect to its and its Affiliates’ performance under this Agreement, 5 
+including without limitation, export control and antitrust laws. Without limiting the generality of 6 
+the foregoing, Adopter acknowledges that this Agreement prohibits any communication that would 7 
+violate the antitrust laws. 8 
+By execution hereof, no form of any partnership, joint venture or other special relationship is 9 
+created between Adopter, or O-RAN ALLIANCE or its Members, Contributors or Academic 10 
+Contributors. Except as expressly set forth in this Agreement, no party is authorized to make any 11 
+commitment on behalf of Adopter, or O-RAN ALLIANCE or its Members, Contributors or 12 
+Academic Contributors. 13 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is 14 
+held to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such 15 
+provisions will be deemed stricken from the contract, and (ii) the remaining terms, provisions, 16 
+covenants and restrictions of this Agreement will remain in full force and effect. 17 
+ 18 

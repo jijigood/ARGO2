@@ -1,0 +1,938 @@
+O-RAN.WG2.R1AP-R003-v02.00
+Technical Specification
+O-RAN Working Group 2 (Non-RT RIC and A1 Interface WG)
+Application Protocols for R1 Services
+Copyright © 2023by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Contents
+Foreword	4
+Modal verbs terminology	4
+1	Scope	5
+2	References	5
+2.1	Normative references	5
+2.2	Informative references	6
+3	Definition of terms, symbols and abbreviations	6
+3.1	Terms	6
+3.2	Symbols	6
+3.3	Abbreviations	6
+4	Application protocol for the R1 services	7
+4.1	Introduction	7
+4.2	Version conventions for the present document	7
+5	RESTful R1 service APIs	7
+5.1	Overview	7
+5.2	Versioning of RESTful R1 service APIs	8
+5.3	URI structure and supported content formats	9
+5.4	General considerations for RESTful R1 service APIs	9
+5.4.1	Usage of HTTP header fields	9
+5.4.2	Handling of large query results	9
+5.4.3	Error reporting	9
+6	Service management and exposure services	10
+6.1	Service registration API	10
+6.1.1	Usage of HTTP header fields	10
+6.1.2	API version	10
+6.1.3	Resource structure and methods	10
+6.1.4	Service operations	11
+6.1.5	Resources	14
+6.1.6	Custom operations without associated resources	15
+6.1.7	Notifications	15
+6.1.8	Data model	15
+6.2	Service discovery API	15
+6.2.1	Introduction	15
+6.2.2	API version	15
+6.2.3	Resource structure and methods	16
+6.2.4	Service operations	16
+6.2.5	Resources	17
+6.2.6	Custom operations without associated resources	17
+6.2.7	Notifications	17
+6.2.8	Data model	17
+7	Data management and exposure services	18
+7.1	Data registration API	18
+7.1.1	Introduction	18
+7.1.2	API version	18
+7.1.3	Resource structure and methods	18
+7.1.4	Service Operations	19
+7.1.5	Resources	21
+7.1.6	Custom operation without associated resources	23
+7.1.7	Notifications	23
+7.1.8	Data Model	23
+7.1.9	Error Handling	25
+7.2	Data discovery API	26
+7.2.1	Introduction	26
+7.2.2	API version	26
+7.2.3	Resource structure and methods	26
+7.2.4	Service operations	27
+7.2.5	Resources	28
+7.2.6	Custom operation without associated resources	31
+7.2.7	Notifications	31
+7.2.8 	Data Model	31
+7.2.9 	Error Handling	32
+Annex A (normative): OpenAPI specifications	32
+A.1	General	32
+A.2	Service management and exposure service	32
+A.2.1 	Service registration service	32
+A.2.2 	Service discovery service	33
+A.3 	Data management and exposure service	35
+A.3.1 	Data Registration API	35
+Annex B (normative): Common data types for R1 service APIs	39
+B.1	Introduction	39
+B.2	Data Types for Generic Usage	40
+B.2.1	Introduction	40
+B.2.2 	Simple data types	40
+B.3.3 	Enumeration	40
+B.2.4 	Structured data types	40
+B.3 	Common data types for Service management and exposure	40
+B.3.1	Introduction	40
+B.3.2	Simple data types	41
+B.3.3	Enumerations	41
+B.3.4	Structured data types	41
+B.3.5	Re-used data types	41
+B.4	Data Types for DME	42
+B.4.1	Introduction	42
+B.4.2 	Simple data types	42
+B.4.3 	Enumerations	43
+B.4.4 	Structured data types	43
+Revision history	44
+History	45
+Foreword
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+1	Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+The present document specifies the Application Protocols for R1 Services. It is part of a TS-family covering the WG2: R1 Interface Specifications.
+2	References
+2.1	Normative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are necessary for the application of the present document.
+[1] 	3GPP TS 29.501 (v16.0): "5G System; Principles and Guidelines for Services Definition;("3GPP TS 29.501").
+[2]	3GPP TS 29.500: "5G System; Technical Realization of Service Based Architecture; Stage 3". ("3GPP TS 29.500")
+[3]	OpenAPI: "OpenAPI 3.0.3 Specification", http://spec.openapis.org/oas/v3.0.3.html.
+[4]	ETSI GS NFV-SOL 013 Rel3: "Protocols and Data Models; Specification of common aspects for RESTful NFV MANO APIs".
+[5]	O-RAN TS: "R1 General Aspects and Principles" ("R1GAP").
+[6]	O-RAN TS: "R1 Use Cases and Requirements" ("R1UCR").
+[7]	O-RAN TS: "Transport Protocols for R1 services"("R1TP").
+[8]	IETF RFC 3986: "Uniform Resource Identifier (URI): Generic Syntax".
+[9]	3GPP TS 29.222 (v17.7.0): "3rd Generation Partnership Project; Technical Specification Group Core Network and Terminals; Common API Framework for 3GPP Northbound APIs. ("3GPP TS 29.222")
+[10]	IETF RFC 7807: "Problem Details for HTTP APIs".
+[11]	Semantic Versioning 2.0.0: https://semver.org.
+[12]		IETF RFC 8259: "The JavaScript Object Notation (JSON) Data Interchange Format".
+[13]	IETF RFC 4229: "HTTP Header Field Registrations".
+[14] 	json-schema 2020-12, "https://json-schema.org/specification-links.html#2020-12"
+2.2	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+Void
+3	Definition of terms, symbols and abbreviations
+3.1	Terms
+For the purposes of the present document, the following terms apply:
+API consumer: The Service Consumer consuming one or more services using APIs.
+NOTE: The Service Consumer role is introduced in O-RAN TS R1GAP [5].
+API producer: The Service Producer that offers its services for consumption via APIs.
+NOTE: The Service Producer role is introduced in O-RAN TS R1GAP [5].
+3.2	Symbols
+Void
+3.3	Abbreviations
+For the purposes of the present document, the follow abbreviations apply:
+API 		Application programming interface
+FQDN				Fully qualified domain name
+4	Application protocol for the R1 services
+4.1	Introduction
+The present document contains a realization for the procedures identified in O-RAN TS R1GAP [5]. It is based on transport protocols as defined in R1TP [7]. This definition of the R1 Application Protocols (R1AP) defined in the present document is based on the 3GPP service framework for network functions specified in 3GPP TS 29.501 [1] .
+4.2	Version conventions for the present document
+The version number of the present document follows the "xx.yy" versioning scheme. There could be implications for the interoperability between rApps and R1 service API implementations in SMO/Non-RT RIC framework that are based on different versions of the present document.
+An incremented "xx" version field of the present document could indicate that a new major feature (e.g., a new R1 service) has been added or that an incompatible change has been made to one or more R1 service APIs. An incremented "yy" version field could indicate that an optional feature has been added, a technical issue has been fixed, or that clarifications or editorial corrections have been made.
+The version conventions for RESTful R1 service APIs are defined in clause 5.2.
+5	RESTful R1 service APIs
+5.1	Overview
+The design of the RESTful R1 service APIs is based on the procedures and requirements defined in O-RAN TS R1UCR [6] and O-RAN TS R1GAP [5], and on the protocol design framework as specified in 3GPP TS 29.501 [1] .
+The API version of a service API includes a pre-release version (e.g. "-alpha.1") if the service API is under development.
+The present document defines the protocols for the R1 service APIs listed in table 5.1-1.
+Table 5.1-1: RESTful R1 service APIs and their versions defined in the present document
+5.2	Versioning of RESTful R1 service APIs
+Each RESTful R1 service API is versioned independently. The API version number defined in the present document contains three numerical fields following a MAJOR.MINOR.PATCH pattern, and may contain a pre-release version field, according to SemVer [11].
+The API version number held by an implementation may additionally include a build metadata field, according to SemVer [11], to indicates a specific deployment. The content of this field is implementation specific; its is provided by the deployment. The <apiVersion> path segment used in URI structures indicate the MAJOR field of the API version number. The full API version number is visible in the "version" field of the "info" object of each OpenAPI document in Annex A.
+To indicate the full API version the API consumer intends to use, the API consumer may include the "Version" HTTP header (see IETF RFC 4229[13] ) in an HTTP request, in which case the header shall contain the version identifier as defined above. It is optional to include the build metadata field.
+The API producer shall include in the response the "Version" HTTP header signalling the used API version, including the build metadata if available. If the build metadata have been omitted in the request, the API producer shall use the combination of MAJOR, MINOR, PATCH and pre-release indicator as requested and the highest supported value for the build metadata field for that combination, if available. In case the API consumer has not sent a "Version" header in the request, the API producer shall use the latest available version, and signal it in the "Version" header.
+NOTE:	In case multiple versions are supported by an API producer under the URI for a major version, this allows the API consumer to request a particular version. This mechanism is referred to as "microversioning".
+If the API version signalled by the API consumer in the "Version" request header is not supported by the API producer, the API producer shall respond with a "406 Not Acceptable" error and may include in the response payload body a Problem Details structure providing more information on the cause of the error.
+5.3	URI structure and supported content formats
+This clause specifies the URI prefix and the supported content formats applicable to the RESTful R1 service APIs.
+All resource URIs of the APIs shall have the following prefix:
+{apiRoot}/<apiName>/<apiVersion>/
+The request URIs used in HTTP requests from the API service consumer towards the API service producer shall have the resource URI structure defined in clause 4.4.1 of 3GPP TS 29.501 [1] , i.e.:
+{apiRoot}/<apiName>/<apiVersion>/<apiSpecificResourceUriPart>
+with the following components:
+-	The {apiRoot} shall be set as described in clause 4.4.1 of 3GPP TS 29.501 [1] ; however,  the restrictions w.r.t the operator specific FQDN of the host portion defined there do not apply.
+-	The <apiName> indicates the API name of the service interface in an abbreviated form. It is defined in the clause specifying the corresponding RESTful R1 service API.
+-	The <apiVersion> indicates the major version (see clause 5.1A)  of the API and is defined in the clause specifying the corresponding RESTful R1 serviceAPI.
+-	Each <apiSpecificResourceUriPart> represents a specific resource of the API. It is defined in the corresponding RESTful R1 service API for each one of the defined resources.
+For HTTP requests and responses that have message content, the content format JSON (see IETF RFC 8259 [12]) shall be supported. The JSON format shall be signalled by the content type "application/json".
+All resource URIs of the API shall comply with the URI syntax as defined in IETF RFC 3986 [8]. An implementation that dynamically generates resource URI parts (individual path segments, sequences of path segments that are separated by "/", query parameter values) shall ensure that these parts only use the character set that is allowed by IETFRFC 3986 [8] for these parts.
+5.4	General considerations for RESTful R1 service APIs
+5.4.1	Usage of HTTP header fields
+HTTP headers are components of the headers section of the HTTP request and response messages. The usage of HTTP header fields shall follow the definitions in clause 4.2 of ETSI GS NFV-SOL 013 [4].
+5.4.2	Handling of large query results
+The handling of large query results shall be supported by RESTful R1 service APIs as specified in clause 5.4.2 of ETSI GS NFV-SOL 013 [4].
+5.4.3	Error reporting
+In RESTful interfaces, application errors are mapped to HTTP errors. Since HTTP error information is generally not enough to discover the root cause of the error, additional application specific error information is typically delivered.
+The RESTful R1 service APIs shall support the error reporting as specified in clause 6 of ETSI GS NFV-SOL 013 [4].
+NOTE:	ETSI GS NFV-SOL 013 [4] refers to "RESTful NFV-MANO API" specification; and wherever such reference is provided "RESTful R1 service API" is to be considered instead for the purpose of the present document.
+If an HTTP method is not defined for a particular resource in the present document, that method is not supported. When that method is requested on the resource, the API producer shall return a "405 Method
+Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [4].
+6	Service management and exposure services
+6.1	Service registration API
+6.1.1	Usage of HTTP header fields
+This API allows the API producer to manage service registrations based on the procedures for “Registration of services” defined in O-RAN TS R1GAP [5].
+6.1.2	API version
+For the service registration API as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0 and the PATCH version field shall be 0 (see clause 4.3.1.1 of 3GPP TS 29.501 [1]  for a definition of the version fields). Consequently, the <apiVersion> URI variable shall be set to "v1".
+The service registration API is under development and consequently the API version shall include the pre-release version "alpha.1".
+6.1.3	Resource structure and methods
+The request URIs used in HTTP requests from the API consumer towards the API producer shall have the resource URI structure as defined for the CAPIF_Publish_Service_API (see Figure 8.2.2.1-1 in Clause 8.2.2 in 3GPP TS 29.222[14]).
+Table 6.1.3-1 lists the individual resources defined for the API, the applicable HTTP methods as defined in clause 8.2 of 3GPP TS 29.222 [9]) and the associated service operations.
+Table 6.1.3-1:  Resources and methods overview of the service registration API
+6.1.4	Service operations
+6.1.4.1	Register service API
+6.1.4.1.1	Operation definition
+A Service Producer uses the Register service API operation as API consumer to register with the API producer service APIs for services it is capable of producing.
+The operation is based on HTTP POST.
+@startuml
+autonumber
+participant "API consumer" as cons
+participant "API producer" as prod
+cons ->> prod : POST …/{apfId}/service-apis (ServiceAPIDescription)
+prod -->> cons : 201 Created (ServiceAPIDescription)
+@enduml
+Figure 6.1.4.1.1-1: Register service API operation
+The service operation is as follows:
+The API Consumer shall send an HTTP POST request to the API Producer that includes the rApp identifier and the service profile defining the service to be registered. The API Producer shall process the message content received in the HTTP POST message and determine if the request sent by the API Consumer is authorized or not.
+The API producer shall generate the service API identifier and construct the URI for the created resource. The API Producer shall return the HTTP POST response. On success "201 Created" is returned. The message body carries the registered service profile and the "Location" HTTP header is present and shall carry the URI for the newly created service resource. On failure, the appropriate error code shall be returned, and the message response body may contain additional error information.
+6.1.4.1.2	Referenced procedures
+6.1.4.1.2.1	Register service procedure
+The Register service procedure defined in O-RAN TS R1GAP [5] is based on the Register service API operation illustrated in figure 6.1.4.1.1-1.
+6.1.4.2	Update registered service API
+6.1.4.2.1 Operation definition
+A Service Producer uses the Update registered service API operation as API consumer to update a complete service API registration with the API producer.
+The operation is based on HTTP PUT.
+@startuml
+autonumber
+participant "API consumer" as cons
+participant "API producer" as prod
+cons ->> prod : PUT  …/{apfId}/service-apis/{serviceApiId}} (ServiceAPIDescription)
+prod -->> cons : 200 OK (ServiceAPIDescription)
+@enduml
+Figure 6.1.4.2.1-1: Update registered service API operation
+The service operation is as follows:
+The API Consumer shall send an HTTP PUT request to the API Producer that includes the rApp identifier and the registered service API identifier in the URI and the updated service API profile as message content. The API Producer shall determine if the request sent by the API Consumer is authorized or not. If so, the API Producer shall process the message content received in the HTTP PUT message.
+The API Producer shall return the HTTP PUT response. On success “200 OK” shall be returned. The message content carries the updated service API profile. On failure, the appropriate error code shall be returned, and the message response body may contain additional error information.
+6.1.4.2.2	Referenced procedures
+6.1.4.2.2.1	Update service registration procedure
+The Update service registration procedure defined in O-RAN TS R1GAP [5] is based on the Update registered service API operation illustrated in figure 6.1.4.2.1-1.
+6.1.4.3	Deregister service API
+6.1.4.3.1 Operation definition
+A Service Producer uses the Deregister service API operation as API consumer to deregister a service with the API producer
+The operation is based on HTTP DELETE.
+@startuml
+autonumber
+participant "API consumer" as cons
+participant "API producer" as prod
+cons ->> prod : DELETE  …/{apfId}/service-apis/{serviceApiId}
+prod -->> cons : 204 No Content
+@enduml
+Figure 6.1.4.3.1-1: Deregister service API operation
+The service operation is as follows:
+To deregister a service, The API Consumer shall send an HTTP DELETE request to the API Producer that includes the rApp identifier and the service API identifier in the request URI. The API Producer shall process the message content received in the HTTP DELETE message and determine if the request sent by the API Consumer is authorized or not.
+The API Producer shall return the HTTP DELETE response. On success “204 No Content” shall be returned. On failure, the appropriate error code shall be returned, and the message response body may contain additional error information.
+6.1.4.3.2	Referenced procedures
+6.1.4.3.2.1 Deregister service procedure
+The Deregister service procedure defined in O-RAN TS R1GAP [5] is based on the Deregister service API operation illustrated in figure 6.1.4.3.1-1.
+6.1.4.4	Partially update registered service API
+6.1.4.4.1 Operation definition
+A Service Producer uses the Partially update registered service API operation as API consumer to partially update a service API registration with the API producer.
+The operation is based on HTTP PATCH.
+@startuml
+autonumber
+participant "API consumer" as cons
+participant "API producer" as prod
+cons ->> prod : PATCH…/{apfId}/service-apis/{serviceApiId} (ServiceAPIDescriptionPatch)
+prod -->> cons : 200 OK (ServiceAPIDescription)
+@enduml
+Figure 6.1.4.2.1-1: Partial update registered service API operation
+The service operation is as follows:
+The API Consumer shall send an HTTP PATCH request to the API Producer that includes the rApp identifier and the registered service API identifier in the URI and the updates to the service API profile as message content. The API Producer shall determine if the request sent by the API Consumer is authorized or not. If so, the API Producer shall process the message content received in the HTTP PATCH message.
+The API Producer shall return the HTTP PATCH response. On success “200 OK” shall be returned. The message content carries the updated service API profile. On failure, the appropriate error code shall be returned, and the message response body may contain additional error information.
+6.1.4.4.2	Referenced procedures
+6.1.4.4.2.1	Update service registration procedure
+The Update service registration procedure defined in O-RAN TS R1GAP [5] is based on the Update registered service API operation illustrated in figure 6.1.4.2.1-1.
+6.1.5	Resources
+6.1.5.1	Overview
+This clause defines the resources for the service registration API based on 3GPP TS 29.222 [9].
+6.1.5.2	Resource: " APF published APIs "
+This resource is defined in clause 8.2 of 3GPP TS 29.222 [14] with the following URI:
+{apiRoot}/ published-apis /<apiVersion>/{apfId}/service-apis
+The role of the APF (API publishing function) is taken by the rApp which consumes this API.
+In addition to the provisions in clause 8.1 of 3GPP TS 29.222 [9], the following shall apply:
+The {apfId} resource URI variable shall carry the rAppId of the rApp that performs the service registration and that produces the registered APIs.
+6.1.6	Custom operations without associated resources
+None
+6.1.7	Notifications
+None
+6.1.8	Data model
+6.1.8.1	General
+The data model is defined in 3GPP TS 29.222 [9]. The re-use of the data types from [9] is specified in clause B.3 .
+6.1.8.2	Simple data types and enumerations
+None
+6.18.3	Structured data types
+None
+6.1.8.4	Re-used data types
+The re-used data types are defined in clause B.3 .Error! Reference source not found.
+6.2	Service discovery API
+6.2.1	Introduction
+This API allows the API consumer to perform service discovery based on the service discovery procedures defined in O-RAN TS R1GAP [5]. The API is based on the CAPIF_Discover_Service_API as specified in 3GPP TS 29.222 [9].
+6.2.2	API version
+For the service discovery API as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0 and the PATCH version field shall be 0 (see clause 4.3.1.1 of 3GPP TS 29.501 [1]  for a definition of the version fields). Consequently, the <apiVersion> URI variable shall be set to "v1".
+The service discovery API is under development and consequently the API version shall include the pre-release version "alpha.1".
+6.2.3	Resource structure and methods
+The request URIs used in HTTP requests from the API consumer towards the API producer shall have the resource URI structure as defined for the CAPIF_Discovery_Service_API (see Figure 8.1.2.1-1 in clause 8.1.2 in 3GPP TS 29.222 [9])
+Table 6.2.3-2 lists the individual resources defined for the API and the applicable HTTP methods as defined in clause 8.1 of 3GPP TS 29.222 [9]) and the associated service operations.
+Table 6.2.3-2:  Resources and methods overview of the service discovery API
+6.2.4	Service operations
+6.2.4.1	Query service APIs
+6.2.4.1.1	Operation definition
+The API consumer uses the Query service APIs operation to discover service APIs information.
+The operation is based on HTTP GET as per figure 6.2.4.1.1-1. The HTTP GET response contains information about all services that the API consumer is authorized to access and that match the filtering criteria.
+@startuml
+autonumber
+participant "API consumer" as cons
+participant "API producer" as prod
+cons ->> prod : GET .../allServiceAPIs
+prod -->> cons : 200 OK (DisoveredAPIs)
+@enduml
+Figure 6.2.4.1.1-1: Query service APIs operation
+This service operation is as follows:
+The API consumer shall send an HTTP GET request to the API producer that includes the rApp identifier and optional filtering criteria. The API producer shall process the service discovery details received in the HTTP GET message and determine if the request sent by the API consumer is authorized or not.
+The API producer shall return the HTTP GET response. On success "200 OK" shall be returned and the message content shall carry a list of service profiles that the API consumer is authorized to access and that match the filtering criteria, if provided. On failure, the appropriate error code shall be returned, and the response message content may contain additional error information.
+6.2.4.1.2	Referenced procedures
+6.2.4.1.2.1	Discovery services procedure
+The Discover services procedure as defined in O-RAN TS R1GAP [5] is based on the Query service APIs operation illustrated in figure 6.2.4.1.1-1.
+6.2.5	Resources
+6.2.5.1	Overview
+This clause defines the resource for the Service discovery API based on 3GPP TS 29.222 [9].
+6.2.5.2	Resource: "All published service APIs"
+This resource is defined in clause 8.1 of 3GPP TS 29.222 [9] with the following URI: {apiRoot}/servicediscovery/<apiVersion>/serviceapis
+In addition to the provisions in clause 8.1 of 3GPP TS 29.222 [9], the following shall apply:
+In the GET method, the URI query parameters "api-name" and "api-version" are relevant in the context of the SME services and shall be supported by the API producer to allow filtering the query by name and/or version of the service API. The API consumer may provide these parameters. The following parameters are not applicable in the context of the SME services and therefore need not be supported: comm-type, protocol, aef-id, data-format, api-cat, preferred-aef-loc, supported-features, api-supported-features.
+In the GET method, the URI query parameter “api-invoker-id” shall carry the rAppId of the rApp that performs the service discovery.
+6.2.6	Custom operations without associated resources
+None
+6.2.7	Notifications
+None
+6.2.8	Data model
+6.2.8.1	General
+This clause specifies the application data model supported by the API.
+6.2.8.2	Simple data types and enumerations
+None
+6.2.8.3	Structured data types
+None
+6.2.8.4	Re-used data types
+The re-used data types are defined in clause B.3 .
+7	Data management and exposure services
+7.1	Data registration API
+7.1.1	Introduction
+This API enables the API consumer to register data type production capabilities based on the data registration service procedure defined in O-RAN TS R1GAP [5].
+7.1.2	API version
+For the data registration API as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0 and the PATCH version field shall be 0 (see clause 4.3.1.1 of 3GPP TS 29.501 [1] for a definition of the version fields). Consequently, the <apiVersion> URI variable shall be set to "v1".
+The data registration API is under development and consequently the API version shall include the pre-release version "alpha.1".
+7.1.3	Resource structure and methods
+The request URIs used in HTTP requests from the API consumer towards the API producer shall have the resource URI structure as defined in clause 5.2. The <apiName> resource URI variable shall be "dataregistration". The <apiSpecificResourceUriPart> for each resource shall be set as described in clause 7.1.5.
+Figure 7.1.3-1 shows the overall resource URI structure defined for the data registration API.
+Figure 7.1.3-1: Resource URI structure of the Data registration API
+Table: 7.1.3-1 1 lists the individual resources defined for the API, the applicable HTTP methods, and the associated service operations.
+Table 7.1.3-1: Resource and methods overview of the Data registration API
+7.1.4	Service Operations
+7.1.4.1	Register data type
+7.1.4.1.1	Operation definition
+The API consumer uses this operation to register data type production capabilities
+The operation to register the capability to produce a data type is based on HTTP POST.
+@startuml
+autonumber
+Participant “API consumer” as Consumer
+Participant “API producer" as Producer
+Consumer ->> Producer: POST …/rapps/{rAppId}/\ndatatypeprodcaps (DataTypeProdCapRegistration)
+Producer -->> Consumer: 201 Created (DataTypeProdCapRegistration)
+@enduml
+Figure 7.1.4.1.1 -1: Register data type operation
+The API consumer shall send an HTTP POST request to the API producer. The target URI shall identify the resource (…/rapps/{rAppId}/datatypeprodcaps) under which the new registration is requested to be created. The message content shall carry a DataTypeProdCapRegistration structure.
+The API producer shall generate the registration identifier and construct the URI for the created resource. The API producer shall return the HTTP POST response. On success, "201 Created" shall be returned. The "Location" header shall be present and shall carry the URI of the new registration resource. The message content shall carry a DataTypeProdCapRegistration structure that represents the new resource. On failure, the appropriate error code shall be returned, and the message content may contain additional error information.
+7.1.4.1.2	Referenced procedures
+7.1.4.1.2.1	Register data type procedure
+Register data type is a procedure defined for the Data registration service in O-RAN TS R1GAP [5]. The procedure is based on the Register data type operation illustrated in figure 7.1.4.1.1-1.
+7.1.4.2	Deregister data type
+7.1.4.2.1	Operation definition
+The API consumer uses this operation to deregister data type production capabilities.
+The operation to deregister the capability to produce a data type is based on HTTP DELETE.
+@startuml
+autonumber
+Participant “API consumer” as Consumer
+Participant “API producer" as Producer
+Consumer ->> Producer: DELETE …/rapps/{rAppId}/\ndatatypeprodcaps/{registrationId}
+Producer -->> Consumer: 204 No Content
+@enduml
+Figure 7.1.4.2.1-1: Deregister data type operation
+The API consumer shall send an HTTP DELETE request to the API producer. The target URI shall identify the resource to be deleted (…/rapps/{rAppId}/datatypeprodcaps/{registrationId}).
+The API producer shall return the HTTP DELETE response. On success, “204 No Content” shall be returned and the response message content shall be empty. On failure, the appropriate error code shall be returned, and the message response content may contain additional error information.
+7.1.4.2.2	Referenced procedures
+7.1.4.2.2.1	Deregister data type procedure
+Deregister data type is a procedure defined for the Data registration service in O-RAN TS R1GAP [5]. The procedure is based on the Deregister data type operation illustrated in figure 7.1.4.2.1-1
+7.1.5	Resources
+7.1.5.1	Overview
+The following clause defines the resources for the Data registration API
+7.1.5.2	Resource:  Registered data type production capabilities
+7.1.5.2.1	Description
+The resource represents the registered capabilities of an rApp to produce data types.
+Only the methods defined in clause 7.1.5.2.3 shall be supported by this resource.
+7.1.5.2.2	Resource Definition
+Resource URI: {apiRoot}/dataregistration/<apiVersion>/rapps/{rAppId}/datatypeprodcaps
+The resource URI variables supported by the resource is defined in Table 7.1.5.2.2-1.
+Table 7.1.5.2.2-1: Resource URI variable for the resource
+7.1.5.2.3	Resource Standard Methods
+7.1.5.2.3.1	HTTP POST
+This method shall support the request data structure specified in the table 7.1.5.2.3.1-1 and the response data structure and response code specified in the table 7.1.5.2.3.1-2, and the HTTP headers specified in table 7.1.5.2.3.1-3.
+Table 7.1.5.2.3.1-1: Data structures supported by the POST request body on this resource
+Table 7.1.5.2.3.1-2: Data structures supported by the POST Response Body on this resource
+Table 7.1.5.2.3.1-3: Headers supported by the 201 Response Code on this resource
+7.1.5.2.4	Resource Custom Operations
+None
+7.1.5.3	Resource: Individual registered data type production capability
+7.1.5.3.1	Description
+The resource represents an individual registered data type production capability.
+Only the methods defined in clause 7.1.5.3.3 shall be supported by this resource.
+7.1.5.3.2	Resource Definition
+Resource URI:
+{apiRoot}/dataregistrations/<apiVersion>/rapps/{rAppId}/datatypeprodcaps/{registrationId}
+The resource URI variables supported by the resource is defined in Table 7.1.5.3.2-1.
+Table 7.1.5.3.2-1: Resource URI variable for the resource
+7.1.5.3.3	Resource Standard Methods
+7.1.5.3.3.1	HTTP DELETE
+This method shall support the request data structure specified in table 7.1.5.3.3.1-1 and the response data structure and response code specified in 7.1.5.3.3.1-2
+Table 7.1.5.3.3.1-1: Data structure supported by the DELETE request body on this resource
+Table 7.1.5.3.3.1-2: Data structure supported by the DELETE response body on this resource
+7.1.5.3.4	Resource Custom Operations
+None
+7.1.6	Custom operation without associated resources
+None
+7.1.7	Notifications
+None
+7.1.8	Data Model
+The following clause specifies the application data model supported by the Data registration API.
+7.1.8.1	Structured data types
+7.1.8.1.1	Overview
+The following  clause defines the data types and attributes to be used by the service API.
+7.1.8.1.2	Data type: DataTypeProdCapRegistration
+The DataTypeProdCapRegistration data type contains the attributes defined in table 7.1.8.1.2-1
+Table 7.1.8.1.2-1: Definition of type DataTypeProdCapRegistration
+7.1.8.1.3	Data type: DataTypeInformation
+The DataTypeInformation data type contains the attributes defined in table 7.1.8.1.3-1.
+Table 7.1.8.1.3-1: Definition of type DataTypeInformation
+7.1.8.1.4	Data type: Metadata
+The Metadata data type contains the attributes defined in table 7.1.8.1.4-1 and the set of metadata attributes may be extended by deployments.
+Table 7.1.8.1.4-1: Definition of type Metadata
+7.1.8.1.5	Data type: MessageSchema
+The MessageSchema data type contains the attributes defined in table 7.1.8.1.5-1.
+Table 7.1.8.1.5-1: Definition of type MessageSchema
+7.1.8.2	Simple data types and enumerations
+7.1.8.2.1	Introduction
+This clause defines simple data types and enumerations that can be referenced from data structures defined in the previous clauses.
+7.1.8.2.2	Simple data types
+No simple data types are defined in this version of the specification.
+7.1.8.3.3	Enumeration
+7.1.8.2.3	Enumeration: SchemaTypes
+Table 7.1.8.2.3-1: Enumeration SchemaTypes
+7.1.9	Error Handling
+7.1.9.1 General
+For the Data Registration API, HTTP error responses shall be supported as specified in clause 4.8 of 3GPP TS 29.501 [1] . Protocol errors and application errors specified in table 5.2.7.2-1 of 3GPP TS 29.500 [2] shall be supported for an HTTP method if the corresponding HTTP status codes are specified as mandatory for that HTTP method in table 5.2.7.1-1 of 3GPP TS 29.500 [2].
+In addition, the requirements in the following clauses are applicable for the Data Registration API.
+7.1.9.2 Protocol Errors
+No specific protocol errors are defined in the present document.
+7.1.9.3 Application Errors
+No additional application errors defined in the present document.
+7.2	Data discovery API
+7.2.1	Introduction
+This API enables the API consumer to discover the available data types based on the data discovery service procedures defined in O-RAN TS R1GAP [5].
+7.2.2	API version
+For the data discovery API as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0 and the PATCH version field shall be 0 (see clause 4.3.1.1 of 3GPP TS 29.501[1] for a definition of the version fields). Consequently, the <apiVersion> URI variable shall be set to "v1".
+The data discovery API is under development and consequently the API version shall include the pre-release version "alpha.1".
+7.2.3	Resource structure and methods
+The request URIs used in HTTP requests from the API consumer towards the API producer shall have the resource URI structure as defined in clause 5.2. The <apiName> resource URI variable shall be "datadiscovery". The <apiSpecificResourceUriPart> for each resource shall be set as described in clause 7.2.5.
+Figure 7.2.3-1 shows the overall resource URI structure defined for the data discovery API.
+Figure 7.2.3-1: Resource URI structure of the Data discovery API
+Table: 7.2.3-1 lists the individual resources defined for the API, the applicable HTTP methods, and the associated service operations.
+Table 7.2.3-1: Resource and methods overview of the Data registration API
+7.2.4	Service operations
+7.2.4.1	Discover data types
+7.2.4.1.1	Operation definition
+The API consumer uses this operation to discover the available data types.
+The operation to discover the data types is based on HTTP GET.
+@startuml
+autonumber
+Participant “API consumer” as Consumer
+Participant “API producer" as Producer
+Consumer ->> Producer: GET …/datatypes
+Producer -->> Consumer: 200 OK (array(DataTypeInformation))
+@enduml
+Figure 7.2.4.1.1 -1: Discover data types operation
+The API consumer shall send an HTTP GET request to the API producer. The target URI shall identify the resource (…/datatypes) and may also contain query parameters to discover the available data types.
+The API producer shall return the HTTP GET response. On success, "200 OK" shall be returned and the message content shall carry an array of data type information. On failure, the appropriate error code shall be returned, and the response message content may contain additional error information.
+7.2.4.1.2	Referenced procedures
+7.2.4.1.2.1	Register service procedure
+Discover data types is a procedure defined for the Data discovery service in O-RAN TS R1GAP [5]. The procedure is based on the Discover data types operation illustrated in figure 7.2.4.1.1-1.
+7.2.4.2	Query data type information
+7.2.4.2.1	Operation definition
+The API consumer uses this operation to query for information about a specific data type identified by a data type identifier.
+The operation to query for information about a specific data type is based on HTTP GET.
+@startuml
+autonumber
+Participant “API consumer” as Consumer
+Participant “API producer" as Producer
+Consumer ->> Producer: GET …/datatypes/{dataTypeId}
+Producer -->> Consumer: 200 OK (DataTypeInformation)
+@enduml
+Figure 7.2.4.2.1-2: Query data type information operation
+The API consumer shall send an HTTP GET request to the API producer. The target URI shall identify the resource (…/datatypes/{dataTypeId}) and the message content shall be empty.
+The API producer shall return the HTTP GET response. On success, "200 OK" shall be returned and the message content shall carry data type information related to the data type identifier. On failure, the appropriate error code shall be returned, and the response message content may contain additional error information.
+7.2.4.2.2		Referenced procedures
+7.2.4.2.2.1	Query data type procedure
+Query data type is a procedure defined for the Data discovery service in O-RAN TS R1GAP [5]. The procedure is based on the Query data type operation illustrated in figure 7.2.4.2.1-1.
+7.2.5	Resources
+7.2.5.1	Overview
+The following  clause defines the resources for the Data discovery API.
+7.2.5.2	Resource: All data types
+7.2.5.2.1		Description
+The resource represents the available data types. Only the methods defined in clause 7.2.5.2.3 shall be supported by this resource.
+7.2.5.2.2		Resource Definition
+Resource URI: {apiRoot}/datadiscovery/<apiVersion>/datatypes
+The resource URI variables supported by the resource is defined in Table 7.2.5.2.2-1.
+Table 7.2.5.2.2-1: Resource URI variable for the resource
+7.2.5.2.3		Resource Standard Methods
+7.2.5.2.3.1	HTTP GET
+This method shall support the URI query parameters specified in table 7.2.5.2.3.1-1, the request data structure specified in the table 7.2.5.2.3.1-2 and the response data structure and response code specified in the table 7.2.5.2.3.1-3.
+Table 7.2.5.2.3.1-1: URI query parameters supported by the GET method on this resource
+Table 7.2.5.2.3.1-2: Data structures supported by the GET request body on this resource
+Table 7.2.5.2.3.1-3: Data structures supported by the GET response body on this resource
+7.2.5.2.4		Resource Custom Operations
+None.
+7.2.5.3	Resource: Individual data type
+7.2.5.3.1		Description
+The resource represents a data type.
+7.2.5.3.2 Resource Definition
+Resource URI: {apiRoot}/datadiscovery/<apiVersion>/datatypes/{dataTypeId}
+The resource URI variables supported by the resource is defined in Table 7.2.5.3.2-1.
+Table 7.2.5.3.2-1: Resource URI variable for the resource
+7.2.5.3.3		Resource Standard Methods
+7.2.5.3.3.1	HTTP GET
+This method shall support the URI query parameters specified in table 7.2.5.3.3.1-1, the request data structure specified in table 7.2.5.3.3.1-2 and the response data structure and response code specified in 7.2.5.3.3.1-3.
+Table 7.2.5.2.3.1-1: URI query parameters supported by the GET method on this resource
+Table 7.2.5.3.3.1-2: Data structures supported by the GET request body on this resource
+Table 7.2.5.3.3.1-3: Data structures supported by the GET response body on this resource
+7.2.5.3.4		Resource Custom Operations
+None.
+7.2.6	Custom operation without associated resources
+None.
+7.2.7	Notifications
+None.
+7.2.8 	Data Model
+The following clause specifies the application data model supported by the Data discovery API.
+7.2.8.1	Structured data types
+7.2.8.1.1	Overview
+The following clause defines the data types and attributes to be used in the resource representations.
+For this service API, no structure data types are defined in the present document
+7.2.8.2	Simple data types and enumerations
+7.2.8.2.1	Introduction
+The following clause defines simple data types and enumerations that can be referenced from data structures defined in the previous clauses.
+7.2.8.2.2	Simple data types
+For this service API, no simple data types are defined in the present document.
+7.2.8.3.3	Enumerations
+For this service API, no enumerations are defined in the present document.
+7.2.9 	Error Handling
+7.2.9.1 General
+For the Data Discovery API, HTTP error responses shall be supported as specified in clause 4.8 of 3GPP TS 29.501 [1] . Protocol errors and application errors specified in table 5.2.7.2-1 of 3GPP TS 29.500 [2] shall be supported for an HTTP method if the corresponding HTTP status codes are specified as mandatory for the HTTP GET method in table 5.2.7.1-1 of 3GPP TS 29.500 [2].
+In addition, the requirements in the following clauses are applicable for the Data Discovery API.
+7.2.9.2 Protocol Errors
+No specific protocol errors are defined in the present document.
+7.2.9.3 Application Errors
+No additional application errors defined in the present document.
+Annex A (normative): OpenAPI specifications
+A.1	General
+This Annex formally specifies the RESTful R1 service APIs by defining OpenAPI documents in YAML format that comply with the OpenAPI 3.0.3 Specification [3].
+The Open API specifications of the RESTful R1 service APIs provided in this annex are versioned as described in clause 5.2.
+A.2	Service management and exposure service
+A.2.1 	Service registration service
+A.2.1.1 Introduction
+The Open API for this service is reusing the CAPIF_Publish_Service_API as specified in clause A.2.1.2 with exceptions specified in clause A.2.1.3 below.
+A.2.1.2 CAPIF_Publish_Service_API
+The Open API for the SME service registration API specified in clause 6.1 reuses the CAPIF_Publish_Service_API as specified in clause A.3 of 3GPP TS 29.222 [9].
+The API version of the Service registration API as specified in clause 6.1.2 shall use the CAPIF_Publish_Service_API OpenAPI version as specified in Table A.2.1.2-1
+Table A.2.1.2-1
+A.2.1.3 Adaptations and Exceptions
+For a service-producing rApp, the "rAppId" shall be used as "aefId" in the AefProfile.
+The attributes in the table A.2.1.3-1 below are not required to be supported when the CAPIF_Publish_Service_API is reused.
+Table A.2.1.3-1: Exceptions when reusing the CAPIF_Publish_Service_API
+A.2.2 	Service discovery service
+A.2.2.1 Introduction
+The Open API for this service is reusing the CAPIF_Discover _Service_API in as specified in clause A.2.2.2 with exceptions specified in clause A.2.2.3 below.
+A.2.2.2 CAPIF_discovery _API
+The Open API for the SME service discovery API specified in clause 6.2reuses the CAPIF_Discover _Service_API as specified in clause A.2 of 3GPP TS 29.222 [9].
+The API version of the Service discovery API as specified in clause 6.2.2 shall use the CAPIF_Discover_Service_API OpenAPI version as specified in Table A.2.2.2-1
+Table A.2.2.2-1
+A.2.2.3 Adaptations and Exceptions
+For an API-producing rApp, the "rAppId" shall be used as "aefId" in the AefProfile.
+For an API-consuming rApp, the "rAppId" shall be used as "api-invoker-id" in the URI query parameter.
+The attributes in the table A.2.2.3-1 below are not required to be supported when the CAPIF_Discover _Service _API is reused.
+Table A.2.2.3-1: Exceptions when reusing the CAPIF_Discover _Service_API
+The Query parameters in the table A.2.2.3-2 below are not required to be supported when the CAPIF_Discover_Service_API is reused.
+Table A.2.2.3-2: Query parameters exceptions when reusing the CAPIF_Discover _Service_API
+A.3 	Data management and exposure service
+A.3.1 	Data Registration API
+A.3.1.1 Introduction
+The Open API for the Data Registration API is specified in clause A.3.1.2
+A.3.1.2 Data Registration API
+openapi: 3.0.3
+info:
+title: 'Data registration service'
+version: 1.0.0-alpha-1
+description: |
+API for Data registration service.
+© 2023, O-RAN ALLIANCE.
+All rights reserved.
+externalDocs:
+description: 'O-RAN.WG2.R1AP-v02.00'
+url: 'https://www.o-ran.org/specifications'
+servers:
+- url: '{apiRoot}/dataregistration/<apiVersion>/rapps/{rAppId}'
+variables:
+apiRoot:
+description: 'apiRoot as defined in clause 5.2 in O-RAN.WG2.R1AP'
+default: 'https://example.com'
+apiVersion:
+description: 'The API major version as defined in clause 7.1.2 in O-RAN.WG2.R1AP'
+default: 'v*'
+rAppId:
+description: Identifier of the rApp that registers the capabilities
+default: '{}'
+paths:
+'/datatypeprodcaps':
+post:
+description: 'To register data type production capabilities'
+tags:
+- Registered data type production capabilities
+requestBody:
+required: true
+content:
+application/json:
+schema:
+$ref: '#/components/schemas/DataTypeProdCapRegistration'
+responses:
+'201':
+description: 'Success case 201 created'
+content:
+application/json:
+schema:
+$ref: '#/components/schemas/DataTypeProdCapRegistration'
+headers:
+Location:
+description: 'Contains the URI of the newly created resource'
+required: true
+schema:
+type: string
+'400':
+$ref: '#/components/responses/400'
+'401':
+$ref: '#/components/responses/401'
+'403':
+$ref: '#/components/responses/403'
+'404':
+$ref: '#/components/responses/404'
+'405':
+$ref: '#/components/responses/405'
+'409':
+$ref: '#/components/responses/409'
+'413':
+$ref: '#/components/responses/413'
+'415':
+$ref: '#/components/responses/415'
+'429':
+$ref: '#/components/responses/429'
+'500':
+$ref: '#/components/responses/500'
+'502':
+$ref: '#/components/responses/502'
+'503':
+$ref: '#/components/responses/503'
+'/datatypeprodcaps/{registrationId}':
+parameters:
+- name: registrationId
+in: path
+required: true
+schema:
+$ref: '#/components/schemas/registrationId'
+delete:
+description: 'To deregister data type production capabilities'
+tags:
+- Individual registered data type production capability
+responses:
+'204':
+description: 'The registration was deleted'
+'400':
+$ref: '#/components/responses/400'
+'401':
+$ref: '#/components/responses/401'
+'403':
+$ref: '#/components/responses/403'
+'404':
+$ref: '#/components/responses/404'
+'429':
+$ref: '#/components/responses/429'
+'500':
+$ref: '#/components/responses/500'
+'502':
+$ref: '#/components/responses/502'
+'503':
+$ref: '#/components/responses/503'
+components:
+schemas:
+registrationId:
+description: 'A successful registration identified by registrationId '
+type: string
+DataTypeProdCapRegistration:
+description: 'Information related to the registration as producer of a data type'
+type: object
+properties:
+dataTypeInformation:
+$ref: '#/components/schemas/DataTypeInformation'
+dataProducerConstraints:
+description: 'Formulates producer constraints related to the data type based on the reqSubSchema'
+type: object
+dataRequestEndpoint:
+$ref: 'TS29222_CAPIF_Publish_Service_API.yaml#/components/schemas/InterfaceDescription'
+dataSubscriptionEndpoint:
+$ref: 'TS29222_CAPIF_Publish_Service_API.yaml#/components/schemas/InterfaceDescription'
+required:
+- dataTypeInformation
+anyOf:
+- required: ["dataSubscriptionEndpoint"]
+- required: ["dataRequestEndpoint"]
+DataTypeInformation:
+description: 'Information of the data type'
+type: object
+properties:
+dataTypeId:
+$ref: '#/components/schemas/DataTypeIdStruct'
+metadata:
+$ref: '#/components/schemas/Metadata'
+reqSubSchema:
+type: object
+description: 'Schema that defines the information necessary to formulate a data request or data subscription.   If this attribute is not present, the schema is assumed to be known from the data type definition that is referenced by dataTypeId'
+dataMessageSchema:
+$ref: '#/components/schemas/MessageSchema'
+required: ["dataTypeId", "metadata", "dataMessageSchema"]
+DataTypeIdStruct:
+description: 'Defining the attributes of data type identifier'
+type: object
+properties:
+namespace:
+type: string
+description: 'Indicating the entity responsible for the data type definition.'
+name:
+type: string
+description: 'Name of the data type. The string can be any character except ":" (colon)'
+pattern: '^[^:]{1,}$'
+version:
+type: string
+description: 'Version of the data type. The versioning and allowed characters are according to SemVer [11]'
+required: ["namespace","name","version"]
+MessageSchema:
+description: 'Defining the attributes of data type identifier'
+type: object
+properties:
+type:
+$ref: '#/components/schemas/SchemaTypes'
+schema:
+type: string
+description: 'The schema serialized to string. If this attribute is not present, the schema is assumed to be known from the data type definition that is referenced by dataTypeId'
+required: ["type"]
+Metadata:
+description: 'Metadata that can be used in discovering the data type'
+properties:
+dataCategory:
+description: 'Defines the category of the data type e.g., PM counters'
+type: array
+items:
+type: string
+minItems: 1
+rat:
+description: 'Defines the radio access technology e.g., 5G'
+type: array
+items:
+type: string
+minItems: 1
+required: ["dataCategory"]
+SchemaTypes:
+description: 'Type of the schema'
+type: string
+enum:
+- JSON_SCHEMA
+ProblemDetails:
+description: 'A problem detail to carry details in an HTTP response according to RFC 7807'
+type: object
+properties:
+type:
+description: 'a URI reference according to IETF RFC 3986 that identifies the problem type'
+type: string
+title:
+description: 'human-readable summary of the problem type'
+type: string
+status:
+description: 'the HTTP status code'
+type: number
+detail:
+description: 'human-readable explanation '
+type: string
+instance:
+description: 'URI reference that identifies the specific occurrence of the problem'
+type: string
+responses:
+'400':
+description: 'Bad Request'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'401':
+description: 'Unauthorized'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'403':
+description: 'Forbidden'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'404':
+description: 'Not Found'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'405':
+description: 'Method Not Allowed'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'409':
+description: 'Conflict'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'411':
+description: 'Length Required'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'413':
+description: 'Payload Too Large'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'415':
+description: 'Unsupported Media Type'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'429':
+description: 'Too Many Request'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'500':
+description: 'Internal Server Error'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'502':
+description: 'Bad Gateway'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+'503':
+description: 'Service Unavailable'
+content:
+application/problem+json:
+schema:
+$ref: '#/components/schemas/ProblemDetails'
+Annex B (normative): Common data types for R1 service APIs
+B.1	Introduction
+In the subsequent clauses, common data types for the following areas are defined:
+Service management and exposure,
+Data types for generic usage,
+-	Data types for DME.
+B.2	Data Types for Generic Usage
+B.2.1	Introduction
+This clause defines common data types for generic usage.
+B.2.2 	Simple data types
+No simple data types are defined in the present document
+B.3.3 	Enumeration
+None.
+B.2.4 	Structured data types
+B.2.4.1		Data type: ProblemDetails
+The ProblemDetails structure is specified in table B.2.4.1-1. It is based on IETF RFC 7807 [10] and shall comply with the provisions defined there.
+Table B.2.4.1-1: Definition of type ProblemDetails
+B.2.4.2	Re-used data types
+Table B.2.4.2-1 specifies re-used data types:
+Table B.2.4.2-1: Re-used data types
+B.3 	Common data types for Service management and exposure
+B.3.1	Introduction
+This clause defines common data types for usage in the service management and exposure APIs.
+Clause B.3.5 references and profiles data types defined in external specifications and defines restrictions on and adaptations of these data type for their usage within the context of the service management and exposure APIs.
+B.3.2	Simple data types
+None.
+B.3.3	Enumerations
+None.
+B.3.4	Structured data types
+None.
+B.3.5	Re-used data types
+Table B.3.5-1 references data types that are reused from external documents by the service management and exposure APIs and defines restrictions on and adaptations of these data type for their usage within the context of the service management and exposure APIs.
+NOTE: All externally-defined data types that are directly used in request or response message content of the service management and exposure APIs (such as ServiceAPIDescription) are listed below. In addition, those externally-defined data types are listed that are descendant of a directly used data type and for which restrictions and adaptations are defined in the present document. Other external ancestor data types are not listed, as they are referenced directly in the external specification.
+Table B.3.5-1: Re-used data types
+B.4	Data Types for DME
+B.4.1	Introduction
+This clause defines common data types for DME usage.
+B.4.2 	Simple data types
+Table B.4.2-1: Simple data types
+B.4.3 	Enumerations
+No enumeration is defined in the present document.
+B.4.4 	Structured data types
+B.4.4.1	Data type: DataTypeIdStruct
+The DataTypeIdStruct data type contains the attributes defined in table B.4.4.1-1
+Table B.4.4.1-1: Definition of type DataTypeIdStruct
+Annex (informative): Bibliography
+ETSI GS NFV-SOL 015v1.2.1: " Protocols and Data Models; Specification of Patterns and Conventions for RESTful NFV-MANO APIs", December 2020.
+Revision history
+History

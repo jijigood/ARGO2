@@ -1,0 +1,950 @@
+O-RAN.WG8.AAD.0-v06.00
+Technical Specification
+O-RAN Working Group 8
+Base Station O-DU and O-CU Software Architecture and APIs
+Prepared by the O-RAN ALLIANCE. Copyright © 2022 by the O-RAN ALLIANCE e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in Annex ZZZ of this specification. All other rights reserved.
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ											  1
+Revision History
+Introductory Material
+Scope
+This Technical Specification has been produced by the O-RAN Alliance.
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should O-RAN modify the contents of the present document, it will be re-released by O-RAN with an identifying change of release date and an increase in version number as follows:
+Version x.y.z
+where:
+x	the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+This document contains RAN Requirements, reference O-CU and O-DU Software Architecture, Functional Blocks and API definitions. O-RU and Low-PHY references in this document are only informational to complete the architecture description. All hardware and/or software implementations of O-RU and Low-PHY are not in the scope of this document.
+References
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+3GPP TR 21.905: Vocabulary for 3GPP Specifications
+3GPP TS 29.281: "General Packet Radio System (GPRS) Tunneling Protocol User Plane (GTPv1-U)".
+3GPP TR 38.104: "NR; Base Station (BS) radio transmission and reception".
+3GPP TS 38.211: "NR; Physical channels and modulation".
+3GPP TS 38.212: "NR; Multiplexing and channel coding".
+3GPP TR 38.300: "NR; NR and NG-RAN Overall Description".
+3GPP TR 38.321: "NR; Medium Access Control (MAC) protocol specification".
+3GPP TR 38.322: "NR; Radio Link Control (RLC) protocol specification".
+3GPP TR 38.323: "NR; Packet Data Convergence Protocol (PDCP) specification".
+3GPP TR 37.324: "NR; Service Data Adaptation Protocol (SDAP) specification".
+3GPP TS 38.331: "NR; Radio Resource Control (RRC) Protocol specification".
+3GPP TS 38.401: "NG-RAN; Architecture description".
+3GPP TS 38.413: "NG-RAN; NG Application Protocol (NGAP)".
+3GPP TS 38.423: "NG-RAN; Xn Application Protocol (XnAP)".
+3GPP TS 38.425: "NG-RAN; NR user plane protocol".
+3GPP TS 38.470: "NG-RAN; F1 general aspects and principles".
+3GPP TS 38.472: "NG-RAN; F1 signaling transport".
+3GPP TS 38.473: "NG-RAN; F1 Application Protocol (F1AP)".
+3GPP TS 38.474: "NG-RAN; F1 data transport".
+3GPP TS 28.541: “5G Network Resource Model (NRM)”
+3GPP TS 28.552: “Management and Orchestration, 5G Performance Management”
+ORAN-WG4.CUS.0-v02.00 Technical Specification, ‘O-RAN Fronthaul Working Group Control, User and Synchronization Plane Specification’.
+O-RAN.WG4.MP.0-v03.00 Technical Specification, ‘O-RAN Fronthaul Working Group Management Plane Specification’.
+ORAN-WG1 Technical Specification, ‘O-RAN Working Group 1 Architecture Description’
+ORAN-WG7-DSC.0-v01.00 Technical Specification, “Deployment Scenarios and Base Station Classes for White Box Hardware”
+O-RAN.WG5.O-DU-O1.0-v03.00 Technical Specification, “O1 Interface specification for O-DU”
+O-RAN.WG3.E2GAP-v01.01 Technical Specification, "Near-Real-time RAN Intelligent Controller Architecture & E2 General Aspects and Principles"
+O-RAN.WG3.E2AP-v01.01 Technical Specification, "Near-Real-time RAN Intelligent Controller E2 Application Protocol (E2AP)"
+SCF Release 10.0, Document 222.10.02, 5G FAPI: PHY API Specification, March 2020
+SCF Release 1.0, Document SCF225.1.0, 5G nFAPI Specifications, Sep 2020
+O-RAN.WG1.Use-Cases-mMIMO-TR-v00.11_clean_FixedNumbering.docx, TR for Massive MIMO optimization usecases.
+INT.AO-2021.12.09-WG3-WID-mMIMO_draft v06 , TR for WG3 WID to support Massive MIMO optimization feature.
+Definitions and Abbreviations
+Definitions
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 [1]. For the base station classes of Pico, Micro and Macro, the definitions are given in 3GPP TR 38.104 [3].
+O-CU: O-RAN Control Unit – a logical node hosting PDCP, RRC, SDAP and other control functions.
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC, MAC, and High-PHY layers based on a lower layer functional split.
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional split.
+E1 interface: The interface defined by 3GPP TS 38.460, 3GPP TS 38.462 and 3GPP TS 38.463 between CU control plane and CU user plane.
+F1 interface:  The interface defined by 3GPP TS 38.470 [16], 3GPP TS 38.472 [17] and 3GPP TS 38.473 [18], to be further interpreted as per O-RAN WG5 specification for interoperability between O-CU and O-DU from different vendors.
+E2 interface: The interface is defined by O-RAN WG3 Near RT-RIC Architecture & E2 General Aspects and Principles that is connecting the near RT-RIC and one or more O-CU-CPs, one or more O-DUs and one or more O-eNBs.
+Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. 
+An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+3GPP	Third Generation Partnership Project
+5G	Fifth-Generation Mobile Communications
+AMC	Adaptive Modulation and Coding
+BWP	Bandwidth Part
+CCCH	Common Control Channel
+CORESET      	Control Resource Set
+CSI	Channel State Information
+CU	Centralized Unit as defined by 3GPP
+DCI	Downlink Control Information
+DPDK	Data Plane Development Kit
+DL	Downlink
+DRB	Dedicated Radio Bearer
+DMRS	Demodulation Reference Signal
+DU	Distributed Unit as defined by 3GPP
+E1AP	E1 Application Protocol
+FAPI	Functional Application Platform Interface
+F1AP	F1 Application Protocol
+FDD	Frequency Division Duplex
+FFT	Fast Fourier Transform
+FSM	Finite State Machine
+GMC	Grand Master Clock
+HARQ	Hybrid Automatic Repeat Request
+IE	Information Element
+LCID	Logical Channel Identifier
+LDPC	Low Density Parity Check code
+LLR	Log Likelihood Ratio
+MAC	Medium Access Control protocol
+MAC CE	MAC Control Element
+MIMO	Multiple Input Multiple Output
+mMIMO 	Massive MIMO
+MT	Mobile-Termination
+MU-MIMO	Multiple User MIMO
+NG-RAN	Next Generation Radio Access Network
+NIC	Network Interface Card
+nFAPI	Network Functional Application Platform Interface
+NGAP		NG Application Protocol
+NR	New Radio
+O-CU	O-RAN Centralized Unit as defined by O-RAN
+O-DU	O-RAN Distributed Unit as defined by O-RAN
+OFH	Open Front Haul protocol defined by O-RAN
+OFH-C	OFH Control plane
+OFH-U	OFH User plane
+O-RU	O-RAN Radio Unit as defined by O-RAN
+PBCH	Physical Broadcast Channel
+PDCCH	Physical Downlink Control Channel
+PDCP	Packet Data Control Protocol
+PF	Proportional Fair (scheduling algorithm)
+PHC	PTP Hardware Clock
+PHR	Power Headroom Report
+PHY	Physical (L1) access layer of RAN
+PRACH	Physical Random Access Channel
+PRB	Physical Resource Block
+PUCCH	Physical Uplink Control Channel
+PUSCH	Physical Uplink Shared Channel
+PSS	Primary Synchronization Signal
+PTRS	Phase Tracking Reference Signal
+QAM	Quadrature Amplitude Modulation
+QPSK	Quadrature (Quaternary) Phase Shift Keying
+QoS	Quality of Service
+RACH	Random Access Channel
+RAN	Radio Access Network
+Rel-x	Release number: where x is the actual release number
+RF	Radio Frequency
+RLC	Radio Link Control protocol
+RRC	Radio Resource Control protocol
+RU	Radio Unit as defined by 3GPP
+Rx	Receiver
+SCS	Sub-Carrier Spacing
+SDAP	Service Data Adaptation Protocol
+SDU	Service Data Unit
+SLA	Slice Level Agreement
+SRIOV	Single Root Input/Output Virtualization
+SRB	Signalling Radio Bearer
+SRS	Sounding Reference Signal
+SSS	Secondary Synchronization Signal
+SSB	SS Block
+SU-MIMO	Singer User MIMO
+TA	Timing Advance
+TB	Transport Block
+TDD	Time Division Duplex
+TS	Technical Specification
+TTI	Transmission Time Interval
+Tx	Transmitter
+UE	User Equipment
+UL	Uplink
+URLLC	Ultra-Reliable Low Latency Communication
+WG	Working Group
+FCAPS                 Fault, Configuration, Accounting, Performance and Security
+Reference design APIs
+A few of 3GPP and O-RAN specific calls flows are described in this specification. All messages shown from or to the following interfaces are 3GPP messages.
+NG
+F1
+Xn
+Refer to appropriate 3GPP specifications for the details of those messages. All the other internal APIs of O-CU and O-DU are described in this document.
+RAN Deployment Scenarios and Requirements
+Deployment Scenario - Example
+The reference design of the O-CU and O-DU is specified in this document to support all deployment scenarios. In this version, the deployment scenario of indoor pico cell is used as an example.
+Requirements
+Table 2-1 lists the features and requirements supported by the reference design based on the target release specification. Requirements marked “R1” and ‘R2” are addressed in this release of the document. Requirements below are aligned to deployment requirements in  [23].
+Table - Requirements
+RAN Architecture
+3GPP specifies the 5G RAN architecture and interfaces between the logical functional blocks. The following diagram presents the overall 5G network architecture [12] as well as the logical partition of the main functions.
+Figure 3-1 3GPP RAN Architecture
+As shown in Figure 3-2 [22], O-RAN defines the RAN architecture with a focus on new, open interfaces between the logical nodes and physical partitions of the RAN functions.
+Figure 3-2 O-RAN Architecture and Interfaces
+O-CU/O-DU Lower Layer Split Architecture
+In some RAN deployment scenarios, e.g., a microcell, the physical layer is split between the O-DU and O-RU. O-RAN WG4 defines the open front haul interface which is adopted in the split architecture as shown in Figure 3-3. The O-DU contains the higher physical layer High-PHY functions while the O-RU contains the lower physical layer Low-PHY functions as specified in [20]. The fronthaul software interface is discussed in section 5.10 of this specification.
+Figure 3-3 O-CU, O-DU and O-RU (Control and user plane)
+O-DU Software Architecture
+The O-DU software architecture is illustrated in Figure 4-1. The O-DU is composed of L1 and L2 functional blocks which interface through the FAPI interface [27]. The functional blocks are further described in the following sections.
+O1 Interface
+The O-DU O1 interface supports the following management capabilities:
+Transport establishment, startup sequence and heartbeat management
+Software management
+Performance (KPIs) management
+Fault management
+File management
+Provisioning management
+Synchronization
+Fronthaul delay management
+The protocol stack for this interface is shown in Figure 4-2
+Figure 4-2 O1 interface protocol stack
+O-DU L1 Functional Blocks
+In O-RAN architecture (refer to Figure 3-2), PHY layer functionality is realized as High-PHY in O-DU and Low-PHY in O-RU. Some of the PHY functionalities may be realized using hardware acceleration.
+Below is a list of PHY related functional blocks.
+PUSCH, PUCCH, PRACH
+PDSCH, PDCCH, PBCH
+UL/DL Reference Signals (DMRS, PTRS, SRS, PSS, SSS)
+Fronthaul handler
+FAPI handler
+Hardware accelerator handler
+Timing sync	No index entries found.
+L1 Task Control Module
+In the following sections, the functional blocks are described in detail.
+Physical Uplink Shared Channel
+The uplink physical layer processing of transport channels consists of the following steps as described in [6]:
+Transport Block CRC attachment
+Code Block segmentation and Code Block CRC attachment
+Channel coding: LDPC coding
+Physical layer hybrid-ARQ processing
+Rate matching
+Scrambling
+Modulation: π/2 BPSK (with transform precoding only), QPSK, 16QAM, 64QAM and 256QAM
+Layer mapping, transform precoding (enabled/disabled by configuration), and precoding
+Mapping to assigned resources and antenna ports
+The frequency domain IQ data received by the fronthaul module are sent to the L1 PUSCH processing functions and the output of the PUSCH is the user bit stream. Figure 5-1 illustrates the PUSCH functional blocks.
+Figure 5-1 PUSCH functional blocks
+Resource Element (RE) Demapper: The RE Demapper function separates the DMRS REs and the user data REs. The DMRS REs are provided to the channel estimation function.
+Channel Estimation: The channel estimation functional block provides a channel estimate based on the DMRS of resource elements of the user data.
+MIMO Equalizer: The MIMO equalizer function processes the received IQ data signals to reverse the distortion incurred during the signal transmission over the air. Using the channel information acquired via the channel estimation, the equalizer tries to restore the IQ symbol sent by the transmitter. The symbols may be conveyed as log-likelihood ratios (LLRs) for use by the LDPC decoder.
+Rate Dematching: The rate dematching function performs the reverse operation steps of rate matching for LDPC code in clause 5.4.2 in 3GPP TS38.212 [5].
+LDPC Decoder: The LDPC decoder function uses received log-likelihood ratios (LLRs) to compute the data bits based on selected decoder algorithm. The selection of the decoder algorithm is out of scope of this specification.
+CRC Check: The CRC function block checks the parity bits using the generator polynomials in Subclause 5.1 of 3GPP TS38.212 [5]. Refer to the 3GPP specification for details.
+Uplink Control Channels
+Physical Uplink Control Channel (PUCCH) conveys Uplink Control Information (UCI) and supports all the formats defined in clause 6.3.2 of 3GPP TS38.211 specification [4]. Refer to this specification for details of the formats as well as the control message including:
+HARQ-ACK (Hybrid Automated Repeat Request Acknowledgement).
+Scheduling Request (SR)
+Channel State Information (CSI)
+Uplink Reference Signals
+5G NR introduces the following reference signals.
+Demodulation Reference Signal (DMRS) for PUSCH and PUCCH
+Phase Tracking Reference Signal (PTRS)
+Sounding Reference Signal (SRS)
+Refer to clause 6.4.1 in 3GPP TS38.211 specification [4] for more details of the reference signals.
+Physical Downlink Shared Channel
+The downlink physical layer processing of transport channels consists of the following steps as described in [6]:
+Transport Block CRC attachment
+Code Block segmentation and Code Block CRC attachment
+Channel coding: LDPC coding
+Physical-layer hybrid-ARQ processing
+Rate matching
+Scrambling
+Modulation: QPSK, 16QAM, 64QAM and 256QAM
+Layer mapping
+Mapping to assigned resources and antenna ports
+Figure 5-2 illustrates the functional blocks of the PDSCH for Category A and Category B radio.
+In Category A radio, the precoder function is located in O-DU; In Category B radio, the precoder function is located in O-RU.
+Figure 5-2 PDSCH Functional Blocks
+Cyclic Redundancy Check Generation: The CRC function block computes the parity bits using the generator polynomials in Subclause 5.1 of 3GPP TS38.212 [5]. Refer to the 3GPP specification for details.
+Segmentation: The transport block is segmented when it exceeds the code block size specified by 3GPP TS38.212 [5]. Refer to Subclause 7.2.3 for details.
+LDPC Encoder: Refer to Subclause 5.3.2 in 3GPP TS38.212 [5] for details.
+Rate Matching: Refer to Subclause 5.4.2 in 3GPP TS38.212 [5] for details.
+Scrambler: Refer to Subclause 7.3.1.1 in 3GPP TS38.211 [4] for details.
+Modulation Mapper: Refer to Subclause 7.3.1.2 in 3GPP TS38.211 [4] for details.
+Layer Mapper: Refer to Subclause 7.3.1.3 in 3GPP TS38.211 [4] for details.
+RE Mapper: Refer to Subclause 7.3.1.5 and Subclause 7.3.1.6 in 3GPP TS38.211 [4] for details.
+Physical Downlink Control Channel
+A Physical Downlink Control Channel (PDCCH) carries control information (DCI) such as scheduling information and resource grant to UEs. The PDCCH includes one or more Control Channel Elements (CCE, consists of 6 resource element group) based on the aggregation level defined by 3GPP specification [4]. The PDCCH processing flow is similar to the PDSCH. The PDCCH uses a polar code instead of LDPC. QPSK modulation is the designated modulation scheme for the PDCCH bits block.
+Downlink Reference Signals
+The Downlink Reference Signals include:
+Demodulation Reference Signal (DMRS) for PDSCH, PDCCH and PBCH.
+Phase Tracking Reference Signal (PTRS)
+Channel State Information Reference Signal (CSI-RS)
+Primary Synchronization Signal (PSS)
+Secondary Synchronization Signal (SSS)
+Refers to clause 7.4.1 in 3GPP TS38.211 specification [4] for more details related to the reference signals. The PSS and SSS combined with PBCH is known as SS/PBCH block, which consists of:
+1 symbol PSS, 1 symbol SSS and 2 symbol PBCH.
+Physical Broadcast Channel
+PBCH carries 5G NR system information for UEs. UEs need to decode the PBCH information in order to access the 5G cell. PBCH information includes: downlink bandwidth, SFN, timing information in radio frame and SS burst periodicity. Polar codes are used as error correcting code for PBCH.
+Figure -: PBCH processing flow diagram
+PBCH Payload Generation: Creates the PBCH payload message, Refer to Subclause 7.1.1 in 3GPP TS38.212 [5] for details.
+Scrambling: Refer to Subclause 7.1.2 in 3GPP TS38.212 [5] for details.
+CRC attachment: Refer to Subclause 7.1.3 in 3GPP TS38.212 [5] for details.
+Channel Encoding: Refer to Subclause 7.1.4 in 3GPP TS38.212 [5] for details.
+Rate Matching: Refer to Subclause 7.1.5 in 3GPP TS38.212 [5] for details.
+Data Scrambling: Refer to Subclause 7.3.1.3 in 3GPP TS38.211 [4] for details.
+Data Modulation: Refer to Subclause 7.3.3.2 in 3GPP TS38.211 [4] for details.
+Resource Element Mapping: Refer to Subclause 7.3.3.3 in 3GPP TS38.211 [4] for details.
+DMRS Sequence Generation: Refer to Subclause 7.4.1.4 in 3GPP TS38.211 [4] for details.
+DMRS Scrambling: Refer to Subclause 7.4.1.4 in 3GPP TS38.211 [4] for details.
+DMRS Modulation: Refer to Subclause 7.3.3.2 in 3GPP TS38.211 [4] for details.
+Physical Random Access Channel
+Physical Random Access Channel (PRACH) is used to carry preamble from UE to gNB. Based on PRACH, gNB is able to calculate the timing advance of each UE and make adjustments on Rx timing for all UEs. PRACH adopts ZC (Zero Correlation) sequences as preamble. It supports two sequence lengths (139 and 839) with various formats targeted for different deployment scenarios. As O-RAN fronthaul separates the PRACH processing into two parts,  the CP removal, frequency shift, samples decimation/filter, FFT and de-mapping function are handled by O-RU; the O-DU PRACH processing flow is shown in Figure 5-4.
+Figure -: PRACH processing flow diagram
+Each O-DU PRACH processing function blocks are described below. The details of the PRACH signal generation, formats are described in 3GPP specifications.
+Root Sequence Generation: Refer to Subclause 6.3.3.1 in 3GPP TS38.211 [4] for details.
+Correlation: Perform correlation operation between root sequence and received signals.
+iFFT: Perform the iFFT operation of received signals.
+Antenna Combination: Combine the received signals from all the antennas.
+Noise Estimation: Perform the noise estimation operation
+Peak Search: Detect the peak for different root sequences.
+Preamble Detection and Timing Advance (TA) Estimation: Determine the preamble sequence and timing advance estimation.
+L1 Tasks Processing Flow
+The L1 function processes are described in previous sections. Those processing blocks focus on specific task that needs to be completed in a timely fashion.  Figure 5-5 shows the L1 related task processing blocks.
+Figure -: L1 tasks processing diagram
+L2 FAPI processing: Handle L2 interface request/response based on FAPI protocol. And triggers additional processing task if required.
+Timing events processing: Handle timing related operations and triggers any prescheduled periodic tasks.
+FEC acceleration processing: Handle FEC related operations and passes the FEC request to hardware and invokes call back function when the acceleration processing is completed.
+Front haul processing: Handle all the front haul related Tx/Rx operations, and queue task if further processing is needed.
+UL task scheduling: Manage all queued UL tasks and starts the processing operation accordingly.
+DL task scheduling: Manage all queued DL tasks and starts the processing operation accordingly.
+PUSCH processing: Process the PUSCH related tasks, refer to section 5.1 for details of processing requirements.
+PUCCH processing: Process the PUCCH related tasks, refer to section 5.2 for details of processing requirements.
+PRACH processing: Process the PRACH related tasks, refer to section 5.8 for details of processing requirements.
+PDSCH processing: Process the PDSCH related tasks, refer to section 5.4 for details of processing requirements.
+PDCCH processing: Process the PDCCH related tasks, refer to section 5.5 for details of processing requirements.
+PBCH processing: Process the PBCH related tasks, refer to section 5.7 for details of processing requirements
+Front Haul Module
+The fronthaul module supports the open fronthaul interface specified by O-RAN Fronthaul Specification [20] lower level split distributed gNB architecture [20]. The detailed requirements and control and data plane protocols are described in O-RAN Fronthaul CUS-plane specification. The module is responsible for communication between the O-DU and O-RU. The fronthaul module processes incoming O-RAN Fronthaul CUS-plane packets and constructs outgoing CUS-plane packets. Figure 5-6 illustrates an example implementation of hardware accelerated packet processing related to the fronthaul interface.
+Figure -: Fronthaul library and interfaces
+The FH library APIs are listed in the following table.
+Table - Fronthaul library APIs
+O-DU Timing Synchronization
+In order to meet the timing accuracy in microsecond to sub-microsecond precision requirement over the air interface, O-DU clock needs to synchronize with the Grand Master Clock (GMC). The location of GMC and its connectivity to DU is out of scope of this specification. Please refer to Chapter 9 of [20] for details of S-plane (synchronization) aspects.
+O-RAN fronthaul defines several timing distribution network topologies. IEEE1588 is used for O-RAN nodes timing synchronization protocol. GNSS based timing synchronization is another option for O-DU acquiring high accuracy timing. With GNSS based timing synchronization, first, the satellite timing messages are decoded by GNSS receiver, then the 1PPS output signal is generated. As described in O-RAN white box hardware reference specification, the 1PPS signal is connected with the PHC on fronthaul NIC. The O-DU is able to choose either IEEE1588 or GNSS synchronization method. Or it can use either one as primary timing synchronization source while keeping the other one as the backup. Here, a LinuxPTP based timing synchronization method is shown as an example. It may be used for O-DU to synchronize with GMC and distribute the clock to O-RU.
+Figure -: O-DU Timing Synchronization
+In Figure 5-7, first, O-DU syncs up backhaul NIC PHC with GMC; second, the system clock syncs up with backhaul PHC using PHC2Sys; then the O-DU software (fronthaul library) gets the system clock using Linux kernel function call. The fronthaul NIC PHC syncs up with system clock through PTP4L. The O-DU becomes boundary clock and is able to distribute the clock through front haul network to O-RU.
+Accelerator Abstraction Layer (AAL)
+In previous sections, the focus is on running a complete L1 layer data on general purpose processor. In certain use cases, a dedicated hardware is used along with host processor to fulfil specific requirements on latency, power efficiency, etc. The hardware accelerator can be implemented on many types of devices such as GPU, FPGA, or ASIC. The accelerator hardware is implementation dependent and is out of scope of this specification. Even so, it is necessary to define a standardized interface to hardware accelerator, which will make the software stack portable with different hardware platform. Based on the data processing flow, the hardware accelerators are categorized into two models: lookaside and inline. In the lookaside model, an accelerator is invoked by the L1 host application to offload designated functions; when acceleration functions are completed, the results are sent back to the host application. With the inline acceleration model, the host processor invokes the accelerator to offload the data processing work, however the result is not sent back to the host. The following figures illustrates L1 processing flow based on these two types of hardware acceleration models.
+Lookaside accelerator processing flow
+Figure -: Lookaside Accelerator Model
+Inline accelerator processing flow
+Figure -: Inline Accelerator Model
+Figure 5.8 shows the lookaside acceleration model. For the uplink data processing, the host receives the data from O-RAN via fronthaul interface; for the downlink processing, the host processor receives the data from L2 via L1/L2 interface. When either uplink or downlink data needs to be processed by accelerator, the host processor handovers the workload to the accelerator; after the data processing is completed, the results are turn over to the host. Figure 5-9 shows the inline accelerator model. In this case, the accelerator directly receives the uplink data from O-RU via front haul interface. When the L1 process is completed, the result is sent to the host via AAL in order to continue the L2 processing. For the downlink process, the finished L2 data is sent to the accelerator via AAL for L1 processing. When the L1 downlink is completed, the results are sent to O-RU.
+AAL Lookaside Profile
+Lookaside FEC Profile
+In general, any combination of L1 functions can be offload to the accelerator. In real deployment, only those functions take more computing power will be offloaded to the accelerator. The accelerator design is implementation specific. To better represent accelerator’s functional capabilities, AAL profile is used to differentiate the combination of accelerator architecture and functions. AAL lookaside profile indicates the accelerator adopted the lookaside processing model. The AAL lookaside processing flows are explained in the early section. During the L1 process, the host application initiates the offload work to accelerator, meanwhile the host may perform other work in parallel, it retrieves the result once the work is complete. The AAL FEC Profile includes both uplink and downlink function of PDSCH and PUSCH. The downlink functions are CRC Generation, LDPC Encoding, Rate Matching. The uplink functions are Rate De-matching, LDPC Decoder, CRC Check. These functions can be invoked sequentially or individually.
+Figure -: Lookaside FEC Accelerator
+FEC APIs
+Refer to the O-RAN OSC for FEC APIs details.
+O-DU L2 Functional Blocks
+Figure 6-1 illustrates the L2 functional blocks of O-DU as a reference design. An implementation may specify the modules differently.
+Figure 6-1 O-DU L2 functional blocks
+O-DU-OAM-Agent: This module terminates O1 interface from the SMO or the management system. The OAM agent module:
+performs startup and registration procedure with SMO
+establishes and maintains transport and NETCONF connections
+handles configuration and reconfiguration messages on O1
+stores the latest configuration
+relays configuration parameters to appropriate L1 (High-PHY) and L2 modules
+receives and relays notifications over O1
+handles software management for O-DU and O-RU
+collects and send performance data files for O-DU and O-RU performance counters
+The procedures and call flows for the above operations are described in [24]. The management plane for fronthaul supports only hierarchical mode as defined currently in [24].
+E2 handler: This module terminates E2 interface from near real-time RIC. This module handles the following:
+E2/SCTP interface termination
+E2AP protocol message send/receive
+Configure appropriate KPI measurements in L2 and L1 modules
+Report metrics over E2
+Actions to be relayed to other modules (based on E2 messages)
+Relaying response over E2
+The E2 global procedures and functional procedures are defines in [25] and [26] respectively. The E2 service models for different use case implemented by following the generic design described in 6.2.
+F1 Control Plane interface handling modules (F1AP handler): It consists of tasks related to cell management, UE management and semi-static Air Interface Resource Management at the cell level. It does tasks defined in 3GPP TS 38.473 [18].
+Cell State Manager: It handles all the tasks related to the handling of cells at O-DU Cell Start, Cell Stop, etc. It also manages a Finite State Machine (FSM) for handling cell specific procedures. This includes maintaining the cell broadcast information. There would be per cell FSM which would run independently of another cell’s FSM.
+UE State Manager: It handles the procedures related to a UE, e.g., SRB packet transfer, UE Context Setup, Release procedure, UE Context Modification procedure, etc. It also manages an internal state machine for handling UE specific procedures. It interacts with other layers like RLC/MAC/F1U for UE level interactions and signaling.
+F1AP Interface Manager: This interacts with the O-CU-CP (Control Unit) to control communication setup, and it exchanges F1AP messages over SCTP interface. It also decodes/encodes the messages and exchanges the same messages with other tasks.
+Resource Manager: This block performs tasks like Admission Control, Bearer Control, etc. It also takes care of managing all the air interface resources for a UE, e.g., physical level resource allocation (SR, CSI resources), etc.
+F1 User Plane interface handling modules: It consists of tasks related to Tunnel management, DL and UL Data and Downlink flow control. It does tasks defined in 3GPP TS 29.281 [2] and TS 38.425 [15].
+Data Plane Application: Handles DL Data packets received within 3GPP TS 29.281 [2] defined NR RAN Container and performs UL Data packet transmission for packets received from RLC. This Application invokes eGTPU encapsulation/decapsulation functionality for eGTPU header processing.
+eGTPU encaps/decaps: This functional block performs eGTPU header decapsulation and processing in DL and eGTPU header encapsulation for the UL packets at F1-U.
+Downlink Flow Control: Downlink Data Delivery Status generation with feedback received from RLC.
+RLC Protocol modules: These modules handle processing related to SRB and DRB plane. It does tasks defined in 3GPP TS 38.322 [8]. RLC uses the logical channel for data transfer. MAC layer indicates the downlink data notification request for a logical channel along with the desired RLC PDU size. RLC segments (optionally) the SDUs depending upon the size requested from MAC and sends the RLC PDUs to MAC. MAC layer also indicates uplink data by sending RLC PDUs. RLC layer forms SDUs by reassembling the received PDUs and transmits SDUs to upper Layer via F1 interface. It does tasks defined in 3GPP TS 38.322 [8].
+UE and Bearer Context management
+RLC Mode Receiver and Transmitter
+TM Mode
+UM Mode
+AM Mode
+MAC Protocol modules: MAC modules include RACH management, HARQ Management, DL and UL Data, BCCH/PCCH/CCCH processing, MAC Transport Block formation, etc. It does tasks defined in 3GPP TS 38.321 [7].
+UE and Bearer Context Management: Stores the semi-static information on air interface resources for the UE. It keeps the QoS related information for the scheduler.
+HARQ Management: Performs DL and UL HARQ management by keeping track of HARQ feedback, HARQ timer and providing free HARQ processes information to the scheduler.
+RACH Manager: RACH (Preamble) resource management, CRNTI Assignment, Message-2,3,4 resource allocation and handling.
+CCCH Manager: Handles the DL and UL CCCH message and corresponding HARQ.
+Resource Assign: PDCCH, PDSCH, PUCCH and PUSCH Resource Assignment based on resource allocation schedule from the scheduler.
+MAC Encoder: It creates MAC Transport block based on input from the scheduler. It interfaces with RLC to get RLC PDUs.
+Demultiplexer: Demultiplexing UL Transport block containing MAC CE and RLC PDUs and sends it to respective tasks.
+CSI Manager: Configuration of “Channel State Information” and informing the CSI feedback from UE to the scheduler.
+PHY-MAC Interface: Receive and transmit the L1-L2 interface messages.
+Beam Failure Detection and Recovery: Beam failure detection in the UE based on the configured beam failure detection reference signal by the gNB and beam failure recovery by performing contention free RACH procedure to the suitable candidate beam.
+L2 MAC Scheduler
+Figure 6-2 illustrates the MAC scheduler components present in O-DU architecture. It is assumed that the DU includes complete MAC and scheduler functions implemented in the same physical platform.
+Figure 6-2 L2 MAC scheduler components
+NR Scheduler functional block has been further expanded into indicative smaller functional sub-blocks to capture the scheduler functionality.
+Note: An actual implementation may divide the scheduler into functional sub-blocks differently.
+DL/UL Resource Scheduler: This corresponds to functionality of time-domain and frequency domain scheduling in DL and UL, respectively. Resource scheduling is performed per scheduling period and may be performed for a single slot or multiple slots. Massive MIMO focuses on beamforming for capacity enhancement with full digital array structure for frequency<6GHz and hybrid/analog architecture for frequency >6GHz. It is also feasible to have single beam approach for low carrier frequency, however multi-beam approach is desirable for higher carrier frequency.   It may include functions such as beam selection, selecting of UEs and associated bearers per scheduling period, allocation of radio resources for PDCCH, PUSCH, PDSCH and associated channels like DMRS. The beam selection is based on various beamforming method supported in the gNB system. In the case of predefined beamforming method, an index called “beamId” indicates the specific beam pre-defined in the O-RU to use in case of hybrid architecture. However, in case of Hierarchical architecture, the beam indices are pre-defined in the O-DU as defined by O-RAN Fronthaul M-Plane specification [21]. The beam selection function selects beam indices “beamId” that is applied to DL or UL data. In the case of dynamic beamforming, the beamforming weights are given to be applied as defined in the O-RAN Fronthaul CUS Plane specification [20]. It may also include functions/algorithm to support slice differentiation as specified by RRMpolicy for the resource type (PRB) so as to meet the specific SLA. It may also include the slice metric so as to prioritize the specific slice scheduling in a particular TTI that enables the gNB DU system to meet the slice level agreement.
+DL/UL Link Adaptation (LA): This functionality performs per UE Link Adaptation in DL and UL, respectively. Link Adaptation may be performed based on channel quality reported by UE or estimated at gNB corrected by BLER. LA would return effective MCS to be used for channel allocation to the UE.
+UL Tx Power Control: Performs Closed loop UL power control for PUSCH, SRS and PUCCH. It may estimate the UL Tx power based on UE feedback (e.g.: Power Headroom Report) or measured UL channels.
+DL/UL MIMO Mode Control: Determines per UE the MIMO mode, in DL and UL, respectively, to be used along with the corresponding precoding matrix.
+TA Manager: Estimating the TA Command for UE based on feedback from L1 using PUSCH, PUCCH and SRS.
+Performance metrics (Capacity, throughput etc.) will be dependent on software implementation and underlying hardware.
+Supporting E2 service models
+E2 service models are supported as per call flows as per specifications from O-RAN WG5. Each service model enables a use case across O-RAN nodes. The following generic design in O-DU and O-CU supports any service model with report/insert/control/policy services with the neat real-time RIC.
+Figure 6-3 E2 service model support in O-DU
+When an E2 message is received at O-DU, the E2 handler module interacts with SM (Service Model) Fanout module to deliver the messages to internal module related to the service model. The SM fanout module consults the SM catalog module and finds the SM specific modules and APIs to be invoked the SM-Service-API-Table module contains maps the following:
+SM service, E2 messages corresponding
+Receiver module(s) for each E2 message and the message contents to be relayed
+When the O-DU sends an E2 message, it is sent through the E2 Sender module which consults SM Catalog module and maps the respective E2 message API. The E2 sender uses KPIs in KPI module when KPIs are reported in an E2 message.
+O-DU Cloudification
+To be addressed in accordance with recommendations from WG6 on O-DU cloudification in later release of this specification.
+O-CU Software Architecture
+O-CU node interacts with one or more O-DU nodes through F1 interface.
+Figure 7-1 O-CU interfaces
+O1 Interface
+To be addressed in a later release of this specification.
+F1 Interface
+F1 interface supports control plane and user plane separation. The following describe the functions supported over F1-C and F1-U.
+The main services and functions of F1-C:
+F1 interface management function
+System Information management function
+F1 UE context management function
+RRC message transfer function
+Paging function
+Warning messages information transfer function
+The main services and functions of F1-U:
+Transfer of user data
+Flow control function
+E2 Interface
+To be addressed in later release of this specification.
+O-CU Cloudification Aspects
+To be addressed in accordance with recommendations from WG6 on O-DU cloudification.
+O-CU Functional Blocks
+Figure 8-1 below outlines the O-CU functional blocks. An implementation may specify the modules differently.
+Figure 8-1 O-CU Functional Blocks
+The O-CU comprises of O-CU-CP and O-CU-UP.
+O-CU-CP Functional Blocks
+O-CU-CP handles the control plane functionality of O-CU.
+O-CU-CP-OAM-Agent
+O-CU-CP-OAM-Agent manages following services of O-CU-CP:
+Configuration and Control Management
+Performance Counter Management
+Fault Management
+O-CU-CP-OAM receives the configuration for O-CU-CP and configures all the modules of O-CU-CP. It may perform operations like spawning of O-CU-CP modules, and software downloading for O-CU-CP.
+O-CU-CP-OAM collects the performance counters of O-CU-CP and reports it to performance management entity present in the network.
+O-CU-CP-OAM manages the faults and alarms raised at O-CU-CP and reports it to fault management entity present in the network.
+gNB Procedure Management
+Figure 8-2 shows the detailed view of gNB Procedure Management functional block. gNB Procedure Management manages the non-UE associated NGAP and XnAP procedures like NG/Xn Interface Management and Configuration Transfer procedures as defined in 3GPP TS 38.413 [13], TS 38.423 [14] and TS 38.473 [18]. The functional sub-blocks shown in figure below are indicatively used to capture the functionality of gNB Procedure Management functional block and could be realized differently.
+Figure 8-2 gNB Procedure Management Functional Blocks
+Procedure Management: This functionality handles procedures and business logic involving application of the procedure across multiple cells of the gNB. For example, reset triggered due to NGAP link down involving coordination among multiple cells and UE specific paging as described in 3GPP TS 38.413 [12].
+NGAP Interface Management: This functionality manages Interface Management procedures, Configuration Transfer procedures, and Warning Message Transmission Procedures over NGAP interface with AMFs as described in 3GPP TS 38.413 [12]. It establishes the association with AMFs. It monitors the association with AMFs. It also maintains context for each AMF with which O-CU is connected and stores information like link status with AMF.
+XnAP Interface Management: This functionality manages the Global procedures over XnAP interface with peer O-CUs as described in 3GPP TS 38.423 [13]. It establishes the association with peer O-CUs and also accepts association requests from peer O-CUs based on configuration provided by higher layers. It monitors the association with peer O-CUs. It also maintains context for each peer O-CU with which O-CU is connected and stores information like link status with peer O-CU.
+F1AP Interface Procedure Management: This functionality manages Interface Management procedures over F1AP interface with O-DUs as described in 3GPP TS 38.470 [16] and 38.473 [18]. It establishes the association with O-DUs and also accepts association requests from O-DUs based on configuration provided by higher layers. It monitors the association with O-DUs. It also maintains context for each O-DU with which O-CU is connected and stores information like link status with O-DU.
+Cell Procedure Management
+Cell Procedure Management manages the cell level procedures at O-CU like system information management described in 3GPP TS 38.331, procedures for dual connectivity, global procedures like Cell Activation described in 3GPP TS 38.423 [13], Warning Message Transmission procedures, and System Information Procedures described in 3GPP TS 38.473 [18].
+It maintains multiple state machines to handle various cell level procedures. It may have separate state machines for various cell procedures like Cell Setup, Cell Delete, Cell Start, Cell Stop, and Cell Reconfiguration. It also maintains context of each cell to store information like cell state, number of UEs served by the cell, and cell broadcast information.
+It manages the cell level performance counters and provides this information to O-CU-CP-OAM.
+UE Procedure Management
+UE Procedure Management manages the UE Access Control and signalling procedures at O-CU by binding together UE associated RRC, NGAP, XnAP, and F1AP signalling transactions into end-to-end procedures.
+This functionality binds together the following signalling procedures on different 3GPP interfaces:
+3GPP TS 38.331 defined procedures like RRC Connection Control, Inter-RAT mobility, Measurements, UE capabilities and other UE associated procedures.
+3GPP TS 38.413 [12] defined procedures like UE Context Management procedures, UE Mobility Management procedures, PDU Session Management procedures, Transport of NAS Messages procedures, Trace Procedures, Location Reporting procedures, UE Radio Capability Management procedures, and Data Usage Reporting Procedures.
+3GPP TS 38.423 [13] defined inter-gNB procedures for Basic mobility and for gNB-gNB Dual Connectivity.
+3GPP TS 38.473 [18] defined procedures like UE Context Management procedures, and RRC Message Transfer procedures.
+This functionality maintains multiple state machines to handle various UE associated procedures. It may have separate state machines for different UE procedures like UE attach, UE handover, UE context modification, and UE measurement. The single FSM handles NGAP and RRC messages involved in a UE associated procedure, coordinating among AMF, UE, O-DU and other modules of O-CU. It also maintains context of each UE to store information like UE state, various UE AP Ids, and ongoing procedure related information.
+RRC Encoder and Decoder
+RRC Encoder and Decoder encodes and decodes all RRC ASN content as described in 3GPP TS 38.331. RRC ASN encoding is performed for sending message to UE and for preparing containers to be exchanged during handover, etc. RRC ASN decoding is performed on receiving messages from UE and on receiving containers exchanged during handover, etc.  RRC Encoder and Decoder is accessed by Cell Procedure Management and UE Procedure Management functional blocks. Cell Procedure Management accesses it for RRC ASN encoding of broadcast messages and paging message. UE Procedure Management accesses it for encoding and decoding of all the messages exchanged with UE and for populating the RRC ASN content in handover containers.
+NGAP Encoder and Decoder
+NGAP Encoder and Decoder encodes and decodes all NGAP ASN message as described in 3GPP TS 38.413 [12]. NGAP ASN encoding is be performed for sending message to AMF. NGAP ASN decoding is performed on receiving messages from AMF. NGAP Encoder and Decoder is accessed by gNB Procedure Management and UE Procedure Management functional blocks. gNB Procedure Management accesses it for non-UE associated procedures between O-CU and AMF. UE Procedure Management accesses it for encoding and decoding of all the UE associated messages exchanged with AMF.
+XnAP Encoder and Decoder
+XnAP Encoder and Decoder encodes and decodes all XnAP ASN message as described in 3GPP TS 38.423 [13]. XnAP ASN encoding is performed for sending message to peer O-CU. XnAP ASN decoding is performed on receiving messages from peer O-CU. XnAP Encoder and Decoder is accessed by gNB Procedure Management and UE Procedure Management functional blocks. gNB Procedure Management accesses to perform non-UE associated procedures with peer O-CU. UE Procedure Management accesses it for encoding and decoding of all the UE associated messages exchanged with peer O-CU.
+F1AP Encoder and Decoder
+F1AP Encoder and Decoder encodes and decodes all F1AP ASN content at O-CU as described in 3GPP TS 38.473 [18]. F1AP ASN encoding is performed for sending message to O-DU. F1AP ASN decoding is performed on receiving messages from O-DU. F1AP Encoder and Decoder is accessed by gNB Procedure Management and UE Procedure Management functional blocks. gNB Procedure Management accesses it to perform non-UE associated procedures with O-DU. UE Procedure Management accesses it for encoding and decoding of all the UE associated messages exchanged with O-DU.
+O-CU-UP Control
+O-CU-UP Control function configures and controls the CU User Plane entities as per the E1 interface defined by 3GPP. This function is invoked primarily by the UE Procedure Management functionality though the non-UE associated procedures would be invoked by the gNB and Cell Procedure Management functionality.
+Mobility
+Inter-O-CU Handover
+Handover between O-CUs is described in the call flow below.
+Figure 8-3 Inter NG-RAN NG based handover (C-Plane Handling)
+The source gNB RRC decides for handover.
+Source gNB RRC requests PDCP to provide HO preparation info by sending message HO Preparation Info Request. In this message, RRC provides target Cell Id and may provide list of cells under control of target gNB, required for potential re-establishment by the UE in these cells to succeed.
+PDCP sends HO Preparation Info Response to RRC containing list of ShortMAC-I prepared for the cell list received in HO Preparation Info Request. PDCP may also report ue-InactiveTime.
+RRC sends UE Context Modification Request to GNB CU F1AP to query gNB DU configuration.
+GNB CU F1AP sends UE Context Modification Request to DU to query gNB DU configuration by setting GNB-DU Configuration Query to TRUE.
+gNB DU provides CellGroupConfig in DU to CU RRC Information IE in UE Context Modification Response to gNB CU F1AP.
+gNB CU F1AP provides the information received from DU to RRC in UE Context Modification Response.
+Note: If RRC maintains the DU CellGroupConfig then steps 4 to 7 are not required.
+Starts TNGRELOCprep timer.
+Source gNB RRC sends Handover Required message to the AMF.
+Target gNB RRC receives Handover Request from AMF.
+RRC performs UE admission control and allocates resources for the UE.
+RRC creates UE entity at PDCP by sending message PDCP Entity Establishment Request.
+After creating UE entity, PDCP sends response message PDCP Entity Establishment Response to RRC.
+RRC creates UE entity at F1U by sending message F1U Entity Establishment Request.
+After creating UE entity, F1U sends response message F1U Entity Establishment Response to RRC. This message includes UL tunnel information for each DRB to be shared with DU to receive uplink data from DU.
+RRC sends UE Context Setup Request message to F1AP to create UE entity at DU.
+F1AP sends UE Context Setup Request message to DU to create UE entity at DU.
+After creating UE entity at DU, sends UE Context Setup Response message to F1AP. This message includes DL tunnel information for each DRB to be shared with gNB CU F1U to receive downlink data from CU.
+F1AP sends UE Context Setup Response message to RRC.
+RRC reconfigures UE entity at F1U by sending message F1U Entity Reconfigure Request. In this, RRC provides the DL tunnel information received from DU.
+After reconfiguring UE entity, F1U sends response message F1U Entity Reconfigure Response to RRC.
+RRC creates UE entity at NGU by sending message NGU Entity Establishment Request. RRC will also provide forwarding tunnels configuration to NGU, if required.
+After creating UE entity, NGU sends response message NGU Entity Establishment Response to RRC.
+After preparing the target gNB for UE, RRC sends Handover Request Acknowledge message to AMF. This message also contains HandoverCommand IE for UE.
+Source gNB RRC receives Handover Command message from target gNB.
+Source gNB RRC stops TNGRELOCprep timer and start TNGRELOCOverall timer.
+RRC sends PDCP Entity Suspend Request to suspend data in downlink for the UE.
+After suspending the data, PDCP sends PDCP Entity Suspend Response to RRC.
+RRC reconfigures NGU with message NGU Entity Reconfiguration Request to configure forwarding tunnels for DRBs for which target gNB has provided DL Forwarding UP TNL Information or UL Forwarding UP TNL Information or both.
+NGU sends NGU Entity Reconfiguration Response after configuring the forwarding tunnels. After this, source gNB will start forwarding data to target gNB.
+Note: If target gNB does not provide DL Forwarding UP TNL Information or UL Forwarding UP TNL Information, data forwarding will not be configured. In that case, step 29 and step 30 is not be performed.
+RRC sends UE Context Modification Request to GNB CU F1AP to stop DL data transmission.
+gNB CU F1AP sends UE Context Modification Request to DU which includes RRCReconfiguration message and indicates to stop the data transmission for the UE.
+DU may indicate RRCReconfiguration message delivery to UE status to gNB CU F1AP.
+DU responds with UE Context Modification Response to gNB CU F1AP.
+gNB CU F1AP responds with UE Context Modification Response to RRC.
+RRC requests PDCP to provide uplink PDCP-SN and HFN receiver status and the downlink PDCP SN and HFN transmitter status of RLC AM DRBs for which PDCP status preservation applies in message RAN Status Transfer Request so that same can be provided to target gNB.
+PDCP reports uplink PDCP-SN and HFN receiver status and the downlink PDCP SN and HFN transmitter status of RLC AM DRBs in RAN Status Transfer Request message.
+RRC provides uplink PDCP-SN and HFN receiver status and the downlink PDCP SN and HFN transmitter status of RLC AM DRBs to target gNB in Uplink RAN Status Transfer message. After sending this, source gNB RRC waits for UE Context Release Command message from AMF.
+Target gNB receives source gNB Downlink RAN Status Transfer for RLC AM DRBs on which PDCP status preservation applies.
+RRC sends RAN Status Transfer Indication to PDCP to provide uplink PDCP-SN and HFN receiver status and the downlink PDCP SN and HFN transmitter status of RLC AM DRBs received from source gNB via AMF.
+Note: If RLC AM DRB is not configured, steps 36 to 40 is not be performed. In that case, source gNB RRC can receive UE Context Release Command from AMF any time after performing step 32.
+After handover execution at source gNB, UE sends RRCReconfigurationComplete to target gNB DU which target gNB DU sends to target gNB CU F1AP in UL RRC Message Transfer message.
+gNB CU F1AP sends the received RRCReconfigurationComplete message to PDCP in UL RRC Message Transfer message for decryption and deciphering.
+PDPC decrypt and decipher RRCReconfigurationComplete and sends it to RRC as payload in SRB Data Request message.
+On receiving RRCReconfigurationComplete, RRC sends Data Buffer Stop Indication to PDCP so that PDCP can process the buffered data and resume the data at target gNB.
+Target gNB RRC sends Handover Notify to AMF to indicate successful completion of handover procedure at target gNB.
+After successful handover of UE at target gNB, AMF sends UE Context Release Command to source gNB which is handled by source gNB RRC.
+Source gNB initiates local UE release procedure.
+After completion of UE release, source gNB RRC sends UE Context Release Complete message to AMF.
+Inter-O-DU Handover within an O-CU
+This procedure is defined for the use case when UE moves from one gNB-DU to another gNB-DU within the same gNB-CU during NR operation.
+This message descriptions are captured high level with the intend to specify the inter-layer messages interaction on top of 3gpp messages. FAPI messages are not detailed here (Reference for FAPI specification [29], [30]).
+Figure 8-4: Intra-NR Handover (Inter-gNB-DU Handover)
+Assumption: UE is RRC connected with gNB and PDU data session is active.
+The UE sends Measurement Report message to the source gNB-DU. gNB-DU receives the UL Information Transfer message and it send the PUSCH message to the MAC/RLC layer.
+The UL RRC message transfer message is sent by RLC to F1AP over RLC-F1AP interface, later O-DU/F1AP layer sends the UL RRC Message Transfer to F1AP layer at O-CU to convey the UE Measurement Report message.
+F1AP later at O-CU sends the UL RRC Message Transfer message to RRC layer via PDCP interface.
+The gNB-CU makes an handover decision to the another cell belonging to the target gNB-DU.
+Optionally the gNB-CU may send an UE CONTEXT MODIFICATION REQUEST message to the source gNB-DU to query the latest configuration. Optionally the source gNB-DU sends the UE Reconfiguration Request to MAC/RLC layer and get the UE Reconfiguration Response from the respective protocol layers in case gNB-DU application does not store the latest configuration.
+The source gNB-DU responds with an UE CONTEXT MODIFICATION RESPONSE message that includes latest full configuration information.
+The gNB-CU sends an UE CONTEXT SETUP REQUEST message to the target gNB-DU to create an UE context and setup one or more data bearers. The UE CONTEXT SETUP REQUEST message includes HandoverPreparationInformation. The target gNB-DU sends the UE Create Request to the MAC and RLC layer to create the UE context with radio resources and receives UE Create Response from the respective protocol layers.
+The target gNB-DU responds with an UE CONTEXT SETUP RESPONSE message if the target gNB-DU can admit resources for the handover.
+The gNB-CU sends an UE CONTEXT MODIFICATION REQUEST message to the source gNB-DU, which includes RRCReconfiguration message towards the UE. The gNB-CU also indicates the source gNB-DU to stop the data transmission for the UE.
+The source gNB-DU sends the UE Reconfiguration Request to MAC/Scheduler and RLC layer and get the UE Reconfiguration Response from the respective protocol layers.
+The source gNB-DU optionally sends a Downlink Data Delivery Status frame to inform the gNB-CU about the downlink data PDUs that could not be successfully transmitted to the UE.
+The source gNB-DU forwards the received RRCReconfiguration message to the UE.
+The source gNB-DU responds to the gNB-CU with UE CONTEXT MODIFICATION RESPONSE message.
+UE triggers Random Access procedure at the target gNB-DU.
+Optionally the target gNB-DU sends Downlink Data Delivery Status frame to the gNB-CU.
+The gNB-CU sends the target gNB-DU with the PDCP PDUs that are not successfully transmitted in the source gNB-DU.
+The UE responds to the target gNB-DU with an RRCReconfigurationComplete message.
+The target gNB-DU sends UL RRC MESSAGE TRANSFER message to the gNB-CU to convey the received RRCReconfigurationComplete message.
+The downlink and uplink data packets are sent to/from the UE through the target gNB-DU.
+The gNB-CU sends an UE CONTEXT RELEASE COMMAND message to the source gNB-DU.
+The source gNB-DU sends UE DELETE REQUEST to MAC/RLC layer to release the UE context in the respective protocol layer and receives UE DELETE RESPONSE message.
+The source gNB-DU responds the gNB-CU with an UE CONTEXT RELEASE COMPLETE message.
+O-CU-UP Functional Blocks
+O-CU-UP handles the user plane functionality at O-CU.
+O-CU-UP-OAM-Agent
+O-CU-UP-OAM-Agent manages following services of O-CU-UP:
+Configuration and Control Management
+Performance Counter Management
+Fault Management
+O-CU-UP-OAM receives the configuration for O-CU-UP and configures all the modules of O-CU-UP. It may perform operations like spawning of O-CU-UP modules and software downloading for O-CU-UP.
+O-CU-UP-OAM collects the performance counters of O-CU-UP and reports it to performance management entity present in the network.
+O-CU-UP-OAM manages the faults and alarms raised at O-CU-UP and reports it to fault management entity present in the network.
+eGTPu
+Figure 8-3 shows the detailed view of eGTPu functional block.
+Figure 8-3 eGTPu Functional Blocks
+eGTPu encaps and decaps: It handles the eGTPu protocol stack. It performs eGTPu encapsulation and decapsulation as described in 3GPP TS 29.281 [2] and TS 38.425 [15].
+Data Application: This function receives the data packet from UPF, peer O-CU and O-DU over eGTPu interface. It calls eGTPu encaps and decaps to remove the eGTPu header. It identifies the corresponding UE and DRB Id based on mapping of TEID and IP address maintained at eGTPu. It then forwards the data packet to SDAP, which maps the PDU Session to appropriate DRB and passes data to NR PDCP along with information of UE and DRB Id. While sending packet to NR PDCP, it also indicates from which interface this packet has been received, i.e., from UPF or from peer O-CU or from O-DU.
+Data Application also processes the data packets received from SDAP. On receiving data packet, it adds the eGTPu header by calling eGTPu encaps and decaps. On the basis of destination, UE and DRB Id received from NR PDCP, packet relay fetches the TEID and IP address from the mapping maintained at eGTPu and sends the data packet to the destination provided by NR PDCP.
+NGU: It exchanges ECHO request and response over NGU interface. It takes care of the error handling on NGU interface.
+XnU: It exchanges ECHO request and response over XnU interface. It takes care of the error handling on XnU interface. It also takes care of data flow control on XnU interface.
+F1U: It exchanges ECHO request and response over F1U interface defined in [19]. It takes care of the error handling on F1U interface. It also takes care of data flow control on F1U interface.
+NR PDCP
+NR PDCP transfers user plane and control plane data. It maintains PDCP SNs of 12 bits or 18 bits for DRBs and 12 bits for SRBs. It performs header compression and decompression, integrity protection and verification, ciphering and deciphering, timer based SDU discard, routing for split bearers, duplication, reordering and in-order delivery, out of order delivery, and duplicate discarding as described in 3GPP TS 38.323 [9].
+SDAP
+It performs QoS flow to DRB mapping and implements the procedure described in 3GPP TS 37.324 [10]. In case of a DRB where SDAP header to/from UE is not configured, SDAP entity may not be present.
+O-DU Interfaces
+L1/L2 Interface
+MAC (L2) and High-PHY (L1) layers in O-DU interface using the APIs defined 5G FAPI specifications [27] from Small Cell Forum. In implementations where L2 and L1 of O-DU are on different hosts, a virtualized nFAPI interface will be used. nFAPI is under standardization in Small Cell Forum [28].
+Small Cell Forum 5G FAPI includes the following interfaces:
+P5: –PHY configuration interface
+P7: –Main data path interface
+P19:   RF control interface
+O-RAN based implementation of O-DU will use an adaptation module at Frontend to handle P19 interface.
+L2 Interfaces
+It is expected that the software implementation of the APIs defined in this section will be in conformance with the API message definition and the fields or message elements. Data types and encoding/decoding of the message contents will be implementation dependent. Message elements (IEs) referring to definitions in 3GPP specifications are italicized for ease of reference.
+O-DU-OAM-Agent -MAC Interface
+NR Cell Configuration
+The following table details the configurations between O-DU-OAM-Agent and MAC for config parameter exchanges.
+Table - Carrier Configuration Table
+Table -2 Cell Configuration Table
+Table -3 SSB Configuration
+Table -4 PRACH Configuration
+Table -5 TDD Configuration
+Table -6 Precoding Configuration
+Table -7 Beamforming Configuration (Reference: TS 28.541 NRM section 4.3.40)
+In case of hierarchical architecture, O-DU receives the aggregated RU configuration, disaggregate the RU configuration per each RU instance and send the specific configurations towards O-RU. The below table captures the beam forming configuration towards O-RU applicable for hierarchical approach.
+Beamforming configuration as per O-RAN Fronthaul M-plane specification [21]
+Slice Configuration
+MAC - O-DU-OAM-Agent Interface
+The following table details the performance statistics for various features to be reported from MAC layer towards the O-DU OAM agent. The cell specific measurements or the distribution of UE statistics received by the gNB from UEs in that cell (Reference [21] and reference [26] ) are reported in these interface functions.
+The below MU-MIMO feature related statistics helps to fix and improve the MU-MIMO algorithms in the Non RT-RIC/rAPPs which is AI/ML driven and optimize the specific MU-MIMO configuration towards the gNB system.
+RLC-MAC Interface
+The following table details the interactions between RLC and MAC for data transfer and reporting operations.
+Table -8 RLC-MAC Interface
+Note:
+DL:
+RLC -> MAC: The Buffer status in RLC
+MAC -> RLC: the schedule result Reporting to RLC, then RLC decide how to implement the RLC segment.
+RLC->MAC: DL data
+UL:
+MAC-> RLC: UL data
+Data Transfer (DL)
+Table -9 RLC-MAC Data transfer (DL) message contents
+Data Transfer (UL)
+Table -10 RLC-MAC Data transfer (UL) message contents
+Schedule Result Reporting (DL)
+Table -11 RLC-MAC Schedule result reporting (DL) message contents
+Buffer Status Report (DL)
+Table -12 RLC-MAC Buffer Status reporting (DL) message contents
+MAC – Scheduler Interface
+5G NR MAC and scheduler modules interact via well-defined APIs. The APIs ensure any scheduler implementation interworks with MAC. This ensures the freedom of choice for OEMs and operators to plug in a scheduler implementation of choice from a third-party vendor in O-DU.
+The functionalities of  the scheduler module are restricted to optimal allocation of radio resources at every TTI while catering to the need of gNB for transmission of:
+UE specific UL/DL data and signalling messages and
+broadcast messages
+To achieve the above objective, the APIs defined below abstract the scheduler of any protocol specific operations like handling payloads. The interfaces shown below and the APIs may evolve/change further in future releases of this document to achieve a more optimized scheduler implementation.
+Figure 9-13 MAC-Scheduler interface
+The MAC-Scheduler interface includes the slice related information (sNSSAI) associated with the logical channel, that helps the scheduler in multiplexing of MAC SDUs from one or different logical channel onto transport blocks (TB) to be delivered to the physical layer on transport channels. The slice id/sNSSAI associated with the logical channel and its slice priority (defined by the operator) derives a slice metric in the PF scheduler to do logical channel prioritization and radio resource selection so as to meet the slice SLA.
+The following tables detail the interactions between MAC and scheduler both for configuration and data transfer operations.
+Table -14 MAC to Scheduler APIs
+Table -15 Scheduler to MAC APIs
+Common Information Elements in MAC-Scheduler APIs
+Air Interface Time
+This is the timing information over the air interface in terms of system frame number and slot.
+Table -16 Air interface time
+(Debug) Timing Information
+Additional timing information might be present in the APIs between MAC and scheduler to help troubleshoot issues. This is an optional information element in the APIs below. This timing information is defined below.
+Table -17 Debug timing information
+MAC to Scheduler APIs
+Cell Configuration Request
+When MAC layer receives configuration to create a new cell, this API is invoked.
+Table -18 Cell Configuration Request
+Cell Delete Request
+When MAC layer receives configuration to create a new cell, this API is invoked.
+Table -19 Cell Delete Request
+Slice Configuration Request
+Slice Configuration Request is sent to configure the MAC/Scheduler with the rRMPolicyRatio for each of the slices supported in the cell.
+Table -20 Slice Configuration Request
+Slice Reconfiguration Request
+Slice Reconfiguration Request is sent to re-configure the MAC/Scheduler with the rRMPolicyRatio for the slices for which the rRMPolicy is updated/modified over O1 interface.
+Table -20 Slice Reconfiguration Request
+Add UE Configuration Request
+This API is invoked by MAC layer to create a new UE in the scheduler, including the details of logical channels associated with the UE.
+Table -20 Add UE Configuration Request
+Modify UE Reconfiguration Request
+MAC layer invokes this API to modify an existing UE context also to add/release/modify existing logical channels.
+Table -21 Modify UE Reconfiguration Request
+Delete UE Request
+MAC indicates to Scheduler to Delete an existing UE using this API.
+Table - Delete UE Request
+DL HARQ Indication
+MAC informs Scheduler on reception and Decoding of received DL HARQ feedback from the UE. Feedback itself might have been received either on PUSCH or PUCCH, decoding of feedback is done at MAC/L1.
+Table -22 DL HARQ Indication
+UL HARQ (CRC) Indication
+This API is invoked by MAC to inform Scheduler the CRC decode results of PUSCH.
+Table -23 UL HARQ (CRC) Indication
+UL Channel Quality Information
+MAC informs Scheduler using this API the UL Channel Quality Indication of PUSCH/PUCCH
+Table -24 UL Channel Quality Information
+DL Channel Quality Information
+This API is invoked by MAC to report to Scheduler the DL Channel Quality delivered on PUSCH/PUCCH
+Table -25 DL Channel Quality Information
+RACH Indication Contents
+MAC receives the RACH Indication and shares the contents with the scheduler.
+Table -26 RACH Indication Contents
+Paging Indication Contents
+MAC indicates Paging message (F1AP Paging) contents to scheduler.
+Table -27 Paging Indication Contents
+RACH Resource Request
+When contention free random access is initiated by a UE, MAC shares the CRNTI and SSB resource allocation information with the scheduler through this API.
+Table -28 RACH Resource Request
+RACH Resource Release
+MAC indicates to scheduler through this API when RACH resources associated with a UE have to be released.
+Table -29 RACH Resource Release
+DL RLC Buffer Status Information
+This API is used by RLC for reporting data volume per UE for multiple LCs. This can be used in two different ways depending on the QoS/latency requirements.
+Data Volume reports are aggregated per UE (at an aggregation point such as slot indication)
+This adds latency however it reduces message exchange traffic between SCHED and MAC
+Data Volume is reported per LC as soon as it is received at MAC
+This adds to the message exchange traffic however it would be perfect for Low Latency Usecases
+Implementor of this API can choose either one of the above approaches.
+Table -30 DL RLC Buffer Status Information
+Scheduling Request Indication
+MAC indicates to scheduler through this API when UE has to be scheduled for uplink grant.
+Table -31 Scheduling Request Information
+UL Buffer Status Report Indication
+This API is invoked by MAC on reception and Decoding of received BSR from the UE.
+Table -32 Buffer Status Report Indication
+Power Headroom Indication
+MAC invokes this API to inform Scheduler on reception and decoding of received PHR from the UE.
+Table -33 Power Headroom Indication
+Scheduler to MAC APIs
+Cell Configuration Response
+This API is invoked by scheduler to respond to a Cell configuration request.
+Table -34 Cell Deletion Response
+Cell Deletion Response
+This API is invoked by scheduler to respond to a Cell Deletion request.
+Table -35 Cell Deletion Response
+Slice Configuration Response
+This API is invoked by scheduler to respond to a Slice Configuration request.
+Slice Reconfiguration Response
+This API is invoked by scheduler to respond to a Slice Reconfiguration request.
+UE Configuration Response
+This response API is used by scheduler to respond to a UE configuration request from MAC.
+Table -36 UE Configuration Response
+UE Reconfiguration Response
+This response API is used by scheduler to respond to a UE reconfiguration request from MAC.
+Table -37 UE Reconfiguration Response
+UE Deletion Response
+Scheduler responds with this API to a UE deletion request from MAC.
+Table -38 UE Deletion Response
+DL Scheduling Information
+Scheduler provides scheduling information for a given TTI for downlink data. Downlink data can either be a Broadcast message or RAR or MSG4 or Grant for the BSR response or a Dedicated downlink message. Scheduling information contains timing information, time and frequency domain resources to be scheduled with a list of logical channels and TBS opportunity per LC, BWP information along with PDCCH and PDSCH configuration. Additionally, SCH also provides a list of MAC CEs that are scheduled for a specific transmission opportunity. MAC is supposed to encode these CEs into the MAC PDU.
+Table -39 DL Scheduling Information
+Table -33 MAC CE information
+Table 9-32 BWP Information
+Table 9-35 CORESET Configuration
+Table 9-36 DCI Format0_0 Configuration
+Table 9-40 DCI Format 0_1 Configuration
+Table 9-41 DCI Format1_0 Configuration
+Table 9-41 DCI Format1_1 Configuration
+Table 9-42 DL-DCI Configuration
+Table 9-43 PDSCH Configuration
+Table 9-44 DL-SCH Configuration
+UL Scheduling Information
+Scheduler provides Scheduled information to MAC to enable MAC to form the UL_TTI.request towards L1. This is akin to a reception request towards L1 to allow L1 to receive scheduled PUSCH, PUCCH, and SRS data for a specific UE.
+Table -45 UL Scheduling Information
+RAR Information
+This API is invoked by scheduler to inform MAC of uplink scheduling and Msg3 scheduling information.
+Table -46 RAR Information
+Downlink Control Channel Information
+Scheduler provides DCI scheduling information for a given TTI on PDCCH. Scheduling information contains Coreset and Search Space resource allocation. MAC is supposed to prepare the DCI payload with the Downlink control channel information and DL/UL Scheduling Information Frequency and Time Domain allocation for the UE.
+Table -47 Downlink Control Channel Information
+Downlink Broadcast Allocation
+Scheduler provides DCI and DL data scheduling information for SSB and System Information Block1 and Other System Information for a given TTI for Broadcast Channel. MAC forms the SSB and SI payload.
+Table -48 Downlink Broadcast Allocation
+DL DCI Information:
+DL DSCH Information
+Downlink Paging Allocation
+Scheduler provides DCI and optionally DL data scheduling information for Paging Message for given TTI for Paging Channel.
+Table -49 Downlink Paging Allocation
+F1AP handler – MAC Interface
+The following section captures the interface APIs between F1AP handler and MAC:
+Table -50 F1AP handler –MAC Cell Specific API
+Note: Cell State Manager in the F1AP module interfacing with MAC
+Table -51 F1AP handler - MAC UE Specific APIs
+Note: UE State Manager in the F1AP module interfacing with MAC will be the module interacting with MAC for the following APIs.
+Table -52 F1AP handler - MAC Channels Specific APIs
+Note: UE State Manager in the F1AP module interfacing with MAC
+The detailed description of the APIs is below:
+Cell Start
+Table -53 F1AP handler - MAC Cell Start message contents
+Cell Stop
+Table -54 F1AP handler - MAC Cell Stop message contents
+UE Create Request
+Table -55 F1AP handler - MAC UE Create Request message contents
+UE Create Response
+Table -56 F1AP handler - MAC UE Create Response message contents
+UE Reconfiguration Request
+Table -57 F1AP handler - MAC UE Reconfiguration Request message contents
+UE Reconfiguration Response
+Table -58 F1AP handler - MAC UE Reconfiguration Response message contents
+UE Delete Request
+Table -59 F1AP handler - MAC UE Delete Request message contents
+UE Delete Response
+Table -60 F1AP handler - MAC UE Delete Response message contents
+RACH Resource Request
+Table -61 F1AP handler - MAC RACH Resource Request message contents
+RACH Resource Response
+Table -62 F1AP handler - MAC RACH Resource Response message contents
+RACH Resource Release
+Table -63 F1AP handler - MAC RACH Resource Release message contents
+UE Reset Request
+Table -64 F1AP handler - MAC UE Reset Request message contents
+UE Reset Response
+Table -65 F1AP handler - MAC UE Reset Response message contents
+UE Sync Status Indication
+Table -66 F1AP handler - MAC UE Sync Status message contents
+UL CCCH Indication
+Table -67 F1AP handler - MAC UL CCCH Indication message contents
+DL CCCH Indication
+Table -68 F1AP handler - MAC DL CCCH Indication message contents
+DL PCCH Indication
+Table -69 F1AP handler - MAC DL PCCH Indication message contents
+DL Broadcast Request
+Table -70 F1AP handler - MAC DL Broadcast Request message contents
+F1AP Handler – RLC Interface
+The following section captures the interface APIs between F1AP and RLC:
+Table -71 F1AP handler - RLC Specific APIs
+The detailed description of APIs is below.
+UE Create
+Please note that UL configuration below applies to the DL AM/UM entity locally on the O-DU. Correspondingly DL Configuration below applies to UL AM/UM entity locally on the O-DU.
+Table -72 F1AP handler - RLC UE Create message contents
+UE Create Response
+Table -73 F1AP handler - RLC UE Create Response message contents
+UE Reconfiguration
+Please note that UL configuration below applies to the DL AM/UM entity locally on the gNB. Correspondingly DL Configuration below applies to UL AM/UM entity locally on the gNB.
+Table -74 F1AP handler - RLC UE Reconfiguration message contents
+UE Reconfiguration Response
+Table -75 F1AP handler - RLC UE Reconfiguration Responses message contents
+UE Delete
+Table -76 F1AP handler - RLC UE Delete message contents
+UE Delete Response
+Table -77 F1AP handler - RLC UE Delete Response message contents
+DL RRC Message Transfer
+Table -78 F1AP handler – RLC DL RRC Message Transfer message contents
+UL RRC Message Transfer
+Table -79 F1AP handler – RLC UL RRC Message Transfer message contents
+UL RRC Message Delivery Report
+Table -80 F1AP handler – RLC UL RRC Message Delivery Report message contents
+RLC Max Retransmission Reached
+Table -81 F1AP handler – RLC RLC Max Retransmission Reached message contents
+UL RLC Re-establishment Request
+Table -82 F1AP handler – RLC RLC Reestablishment Request message contents
+UE RLC Re-establishment Response
+Table -83 F1AP handler - RLC RLC Reestablishment Response message contents
+RLC – O-DU-OAM-Agent Interface
+PM Slice throughput Event
+This is PM event to notify the slice specific throughput towards OAM agent that are sent at every reporting interval (1 minutes).
+Table -84 RLC – O-DU-OAM-Agent PM Slice Throughput Event
+O1 Interface
+The O1 interface performs FCAPS management for the O-DU.
+The O1 interface is terminated at the O-DU-OAM-Agent module of O-DU to handle all configurations of L1 and L2 layers.
+The interface includes cell configuration towards MAC/SCH and RLC layer.
+The interface includes slice specific configuration to support RAN slicing SLA assurance.
+The interface includes Beam forming and MIMO configurations and additionally configuration related to supported SSB and CSI-RS TRS per cell, supported beam forming modes, SRS configuration periodicity to support massive MIMO optimization use cases like non-GoB ,GoB beamforming, L1/L2 beam management as reference in O-RAN.WG1.Use-Cases-mMIMO-TR[31].
+to support Massive MIMO optimization feature.
+The O1 interface for the O-DU details the data model at cell level, beam level and slice level configurations at stated in reference [26].
+O1 interface supports the performance management/KPI management. O-DU-OAM -Agent collects the performance counters at the cell level, beam level and slice level as required to support various feature optimization and reports to the performance management entity of the SMO.
+The optimized DU configuration for the features e.g. Massive MIMO optimization is notified by the SMO to O-DU-OAM-Agent over file ready notification and the same can be downloaded at O-DU-OAM-Agent module upon accepting the file download request from O-DU system. If required, the O-DU system notifies the new configuration to the O-RU over Fronthaul M-plane interface as reference in [23]. The optimized DU configuration is achieved by the AI/ML driven rAPP application hosted at the Non RT-RIC performs or by xApp application hosted at the Near RT-RIC underlying ML model trained on the historical data collected from a cell or a cluster of cells .The input data for this optimization training and interference can be comprised of several performance statistics and the output of the inference is the optimized configuration sent towards O-DU over the O1 interface.
+E2 Interface
+The E2 service models is extended to support the use cases e.g. RAN slicing SLA assurance and Massive MIMO Optimization.
+The enhancement in the O-RAN interfaces and data models of the E2 interface to enable the Near RT RIC to support Massive MIMO sub-features for AI/ML based mMIMO BF optimization, also enhancements to Near-RT RIC architecture if there is any is detailed in reference [32]
+O-CU Interface
+APIs between the following layers of O-CU are described in this section.
+RRC-SDAP
+RRC-PDCP
+SDAP- PDCP
+It is expected that the software implementation of the APIs defined in this section will be in conformance with the API message definition and the fields or message elements. Data types and encoding/decoding of the message contents will be implementation dependent. Message elements (IEs) referring to definitions in 3GPP specifications are italicized for ease of reference.
+RRC-SDAP Interface
+Table - RRC-SDAP APIs
+The detailed description of RRC-SDAP APIs is below.
+QoS Flow to DRB Mapping
+Table - RRC-SDAP QoS flow to DRB mapping message contents
+DRB Release
+Table - RRC-SDAP DRB release message contents
+SDAP-PDCP Interface
+Table - SDAP-PDCP Interface
+The detailed description of SDAP-PDCP APIs is below:
+Transfer Data PDU (DL)
+Table - SDAP-PDCP Transfer Data PDU (DL) message contents
+Transfer Data PDU (UL)
+Table - SDAP-PDCP Transfer Data PDU (UL) message contents
+End-marker Control PDU (DL)
+Table - SDAP-PDCP End-marker control PDU (UL) message contents
+RRC-PDCP Interface
+Table - RRC-PDCP Interface
+The detailed description of RRC-PDCP APIs is below:
+PDCP Entity Establishment
+Table - RRC-PDCP PDCP entity establishment
+PDCP Entity Re-establishment
+Table - RRC-PDCP PDCP entity release
+SRB Data Request
+Table - RRC-PDCP SRB Data Request
+SRB Data Indication
+Table - RRC-PDCP SRB Data Indication
+SDAP-eGTPU Interface
+Table -13 SDAP-eGTPU APIs
+Transfer Data SDAP SDU (UL)
+This message is sent by SDAP to transfer uplink data to eGTPU.
+Table -14 SDAP-eGTPU Transfer Data SDAP SDU (UL) message contents
+Transfer Data SDAP SDU (DL)
+This message is sent by eGTPU to transfer downlink data to SDAP.
+Table -15 -eGTPU-SDAP Transfer Data SDAP SDU (DL) message contents
+PDCP-eGTPU Interface
+Table -16 PDCP-eGTPU APIs
+Transfer Data PDCP PDU (DL)
+This message is sent by PDCP to eGTPU to transfer packets in downlink direction.
+Table -17 PDCP-eGTPU Transfer Data PDCP PDU (DL) message contents
+Transfer Data PDCP PDU (UL)
+This message is sent by eGTPU to PDPCP to transfer packets in uplink direction.
+Table -18 -eGTPU to PDCP Transfer Data PDCP PDU (UL) message contents
+Ciphering and Integrity Protection
+Support for software implementation and hardware acceleration. This will be addressed in a later release of this specification.
+Header Compression
+Support for software implementation and hardware acceleration. This This will be addressed in a later release of this specification.
+Annex A	(Informative)
+L1 APIs
+Table A-1 Uplink Module APIs
+Table A-2 Layer Demapping Parameters
+Table A-3 Channel Estimation API Parameters
+Table A-4 Downlink Module APIs
+Table A-5 PRACH Module APIs
+Table A-6 PBCH Module APIs
+Call Flows
+F1 Startup and Cells Activation
+Figure below describes F1 interface setup and cell enabling across O-CU and O-DU as specified in subclause 8.5 of 3GPP TS 38.401 [12] when O-CU and O-DU nodes are brought up. The O-DU and its cells are configured by OAM in the pre-operational state.
+Figure A-1  F1 interface setup and cell enabling across O-CU and O-DU
+UE registration
+The following call flow depicts all the messages across interfaces and internal APIs for UE registration in 5G SA.
+s
+Figure A-  UE registration
+RACH procedure
+Figure A.2.3 shows the RACH procedure in UE registration call flow described in the previous section.
+Figure A-  RACH procedure
+SR procedure
+The SR procedure call flow is depicted in Figure A.2.4
+Figure A-  SR procedure
+UL Grant procedure
+The UL Grant procedure call flow is depicted in Figure A.2.5
+Figure A-  UL Grant Procedure
+PDU Session Establishment
+PDU session establishment call flows are as shown in Figure A.2.6
+Figure A-  PDU Session Establishment
+Annex ZZZ : O-RAN Adopter License Agreement
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT.
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”).
+This is a license agreement for entities who wish to adopt any O-RAN Specification.
+Section 1: DEFINITIONS
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity.
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, software or combinations thereof) that fully conforms to a Final Specification.
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications.
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN Specification. The term “O-RAN Specifications” includes Minor Updates.
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary Claims.
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.
+Section 2: COPYRIGHT LICENSE
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in furtherance of implementations of an ORAN Specification.
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written agreement with O-RAN Alliance.
+Section 3: FRAND LICENSE
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant Implementations.
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees.
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Implementations.
+Section 4: TERM AND TERMINATION
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) days after being given notice specifying the breach.
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the version that was current as of the date of termination.
+Section 5: CONFIDENTIALITY
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval.
+Section 6: INDEMNIFICATION
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications.
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS.
+Section 8: ASSIGNMENT
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN Alliance may freely assign this Agreement.
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, including as licensees under Section 3.
+Section 10: BINDING ON AFFILIATES
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder.
+Section 11: GENERAL
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating to the subject matter of this Agreement.
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any communication that would violate the antitrust laws.
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full force and effect.
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full force and effect.

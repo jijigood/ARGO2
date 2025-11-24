@@ -1,0 +1,1903 @@
+O-RAN.SFG.Security-for-Near-RT-RIC–xApps-v01.00
+Technical Report  
+O-RAN Security Focus Group
+Study on Security for Near Real Time RIC and xApps 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this specification 
+in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may 
+print or download extracts of the material on this site for your personal use, or copy the material on this site 
+for the purpose of sending to individual third parties for their information provided that you acknowledge O-
+RAN ALLIANCE as the source of the material and that you inform the third party that these conditions 
+apply to them and that they must comply with them.
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the copyright statement on the cover page of this specification.
+
+1 
+ O-RAN.SFG.Security-for-Near-RT-RIC–xApps-v01.00 
+Technical Report   
+ 
+ 
+ 
+ 
+O-RAN Security Focus Group 
+  
+Study on Security for Near Real Time RIC and xApps 
+ 
+ 
+  
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O -RAN Adopter License Agreement in 
+the Annex ZZZ 
+1 
+Prepared  by the O-RAN ALLIANCE e.V. Copyright © 2022 by O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving, 
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter 
+License Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+VAT ID DE321720189 
+www.o-ran.org             
+
+
+Contents 1 
+Foreword............................................................................................................................................ 5 2 
+Introduction ....................................................................................................................................... 6 3 
+1 Scope ....................................................................................................................................... 7 4 
+2 References................................................................................................................................ 8 5 
+3 Definitions and abbreviations .................................................................................................  10 6 
+3.1 Definitions ...................................................................................................................................... 10 7 
+3.2 Abbreviations .................................................................................................................................. 10 8 
+4 RIC background, concepts and assumptions ............................................................................ 12 9 
+4.1 Introduction..................................................................................................................................... 12 10 
+4.2 Near-RT RIC architecture ................................................................................................................ 12 11 
+4.3 Interfaces ........................................................................................................................................ 13 12 
+4.4 xApps ............................................................................................................................................. 13 13 
+4.5 Near-RT RIC APIs .......................................................................................................................... 13 14 
+5 Key Issues .............................................................................................................................. 16 15 
+5.1 Introduction..................................................................................................................................... 16 16 
+5.2 Key Issue #1: Malicious xApps deployed on the Near-RT RIC ......................................................... 16 17 
+5.2.1 Key issue detail .......................................................................................................................... 16 18 
+5.2.2 Security threats .......................................................................................................................... 16 19 
+5.2.3 Potential security requirements ................................................................................................... 16 20 
+5.3 Key Issue #2: Compromised xApp ................................................................................................... 16 21 
+5.3.1 Key issue detail .......................................................................................................................... 16 22 
+5.3.2 Security Threats ......................................................................................................................... 17 23 
+5.3.3 Potential security requirements ................................................................................................... 17 24 
+5.4 Key Issue #3: Conflicting xApps ..................................................................................................... 17 25 
+5.4.1 Key issue detail .......................................................................................................................... 17 26 
+5.4.2 Security threats .......................................................................................................................... 17 27 
+5.4.3 Potential security requirements ................................................................................................... 18 28 
+5.5 Key Issue #4: Isolation between xApps ............................................................................................ 18 29 
+5.5.1 Key issue detail .......................................................................................................................... 18 30 
+5.5.2 Security threats .......................................................................................................................... 18 31 
+5.5.3 Potential security requirements ................................................................................................... 18 32 
+5.6 Key Issue #5: Compromise of ML data pipelines used in Near-RT RIC ............................................ 19 33 
+5.6.1 Key issue detail .......................................................................................................................... 19 34 
+5.6.2 Security threats .......................................................................................................................... 19 35 
+5.6.3 Potential security requirements ................................................................................................... 19 36 
+5.7 Key Issue #6: Altering the ML learning models used in Near-RT RIC .............................................. 19 37 
+5.7.1 Key issue detail .......................................................................................................................... 19 38 
+5.7.2 Security threats .......................................................................................................................... 20 39 
+5.7.3 Potential security requirements ................................................................................................... 20 40 
+5.8 Key Issue #7: Data Protection and Privacy in Near-RT RIC Database .............................................. 20 41 
+5.8.1 Key issue detail .......................................................................................................................... 20 42 
+5.8.2 Security threats .......................................................................................................................... 21 43 
+5.8.3 Potential security requirements ................................................................................................... 21 44 
+5.9 Key Issue #8: Onboarding untrusted xApps...................................................................................... 21 45 
+5.9.1 Key issue detail .......................................................................................................................... 21 46 
+5.9.2 Security threats .......................................................................................................................... 21 47 
+5.9.3 Potential security requirements ................................................................................................... 22 48 
+5.10 Key Issue #9: xApp exploitation via malicious A1 policies .............................................................. 22 49 
+5.10.1 Key issue detail .......................................................................................................................... 22 50 
+5.10.2 Security threats .......................................................................................................................... 22 51 
+5.10.3 Potential security requirements ................................................................................................... 22 52 
+5.11 Key Issue #10: Near-RT RIC APIs authentication ............................................................................ 23 53 
+5.11.1 Key issue detail .......................................................................................................................... 23 54 
+5.11.2 Security threats .......................................................................................................................... 23 55 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+3 
+ 
+5.11.3 Potential security requirements ................................................................................................... 23 1 
+5.12 Key Issue #11: Near-RT RIC APIs authorization ............................................................................. 23 2 
+5.12.1 Key issue detail .......................................................................................................................... 23 3 
+5.12.2 Security threats .......................................................................................................................... 24 4 
+5.12.3 Potential security requirements ................................................................................................... 24 5 
+6 Mitigations and Solutions ....................................................................................................... 25 6 
+6.1 Introduction..................................................................................................................................... 25 7 
+6.2 Solution #1: Secure onboarding and deployment of xApps in Near-RT RIC ..................................... 25 8 
+6.2.1 Introduction ............................................................................................................................... 25 9 
+6.2.2 Solution details .......................................................................................................................... 25 10 
+6.2.3 Evaluation.................................................................................................................................. 27 11 
+6.3 Solution #2: Security management of risks in open-source components of Near-RT RIC architecture 27 12 
+6.3.1 Introduction ............................................................................................................................... 27 13 
+6.3.2 Solution details .......................................................................................................................... 27 14 
+6.3.3 Evaluation.................................................................................................................................. 29 15 
+6.4 Solution #3: Authentication schema for APIs ................................................................................... 30 16 
+6.4.1 Introduction ............................................................................................................................... 30 17 
+6.4.2 Solution details .......................................................................................................................... 30 18 
+6.4.3 Evaluation.................................................................................................................................. 31 19 
+6.5 Solution #4: Authorization framework for APIs ............................................................................... 31 20 
+6.5.1 Introduction ............................................................................................................................... 31 21 
+6.5.2 Solution details .......................................................................................................................... 31 22 
+6.5.3 Evaluation.................................................................................................................................. 33 23 
+6.6 Solution #5: Near-RT RIC database and SDL access control mechanisms......................................... 33 24 
+6.6.1 Introduction ............................................................................................................................... 33 25 
+6.6.2 Solution details .......................................................................................................................... 33 26 
+6.6.3 Evaluation.................................................................................................................................. 34 27 
+6.7 Solution #6: Security Logging (part of FCAPS) ............................................................................... 34 28 
+6.7.1 Introduction ............................................................................................................................... 34 29 
+6.7.2 Solution details .......................................................................................................................... 35 30 
+6.7.3 Evaluation.................................................................................................................................. 35 31 
+6.8 Solution #7: Access control mechanism for API repository/registry .................................................. 35 32 
+6.8.1 Introduction ............................................................................................................................... 35 33 
+6.8.2 Solution details .......................................................................................................................... 35 34 
+6.8.3 Evaluation.................................................................................................................................. 35 35 
+6.9 Solution #8: Secure mechanisms for E2 interface ............................................................................. 36 36 
+6.9.1 Introduction ............................................................................................................................... 36 37 
+6.9.2 Solution details .......................................................................................................................... 36 38 
+6.9.3 Evaluation.................................................................................................................................. 36 39 
+6.10 Solution #9: Secure mechanisms for A1 interface ............................................................................. 36 40 
+6.10.1 Introduction ............................................................................................................................... 36 41 
+6.10.2 Solution details .......................................................................................................................... 36 42 
+6.10.3 Evaluation.................................................................................................................................. 36 43 
+6.11 Solution #10: Secure mechanisms for O1 interface ........................................................................... 36 44 
+6.11.1 Introduction ............................................................................................................................... 36 45 
+6.11.2 Solution details .......................................................................................................................... 36 46 
+6.11.3 Evaluation.................................................................................................................................. 37 47 
+6.12 Solution #11: Mitigation for conflicting xApps ................................................................................ 37 48 
+6.12.1 Introduction ............................................................................................................................... 37 49 
+6.12.2 Solution details .......................................................................................................................... 37 50 
+6.12.3 Evaluation.................................................................................................................................. 37 51 
+6.13 Solution #12: A1 Policy authentication ............................................................................................ 37 52 
+6.13.1 Introduction ............................................................................................................................... 37 53 
+6.13.2 Solution details .......................................................................................................................... 37 54 
+6.13.3 Evaluation.................................................................................................................................. 38 55 
+6.14 Solution #13: Network Security layer for APIs................................................................................. 38 56 
+6.14.1 Introduction ............................................................................................................................... 38 57 
+6.14.2 Solution details .......................................................................................................................... 38 58 
+6.14.3 Evaluation.................................................................................................................................. 39 59 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+4 
+ 
+7. Conclusions ............................................................................................................................ 40 1 
+7.1 Key Issue Solution Mapping ............................................................................................................ 40 2 
+8. Recommendations .................................................................................................................. 41 3 
+Annex A (informative): .................................................................................................................... 42 4 
+Annex B (informative): Change history ............................................................................................ 43 5 
+Annex ZZZ : O-RAN Adopter License Agreement ........................................................................... 44 6 
+Section 1: DEFINITIONS ............................................................................................................................. 44 7 
+Section 2: COPYRIGHT LICENSE .............................................................................................................. 44 8 
+Section 3: FRAND LICENSE ....................................................................................................................... 45 9 
+Section 4: TERM AND TERMINATION....................................................................................................... 45 10 
+Section 5: CONFIDENTIALITY .................................................................................................................... 45 11 
+Section 6: INDEMNIFICATION .................................................................................................................... 46 12 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ...................................................................... 46 13 
+Section 8: ASSIGNMENT ............................................................................................................................ 46 14 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................. 46 15 
+Section 10: BINDING ON AFFILIATES....................................................................................................... 46 16 
+Section 11: GENERAL .................................................................................................................................  46 17 
+ 18 
+ 19 
+  20 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+5 
+ 
+Foreword 1 
+This Technical Specification has been produced by the O-RAN ALLIANCE. 2 
+The contents of the present document are subject to continuing work within O-RAN and may change following formal 3 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by 4 
+O-RAN with an identifying change of release date and an increase in version number as follows: 5 
+Release xx.yy.zz 6 
+where: 7 
+xx the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. 8 
+(the initial approved document will have xx=01). 9 
+yy the second digit is incremented when editorial only changes have been incorporated in the document. 10 
+zz the third digit included only in working versions of the document indicating incremental changes during the 11 
+editing process. 12 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+6 
+ 
+Introduction 1 
+The Near-Real Time RAN Intelligent Controller (Near-RT RIC) is a new virtualized function that adds RAN 2 
+programmability to existing or new RAN networks, e.g., self-organizing networks (SON) type of functions. It is a 3 
+platform designed to use AI/ML-based tools with open interfaces to the RAN (E2) and the management and 4 
+orchestration system (A1, O1).  5 
+ 6 
+The Near-RT RIC enables near real time control and optimization of RAN elements and resources via fine-grained 7 
+data (e.g., UE basis, Cell basis) collection and actions over E2 interface, and includes open interfaces (A1, O1) to the 8 
+management and orchestration system (SMO). 9 
+ 10 
+The Near-RT RIC platform is a software based near – real-time micro - service-based platform for hosting micro 11 
+service-based applications - the xApps - that run on the Near-RT RIC platform. A xApp may consist of one or more 12 
+microservices and at the point of onboarding it identifies which data it consumes and which data it provides. It is 13 
+independent of Near-RT RIC and may be provided by any third party. The E2 interface enables a direct association 14 
+between xApp and RAN functionalities.   15 
+  16 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+7 
+ 
+1 Scope 1 
+The present document considers the security aspects of the Near-RT RIC platform and xApps, as well as the 2 
+associated network and management interfaces (E2, A1, O1) and APIs.  3 
+Taking into consideration the threats and risks identified in O-RAN Threat Model specification [1], the study analyzes 4 
+a list of key issues in the Near-RT RIC overall architecture and proposes solutions in order to derive security 5 
+requirements, intended to be part of O-RAN Security Requirements Specifications [2]. 6 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+8 
+ 
+2 References 1 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 2 
+document. 3 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 4 
+non-specific. 5 
+- For a specific reference, subsequent revisions do not apply. 6 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 7 
+a GSM document), a non-specific reference implicitly refers to the  latest version of that document in the same 8 
+Release as the present document. 9 
+ 10 
+[1] O-RAN ALLIANCE, “O-RAN Security Threat Modeling and Remediation Analysis 2.01”, November 2021 11 
+[2] O-RAN ALLIANCE, “O-RAN.SFG.O-RAN-Security-Requirements-Specifications 2.0”, November 2021 12 
+[3] O-RAN ALLIANCE, “O-RAN.WG3.RICARCH-v02.01” (Near-RT RIC Architecture v2.1), November 2021  13 
+[4] O-RAN ALLIANCE, “O-RAN.WG2.Use-Case-Requirements-v04.00”, July 2021 14 
+[5] O-RAN ALLIANCE, “ORAN-WG3.E2GAP-v02.00” (E2 General Aspects and Principles), July 2021 15 
+[6] O-RAN ALLIANCE, “O-RAN.WG5.MP.0-v02.00” (O1 Interface specification for O-DU), July 2021  16 
+[7] O-RAN ALLIANCE, “O-RAN-WG5.O-CU-O1.0-v01.00” (O1 Interface specification for O-CU-UP and O-CU-17 
+CP), July 2021  18 
+[8] O-RAN ALLIANCE, “O-RAN.WG10.O1-Interface.0-v05.00” (O-RAN Operations and Maintenance Interface 19 
+Specification), June 2021 20 
+[9] O-RAN ALLIANCE, “O-RAN.WG2.A1GAP-v02.03” (A1 interface: General Aspects and Principles), June 2021 21 
+[10] OWASP API Security Top 10 2019. https://owasp.org/www-project-api-security  22 
+[11] RFC 6749: The OAuth 2.0 Authentication framework. https://datatracker.ietf.org/doc/html/rfc6749  23 
+[12] RFC 6819: OAuth 2.0 threat model and security considerations. https://datatracker.ietf.org/doc/html/rfc6819  24 
+[13] 3GPP TS 33.501: “Security architecture and procedures for 5G system” 25 
+[14] ETSI NFV SEC022: “Network Functions Virtualization (NFV) Release 2; Security; Access Token Specification 26 
+for API Access”.  27 
+[15] ETSI GS MEC 009 V3.1.1 (2021-06): Multi-access Edge Computing (MEC); General principles, patterns and 28 
+common aspects of MEC Service APIs. 29 
+https://www.etsi.org/deliver/etsi_gs/MEC/001_099/009/03.01.01_60/gs_MEC009v030101p.pdf  30 
+[16] 3GPP TR 33.845 v16.1.0 (2020-09): Study on security aspects of the 5G Service Based Architecture (SBA) 31 
+[17] RFC 7519: JSON Web Token. https://datatracker.ietf.org/doc/html/rfc7519  32 
+[18] RFC 7515: JSON Web Signature. https://datatracker.ietf.org/doc/html/rfc7515  33 
+[19] O-RAN ALLIANCE, “O-RAN.SFG.O-RAN-Security-Protocols-Specifications-v02.00”, July 2021 34 
+[20] 3GPP TS 33.310: "Network Domain Security (NDS); Authentication Framework (AF)". 35 
+[21] 3GPP TS 33.210: "3G security; Network Domain Security (NDS); IP network layer security". 36 
+[22] O-RAN ALLIANCE, “O-RAN.WG10.OAM-Architecture-v05.00” (O-RAN Operations and Maintenance 37 
+Architecture), July 2021 38 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+9 
+ 
+[23] O-RAN ALLIANCE, “O-RAN.WG6.ORCH-USE-CASES-v02.00” (O-RAN Orchestration Use Cases and 1 
+Requirements for O-RAN Virtualized RAN), November 2020 2 
+[24] NIST Executive Order 14028, Improving the Nation's Cybersecurity: Security Measures for EO-Critical Software 3 
+Use. https://www.nist.gov/itl/executive-order-improving-nations-cybersecurity/security-measures-eo-critical-4 
+software-use  5 
+[25] OpenSSF Best Practices. https://bestpractices.coreinfrastructure.org/en/projects?q=O-RAN 6 
+[26] OpenSSF Software Development Fundamentals Link: https://openssf.org/training/courses/ 7 
+[27] CII Security best practices badging https://wiki.o-ran-8 
+sc.org/display/ORAN/Core+Infrastructure+Initiative+%28CII%29+Badging  9 
+[28] CISA NSA 5G Security guideline https://media.defense.gov/2021/Oct/28/2002881720/-1/-10 
+1/0/SECURITY_GUIDANCE_FOR_5G_CLOUD_INFRASTRUCTURES_PART_I_20211028.PDF 11 
+[29] Opensource Software “Security 5G Security” whitepaper. https://www.5gamericas.org/security-for-5g/ 12 
+[30] NIST Special Publication (SP) 800-40, Guide to Enterprise Patch Management Technologies. 13 
+https://csrc.nist.gov/publications/detail/sp/800-40/rev-4/draft  14 
+ 15 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+10 
+ 
+3 Definitions and abbreviations 1 
+3.1 Definitions 2 
+For the purposes of the present document, the following terms and definitions apply. 3 
+Near-RT RIC: O-RAN Near-Real-Time RAN Intelligent Controller: A logical function that enables near-real -time 4 
+control and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface. 5 
+Non-RT RIC: O-RAN Non-Real-Time RAN Intelligent Controller: A logical function within SMO that drives the 6 
+content carried across the A1 interface . It is comprised of the Non-RT RIC Framework and the Non-RT RIC 7 
+Applications.  8 
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting RRC and the control plane part of PDCP 9 
+protocol. 10 
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of PDCP protocol and SDAP 11 
+protocol. 12 
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional 13 
+split. 14 
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional 15 
+split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH 16 
+extraction).   17 
+O-eNB: An eNB or ng-eNB that supports E2 interface. 18 
+O1: An interface between SMO and O -RAN managed elements, for operation and management, by which FCAPS 19 
+management, PNF (Physical Network Function) Software management, File management shall be achieved.  20 
+SMO: A Service Management and Orchestration system. 21 
+A1: An interface between Non- RT RIC and Near -RT RIC to enable policy-driven guidance of Near- RT RIC 22 
+applications/functions, and support AI/ML workflow. 23 
+E2: An interface connecting Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, or one or more O-DUs. 24 
+E2 Node: A logical node terminating E2 interface. In this version of the specification, O -RAN nodes terminating E2 25 
+interface are: 26 
+- for NR access: O-CU-CP, O-CU-UP, O-DU  27 
+- for E-UTRA access: O-eNB. 28 
+xApp: An application designed to run on Near-RT RIC. It may consist of one or more microservices and at the point of 29 
+on-boarding it identifies which data it consumes and which data it provides. It is independent of Near-RT RIC and may 30 
+be provided by any third party. The E2 interface enables a direct association between xApp and RAN functionalities.   31 
+O-Cloud: O-Cloud is a cloud computing platform comprising a collection of physical infrastructure nodes that meet O-32 
+RAN requirements to host the relevant O-RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP, and O-DU), the 33 
+supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and 34 
+the appropriate management and orchestration functions. 35 
+Solution Provider: An application developer who delivers applications to Service Providers. [22] 36 
+Service Provider: A network provider who is planning to deploy applications into their network. [22] 37 
+ 38 
+3.2 Abbreviations 39 
+For the purposes of the present document, the following abbreviations apply.  40 
+API    Application Programming Interface 41 
+AI/ML Artificial Intelligence/Machine Learning 42 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+11 
+ 
+CP Control Plane 1 
+DoS Denial of Service 2 
+DTLS    Datagram Transport Layer Security 3 
+eNB    e NodeB (applies to LTE) 4 
+E2SM E2 Service Model 5 
+FCAPS Fault, Configuration, Accounting, Performance, Security   6 
+FM Fault Management 7 
+gNB g NodeB (applies to NR)   8 
+IPsec Internet Procotol Security 9 
+JWS JSON Web Signature 10 
+JWT JSON Web Token 11 
+LCM Life-Cycle Management  12 
+MEC Multi-access Edge Computing 13 
+MIMO Multiple Input Multiple Output 14 
+Near-RT RIC Near-real-time RAN Intelligent Controller 15 
+NIB Network Information Base 16 
+Non-RT RIC Non-real-time RAN Intelligent Controller 17 
+O-CU O-RAN Central Unit 18 
+O-DU O-RAN Distributed Unit   19 
+O-RU O-RAN Radio Unit   20 
+PM Performance Management 21 
+QoS Quality of Service  22 
+QoE Quality of Experience 23 
+RAN Radio Access Network 24 
+RIC RAN Intelligent Controller 25 
+R-NIB Radio-Network Information Base 26 
+RRM Radio Resource Management 27 
+SBA Service Based Architecture 28 
+SDL Share Data Layer 29 
+SMO Service Management and Orchestration 30 
+TLS Transport Layer Security 31 
+UE User Equipment 32 
+UE-NIB UE-Network Information Base 33 
+UP User Plane 34 
+ 35 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+12 
+ 
+4 RIC background, concepts and assumptions 1 
+4.1 Introduction  2 
+The RIC architecture consists of the Non-RT RIC, which deals with control loops of more than 1 second, and the 3 
+Near-RT RIC, with control loops in the order of 10 ms to 1s [3]. The Non-RT RIC is embedded in the Service and 4 
+Management Orchestration function and hosts rApps to provide policy-based guidance, machine learning model 5 
+management and enrichment information to the Near-RT RIC function for the purpose of RAN optimization [4]. The 6 
+Near-RT RIC is a logical function that enables near real-time control and optimization of E2 Nodes functions and 7 
+resources, steered via the policies and enrichment data provided from the Non-RT RIC [3]. 8 
+4.2 Near-RT RIC architecture 9 
+The following diagram shows the building blocks of the Near-RT RIC internal architecture. For more detailed 10 
+descriptions of the architecture and platform functions, see WG3 Near-RT RIC Architecture specification [3]. 11 
+ 12 
+Figure 1: Near-RT RIC Internal Architecture 13 
+ Interface Termination for E2, A1, O1  14 
+ xApp: application that runs on the Near-RT RIC to provide desired RAN functionality 15 
+ Messaging infrastructure: provides low-latency message delivery service b/t Near-RT RIC internal 16 
+endpoints 17 
+ Conflict mitigation: resolves potentially overlapping or conflicting requests from multiple xApps  18 
+ Subscription management: manages subscriptions from xApps to E2 Nodes and enforces authorization of 19 
+policies 20 
+ Management services: life-cycle management of xApps (onboarding, deployment, resource management, 21 
+and termination) and FCAPS management of Near-RT RIC (logging, tracing, metrics collection) 22 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+13 
+ 
+ Security: provides the security scheme for the xApps. One of the targets of this function is to prevent 1 
+malicious xApps from abusing radio network information (e.g. exporting to unauthorized external systems) 2 
+and/or control capabilities over RAN functions 3 
+Note. The Security function is a placeholder in Near-RT RIC architecture and has not been specified 4 
+yet. The requirements and solutions proposed in this study will support the spefication of this function.  5 
+ AI/ML support: provides data ingestion and preparation for xApps and AI/ML training for xApps 6 
+ xApp Repository Function: performs selection of xApps for A1 message routing and provides policy types 7 
+supported in Near-RT RIC to the A1 termination funciton  8 
+ Shared Data Layer (SDL): API for accessing shared data storage 9 
+ Database: UE-NIB database contains a list of UEs and associated data, and Radio-NIB database stores 10 
+configurations and information relating to the connected E2 Nodes  11 
+ API Enablement: support for registration, discovery and consumption of Near-RT RIC APIs 12 
+ 13 
+4.3 Interfaces 14 
+E2 : Interface between the Near-RT RIC and the E2 Nodes (O-DU, O-CU-UP, O-CU-CP, O-eNB) [5] 15 
+O1 : Interface between the SMO and O-RAN Managed Functions (Near-RT RIC, O-RU, O-DU, O-CU-UP, O-CU-16 
+CP, O-eNB) [6][7][8] 17 
+A1 : Interface between the Non-RT RIC at the SMO and the Near-RT RIC [9] 18 
+ 19 
+4.4 xApps 20 
+As per definition in [3], an xApp is an application designed to run on Near-RT RIC. It may consist of one or more 21 
+microservices and at the point of on-boarding it identifies which data it consumes and which data it provides. It is 22 
+independent of Near-RT RIC and may be provided by any third party. The E2 interface enables a direct association 23 
+between xApp and RAN functionalities.  24 
+From security viewpoint the following requirements [3] are key aspects to take into consideration in this study, and 25 
+will be developed in subsequent key issues and solutions: 26 
+- xApps shall communicate with Near-RT RIC platform via Near-RT RIC APIs.  27 
+- xApps shall use Near-RT RIC APIs to make use of the Information Elements (IEs) only of the E2 Service 28 
+Models (E2SM) that are associated with it.  29 
+Note. E2SM describes the functions in the E2 Node which may be controlled by the Near-RT RIC 30 
+and corresponding procedures.    31 
+- xApp shall register the APIs it produces  32 
+Note. Services for which the API producer is the xApp are FFS 33 
+- xApp shall be capable of discovering the Near-RT RIC APIs they consume  34 
+- The platform will consider the level of trust related to the xApp, e.g. 3rd party xApp, RIC-owned xApp (i.e. 35 
+xApp provided by the RIC vendor) 36 
+4.5 Near-RT RIC APIs 37 
+The following diagram [3] provides a representation of the APIs involved in Near-RT RIC.  38 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+14 
+ 
+ 1 
+Figure 2: Overview of Near-RT RIC APIs 2 
+ 3 
+- A1 related APIs: APIs allowing to access A1 related functionality. 4 
+o Policy Enforcement API (transactional) 5 
+o Enrichment information API (transactional) 6 
+- E2 related APIs: APIs allowing to access E2 related functionality and associated xApp Subscription 7 
+Management and Conflict Mitigation functionality. 8 
+o E2 Subscription API (transactional) 9 
+o E2 Guidance (transactional) 10 
+o E2 Indication (time critical, uni-streaming) 11 
+o E2 Control (time critical, bi-streaming) 12 
+- Management APIs: APIs allowing to access management related functionality. They are used for services 13 
+such as O1 Termination, management services and logging, tracing, metrics collection.  14 
+o ML model related APIs (FFS) 15 
+o FACPS related APIs (transactional): 16 
+ xApp Registration API  17 
+ xApp Deregistration API 18 
+ Configuration API 19 
+ PM (Performance Management) API 20 
+ FM (Fault Management) API 21 
+- SDL API (transactional + Uni-streaming): API allowing to access Shared Data Layer related functionalities 22 
+(strore/fetch/notify/modify/push/…) over R-NIB, UE-NIB, other data in the database.   23 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+15 
+ 
+- Enablement APIs (transactional): APIs between xApps and API enablement functionality. 1 
+o Registration API. Enabling the API producer to register the APIs it produces 2 
+o Discovery API. Enabling the discovery of the Near-RT RIC APIs by the xApps 3 
+o Subscription API. Enabling the subscription/un-subscription to API-related events and event 4 
+notification. 5 
+ 6 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+16 
+ 
+5 Key Issues 1 
+5.1 Introduction 2 
+This clause details the key issues identified for security aspects related to the Near-RT RIC architecture, relevant 3 
+interfaces, xApps and APIs. Each key issue defines the background to the issue, defines the threats related to the issue 4 
+and proposes requirements that resolve or mitigate the key issue. 5 
+ 6 
+5.2 Key Issue #1: Malicious xApps deployed on the Near-RT RIC 7 
+5.2.1 Key issue detail 8 
+xApps on the Near-RT RIC can collect near real-time information from E2 Nodes and influence behavior of E2 Nodes 9 
+thereby impacting cell performance and delivery of services to a group of UEs or a single UE. The security 10 
+requirements for onboarding and hosting xApps should be defined to reduce the risk of unauthorized, untrusted, or 11 
+malicious xApps to be deployed into the Near-RT RIC. 12 
+Malicious xApps could be onboarded onto the Near-RT RIC with the intent of manipulating or negatively impacting 13 
+the delivery of services to subscribers, the RAN, or the core network. Malicious xApps could also be onboarded onto 14 
+the Near-RT RIC with the intent of accessing, manipulating or negatively impacting the privacy of subscribers, the 15 
+RAN or the core network. 16 
+This threat has been identified in O-RAN Threat Model [1] as Threat ID T-NEAR-RT-01. 17 
+5.2.2 Security threats 18 
+The security threats associated with the onboarding and deployment of malicious xApps include: 19 
+• Malicious xApps attaining unauthorized access to the Near-RT RIC and E2 Nodes 20 
+• Malicious xApps abusing radio network information and control capabilities over RAN functions 21 
+• Malicious xApp impacting service for a subscriber or a dedicated area 22 
+• Malicious xApp exploiting UE identification, tracking UE location and changing UE slice priority 23 
+5.2.3 Potential security requirements 24 
+xApps shall be authenticated during onboarding using a signature that is generated by the xApp Solution Provider and 25 
+validated by the Service Provider. 26 
+xApps shall be validated during Registration to the Near-RT RIC platform using signatures from both the Service 27 
+Provider and the xApp Solution Provider. 28 
+ 29 
+5.3 Key Issue #2: Compromised xApp 30 
+5.3.1 Key issue detail 31 
+Vulnerabilities can potentially exist in any xApp. Those can be e.g.: 32 
+• Security misconfiguration, such enabled but unnecessary protocols 33 
+• Weak or misconfigured authentication and authorization 34 
+• A malicious xApp an untrusted source may intentionally provide 35 
+• A backdoor intentionally inserted in the xApp by a trusted source 36 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+17 
+ 
+• An attacker submitting requests without prior authentication and authorization by executing an injection 1 
+attack to manipulate configurations, access logs, perform remote code execution, etc   2 
+If attackers can find an exploitable xApp, they can disrupt the offered network service and potentially take over 3 
+another xApp or the near-RT RIC. The actual consequences may vary. For example, an attacker may gain the ability 4 
+to alter data transmitted by any accessible API, extract sensitive information, etc. 5 
+5.3.2 Security Threats 6 
+The security threats associated with compromised xApps include: 7 
+• Security misconfiguration 8 
+• Weak authentication and authorization 9 
+• Malicious xApps from an untrusted source 10 
+• Backdoors in trusted xApps 11 
+• Vulnerabilities in trusted apps 12 
+5.3.3 Potential security requirements 13 
+Requirement: xApps images shall be authenticated during onboarding using a signature that is generated by the xApp 14 
+Solution Provider and validated by the Service/Cloud Provider and telco operator.  15 
+Requirement: xApps instances shall be validated during Registration to the Near-RT RIC platform using signatures 16 
+from both the Service/Cloud Provider and the xApp Solution Provider. Signatures made from certificates reaching the 17 
+end of their lifetime shall be renewed before the certificate times out (signatures provided by the xApp Solution 18 
+Provider might be ignored if the signature of the Service/Cloud Provider is valid).  19 
+Recommendation: xApps should be hardened by the vendor, and this hardening should be tested by the service 20 
+provider, using a well-defined standard, e.g., using penetration tests 21 
+Requirement: xApp APIs shall be provided with proper Authentication/Authorization schemas.  22 
+Recommendation: prevent supply chain attacks, e.g., as defined in [24] 23 
+ 24 
+5.4 Key Issue #3: Conflicting xApps 25 
+5.4.1 Key issue detail 26 
+xApps can change RAN parameters to optimize a specific network metric, which could result in conflicting actions 27 
+between xApps. Conflicting xApps can unintentionally or maliciously impact O-RAN system functions such as 28 
+mobility management, admission controls, radio resource control, and load balancing to degrade the performance or 29 
+availability of the network.  30 
+The functional split between the Near-RT RIC and the E2-Node depends on the available xApps and the capabilities 31 
+exposed by the O-gNB. This can create possible conflicts between the decisions taken by the Near-RT RIC and the O-32 
+gNB that could lead to instability in the network, which introduces vulnerabilities that could be exploited by threat 33 
+actors. [1] 34 
+This threat has been identified in O-RAN Threat Model [1] as Threat ID T-xApp-02. 35 
+5.4.2 Security threats 36 
+The security threats associated with conflicting xApps include: 37 
+• DoS from an xApp intentionally creating RRM decisions that conflict with gNB internal decisions  38 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+18 
+ 
+• Degradation of performance from an xApp intentionally creating RRM decisions that conflict with other 1 
+xApp decisions 2 
+5.4.3 Potential security requirements 3 
+The solution should make use of the existing, but currently optional, E2 Guidance Request Procedure during xApp 4 
+Registration to mitigate conflicts arising from new xApps. The purpose of the E2 Guidance procedures is to allow 5 
+xApps to obtain guidance from the Conflict Mitigation function in the Near-RT RIC. The Conflict Mitigation function 6 
+is intended to resolve potentially overlapping or conflicting requests from multiple xApps, but some conflict 7 
+mitigation messages and procedures are FFS [3]. 8 
+ 9 
+5.5 Key Issue #4: Isolation between xApps 10 
+5.5.1 Key issue detail 11 
+The Near-RT RIC enables near real time control and optimization of RAN elements and resources via fine-grained 12 
+data collection and actions over E2 interface, and includes open interfaces (A1, O1) to the management and 13 
+orchestration system (SMO). This will be achieved using a collection of xApps, with each xApp providing a specific 14 
+functionality by consuming a specific subset of data or producing data for other xApps or Near-RT RIC platform. To 15 
+provide its desired functionality, the xApps would interact with other Near-RT RIC platform components. 16 
+In a multi-vendor environment, where 3rd party xApps and those provided by the RIC vendor are deployed together, 17 
+an xApp can be used to impact the other co-located xApps/Near-RT RIC platform thus creating a noisy neighbour 18 
+effect where an xApp can overconsume the underlying shared resources provided by the Near-RT RIC platform like 19 
+CPU, memory, I/O bandwidth, etc. and can negatively affect the performance of other co-located xApps and 20 
+potentially other CNFs sharing the same underlying platform.  21 
+It’s also possible that xApps have different levels of access to the data and resources available on Near-RT RIC. 22 
+Appropriate isolation is needed for xAPPs that have different threat profiles. 23 
+ 24 
+5.5.2 Security threats 25 
+Without proper isolation, an xApp can be used to: 26 
+- overconsume the platform resources shared by all xApps, creating a noisy neighbour effect by leaving other 27 
+co-located xApps with a resource deficit. 28 
+- administer DoS attacks on other co-located xApps and impacting service offered by the xApp under attacks 29 
+- administer DoS attacks on the Near-RT RIC platform components, impacting the availability of the Near-RT 30 
+RIC  31 
+- administer unauthorised access to sensitive real-time information from RAN, persistent configuration used 32 
+by the Near-RT RIC to control the RAN  33 
+- probe for vulnerabilities in the underlying system hosting the xApps application and use them to administer 34 
+attacks on another xApps and the platform 35 
+ 36 
+5.5.3 Potential security requirements 37 
+Requirement: Based on xAPPs threat profile, the Near-RT RIC platform shall categorise and isolate xApps into 38 
+different security groups and define security boundaries. Near-RT RIC platform shall cap the resources allocated to 39 
+xApps make sure that xApps trying to overconsume the resources are quarantined. 40 
+Requirement: Access controls shall be established and enforced for accessing critical data in Near-RT RIC 41 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+19 
+ 
+Requirement: Communication between security zones shall require mutual authentication and authorization between 1 
+communicating xApps 2 
+ 3 
+5.6 Key Issue #5: Compromise of ML data pipelines used in 4 
+Near-RT RIC 5 
+5.6.1 Key issue detail 6 
+The Near-RT RIC contains database(s) which contain historic data collected from UE and RAN information. This 7 
+historic data can be used to train various ML models used in Near-RT RIC. Also, streaming data may be collected 8 
+from E2 nodes by some ML based xApps, and used either for training ML models or deriving inferences. 9 
+ML data pipelines can consist of several ML models, using one or more sources of data for training as well as 10 
+inference derivation. xApps can have ML pipelines implemented within, or can be using ML pipelines from another 11 
+xApps that provide analytics services. 12 
+ML data pipelines can be compromised due to: 13 
+• A potential vulnerability existing in the xApp that implements the ML pipeline 14 
+• Poisoning of ML training data due to compromised E2 node(s) 15 
+• Poisoning of ML training data due to compromised UE(s) 16 
+• Compromised database(s) which store historic data used for ML training 17 
+• Compromised interfaces of Near-RT RIC allowing a malicious intruder to alter some of the training data that 18 
+may be used to train ML models used by xApps 19 
+ 20 
+5.6.2 Security threats 21 
+T_ML_01 from ORAN Threat Modelling [1] is applicable here. 22 
+ 23 
+5.6.3 Potential security requirements 24 
+The following security requirements should be considered: 25 
+• Secure data storage, and secure data transfer mechanisms shall be implemented in Near-RT RIC. 26 
+• Authenticated and authorized access to data stores shall be implemented in Near-RT RIC. 27 
+• Near-RT RIC deployment shall have provision for regular security vulnerability patch updates for xApps. 28 
+• Integrity of xApps shall be monitored after installation as well as during runtime on a periodic or need basis. 29 
+• O-Cloud security requirements shall be adhered to, in order to ensure that the interfaces feeding data to ML 30 
+data pipelines are secured. 31 
+• Detection of compromised E2 nodes, and filtering ML data pipelines to exclude inputs from such nodes. 32 
+• Detection of compromised UE, and filtering ML data pipelines to exclude inputs from such UEs. 33 
+ 34 
+5.7 Key Issue #6: Altering the ML learning models used in Near-35 
+RT RIC 36 
+5.7.1 Key issue detail 37 
+Near-RT RIC hosts a set of xApps, some of which may contain ML based solutions performing inference and/or 38 
+training processes.  39 
+• ML enabled xApps can hold any required ML models and would be deployed as an integrated function.  40 
+o In such cases, if ML models use online training, or transfer learning, or reinforcement learning, or 41 
+other such mechanisms, it is likely that during runtime, the binary footprint of the models can 42 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+20 
+ 
+change for good reasons. However, this makes it a challenge to distinguish between maliciously 1 
+modified ML models and genuine model changes. 2 
+• xApps can also use ML models stored in databases or separate filesystems/storage 3 
+o xApps can perform online training of ML models by updating the models in DB, while ensuring that 4 
+the binary footprint of xApp remains un-changed 5 
+ 6 
+For xApps having embedded ML models, a compromise of ML models is likely due to following reasons: 7 
+• A potential vulnerability existing in xApp 8 
+• Security Weakness in APIs exposed by xApps 9 
+o For example, APIs allowing modifications of ML models using transfer learning can allow changes 10 
+of models by a malicious source, if authentication and authorization for such interfaces are not 11 
+strong 12 
+ 13 
+For xApps using ML models stored in DB/separate storage, a compromise of ML models is likely due to following 14 
+reasons: 15 
+• A potential vulnerability existing in xApp leading to compromised ML model updated in the DB 16 
+• A potential vulnerability existing in DB security 17 
+o Missing or weak authentication and authorization for DB 18 
+ 19 
+Transfer Learning can be implemented in a manner that Non-RT RIC can provide updated ML models to Near-RT 20 
+RIC via A1 interface. If this interface is compromised, or, if an un-authenticated or un-authorized source is allowed to 21 
+update ML models in Near-RT RIC, it can lead to unexpected behaviour of ML models. 22 
+ 23 
+5.7.2 Security threats 24 
+T_ML_02 from ORAN Threat Modelling [1] is applicable here. 25 
+An attacker can illegally access a machine learning model and alter its parameters and thereby influence how it 26 
+produces results. This can lead to wrong prediction and might result in catastrophic decisions if the results of the 27 
+predictions were being used to make key business decisions. 28 
+Also, an attacker can extract sensitive or confidential data that, through training, are built right into the ML model. 29 
+ 30 
+5.7.3 Potential security requirements 31 
+Following security requirements should be considered: 32 
+• Integrity of xApps shall be monitored after installation as well as during runtime on a periodic or need basis. 33 
+• Secure data storage, and secure data transfer mechanisms shall be implemented in Near-RT RIC. 34 
+• Authenticated and authorized access to data stores shall be implemented in Near-RT RIC.Security measures 35 
+shall be ensured to allow only authenticated and authorized applications providing ML model updates over 36 
+the A1 interface. 37 
+ 38 
+5.8 Key Issue #7: Data Protection and Privacy in Near-RT RIC 39 
+Database 40 
+5.8.1 Key issue detail 41 
+The Near-RT RIC contains database(s) which contain sensitive UE and RAN information, including history of the 42 
+network state, configurations related to E2 Nodes, cells, bearers, flows, UE identities, and the mappings between 43 
+them. Overlayed on top of these databases is the shared data layer (SDL) which enables xApp access. There is 44 
+currently no model for authentication or authorization for the database(s). The Near-RT RIC requires security 45 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+21 
+ 
+mechanisms in place to ensure xApps have authenticated access to the database(s) and may access only parts of the 1 
+database(s) in which they have permission to access. Adverse effects may result if no security mechanisms are in 2 
+place, such as manipulation of database information.  3 
+5.8.2 Security threats 4 
+xApps that have gained unauthorized access to Near-RT RIC database(s) have the ability to: 5 
+ Perform unauthorized database operations and manipulate database information to impact network service 6 
+and performance 7 
+ Export sensitive data from the Near-RT RIC database(s) (data or user privacy threat) 8 
+ Monitor the database for specific information and take an adverse action 9 
+5.8.3 Potential security requirements 10 
+Near-RT RIC shall authenticate xApp access to the Near-RT RIC database(s) during SDL registration.  11 
+Near-RT RIC shall provide authorized access to Near-RT RIC database(s).  12 
+ 13 
+5.9 Key Issue #8: Onboarding untrusted xApps 14 
+5.9.1 Key issue detail 15 
+As per definition in [3], an xApp is an application designed to run on Near-RT RIC. It may consist of one or more 16 
+microservices. It is independent of Near-RT RIC and may be provided by any third party. As part of offering its 17 
+service to Near RT-RIC, some of the xApp’s functionalities include  18 
+- communicating with Near-RT RIC platform via Near-RT RIC API,  19 
+- providing the APIs it produces to other xApps and Near-RT RIC,  20 
+- collecting near real-time information from E2 Nodes and influence behaviour of E2 Nodes and  21 
+- accessing Near-RT RIC Databases (via SDL) which gives access to sensitive information related to UE and RAN  22 
+Onboarding an untrusted third party xApp onto Near-RT RIC can create serious security issues which can 23 
+compromise the Near-RT RIC functionality, impact the availability of other xApps and have cascading impact on 24 
+overall performance of ORAN. 25 
+ 26 
+5.9.2 Security threats 27 
+Onboarding an untrusted third party xApp onto Near-RT RIC can cause similar or same security threats as a 28 
+Malicious or Badly configured xApp. Some well-known and easily administrated attacks with untrusted xApps are: 29 
+- If the xApp is not from a trusted source or is not maintained by a trusted source, it could contain security 30 
+vulnerabilities or back doors which could be exploited by the attackers and impact Near-RT RIC functions 31 
+- The untrusted/unverified xApp could provide APIs with weak security (weak or no authentication and 32 
+authorizaton) and such xApps could be easy target for attackers to break in and propagate lateral movement 33 
+of attack in the system (towards other xApps). 34 
+- The untrusted/unverified xApp could expose more services than required and such xApps could expose a 35 
+large attack surface to the attackers to break in and gain access, manipulate configurations, access logs, insert 36 
+back doors 37 
+- The untrusted/unverified xApp can be used to sniff sensitive UE information which can be used by attackers 38 
+or the untrusted/unverified xApp itself for rogue purposes 39 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+22 
+ 
+ 1 
+5.9.3 Potential security requirements 2 
+Requirement: The xApp shall be compliant to industry standards for API security (eg : OWASP Top 10) 3 
+Requirement: The xApp shall be free of any known software vulnerabilities. 4 
+Requirement: The xApp shall be authenticated before the app is onboarded to the cloud platform and registered onto 5 
+the Near-RT RIC platform 6 
+Requirement: The xApp shall support appropriate authorization schemes to make sure that a user accessing its 7 
+service shall not be able to execute any actions that the user is not authorized for.  8 
+Requirement: The xApp shall harden its service offering by making sure that only required services should be 9 
+exposed to its users. 10 
+ 11 
+5.10 Key Issue #9: xApp exploitation via malicious A1 policies 12 
+5.10.1 Key issue detail 13 
+The Non-RT RIC defines policies that are provided to the Near-RT RIC over the A1 interface. The purpose of the A1 14 
+policies is to guide and optimize the RAN, and the policies inform behavior of xApps in the Near-RT RIC. [9] 15 
+Unauthorized access to the Non-RT RIC enables the creation of ‘false policies’ that can be issued to the Near-RT RIC 16 
+for enforcement. Existing Near-RT RIC policies could also be modified to achieve a false policy. False policies 17 
+passed to the Near-RT RIC would be persistent until they were modified or deleted by the Non-RT RIC or the Near-18 
+RT RIC power cycles. 19 
+5.10.2 Security threats 20 
+False policies can be created to have numerous impacts to the normal performance of the RAN. A single false A1 21 
+policy can target a specific UE, groups of UEs, or an entire cell. A false policy could influence the Near-RT RIC to 22 
+configure the O-DU and O-RU functions to support Denial of Service (DoS) attacks by simply using feedback data to 23 
+degrade RAN performance.  24 
+False policies could also be used for the purpose of locating a subscriber or group of subscribers. In this case, the false 25 
+policy would cause the Near-RT RIC to isolate a subscriber in the O-CU. The Near-RT RIC could also use MIMO 26 
+beamforming in the O-DU and O-RU to isolate a user onto a single beam. The data feedback from the RAN can 27 
+include UE location or trajectory information from GPS data. The subscriber location would be attained from access 28 
+to the Non-RT RIC in the SMO function. 29 
+The Near-RT RIC is capable of steering traffic to achieve optimal QoS or QoE performance. A false policy could 30 
+notionally cause the Near-RT RIC to steer user data to isolate the data in order to facilitate a cyber-attack. 31 
+5.10.3 Potential security requirements 32 
+Security protections are defined for the A1 interface and security work is in process for A1 related APIs and the Non-33 
+RT RIC. For example, A1 peering should be established with only trusted sources using TLS 1.2, or higher, and PKI 34 
+X.509 certificates, as specified in [19].  TLS also provides confidentiality and integrity protection. Additional Near-35 
+RT RIC authentication of the A1 policy may be a consideration later, after the above security protections are defined 36 
+and evaluated. 37 
+A perimeter security approach may enable an internal threat actor to conduct a MitM attack on the A1 interface.  38 
+Security for the Near-RT should take a zero-trust approach in which security controls are implemented at the Near-RT 39 
+RIC without assumption of a secure perimeter. The Near-RT RIC could implement security controls consistent with a 40 
+zero-trust architecture in which there is no assumption of perimeter defenses being provided by other O-RAN 41 
+functions.  For example, the Near-RT RIC could provide checking and validation of policies received from the Non-42 
+RT RIC on the A1 interface. 43 
+ 44 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+23 
+ 
+5.11 Key Issue #10: Near-RT RIC APIs authentication 1 
+5.11.1 Key issue detail 2 
+Like any software, APIs can be compromised, and data can be intercepted. APIs can be manipulated causing service 3 
+disruptions and can be subject as well to DoS attacks. Authentication, an essential part of secure communication, 4 
+ensures that an attribute claimed by a given entity (e.g., its identity) is actually correct. In the context of secure 5 
+communication between xApps and Near-RT RIC platform, the platform shall authenticate all xApps instances and 6 
+only provide them with the information and services for which they are authorized through the use of the Near-RT 7 
+RIC APIs, as a key objective to guarantee the validity of the transferred messages. xApps can also act as service 8 
+producers, exposing APIs to be consumed by other xApps for example. In that case, the xApps ‘producers’ shall 9 
+authenticate the instances interested in consuming those xApp services. Authentication is also a prerequisite for 10 
+conducting authorization which itself is another key issue for API Security.  11 
+Note that using the xApp registration procedure Near-RT platform performs authentication and validation of the 12 
+xApp, addressed in solution #1, however xApps, as consumers of the services exposed by Near-RT RIC APIs, are not 13 
+authenticated as per current O-RAN specifications at the time of requesting those services.    14 
+5.11.2 Security threats 15 
+Not mutually authenticating xApps and Near-RT RIC platform APIs could potentially allow attackers to perform the 16 
+following type of attacks [17]: 17 
+- Operating malicious xApp claiming to be genuine in order to request certain services (theft of services) or 18 
+information (data leakage) 19 
+- Man in the middle attacks between a genuine xApp and a Near-RT RIC platform API 20 
+- Querying network or UE information from a compromised xApp to Near-RT RIC platform (e.g. database via 21 
+SDL API), thereby leaking potentially sensitive data about network and/or UE (potential privacy issues)  22 
+- Subscribing a malicious xApp to services provided by the Near-RT RIC platform, such as API-related events 23 
+notifications, discovery of APIs, E2SM, etc.  24 
+The use of weak credentials in the process of API authentication can compromise the overall system. The 25 
+user/password combination isn’t considered safe, not only for password related attacks (e.g., brute-force), but also it 26 
+would represent a high risk to allow xApps, especially 3rd party xApps, to store the user/password combo. This 27 
+approach would extend the attack surface into xApps side.    28 
+As a reference, OWASP API Security Top 10 report [10] indicates that authentication mechanisms are often 29 
+implemented incorrectly, allowing attackers to compromise authentication tokens or to exploit implementation flaws 30 
+to assume other user's identities temporarily or permanently. Compromising system's ability to identify the client/user, 31 
+compromises API security overall. 32 
+5.11.3 Potential security requirements 33 
+The communication between xApps and Near-RT RIC platform APIs shall be authenticated at least at the transport 34 
+layer (for e.g., with mutual TLS). 35 
+At application layer complementary end to end authentication mechanisms based on JSON Web Tokens (JWTs) may 36 
+be considered as well.  37 
+ 38 
+5.12 Key Issue #11: Near-RT RIC APIs authorization 39 
+5.12.1 Key issue detail 40 
+Authorization is the function of specifying and enforcing access rights or privileges to certain resources or services. In 41 
+the actual context of Near-RT RIC, the platform as API producer shall be responsible to specify those rights/privileges 42 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+24 
+ 
+for the platform services as resources to the xApps as consumers. In general, an xApp should only have the required 1 
+set of permissions to perform the actions for which they are authorized, and no more.  2 
+  Note. The investigation of services for which the API producer is the xApp is FFS [3]. 3 
+Authorization mechanisms are to be enforced by the Near-RT RIC platform among other in the following key API 4 
+procedures [3]: 5 
+- Discovery of Near-RT RIC APIs: The Near-RT RIC platform shall provide means to restrict xApps from 6 
+discovery of some published APIs based on configuration policies. 7 
+- E2 Subscription API procedure: The subscription management shall be based on operator’s policies. An 8 
+xApp may be restricted to interface with only a subset of E2 Nodes by such policies. This procedure 9 
+establishes a set of preconditions that assume authorization procceses: 10 
+o xApp has been authorized to issue E2 Subscription API requests 11 
+o xApp has been authorized to request guidance from Conflict mitigation 12 
+o xApp Subscription Management has been configured to permit E2 Subscription API requests only 13 
+from specific list of xApps.     14 
+- E2 Control API procedure: Only authorized xApps may initiate RIC control request messages issued by 15 
+the Near-RT RIC over the E2 interface to the E2 Nodes, for a specific scope (e.g, E2 Node list, RAN 16 
+function, etc.).  17 
+- E2 Guidance API procedure: The purpose of this procedure only authorized xApp to obtain guidance from 18 
+the conflict mitigation platform function prior to initiating an action.  19 
+- SDL API procedures: The precondition to consume the services exposed by SDL API (e.g, client 20 
+registration, fetch data, notification, store, etc.) is that xApps have been successfully registered and 21 
+authorized.  22 
+5.12.2 Security threats 23 
+If the API consumers are not authorized by the API producers, attackers (e.g, malicious xApps) would potentially be 24 
+able to perform the following types of attacks: 25 
+- Abuse and/or theft of services or information (data leakage), requesting and successfully obtaining them 26 
+from the platform, e.g, in order to extract potentially sensitive information from the network and/or UEs 27 
+- Negatively impacting the network performance due to malicious policies over E2 Nodes 28 
+- Flooding the platform with resource demanding operations that may lead to a Denial of Service attack 29 
+As a reference, OWASP API Security Top 10 report [10] indicates that ‘Broken Object Level Authorization’ has been 30 
+the most common and impactful attack on APIs. Even if the application implements a proper infrastructure for 31 
+authorization checks, developers might forget to use these checks before accessing a sensitive object. Unauthorized 32 
+access can result in data disclosure to unauthorized parties, data loss, or data manipulation. 33 
+5.12.3 Potential security requirements 34 
+Near-RT RIC architecture shall provide an authorization framework for the consumption of the services exposed in 35 
+the platform APIs by the xApps, that takes operator policies into consideration. The framework should be used by the 36 
+specified API procedures in [3]. 37 
+The authorization framework may need to consider the level of trust related to the xApp (e.g. 3rd party xApp, RIC-38 
+owned xApp, etc.) 39 
+ 40 
+ 41 
+ 42 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+25 
+ 
+6 Mitigations and Solutions 1 
+6.1 Introduction 2 
+This section will contain any potential Mitigations or Solutions that may be used to address or reduce the risk 3 
+associated with Key Issues identified in section 5. 4 
+6.2 Solution #1: Secure onboarding and deployment of xApps in 5 
+Near-RT RIC 6 
+6.2.1 Introduction 7 
+xApps are applications that are onboarded to the SMO, deployed on the Near-RT RIC, and then registered in the 8 
+Near-RT RIC. At each of these steps in the xApp life cycle, security measures can be applied to ensure that the xApp 9 
+comes from a valid solution provider and is integrity protected. 10 
+6.2.2 Solution details 11 
+Onboarding to the SMO is the first step of the xApp life cycle. This solution details the flow from the xApp solution 12 
+provider to the SMO in Figure 6.2.2-1.  13 
+ 14 
+Figure 6.2.2-1: Onboarding xApp to SMO 15 
+1. Solution provider digitally signs the xApp and sends to the Service Provider. 16 
+2. The Service Provider validates the digital signature for code integrity, performs a schema check and any 17 
+operational testing, and then adds their signature to the package.  18 
+3. The xApp is published into the catalogue for visibility by the SMO. 19 
+The next step of the xApp life cycle is deployment on the Near-RT RIC, which starts with a request to the SMO from 20 
+the NF Install Project Manager to deploy new xApps on the RIC, per [23]. The SMO maps the RIC variables and 21 
+instructs the O-Cloud DMS to create the xAPP Deployment and allocate the resources necessary on the Near-RT RIC 22 
+O-Cloud. The DMS notifies the SMO that the xAPP Deployment has been created and the DMS assigns a 23 
+Deployment ID which the SMO uses to update its xApp inventory. At the end of the deployment process, the xApp 24 
+starts the registration process with the Near-RT RIC by sending a registration request to Near-RT RIC Management 25 
+Services function, per [3].  26 
+This solution proposes a security validation request sent from the Management Services to the Security Function in 27 
+the Near-RT RIC, as shown in Figure 6.2.2-2.  28 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+26 
+ 
+ 1 
+Figure 6.2.2-2 - Authentication during Deployment Process 2 
+Once the xApp is deployed and has sent a registration request to Management Services: 3 
+1. In the Near-RT RIC, a xApp validation request is sent from Management Services to the Security Function. 4 
+2. The Security Function performs the following checks:  5 
+a. Validate the signature of the Service Provider. Confirm the signing Service Provider is the trusted 6 
+Service Provider. This proves that the valid Service Provider approved the xApp, and that the xApp 7 
+has not been modified since it was approved for use by the Service Provider.  8 
+i. Note – Consideration on different security validation processes for 3rd party xApps, as 9 
+compared to xApps from the Near-RT RIC platform provider, is FFS after the impacts of 10 
+all key issues and solutions have been studied.  11 
+b. Validate signature of the xApp Solution Provider. Confirm that the signing xApp Solution Provider 12 
+is a member of a trusted list of providers. This proves that the xApp came from a trusted provider 13 
+and has not been modified since the Solution Provider released it.  14 
+c. Verify that neither the Service Provider nor Solution Provider certificates are revoked. This ensures 15 
+that nothing has changed to imply either signature can no longer be trusted.  16 
+3. A security validation response is sent back to Management Services, who can then continue with the xApp 17 
+registration process if the checks are successful.  18 
+In the context of WG3 Near-RT RIC Architecture specification [3], this solution would be added to Figure 9.3.1-19 
+1 to fill in details of the authentication and validity checks during registration processing.  20 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+27 
+ 
+ 1 
+Figure 6.2.2-3 – Extended xApp Registration procedure from [3] 2 
+ 3 
+6.2.3 Evaluation 4 
+By requiring a secure onboarding process with authentication for all xApps, this solution addresses key issues #1, #2, 5 
+#8.  6 
+ 7 
+6.3 Solution #2: Security management of risks in open-source 8 
+components of Near-RT RIC architecture 9 
+6.3.1 Introduction 10 
+O-RAN Near-RT RIC and xApps software components will hugely depend on open-source software and open-source 11 
+libraries, because of agility, flexibility, community support, cost-effectiveness and many other benefits open-source 12 
+community provides to meet modern software development. However, on the flip side, there are a number of risks 13 
+associated with open-source software which needs to be managed.  14 
+Key risks with Near-RT RIC and xApps open-source components:  15 
+• Open-source software provides opportunity for attackers to exploit any known vulnerabilities. A bad actor 16 
+can use publicly available information to target Near-RT RIC open-source components that have not 17 
+implemented a patch for known vulnerabilities.  18 
+• Non-adaptation of secure software development practices results in unintentional insertion of vulnerable 19 
+code, propagation of vulnerable code and libraries. 20 
+• Intentional backdoors can be inserted by malicious developers. 21 
+• Attackers can review the code to identify vulnerabilities.  22 
+• Non-compliance of Near-RT RIC open-source license could lead to legal action, affecting business 23 
+operations and incurring financial damage to consumers. It's critical for consumers to establish processes to 24 
+manage open-source software license compliance. 25 
+ 26 
+6.3.2 Solution details 27 
+Recommended Security best practices to manage open-source software risks listed in section 6.3.1 28 
+Maintain open-source Near-RT RIC components and xApps Inventory  29 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+28 
+ 
+• Recommended to have Software Composition Analysis tooling to automatically scan and identify all open-1 
+source components, version(s) in use, all package dependencies, libraries, and create an accurate bill of 2 
+materials (BOM), checks for policy and license compliance, security risks, protect against threats to 3 
+intellectual property (IP) and version updates.  4 
+ 5 
+Track and analyse open-source Near-RT RIC components and xApps vulnerabilities  6 
+• Track known vulnerabilities against the inventory of open-source software and libraries.  7 
+• Run automated static application security testing to identify known vulnerabilities in open-source software      8 
+components. 9 
+• Create SBOM to facilitate identification of a potential vulnerability in the software product when a CVD is       10 
+released for an open-source binary, library, or package. 11 
+• Perform frequent scanning for known vulnerability or misconfiguration on open-source container image 12 
+during build phase, within the registry, before deployment and during run time. Recommended to use 13 
+automated tools integrated into the CI/CD pipeline.  14 
+• Perform dynamic application security testing (DAST) which can be tuned and trained to detect run-time 15 
+vulnerabilities. 16 
+• Continuously monitor open-source workload during runtime for any security risks and vulnerabilities.  17 
+• Conduct Penetration testing to identify and resolve critical security defects.  18 
+ 19 
+Remediate open-source vulnerabilities  20 
+ 21 
+Software vulnerabilities fall into three categories: publicly known with a patch available for the software; publicly 22 
+known without a patch (n-day); and not publicly known (0-day). Although measures should be taken to mitigate the 23 
+risk of n-day and 0-day vulnerabilities, patching publicly known vulnerabilities as quickly as possible significantly 24 
+reduces the risk of exploitation. 25 
+• Patch critical vulnerabilities in the operational environment within [policydefined, suggested: < 15] days and 26 
+other vulnerabilities within [policy-defined, suggested: <60] days. 27 
+• Refer to [30] 28 
+• Refer to [28]  29 
+ 30 
+Continuously monitor for new open-source risks 31 
+ 32 
+• Perform frequent scanning for known vulnerabilities during run time.  33 
+• Enable security audit logs for monitoring security events.  34 
+• Dynamic application security testing (DAST) which can be tuned and trained to detect run-time 35 
+vulnerabilities. 36 
+ 37 
+Secure Software development practice  38 
+Security Best practices based on openssf secure software development practices  39 
+ 40 
+• The project MUST have at least one primary developer who knows how to design secure software.  41 
+• At least one of the project's primary developers MUST know of common kinds of errors that lead to 42 
+vulnerabilities in this kind of software, as well as at least one method to counter or mitigate each of them 43 
+• Use basic good cryptographic practices 44 
+o The software produced by the project MUST use, by default, only cryptographic protocols and 45 
+algorithms that are publicly published and reviewed by experts (if cryptographic protocols and 46 
+algorithms are used).  47 
+o If the software produced by the project is an application or library, and its primary purpose is not to 48 
+implement cryptography, then it SHOULD only call on software specifically designed to implement 49 
+cryptographic functions; it SHOULD NOT re-implement its own. 50 
+o All functionality in the software produced by the project that depends on cryptography MUST be 51 
+implementable using FLOSS. 52 
+o The default security mechanisms within the software produced by the project MUST NOT depend on 53 
+broken cryptographic algorithms (e.g., MD4, MD5, single DES, RC4, Dual_EC_DRBG), or use cipher 54 
+modes that are inappropriate to the context, unless they are necessary to implement an interoperable 55 
+protocol (where the protocol implemented is the most recent version of that standard broadly supported 56 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+29 
+ 
+by the network ecosystem, that ecosystem requires the use of such an algorithm or mode, and that 1 
+ecosystem does not offer any more secure alternative). The documentation MUST describe any relevant 2 
+security risks and any known mitigations if these broken algorithms or modes are necessary for an 3 
+interoperable protocol.  4 
+o The default security mechanisms within the software produced by the project SHOULD NOT depend on 5 
+cryptographic algorithms or modes with known serious weaknesses (e.g., the SHA-1 cryptographic hash 6 
+algorithm or the CBC mode in SSH). 7 
+o The security mechanisms within the software produced by the project SHOULD implement perfect 8 
+forward secrecy for key agreement protocols so a session key derived from a set of long-term keys 9 
+cannot be compromised if one of the long-term keys is compromised in the future. 10 
+o If the software produced by the project causes the storing of passwords for authentication of external 11 
+users, the passwords MUST be stored as iterated hashes with a per-user salt by using a key stretching 12 
+(iterated) algorithm (e.g., Argon2id, Bcrypt, Scrypt, or PBKDF2).  13 
+o The security mechanisms within the software produced by the project MUST generate all cryptographic 14 
+keys and nonces using a cryptographically secure random number generator and MUST NOT do so 15 
+using generators that are cryptographically insecure. 16 
+• Secured delivery against man-in-the-middle (MITM) attacks 17 
+o The project MUST use a delivery mechanism that counters MITM attacks. Using https or ssh+scp is 18 
+acceptable. 19 
+o A cryptographic hash (e.g., a sha1sum) MUST NOT be retrieved over http and used without checking 20 
+for a cryptographic signature. 21 
+• Publicly known vulnerabilities fixed 22 
+o There MUST be no unpatched vulnerabilities of medium or higher severity that have been publicly 23 
+known for more than 60 days. 24 
+o Projects SHOULD fix all critical vulnerabilities rapidly after they are reported.  25 
+• Static code analysis 26 
+o At least one static code analysis tool (beyond compiler warnings and "safe" language modes) MUST be 27 
+applied to any proposed major production release of the software before its release, if there is at least one 28 
+FLOSS tool that implements this criterion in the selected language. 29 
+o It is SUGGESTED that at least one of the static analysis tools used for the static_analysis criterion 30 
+include rules or approaches to look for common vulnerabilities in the analyzed language or environment. 31 
+o All medium and higher severity exploitable vulnerabilities discovered with static code analysis MUST 32 
+be fixed in a timely way after they are confirmed.  33 
+o It is SUGGESTED that static source code analysis occur on every commit or at least daily. 34 
+• Dynamic code analysis 35 
+o It is SUGGESTED that at least one dynamic analysis tool be applied to any proposed major production 36 
+release of the software before its release. 37 
+o All medium and higher severity exploitable vulnerabilities discovered with dynamic code analysis 38 
+MUST be fixed in a timely way after they are confirmed 39 
+ 40 
+Refer to open-source software best practices:  41 
+https://openssf.org/  https://openssf.org/training/courses/ 42 
+https://wiki.o-ran-sc.org/display/ORAN/Core+Infrastructure+Initiative+%28CII%29+Badging  43 
+https://wiki.o-ran-sc.org/display/ORAN/Projects 44 
+ 45 
+6.3.3 Evaluation 46 
+Recommended open-source best practices mitigates Near-RT RIC components and xApps open-source Risks. This 47 
+solution addresses key issues #1, #2, #5, #6, #8. 48 
+ 49 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+30 
+ 
+6.4 Solution #3: Authentication schema for APIs 1 
+6.4.1 Introduction 2 
+REST APIs and gRPC APIs are being considered as valid network solutions for Near-RT RIC API. REST APIs use 3 
+HTTP and support Transport Layer Security (TLS). REST APIs utilizes JavaScript Object Notation (JSON) as 4 
+encoding protocol. gRPC APIs use HTTP/2 and support as well TLS. In contrast with REST APIs, gRPC used 5 
+Protobuf as encoding protocol.  6 
+Time critical E2 related APIs are currently specified to run over SCTP/Protobuf network protocol stack. The security 7 
+network layer specified for E2 interface is IPSec (SEC-CTL-E2 [2]). DTLS is proposed as optional mechanism. 8 
+The solution proposes a basic network authentication schema for transactional APIs (REST and gRPC) based on 9 
+mutual TLS (mTLS) authentication via X.509 certificates. The use of mTLS serves a dual purpose: 10 
+- Mutual authentication 11 
+- Confidentiality protection for the authorization framework (solution #4) 12 
+mTLS is fully aligned with Zero Trust principles of O-RAN security architecture. 13 
+Additionally, the network authentication schema can be complemented by a client authentication schema at 14 
+application layer, with the use of secure tokens (e.g. JWT, secured with digital signatures based on JWS). 15 
+Authentication is a prerequisite of the authorization framework, applicable to those APIs. 16 
+For time critical E2 related APIs, secured by IPSec, the solution proposes IKEv2 certificate-based authentication 17 
+implementation according to O-RAN Security Protocols specification [19], which is aligned with 3GPP TS 33.310 18 
+specification [20] in terms of certificates and IKEv2 profiles.  19 
+ 20 
+6.4.2 Solution details 21 
+6.4.2.1 mTLS authentication 22 
+In mTLS both the client (e.g, xApp as API consumer) and the server (e.g, platform as API producer) require a 23 
+certificate, and both sides authenticate each other using their public/private key pair. The authentication process 24 
+includes the following steps: 25 
+- the client connects to server and requests access 26 
+- the server presents a server certificate 27 
+- the client verifies the server certificate 28 
+- the client presents a client certificate 29 
+- the server verifies the client certificate 30 
+- the server grants access 31 
+- client and server can exchange information over encrypted TLS connection 32 
+6.4.2.2 Application layer client authentication 33 
+The purpose of the solution is to perform an additional consumer authentication at application layer by the platform, 34 
+which acts as authorization server and producer. The process is as follows: 35 
+- The API consumer (e.g, xApp) shall attach a signed token in the service request towards the receiving end 36 
+point, i.e, authorization server, producer.  37 
+- The signed token includes the consumer instance ID (e.g, xApp ID), that can be checked against the 38 
+certificate by the producer 39 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+31 
+ 
+- The signed token includes a timestamp as basis for restriction of its lifetime. It could be even one per service 1 
+request, this is up to the configuration. 2 
+6.4.2.3 IPsec authentication 3 
+Please refer to O-RAN Security Protocols Specification [19], chapter 2.5 for supported IPsec capabilities in O-RAN.  4 
+In summary, the following options for IPSec authentication have been specified in [19]: 5 
+- Data origin authentication, always enabled 6 
+- ESP authentication transforms 7 
+- IKE endpoint Identification 8 
+- X.509v3 digital certificates provided by a Certificate Authority solution shall be supported 9 
+- Pre-shared Keys may be supported 10 
+- Key exchange shall be supported via IKEv2, profile as described in [21]. 11 
+ 12 
+6.4.3 Evaluation 13 
+The proposed authentication schema addresses the key issues #1, #2, #4, #5, #6, #7, #8, #9, #10, #11 14 
+Note. The authentication mechanisms described in the solution may be applicable to other O-RAN parts of the 15 
+architecture.  16 
+ 17 
+6.5 Solution #4: Authorization framework for APIs  18 
+6.5.1 Introduction 19 
+The proposed authorization framework is based on OAuth 2.0 as specified in RFC 6749 [11]. The OAuth 2.0 20 
+authorization framework enables a third-party application (e.g, xApp) to obtain limited access to a service (HTTP), 21 
+either on behalf of a resource owner by orchestrating an approval interaction between the resource owner and the 22 
+HTTP service, or by allowing the third-party application to obtain access on its own behalf.  23 
+OAuth 2.0 is the framework adopted in 3GPP 5G Service Based Architecture (SBA) [13], where the NRF (Network 24 
+Resource Function) acts as authorization server.  25 
+MEC specifications [15] mandate the use of OAuth 2.0 for authorization of access to RESTful MEC service APIs, and 26 
+ETSI NFV [14] also speficies the same framework for ETSI NFV-MANO APIs.  27 
+The proposed solution implementation in Near-RT RIC architecture of O-RAN is based on the options selected for 28 
+OAuth 2.0 in both standards developing organizations, 3GPP and ETSI.   29 
+6.5.2 Solution details 30 
+The roles defined in OAuth 2.0 has been assigned as follows: 31 
+- Resource owner / Resource server (producer): Near-RT RIC platform modules providing services via APIs. 32 
+- Client (consumer): xApp 33 
+Note.- xApp as API producer is FFS in current RIC Architecture specification. 34 
+- Authorization server: Security function in Near-RT RIC platform 35 
+Grants shall be of the type Client Credentials Grant, as described in clause 4.4 of RFC 6749 [11], and represented in 36 
+the following diagram: 37 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+32 
+ 
+ 1 
+Figure 4 - from RFC 6749 2 
+3GPP SBA specifies in [13] that access tokens shall be JSON Web Tokens as described in RFC 7519 [18], and are 3 
+secured with digital signatures or Message Authentication Cores (MAC) based on JSON Web Signature (JWS) as 4 
+described in RFC 7515 [18]. ETSI MEC can also use JWT, that may include scopes of roles to restrict the access to 5 
+MEC services. They may be signed to become tamper proof and encrypted. In general, the use of JWTs as access 6 
+tokens in Near-RT RIC will depend on the final specification for network API solutions by O-RAN WG3. 7 
+The authorization process entails two verifications: 8 
+- Check whether the consumer is permitted to discover the requested Near-RT RIC API via the Enablement 9 
+Discovery API during the discovery procedure. This is performed on per consumer granularity by the 10 
+authorization server 11 
+- Check whether the consumer is permitted to access the requested service producer for consuming the service 12 
+(e.g. SDL fetch data), on a per request type and corresponding subscription. The granularity is determined by 13 
+the service logic of the producer.  14 
+Management module of Near-RT RIC platform maintains the information of available producers and their supported 15 
+services, as each of them needs to register the list of services it supports.  16 
+The following schema represents the main steps of the entire authorization process: 17 
+ 18 
+Figure 5 - OAuth 2.0 process in Near-RT RIC 19 
+The overall OAuth 2.0 process is foreseen to take place after xApp registration and API discovery procedures 20 
+specified in Near-RT RIC. The main steps would be: 21 
+-  Registration procedure in Management service of Near-RT RIC platform 22 
+o xApp registration  23 
+Note 1. Solution #1 adds a security validation feature in this process.  24 
+Note 2. During the proposed registration/validation process the platform may check whether the 25 
+xApp is provided by 3rd party or is RIC-owned application.    26 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+33 
+ 
+o APIs registration by the producer via Enablement API 1 
+- Enablement API related procedures 2 
+o Discovery 3 
+ Basic: Static restriction based on the registration information in database 4 
+ Optional: Protection of Discovery services by OAuth 2.0, e.g. in case of 3rd party xApps 5 
+- OAuth 2.0 based authorization 6 
+o Services offered by the Near-RT RIC platform are described in the scope of the access token 7 
+provided to the xApp, required to use the specified APIs.  8 
+6.5.3 Evaluation 9 
+The proposed authorization framework addresses the key issues #1, #2, #4, #5, #6, #7, #8, #9, #10, #11 10 
+Note. The authorization mechanisms described in the solution may be applicable to other O-RAN parts of the 11 
+architecture.  12 
+ 13 
+6.6 Solution #5: Near-RT RIC database and SDL access control 14 
+mechanisms 15 
+6.6.1 Introduction 16 
+OAuth 2.0 as described in Solution 4 is used to ensure authorized xApp access to SDL API. Additional steps need to 17 
+be implemented to control granularity for the database access and that is considered in this solution. 18 
+This solution implements Role-Based Access Control (RBAC) to control and restrict xApp access to the information 19 
+stored in the Near-RT RIC database(s) and accessible via SDL APIs. Under RBAC, xApps would access the 20 
+database(s) according to their assigned role, and the assigned role determines what operations the xApp can perform 21 
+on what database.  22 
+6.6.2 Solution details 23 
+The solution is comprised of separate steps during the Onboarding to SMO process and during the SDL Registration 24 
+process. RBAC roles are assigned during the onboarding process where privileges are defined by the xApp Solution 25 
+Provider by a xApp database “token” and vetted by the Service Provider. The token needs granularity for data and 26 
+operations in order to control access.  27 
+ 28 
+Figure 6 - xApp database token during onboarding 29 
+As part of the xApp onboarding to SMO process: 30 
+1. The xApp Solution Provider generates a database “token” that declares what kind of database access and 31 
+operations the xApp would need. This is sent to the Service Provider along with the xApp.  32 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+34 
+ 
+2. The Service Provider vets the proposed database access and operations during xApp validation by agreeing 1 
+to the access rights requested by the xApp. 2 
+3. The database “token” is passed to the SMO when the xApp is onboarded.  3 
+Before accessing the database, the xApp must register with the SDL using the SDL Client Registration procedure. 4 
+This solution adds in an access authorization step before the xApp is allowed to register with the SDL. The Security 5 
+Function uses the xApp database token to identify which roles the xApp is authorized for. 6 
+  7 
+Figure 7 – Modified SDL Client Registration Procedure from [3] 8 
+1. The xApp sends SDL Client Registration request to the SDL to access the database in the Near-RT RIC 9 
+Platform. 10 
+a. After the receipt of the request, the SDL sends a client authorization request to the Security 11 
+Function. 12 
+b. The Security Function performs access authorization for the xApp by comparing the database 13 
+“token” from the xApp with the one validated by the Service Provider. After verification, the 14 
+security function will assign the xApp a role based on the token. 15 
+c. The Security Function sends a client authorization response to SDL. 16 
+2. SDL arranges with the database the permission for the xApp to access the database (if authentication is 17 
+successful). 18 
+3. The SDL sends the response of successful or failed registration to the xApp. 19 
+6.6.3 Evaluation 20 
+This solution addresses key issue #7 Data protection and privacy in Near-RT RIC Database(s), and key issues #4, #5, 21 
+#6.  22 
+ 23 
+6.7 Solution #6: Security Logging (part of FCAPS) 24 
+NOTE: Security Logging will be tackled in dedicated Work Item study to Security Log Management within O-RAN 25 
+Security Focus Group 26 
+6.7.1 Introduction 27 
+Void 28 
+
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+35 
+ 
+6.7.2 Solution details 1 
+Void 2 
+6.7.3 Evaluation 3 
+Void 4 
+ 5 
+6.8 Solution #7: Access control mechanism for API 6 
+repository/registry 7 
+6.8.1 Introduction 8 
+Near-RT RIC architecture specification [3] provides the following requirement in clause 5.1.3: ‘Near-RT RIC shall 9 
+provide means to restrict xApps from discovery some published APIs based on configured policies.’  10 
+The same specification in clause 6.2.8 describes the API Enablement function, which provides the discovery service 11 
+as well as repository/registry services for the Near-RT RIC APIs.  12 
+‘API Enablement provides support for registration, discovery and consumption of Near-RT RIC APIs within the Near-13 
+RT RIC scope. In particular, the API enablement services include: 14 
+• Repository / Registry services for the Near-RT RIC APIs; 15 
+• Services that allow discovery of the registered Near-RT RIC APIs; 16 
+• Services to authenticate xApps for use of the Near-RT RIC APIs; 17 
+• Services that enable generic subscription and event notification; 18 
+• Means to avoid compatibility clashes between xApps and the services they access. 19 
+ 20 
+The API enablement services can be accessed by the xApps via one or more enablement APIs.  21 
+NOTE: The provided enablement APIs may need to consider the level of trust related to the xApp (e.g. 3rd party xApp, 22 
+RIC-owned xApp, etc.)’ 23 
+The proposed solution addresses: 24 
+- The access control to API enablement function providing API authentication and authorization mechanisms. 25 
+- The level of trust related to the xApp via a secure onboarding and deployment of xApps in Near-RT RIC 26 
+platform. 27 
+ 28 
+6.8.2 Solution details 29 
+API authentication (mutual TLS) and authorization (OAuth 2.0) mechanisms, providing the necessary access control 30 
+to API Enablement function, are described in solutions #3 and #4 of the present document respectively. 31 
+Secure onboarding and deployment procedure of xApps in Near-RT RIC, considers the level of trust related to the 32 
+xApp by ensuring that the xApp comes from a valid solution provider and is integrity protected.  The solution is 33 
+described in solution #1 of the present document. 34 
+6.8.3 Evaluation 35 
+Solutions #1, #3 and #4 of the present address the security requirements related to API Enablement function coming 36 
+from the Near-RT RIC architecture [3] in clauses 5.1.3 and 6.2.8, specifically related to access control and 37 
+considerations around the level of trust of xApps.  Key issues #4, #7, #8, #10 and #11 are addressed by the solution. 38 
+ 39 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+36 
+ 
+ 1 
+6.9 Solution #8: Secure mechanisms for E2 interface 2 
+6.9.1 Introduction 3 
+Secure mechanisms for E2 interface are provided in existing SFG specifications, in particular in O-RAN.SFG.O-4 
+RAN-Security-Requirements-Specifications-v-02.00 [2], clause 3.2.4. 5 
+6.9.2 Solution details 6 
+Refer to O-RAN.SFG.O-RAN-Security-Requirements-Specifications-v-02.00 [2], clause 3.2.4. 7 
+6.9.3 Evaluation 8 
+NOTE: Authorization solutions to access E2 nodes and associated services by xApps are for further study. Security 9 
+mechanisms for E2 interface address key issues #3, #5 and #10.  10 
+ 11 
+6.10 Solution #9: Secure mechanisms for A1 interface 12 
+6.10.1 Introduction 13 
+The Near-RT RIC receives policies from the Non-RT RIC across the A1 interface.  While the A1 interface is 14 
+considered secure with controls that provide confidentiality, integrity, and mutual authentication, the Near-RT RIC 15 
+should not assume that the policies are valid and trusted.  The Near-RT RIC should provide security built-in compliant 16 
+with a zero-trust architecture based upon the principle that perimeter security is insufficient to protect against internal 17 
+threats.   18 
+NOTE: A1 related security mechanisms will be tackled in Non-RT RIC Security technical report (to be released) 19 
+6.10.2 Solution details 20 
+Security controls for the Near-RT-RIC that could be implemented as part of its A1 Termination include: 21 
+1. Check policies received on A1 conform to defined schema. See also clause 6.13, Solution #12: A1 Policy 22 
+Authentication of the present document. 23 
+2. Validate policy values for validity and range 24 
+3. Provide rate limiting on A1 to prevent resource exhaustion and DoS 25 
+4. Implement security logging for each of the above failure events 26 
+ 27 
+6.10.3 Evaluation 28 
+The solution addresses key issues #9 and #6 29 
+ 30 
+6.11 Solution #10: Secure mechanisms for O1 interface 31 
+6.11.1 Introduction 32 
+Secure mechanisms for O1 interface are provided in existing SFG specifications, in particular in O-RAN.SFG.O-33 
+RAN-Security-Requirements-Specifications-v-02.00 [2], clause 3.2.2. 34 
+6.11.2 Solution details 35 
+Refer to O-RAN.SFG.O-RAN-Security-Requirements-Specifications-v-02.00 [2], clause 3.2.2. 36 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+37 
+ 
+6.11.3 Evaluation 1 
+NOTE: xApps are managed via Near-RT RIC, not directly by SMO. Adequacy of existing security mechanisms 2 
+specified for O1 in management of xApps is for further study. Key issue #4 is addressed by O1 security mechanisms.  3 
+ 4 
+6.12 Solution #11: Mitigation for conflicting xApps 5 
+6.12.1 Introduction 6 
+WG3 has already defined a process to seek guidance from the Near-RT RIC Conflict Mitigation function prior to 7 
+initiating a RIC function procedure. The purpose of the Conflict Mitigation function is to resolve potentially 8 
+overlapping or conflicting request from multiple xApps. These are currently optional procedures [3].  9 
+This guidance can be initiated by 4 different actors at different points in the life cycle of an xApp:  10 
+- Initiated by an authorized xApp  11 
+- Initiated by Subscription Management function  12 
+- Initiated by message monitoring by the Conflict Mitigation function 13 
+- Initiated by Conflict Mitigation function 14 
+For these procedures, the assumption from WG3 is that the Conflict Mitigation function has access to sufficient 15 
+information to detect a potential conflict and take a decision on an optimal mitigation solution [3]. 16 
+6.12.2 Solution details 17 
+This solution proposes to make the first procedure, Conflict Mitigation guidance initiated by an authorized xApp, 18 
+mandatory during the E2 Subscription procedure, which is performed at the end of xApp Registration. The E2 19 
+Subscription procedure is detailed in [3] in Section 9.3.2.1, with the xApp initiated E2 Guidance Request procedure 20 
+described in Section 9.3.3.1 [3]. 21 
+Performing this guidance request during xApp Registration would mitigate conflicts arising from newly deployed 22 
+xApps. Additional consideration is needed for conflicts arising after deployment, once additional Conflict Mitigation 23 
+messages and procedures are defined in WG3.  24 
+ 25 
+6.12.3 Evaluation 26 
+The solution addresses key issue #3.  27 
+ 28 
+6.13 Solution #12: A1 Policy authentication 29 
+6.13.1 Introduction 30 
+A1 policies are provided by the Non-RT RIC to the Near-RT RIC over the A1 interface, which already has security 31 
+protections as defined in [2]. The security control for the A1 interface is TLS at the transport layer. In addition, the 32 
+Near-RT RIC APIs include A1 related APIs for A1 Policy Setup, Update, and Delete procedures [3]. Security for 33 
+these APIs is considered in key issues 10 and 11 and solutions 3, 4, and 13 of this technical report. 34 
+6.13.2 Solution details 35 
+For a malicious A1 policy to successfully affect the Near-RT RIC, the policy first must contain a valid policy type 36 
+supported by the Near-RT RIC, in order to pass the policy type check at the A1 Termination in the Near-RT RIC. The 37 
+policy must then be mapped to an xApp in the Near-RT RIC. Finally, to exploit an xApp for malicious intent as 38 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+38 
+ 
+described in Key Issue 9, the A1 policy needs to have capabilities to execute any of the security threats outlined. The 1 
+access and knowledge required to complete this sequence of events implies a skilled adversary.  2 
+Securing the endpoints of the A1 interface is another factor in preventing xApp exploitation by malicious A1 policies. 3 
+This work item (WG3Sec) in SFG addresses the Near-RT RIC side of the A1 interface. On the other end, the 4 
+requirements and security controls for the SMO are FFS for the SFG Security Requirements specification, but there is 5 
+a newly started work item (SecureNonRTRIC) to secure the Non-RT RIC in the SMO. This new work item will 6 
+address the security and data privacy of the Non-RT RIC, A1 interface, R1 interface, and external interfaces.  7 
+With the A1 interface itself secured, security of the A1 interface endpoints in progress, A1 related APIs security in 8 
+progress for authentication and authorization, and the challenges of generating a malicious policy, the likelihood of 9 
+xApp exploitation via malicious A1 policies is judged to be very low. Further examination of this issue should be 10 
+performed upon completion of the relevant SFG work items, but at the moment, no additional A1 policy 11 
+authentication is deemed necessary. 12 
+6.13.3 Evaluation 13 
+This solution describes the protections against the security threats in key issue #9. 14 
+ 15 
+6.14 Solution #13: Network Security layer for APIs 16 
+6.14.1 Introduction 17 
+The following network layers are being proposed for the Network APIs in Near-RT RIC by O-RAN WG3: 18 
+ 19 
+This solution proposes to add a security layer in the current network protocol stack for the different APIs specified in 20 
+Near-RT RIC architecture.  21 
+6.14.2 Solution details 22 
+TLS is proposed as a solution for transactional Near-RT RIC APIs based on HTTP or HTTP/2. REST APIs use HTTP 23 
+and support Transport Layer Security (TLS). REST APIs utilizes JavaScript Object Notation (JSON) as encoding 24 
+protocol. gRPC APIs use HTTP/2 and support as well TLS. In contrast with REST APIs, gRPC used Protobuf as 25 
+encoding protocol. Please refer to O-RAN Security Protocols [19] for TLS 1.2, TLS 1.3 specifications. 26 
+RIC API NATURE
+NETWORK API SOLUTION (PROTOCOL/ MESSAGE ENCODING)
+Default Alternative (s)
+A1  r elat ed APIs in A1 med towards 
+xApp
+- Policy Enf or cem ent  API Transact ional gRPC/Protobuf/JSON
+- E nrichment information API Transact ional gRPC/Protobuf/JSON
+E2 related APIs i n  E2 T/ E2 M t o war d s 
+xApp
+[ SCTP/ E2 r elat ed / E2 SM]
+- E 2 S ubscription
+- E 2 Subscription Delete
+[- E 2 Subscription Delete R equired]
+Transact ional SCTP/Protobuf / ASN.1 HTTP/ JSON/ ASN.1
+- E 2 G uidance Transact ional SCTP/Protobuf / ASN.1 HTTP/ JSON/ ASN.1
+- E 2 Indication Time critical Uni-
+St r eam ing
+SCTP/Protobuf / ASN.1
+- E 2 Control Time critical 
+Bi-St r eam ing
+SCTP/Protobuf / ASN.1
+Management APIs
+- ML model related APIs Transact ional For future study
+- FCAPS r elat ed APIs Transact ional gRPC/Protobuf
+SDL APIs (store/ fetch/ notify/ push)
+- R-NIB, UE-NIB, Ot her dat a
+Transact ional + Uni-
+st reaming
+For future study
+Enablement APIs Transact ional gRPC/Protobuf HTTP/ JSON
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+39 
+ 
+IPSec is proposed as a preferred solution for time critical uni-streaming and bi-streaming E2 related APIs, which are 1 
+based on SCTP. Please refer to O-RAN Security Protocols [19] for IPsec specifications. 2 
+DTLS is proposed as optional solution for time critical uni-streaming and bi-streaming E2 related APIs, which are 3 
+based on SCTP. The solution is currently on hold due to limitation of packet size when DTLS is running over SCTP 4 
+(refer to RFC 6083). Please refer to O-RAN Security Protocols [19] for DTLS specifications. 5 
+6.14.3 Evaluation 6 
+Network Security layer for APIs shall be consider as a basic requirement in Near-RT RIC architecture. The choice 7 
+will depend on the selected network protocol stacks.  8 
+The solution addresses key issues #1, #2, #4, #5, #6, #7, #8, #9 and #10 9 
+ 10 
+ 11 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+40 
+ 
+7. Conclusions 1 
+7.1 Key Issue Solution Mapping 2 
+This document currently contains 11 key issues and 13 solutions proposals to address or reduce the risk associated 3 
+with the key issues. A mapping of the solutions to the key issues is shown here.  4 
+Key issue Sol 
+# 1 
+Soln
+#2 
+Sol 
+#3 
+Sol 
+#4 
+Sol 
+#5 
+Sol 
+#6 
+Sol 
+#7 
+Sol 
+#8 
+Sol 
+#9 
+Sol 
+#10 
+Sol 
+#11 
+Sol 
+#12 
+Sol 
+#13 
+KI 1: Malicious 
+xApps 
+X X X X         X 
+KI 2: 
+Compromised 
+xApp 
+X X X X         X 
+KI 3: Conflicting 
+xApps 
+       X   X   
+KI 4: Compromise 
+of xApp isolation  
+  X X X  X   X   X 
+KI 5: Compromise 
+of ML data 
+pipelines 
+ X X X X   X     X 
+KI 6: Altering ML 
+training models 
+ X X X X    X    X 
+KI 7: Database 
+protection and 
+privacy 
+  X X X  X      X 
+KI 8: Untrusted 
+xApps 
+X X X X   X      X 
+KI 9: Malicious 
+A1 policies 
+  X X     X   X X 
+KI 10: RIC API 
+authentication 
+security 
+  X X   X X     X 
+KI 11: RIC API 
+authorization 
+security 
+  X X   X       
+ 5 
+ 6 
+ 7 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+41 
+ 
+8. Recommendations 1 
+The following key issues have been agreed as contributions in O-RAN Threat Model v.03.00: 2 
+• Key issue #1: Malicious xApps deployed on the Near-RT RIC  3 
+• Key issue #10: Near-RT RIC APIs authentication 4 
+• Key issue #11: Near-RT RIC APIs authorization 5 
+The following solutions have been agreed as contributions in O-RAN Security Requirement Specification v3.0: 6 
+• Solution #1: Secure onboarding and deployment of xApps in Near-RT RIC 7 
+• Solution #3: Authentication schema for APIs 8 
+• Solution #4: Authorization framework for APIs 9 
+ 10 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+42 
+ 
+Annex A (informative):   1 
+ 2 
+ 3 
+ 4 
+ 5 
+ 6 
+ 7 
+  8 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+43 
+ 
+Annex B (informative): 1 
+Change history 2 
+ 3 
+Date Meeting CRs Subject/Comment New 
+version 
+06.12.2021 WG3Sec Meeting #12 N/A First draft / incomplete 1.0.0 
+March train  NOK-2020.02.10-SFG-CR-0001-Key_issue_#2 Key issue #2  
+March train  RMI-2022.03.01-SFG-CR-002-Solution_#2 Solution #2  
+March train  NOK-2020.03.01-SFG-CR-0002-Solutions_#7#8#9#10 Solutions #7, #8, #9, #10  
+March train  ERI.AO CR0013 Near-RT RIC Security Analysis Key issue #9, Solution #9  
+March train  NOK-2020.03.07-SFG-CR-0003-KI_#5#6-v01 Key issue #5, #6  
+March train  ALS-2020.02.10-SFG-CR-0005-Key_issue_#4 Key issue #4  
+March train  ALS-2020.02.10-SFG-CR-0006-Key_issue_#8 Key issue #8  
+     
+23.03.2022  Editorial changes First complete version 2.0.0 
+24.04.2022  N/A Update of Near-RT RIC architecture and editorial corrections 2.0.1 
+     
+     
+ 4 
+ 5 
+ 6 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+44 
+ 
+Annex ZZZ : O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 11 
+software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not 23 
+possible on technical (but not commercial) grounds, taking into account normal technical practice and the state of the 24 
+art generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or 26 
+operate a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases 27 
+where a Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all 28 
+such patent claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an O-RAN 38 
+Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate 40 
+written agreement with O-RAN Alliance. 41 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+45 
+ 
+Section 3: FRAND LICENSE 1 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 2 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 3 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 4 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have 5 
+made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, 6 
+that such license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is 7 
+incorporated that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not 8 
+making a reciprocal grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the 9 
+avoidance of doubt, the foregoing licensing commitment includes the distribution by the Adopter’s distributors and 10 
+the use by the Adopter’s customers of such licensed Compliant Implementations. 11 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then 13 
+Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, 14 
+Adopter and its Affiliates for its license of Necessary Claims to its licensees. 15 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 16 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 17 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 18 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide 19 
+patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise 20 
+distribute Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function 21 
+of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant 22 
+Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not 23 
+making a reciprocal grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing 24 
+commitment includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their 25 
+Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their 26 
+Affiliates’ customers of such licensed Compliant Implementations. 27 
+Section 4: TERM AND TERMINATION 28 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this 30 
+Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach 31 
+within thirty (30) days after being given notice specifying the breach. 32 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 33 
+3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters 34 
+after the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with 35 
+the version that was current as of the date of termination. 36 
+Section 5: CONFIDENTIALITY 37 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN 38 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 39 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 41 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 42 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) 43 
+disclosed by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 44 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 45 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 46 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor 47 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+46 
+ 
+or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN 1 
+Alliance’s prior written approval. 2 
+Section 6: INDEMNIFICATION 3 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 4 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 5 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 6 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 7 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 8 
+products that comply with O-RAN Specifications. 9 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 10 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 11 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 12 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR 13 
+CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER 14 
+THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR 15 
+OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF 16 
+SUCH DAMAGES. O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR 17 
+CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-18 
+RAN ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY 19 
+DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY 20 
+QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE 21 
+OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 22 
+Section 8: ASSIGNMENT 23 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 24 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 25 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 26 
+Alliance may freely assign this Agreement. 27 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 28 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future 29 
+Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this 30 
+Agreement, including as licensees under Section 3. 31 
+Section 10: BINDING ON AFFILIATES 32 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 33 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter 34 
+hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 35 
+Section 11: GENERAL 36 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  37 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 38 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, 39 
+relating to the subject matter of this Agreement.  40 
+
+                Study on Security for Near RT RIC and xApps 
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in the Annex ZZZ 
+47 
+ 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 1 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, 2 
+export control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this 3 
+Agreement prohibits any communication that would violate the antitrust laws. 4 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between 5 
+Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in 6 
+this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its 7 
+Members, Contributors or Academic Contributors. 8 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 9 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed 10 
+stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will 11 
+remain in full force and effect.  Any failure by a party or third party beneficiary to insist upon or enforce performance 12 
+by another party of any of the provisions of this Agreement or to exercise any rights or remedies under this 13 
+Agreement or otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ 14 
+or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other 15 
+instance; rather the same shall be and remain in full force and effect. 16 
+ 17 

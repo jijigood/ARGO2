@@ -1,0 +1,2263 @@
+O-RAN-WG1.OAM Interface Specification-v1.0
+Technical Specification 
+O-RAN Operations and Maintenance Interface Specification
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform 
+the third party that these conditions apply to them and that they must comply with them.
+
+1 
+  O-RAN-WG1.OAM Interface Specification-v1.0 
+Technical Specification 
+ 
+ 
+O-RAN Operations and Maintenance Interface Specification  
+ 
+ 
+  
+ 
+Prepared by the O-RAN Alliance. Copyright © 2019 by the O-RAN Alliance. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving,  distributing, displaying or preparing 
+derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License 
+Agreement contained in Annex ZZZ of this specification. All other rights reserved.. 
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ           
+            
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Revision History 1 
+Date Revision Author Description 
+2019.03.18 01.00.00 David Kinsey 
+(AT&T) Li 
+Xiang(CMCC), 
+Cagatay 
+Buyukkoc 
+(AT&T), 
+Lyndon Ong 
+(Ciena), Marge 
+Hillis (Nokia) 
+and Linda 
+Horn (Nokia) 
+First draft of O-RAN OAM Interface Specification  
+2019.03.28 01.01.00 Marge Hillis 
+(Nokia) 
+Updates from review remarks received  
+2019.05.21 01.01.01 Marge Hillis 
+(Nokia) 
+Fault Supervision, Performance Assurance and File 
+Management updates 
+2019.05.28 01.01.02 Marge Hillis, 
+Linda Horn 
+(Nokia) 
+References, Abbreviations, Definitions, Provisioning, 
+Communication Surveillance, PNF Start Up and 
+Registration updates 
+2019.06.13 01.01.03 Marge Hillis, 
+Linda Horn 
+(Nokia), David 
+Kinsey (ATT) 
+Diagrams for File Management converted to UML, 
+Performance Assurance UML, PNF Software Management 
+Updates 
+2019.06.17 01.01.04 Marge Hillis, 
+Linda Horn 
+Provisioning Updates 
+2019.07.01 1.0 Marge Hillis, 
+Linda Horn 
+Review Comments Addressed 
+  2 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Contents 1 
+ 2 
+Revision History ................................................................................................................................................. 2 3 
+Chapter 1. Introductory Material ................................................................................................................ 5 4 
+1.1 Scope ................................................................................................................................................................. 5 5 
+1.2 References.......................................................................................................................................................... 5 6 
+1.3 Definitions and Abbreviations ........................................................................................................................... 6 7 
+1.3.1 Definitions .................................................................................................................................................... 6 8 
+1.3.2 Abbreviations ............................................................................................................................................... 6 9 
+1.4 Philosophy ......................................................................................................................................................... 7 10 
+1.5 Open Points ........................................................................................................................................................ 7 11 
+1.6 General Requirements ........................................................................................................................................ 8 12 
+1.6.1 Transport Layer Security (TLS) ................................................................................................................... 8 13 
+Chapter 2. Management Services ............................................................................................................... 9 14 
+2.1 Provisioning Management Services ................................................................................................................... 9 15 
+2.1.1 Create Managed Object Instance .................................................................................................................. 9 16 
+2.1.2 Modify Managed Object Instance Attributes ............................................................................................. 12 17 
+2.1.3 Delete Managed Object Instance ................................................................................................................ 14 18 
+2.1.4 Read Managed Object Instance Attributes ................................................................................................. 16 19 
+2.1.5 Notify Managed Object Instance Attribute Value Change ......................................................................... 18 20 
+2.2 Fault Supervision Management Services ......................................................................................................... 19 21 
+2.2.1 Fault Notification ....................................................................................................................................... 19 22 
+2.2.2 Fault Supervision Control .......................................................................................................................... 20 23 
+2.3 Performance Assurance Management Services ............................................................................................... 21 24 
+2.3.1 Performance Data File Reporting ............................................................................................................... 21 25 
+2.3.2 Performance Data Streaming...................................................................................................................... 22 26 
+2.3.3 Performance Assurance Control ................................................................................................................. 23 27 
+2.4 Trace Management Services ............................................................................................................................ 23 28 
+2.4.1 Trace Data Reporting ................................................................................................................................. 23 29 
+2.4.2 Trace Session Activation ............................................................................................................................ 24 30 
+2.4.3 Trace Session Deactivation ........................................................................................................................ 24 31 
+2.4.4 Trace Recording Session Activation .......................................................................................................... 24 32 
+2.4.5 Trace Recording Session Deactivation ....................................................................................................... 24 33 
+2.5 File Management Services ............................................................................................................................... 25 34 
+2.5.1 File Ready Notification .............................................................................................................................. 25 35 
+2.5.2 List Available Files .................................................................................................................................... 26 36 
+2.5.3 Upload File ................................................................................................................................................. 27 37 
+2.5.4 Download File ............................................................................................................................................ 29 38 
+2.6 Communication Surveillance Management Services ....................................................................................... 31 39 
+2.6.1 Heartbeat Notification ................................................................................................................................ 31 40 
+2.6.2 Communication Surveillance Control ........................................................................................................ 32 41 
+2.7 PNF Startup and Registration Management Services ...................................................................................... 33 42 
+2.7.1 PNF Plug-n-Play ........................................................................................................................................ 34 43 
+2.7.2 PNF Registration ........................................................................................................................................ 34 44 
+2.8 PNF Software Management Services .............................................................................................................. 35 45 
+2.8.1 Software Package Naming and Content ..................................................................................................... 35 46 
+2.8.2 Software Inventory ..................................................................................................................................... 36 47 
+2.8.3 Software Download .................................................................................................................................... 37 48 
+2.8.4 Software Pre-Check.................................................................................................................................... 39 49 
+2.8.5 Software Activate ....................................................................................................................................... 40 50 
+Appendix A ...................................................................................................................................................... 43 51 
+Annex ZZZ O-RAN Adopter License Agreement ...................................................................................... 48 52 
+2.9 Section 1: DEFINITIONS ............................................................................................................................. 48 53 
+2.10 Section 2: COPYRIGHT LICENSE ............................................................................................................. 48 54 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.11 Section 3: FRAND LICENSE ....................................................................................................................... 48 1 
+2.12 Section 4: TERM AND TERMINATION ..................................................................................................... 49 2 
+2.13 Section 5: CONFIDENTIALITY ................................................................................................................... 49 3 
+2.14 Section 6: INDEMNIFICATION ................................................................................................................... 49 4 
+2.15 Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ................................................................... 50 5 
+2.16 Section 8: ASSIGNMENT ............................................................................................................................ 50 6 
+2.17 Section 9: THIRD-PARTY BENEFICIARY RIGHTS ................................................................................ 50 7 
+2.18 Section 10: BINDING ON AFFILIATES ..................................................................................................... 50 8 
+2.19 Section 11: GENERAL ................................................................................................................................. 50 9 
+ 10 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Chapter 1. Introductory Material 1 
+1.1 Scope 2 
+This Technical Specification has been produced by the O-RAN.org. 3 
+The contents of the present document are subject to continuing work within O-RAN WG1 and may change following 4 
+formal O-RAN approval. Should the O-RAN.org modify the contents of the present document, it will be re -released by 5 
+O-RAN Alliance with an identifying change of release date and an increase in version number as follows: 6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. 9 
+(the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document. 11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+This document defines O-RAN OAM interface functions  and pro tocols for the O -RAN O1 interface . The document 14 
+studies the functions conveyed over the inter face, including management functions, procedures, operations and 15 
+corresponding solutions, and identifies existing standards and industry work that can serve as a basis for O-RAN work. 16 
+1.2 References 17 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 18 
+document. 19 
+- References are either specific (identified by date of publication, edition numbe r, version nu mber, etc.) or 20 
+non-specific. 21 
+- For a specific reference, subsequent revisions do not apply. 22 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 23 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 15. 24 
+ 25 
+[1] 3GPP TR 21.905: Vocabulary for 3GPP Specifications 26 
+[2] 3GPP TR 28.890:  Management and orchestration; Study on integration of Open Network Automation 27 
+Platform (ONAP) and 3GPP management for 5G networks 28 
+[3] 3GPP TS 28.530: “Management and orchestration; Concepts, use cases and requirements” 29 
+[4] 3GPP TS 28.531: Management and orchestration; Provisioning 30 
+[5] 3GPP TS 28.532: Management and orchestration; Generic management services 31 
+[6] 3GPP TS 28.533: Management and orchestration: Architecture framework 32 
+[7] 3GPP TS 28.540: Management and orchestration; 5G Network Resource Model (NRM); Stage 1 33 
+[8] 3GPP TS 28.541: Management and orchestration; 5G Network Resource Model (NRM); Stage 2 and stage 3  34 
+[9] 3GPP TS 28.545: Management and orchestration; Fault Supervision (FS) 35 
+[10] 3GPP TS 28.550: Management and orchestration; Performance assurance 36 
+[11] 3GPP TS 28.552: Management and orchestration; 5G performance measurements 37 
+[12] 3GPP TS 28.554: Management and orchestration; 5G end to end Key Performance Indicators (KPI) 38 
+[13] 3GPP TS 28.621: Telecommunication management; Generic Network Resource Model (NRM) Integration 39 
+Reference Point (IRP); Requirements 40 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+[14] 3GPP TS 28.622: Telecommunication management; Generic Network Resource Model (NRM) Integration 1 
+Reference Point (IRP); Information Service (IS) 2 
+[15] 3GPP TS 32.341: Telecommunication management; File Transfer (FT) Integration Reference Point (IRP); 3 
+Requirements 4 
+[16] 3GPP TS 32.342: Telecommunication management; File Transfer (FT) Integration Reference Point (IRP); 5 
+Information Service (IS) 6 
+[17] 3GPP TS 32.346: Telecommunication management; File Transfer (FT) Integration Reference Point (IRP): 7 
+Solution Set (SS) definitions 8 
+[18] 3GPP TS 32.421: Telecommunication management; Subscriber and equipment trace; Trace concepts and 9 
+requirements 10 
+[19] 3GPP TS 32.422: Telecommunication management; Subscriber and equipment trace; Trace control and 11 
+configuration management 12 
+[20] 3GPP TS 32.423: Telecommunication management; Subscriber and equipment trace; Trace data definition 13 
+and management 14 
+[21] 3GPP TS 32.508: Telecommunication management; Procedure flows for multi-vendor plug-and-play eNode 15 
+B connection to the network 16 
+[22] 3GPP TS 32.509: Telecommunication management; Data formats for multi-vendor plug and play eNode B 17 
+connection to the network 18 
+[23] 3GPP TS 38.401: NG-RAN; Architecture description 19 
+[24] 3GPP S5-193519: Add RESTful HTTP-based solution set of fault supervision for integration with ONAP 20 
+VES 21 
+[25] 3GPP S5-191413: Integration of ONAP and 3GPP 5G management framework 22 
+[26] 3GPP S5-191461: Overview of the 5G specification structure 23 
+[27] 3GPP S5-192073: Heartbeat and Communication Surveillance 24 
+[28] O-RAN Whitepaper 25 
+[29] ORAN-WG4.MP.0-v01.00: O-RAN Alliance Working Group 4 Management Plane Specification 26 
+[30] O-RAN WG1 OAM Architecture 27 
+[31] ONAP VES Event Listener Specification 28 
+[32] RFC 6241, “Network Configuration Protocol (NETCONF)”, IETF, June 2011 29 
+[33] RFC 7950, “The YANG 1.1 Data Modeling Language”, IETF, August 2016  30 
+1.3 Definitions and Abbreviations 31 
+1.3.1 Definitions 32 
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. 33 
+A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 34 
+[1]. 35 
+1.3.2 Abbreviations 36 
+For the purposes of the present document, the abb reviations given in 3GPP TR 21.905 [1] and the following apply. An 37 
+abbreviation defined in the present document takes precedence over the definition of the same abbre viation, if any, in 38 
+3GPP TR 21.905 [1]. 39 
+ 40 
+3GPP 3rd Generation Partnership Project 41 
+EMS  Element Management System 42 
+FCAPS Fault, Configuration, Accounting, Performance, Security 43 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+IOC Information Object Class 1 
+MANO Management and Orchestration 2 
+ME Managed Element 3 
+MF Managed Function 4 
+MnS Management Service 5 
+MO Managed Object 6 
+MOC Managed Object Class 7 
+MOI Managed Obhject Instance 8 
+NAT Network Address Translation 9 
+Near-RT RIC      O-RAN near real time RAN Intelligent Controller 10 
+NMS  Network Management System 11 
+Non-RT RIC O-RAN non real time RAN Intelligent Controller 12 
+O-CU-CP O-RAN Central Unit – Control Plane. 13 
+O-CU-UP O-RAN Central Unit – User Plane 14 
+O-DU O-RAN Distributed Unit 15 
+O-RAN Open Radio Access Network 16 
+O-RU O-RAN Radio Unit 17 
+ONAP Open Network Automation Platform 18 
+PNF Physical Network Function 19 
+RAN    Radio Access Network 20 
+RRH    Remote Radio Head 21 
+TR     Technical Report 22 
+TS     Technical Specification 23 
+SA5    Services & System Aspects Working Group 5 Telecom Management 24 
+VNF    Virtualized Network Function 25 
+ 26 
+1.4 Philosophy 27 
+The O-RAN O1 management services follow existing standards wherever possible.  The focus of this document is to 28 
+identify the use cases which conform to existing standards, identify gaps in management services for O -RAN and define 29 
+needed extensions.  For identified gaps, the goal is to modify the standards to include the needed O-RAN extensions 30 
+and update the references in this document as the standards evolve to cover the gaps.  31 
+It is recognized that the O-RU follows the O-RAN Front-Haul m-plane specification [29] initially but will evolve over 32 
+time to comply with the O1 specification supported by other O-RAN Managed Functions. 33 
+ 34 
+1.5 Open Points 35 
+As each Management Service is evaluated, the Use Cases and relevant specifications need to be assessed and 36 
+augmented as needed to support O-RAN. The current list of Use Cases in Chapter 2 below is not exhaustive, and the list 37 
+of specification references may not be complete. 38 
+Some Use Cases referred to in the standard may not be applicable to O-RAN and this needs to be addressed, perhaps as 39 
+an exception.  40 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+The O1 team needs to be clear when citing a reference whether we are using it as a citation (meaning it will be strictly 1 
+followed) or as a reference.  Precise terminology needs to be included as this draft matures.  2 
+The O1 interfaces are defined assuming that the O-RAN OAM Architecture will ensure that Management Service 3 
+Providers behind a NAT are able to communicate with their Management Service Consumer using the same interfaces 4 
+as Management Service Providers not behind a NAT.  The O-RAN OAM Architecture has agreed to work this 5 
+issue.  This document will be refined, if necessary, based upon their conclusions.  6 
+The version of HTTP to support in O-RAN is under discussion.  ONAP currently supports HTTP v1.1 but WG5 would 7 
+prefer that O-RAN support HTTP v2.0 or higher due to some restrictions in v1.1.  The version of HTTP to support will 8 
+be investigated for v2.0 of the O1 Interface Specification. 9 
+1.6 General Requirements 10 
+This section contains general requirements that are applicable to many O1 Interface Management Services. 11 
+1.6.1 Transport Layer Security (TLS) 12 
+REQ-TLS-FUN-1:  Management Service providers and consumers that use TLS shall support TLS v1.2 or higher.  13 
+ 14 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Chapter 2. Management Services 1 
+2.1 Provisioning Management Services 2 
+Provisioning management services allow a Provisioning MnS Consumer to configure attributes of managed objects on 3 
+the Provisioning MnS Provider that modify the Provisioning MnS Provider’s capabilities in its role in end-to-end 4 
+network services and allows a Provisioning  MnS Provider to report configuration changes to the Provisioning MnS 5 
+Consumer. NETCONF is used for the Provisioning Management Services to Create Managed Object Instance, Delete 6 
+Managed Object Instance, Modify Managed Object Instance Attributes and Read Managed Object Instance Attributes. 7 
+A REST/HTTPS event is used to notify the Provisioning MnS Consumer when a configuration change occurs on the 8 
+Provisioning MnS Provider which was not initiated by the Provisioning MnS Consumer.  YANG 1.1 Data Models are 9 
+used by O-RAN Provisioning MnS Providers. 10 
+O-RAN Provisioning MnS Provider must support a running datastore.  The support of candidate datastore on the 11 
+Provisioning MnS Provider is optional. 12 
+O-RAN ME must support the XPATH capability. 13 
+Version 2.0 of the O1 interface will define more of the espected capabilities the O-RAN ME should support.   14 
+Use cases are from 3GPP TS 28.531. 15 
+Reference documents include 3GPP TR 28.890, TS 28.531, RFC 6241, “Network Configuration Protocol 16 
+(NETCONF)”, IETF, RFC 7950, “The YANG 1.1 Data Modeling Language” . 17 
+2.1.1 Create Managed Object Instance 18 
+2.1.1.1 Description 19 
+Provisioning MnS Consumer sends synchronous provisioning updates to Provisioning MnS Provider to create a 20 
+Managed Object Instance (MOI) on the Provisioning MnS Provider and set its attribute values.  21 
+2.1.1.2 General NETCONF Requirements 22 
+Requirements are to be specified in a 3GPP spec for the Provisioning management services.  Until that time, the 23 
+requirements are provided in this O1 Interface Specification.  24 
+REQ-GNC-FUN-1:  The provisioning management service provider shall have the capability to establish a NETCONF 25 
+session with its authorized consumer upon request from the consumer. 26 
+REQ-GNC-FUN-2:  The provisioning management service provider must support an established NETCONF session 27 
+until the authorized consumer terminates the session.  NOTE: The consumer may want to perform multiple provisioning 28 
+management services operations during a single NETCONF Session.   29 
+REQ-GNC-FUN-3:  The provisioning management service provider shall have the capability to terminate a NETCONF 30 
+session with its authorized consumer when requested to do so by the authorized consumer.    31 
+2.1.1.3 Create MOI Requirements 32 
+Requirements are to be specified in a 3GPP spec for the Create Managed Object Instance use case.  Until that time, the 33 
+requirements are provided in this O1 Interface Specification.  34 
+REQ-CMO-FUN-1:  The provisioning management service provider shall have the capability to allow its authorized 35 
+consumer to create MOI(s) and set attribute values of those MOIs via the NETCONF <edit.config> operation. 36 
+REQ-CMO-FUN-2:  The provisioning management service provider shall have the capability to make the new MOI(s) 37 
+persistent in its running datastore.  38 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.1.1.4 Procedures 1 
+@startuml 2 
+Title Create MOI 3 
+autonumber "[0]" 4 
+participant "Provisioning MnS Consumer” as NMS 5 
+participant "Provisioning MnS Provider" as ME 6 
+NMS <-> ME : Establish NETCONF Session 7 
+Opt Lock Data Store 8 
+NMS -> ME : NETCONF <rpc> <lock><source><targetDS> 9 
+Note over ME : Lock DS 10 
+ME --> NMS: NETCONF <rpc-reply> <OK> or <rpc-error><error-xxx> 11 
+End 12 
+||| 13 
+NMS –> ME: NETCONF <rpc> <edit-config><source><targetDS><error-14 
+option><config><operation=create> 15 
+Note over ME : Create MOI 16 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 17 
+Opt Commit Change (applies if target is candidate) 18 
+NMS -> ME : NETCONF <rpc> <commit><source><targetDS> 19 
+Note over ME : ME commits change to the running data store. 20 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 21 
+End 22 
+||| 23 
+Opt Unlock Data Store (applies if Data Store was locked) 24 
+NMS -> ME : NETCONF <rpc> <unlock><source><targetDS> 25 
+Note over ME : Unlock DS 26 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 27 
+End 28 
+||| 29 
+NMS <-> ME : Terminate NETCONF Session 30 
+@enduml 31 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.1.1.4-1 Creating MOIs  4 
+ 5 
+1. Provisioning MnS Consumer establishes NETCONF session with Provisioning MnS Provider. The 6 
+NETCONF session has authorized create, read, update, and delete privileges into the identified section of 7 
+the data store. 8 
+ 9 
+2. (Optional) Lock Datastore 10 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <lock> <source><target DS>.   11 
+b. Provisioning MnS Provider locks target datastore (running or candidate).   12 
+ 13 
+3. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code.  14 
+ 15 
+4. Create MOI 16 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <edit-17 
+config><source><targetDS><error-option><config><operation=create>.  18 
+b. Provisioning MnS Provider creates the MOI(s) and sets attribute values in the target 19 
+datastore (DS) as specified in operation and config. If an error occurs, Provisioning MnS 20 
+Provider behaves as specified in error-option.  21 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+5. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 2 
+ 3 
+6. (Optional) Commit change if target was candidate 4 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <commit><source><targetDS>.  5 
+b. Provisioning MnS Provider commits the change to the running DS.  6 
+ 7 
+7. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 8 
+ 9 
+8. (Optional) Unlock Datastore 10 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <unlock><source><targetDS>..   11 
+b. Provisioning MnS Provider unlocks the target DS. 12 
+ 13 
+9. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 14 
+ 15 
+10. Provisioning MnS Consumer terminates NETCONF session with Provisioning MnS Provider. 16 
+ 17 
+2.1.2 Modify Managed Object Instance Attributes 18 
+2.1.2.1 Description 19 
+Provisioning MnS Consumer sends synchronous provisioning updates to Provisioning MnS Provider to modify the 20 
+attributes of a MOI on the Provisioning MnS Provider.   21 
+2.1.2.2 Requirements 22 
+Requirements are to be specified in a 3GPP spec for the Modify Managed Object Instance Attributes use case.  Until 23 
+that time, the requirements are provided in this O1 Interface Specification.  24 
+REQ-MMO-FUN-1:  The provisioning management service provider shall have the capability to allow its authorized 25 
+consumer to modify the attribute values of its MOIs via the NETCONF <edit.config> operation. 26 
+REQ-MMO-FUN-2:  The provisioning management service provider shall have the capability to make the changes to 27 
+the MOI(s) persistent in its running datastore.  28 
+2.1.2.3 Procedures 29 
+@startuml 30 
+Title Modify MOI Attributes 31 
+autonumber "[0]" 32 
+participant "Provisioning MnS Consumer” as NMS 33 
+participant "Provisioning MnS Provider" as ME 34 
+NMS <-> ME : Establish NETCONF Session 35 
+Opt Lock Data Store 36 
+NMS -> ME : NETCONF <rpc> <lock><source><targetDS> 37 
+Note over ME : Lock DS 38 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 39 
+End 40 
+||| 41 
+NMS –> ME: NETCONF <rpc> <edit-config><source><targetDS><error-42 
+option>\n<config><operation=merge, replace, create, delete or remove> 43 
+Note over ME : Modify MOI 44 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 45 
+Opt Commit Change (applies if target is candidate) 46 
+NMS -> ME : NETCONF <rpc> <commit><source><targetDS> 47 
+Note over ME : ME commits change to the running data store. 48 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 49 
+End 50 
+||| 51 
+Opt Unlock Data Store (applies if Data Store was locked) 52 
+NMS -> ME : NETCONF <rpc> <unlock><source><targetDS> 53 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Note over ME : Unlock DS 1 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 2 
+End 3 
+||| 4 
+NMS <-> ME : Terminate NETCONF Session 5 
+@enduml 6 
+ 7 
+ 8 
+ 9 
+Figure 2.1.2.3-1 Modify MOI Attributes 10 
+1. Provisioning MnS Consumer establishes NETCONF session with Provisioning MnS Provider. The 11 
+NETCONF session has authorized create, read, update, and delete privileges into the identified section of 12 
+the data store. 13 
+ 14 
+2. (Optional) Lock Datastore--Provisioning MnS Consumer sends NETCONF <rpc> <lock> 15 
+<source><target DS>.   16 
+ 17 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+a. Provisioning MnS Provider locks target datastore (running or candidate).   1 
+ 2 
+3. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code.  3 
+ 4 
+4. Modify MOI Attributes 5 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <edit-config><source><targetDS><error-6 
+option><config><operation=merge, replace, create, delete or remove>.  7 
+b. Provisioning MnS Provider modifies the attributes of the MOI(s) in the target datastore (DS) as 8 
+specified in operation and config. If an error occurs, Provisioning MnS Provider behaves as specified 9 
+in error-option.  10 
+ 11 
+5. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 12 
+ 13 
+6. (Optional) Commit change if target was candidate 14 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <commit><source><targetDS>.  15 
+b. Provisioning MnS Provider commits the change to the running DS.  16 
+ 17 
+7. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 18 
+ 19 
+8. (Optional) Unlock Datastore 20 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <unlock><source><targetDS>..   21 
+b. Provisioning MnS Provider unlocks the target DS. 22 
+ 23 
+9. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 24 
+ 25 
+10. Provisioning MnS Consumer terminates NETCONF session with Provisioning MnS Provider. 26 
+ 27 
+2.1.3 Delete Managed Object Instance 28 
+2.1.3.1 Description 29 
+Provisioning MnS Consumer sends synchronous provisioning updates to Provisioning MnS Provider to delete a MOI 30 
+and its children on the Provisioning MnS Provider. 31 
+2.1.3.2 Requirements 32 
+Requirements are to be specified in a 3GPP spec for the Delete Managed Object use case.  Until that time, the 33 
+requirements are provided in this O1 Interface Specification.  34 
+REQ-DMO-FUN-1:  The provisioning management service provider shall have the capability to allow its authorized 35 
+consumer to delete its MOI(s) and its Children via the NETCONF <edit.config> operation. 36 
+REQ-DMO-FUN-2:  The provisioning management service provider shall have the capability to make the deletions to 37 
+the MOI(s)and its Children persistent in its running datastore.  38 
+2.1.3.3 Procedures  39 
+@startuml 40 
+Title Delete MOI 41 
+autonumber "[0]" 42 
+participant "Provisioning MnS Consumer” as NMS 43 
+participant "Provisioning MnS Provider" as ME 44 
+NMS <-> ME : Establish NETCONF Session 45 
+Opt Lock Data Store 46 
+NMS -> ME : NETCONF <rpc> <lock><source><targetDS> 47 
+Note over ME : Lock DS 48 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error><error-xxx> 49 
+End 50 
+||| 51 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+NMS –> ME: NETCONF <rpc> <edit-config><source><targetDS><error-1 
+option>\n<config><operation=delete or remove> 2 
+Note over ME : Modify MOI 3 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 4 
+Opt Commit Change (applies if target is candidate) 5 
+NMS -> ME : NETCONF <rpc> <commit><source><targetDS> 6 
+Note over ME : ME commits change to the running data store. 7 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 8 
+End 9 
+||| 10 
+Opt Unlock Data Store (applies if Data Store was locked) 11 
+NMS -> ME : NETCONF <rpc> <unlock><source><targetDS> 12 
+Note over ME : Unlock DS 13 
+ME --> NMS: NETCONF <rpc-reply> <OK> or NETCONF <rpc-reply> <rpc-error> <error-xxx> 14 
+End 15 
+||| 16 
+NMS <-> ME : Terminate NETCONF Session 17 
+@enduml 18 
+ 19 
+ 20 
+ 21 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.1.3.3-1 Deleting MOIs 4 
+1. Provisioning MnS Consumer establishes NETCONF session with Provisioning MnS Provider. The 5 
+NETCONF session has authorized create, read, update, and delete privileges into the identified section of 6 
+the data store. 7 
+ 8 
+2. (Optional) Lock Datastore 9 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <lock> <source><target DS>.   10 
+b. Provisioning MnS Provider locks target datastore (running or candidate).   11 
+ 12 
+3. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code.  13 
+ 14 
+4. Delete MOI and its Children 15 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <edit-16 
+config><source><targetDS><error-option><config><operation=delete or remove>.  17 
+b. Provisioning MnS Provider deletes the MOI(s)and its children in the target datastore (DS) 18 
+as specified in operation and config. If an error occurs, Provisioning MnS Provider 19 
+behaves as specified in error-option.  20 
+.  21 
+ 22 
+5. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 23 
+ 24 
+6. (Optional) Commit change if target was candidate 25 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <commit><source><targetDS>.  26 
+b. Provisioning MnS Provider commits the change to the running DS.  27 
+ 28 
+7. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 29 
+ 30 
+8. (Optional) Unlock Datastore 31 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <unlock><source><targetDS>..   32 
+b. Provisioning MnS Provider unlocks the target DS. 33 
+ 34 
+9. Provisioning MnS Provider returns response <OK> or the appropriate rpc error code. 35 
+ 36 
+10. Provisioning MnS Consumer terminates NETCONF session with Provisioning MnS Provider. 37 
+ 38 
+2.1.4 Read Managed Object Instance Attributes 39 
+2.1.4.1 Description 40 
+Provisioning MnS Consumer sends synchronous provisioning request to Provisioning MnS Provider to return the values 41 
+of attributes of its MOI(s) on the Provisioning MnS Provider. 42 
+2.1.4.2 Requirements 43 
+Requirements are to be specified in a 3GPP spec for the Read Managed Object Instance Attributes use case.  Until that 44 
+time, the requirements are provided in this O1 Interface Specification.  45 
+REQ-RMO-FUN-1:  The provisioning management service provider shall have the capability to allow its authorized 46 
+consumer to retrieve the values of the attributes of its MOI(s) via the NETCONF <get> or <get.config> operation. 47 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.1.4.3 Procedures 1 
+ 2 
+@startuml 3 
+Title Read MOI 4 
+autonumber "[0]" 5 
+participant "Provisioning MnS Consumer” as NMS 6 
+participant "Provisioning MnS Provider" as ME 7 
+NMS <-> ME : Establish NETCONF Session 8 
+NMS -> ME : NETCONF <rpc> <get><filter>, or NETCONF <rpc> <get-config> 9 
+<source><targetDS><filter> 10 
+Note over ME : Retrieve config 11 
+ME --> NMS: NETCONF <rpc-reply> <data> 12 
+NMS <-> ME : Terminate NETCONF Session 13 
+@enduml 14 
+ 15 
+ 16 
+ 17 
+ 18 
+Figure 2.1.4.3-1 Read MOI 19 
+ 20 
+1. Provisioning MnS Consumer establishes NETCONF session with Provisioning MnS Provider. 21 
+ 22 
+2. Read MOI Attributes 23 
+a. Provisioning MnS Consumer sends NETCONF <rpc> <get-config> 24 
+<source><targetDS><filter> to retrieve an optionally filtered subset configuration from 25 
+the source configuration datastore (running or candidate).  filter can be used to identify 26 
+the MOIs and attributes to be returned.  27 
+OR 28 
+Provisioning MnS Consumer sends NETCONF NETCONF <rpc> <get><filter> to 29 
+retrieve an optionally filtered subset configuration and operational state of MOIs from 30 
+the running configuration datastore.  filter can be used to identify the MOIs and 31 
+attributes to be returned. 32 
+b. Provisioning MnS Provider retrieves the requested config from the specified DS. 33 
+ 34 
+3. Provisioning MnS Provider returns status in NETCONF response.  35 
+ 36 
+4. Provisioning MnS Consumer terminates NETCONF session with Provisioning MnS Provider. 37 
+ 38 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.1.5 Notify Managed Object Instance Attribute Value Change 1 
+2.1.5.1 Description 2 
+Provisioning MnS Provider sends an asynchronous notifyMOIAttributeValueChange Notification to the Provisioning 3 
+MnS Consumer to report a configuration change on the Provisioning MnS Provider . 4 
+2.1.5.2 Requirements 5 
+Requirements are to be specified in a 3GPP specification for the Notify Managed Object Instance Attribute Value 6 
+Change notification use case.  Until that time, the requirements are provided in this O1 Interface Specification.  7 
+ 8 
+REQ-NMC-FUN-1:  The provisioning management service provider shall have the capability to generate a restful 9 
+asynchronous notifyMOIAttributeValueChange notification to its authorized consumer. 10 
+2.1.5.3 Procedures 11 
+ 12 
+@startuml 13 
+Title Notify Managed Object Instance Attribute Value Change 14 
+Autonumber 15 
+participant "Provisioning MnS Consumer” as NMS 16 
+participant "Provisioning MnS Provider" as ME 17 
+Note over ME : Config change occurs 18 
+ME ->> NMS : <<HTTP/TLS>> notifyMOIAttributeValueChange Event 19 
+Note over NMS : Reconcile Database 20 
+@enduml 21 
+ 22 
+ 23 
+ 24 
+ 25 
+Figure 2.1.5.3-1 Notify Managed Object Instance Attribute Value Change 26 
+Pre-condition:  A configuration change occurs on the running data store of the Provisioning MnS Provider. 27 
+ 28 
+1. Provisioning MnS Provider sends notifyMOIAttributeValueChange notification VES event to 29 
+Provisioning MnS Consumer over HTTP/TLS.  Mutual certificate authentication is performed. 30 
+ 31 
+Post-condition: Provisioning MnS Consumer reconciles its copy of the Provisioning MnS Provider 32 
+configuration database with the change. 33 
+ 34 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.1.5.4 Operations and Notifications 1 
+The notifyMOIAttributeValueChange Notification is a REST/HTTPS event sent from the Provisioning MnS Provider to 2 
+the Provisioning MnS Consumer using YANG 1.1 encoded in JSON format as specificed in RFC 7951  The notification 3 
+contains the MOI attribute value changes.  This event needs to be defined in ONAP and included in the harmonization 4 
+activities between 3GPP and ONAP. 5 
+2.2 Fault Supervision Management Services 6 
+Fault supervision management services allow a Fault Supervision MnS Provider to report errors and events to a Fault 7 
+Supervision MnS Consumer and allows a Fault Supervision MnS Consumer to perform fault supervision operations on 8 
+the Fault Supervision MnS Provider, such as get alarm list.  9 
+Use cases are specified in 3GPP TS 28.545 [9].   10 
+Alignment between 3GPP SA5 and ONAP is described in 3GPP TR 28.890  [2] and CR S5-193519 [24]. 11 
+2.2.1 Fault Notification 12 
+2.2.1.1 Description 13 
+Fault Supervision MnS Provider sends asynchronous Fault3gpp notification event to Fault Supervision MnS Consumer 14 
+when an alarm occurs, is cleared, changes state or priority, etc. 15 
+2.2.1.2 Requirements 16 
+Requirements are specified in 3GPP TS 28.545 Section 5.2.5. 17 
+2.2.1.3 Procedures 18 
+Procedures are defined in 3GPP TS 28.545 Section 9.1. 19 
+@startuml 20 
+Title Fault Notification 21 
+Autonumber 22 
+participant "Fault Supervision MnS Consumer” as NMS 23 
+participant "Fault Supervision MnS Provider" as ME 24 
+Note over ME : Fault occurs on ME 25 
+ME ->> NMS : <<HTTP/TLS>> Fault3gpp Event 26 
+@enduml 27 
+ 28 
+ 29 
+ 30 
+ 31 
+Figure 2.2.1.3-1 Fault Notification 32 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+Pre-condition:  A fault occurs on the Fault Supervision MnS Provider. 3 
+ 4 
+1. Fault Supervision MnS Provider sends Fault3gpp notification VES event to Fault Supervision MnS 5 
+Consumer over HTTP/TLS.  Mutual certificate authentication is performed. 6 
+ 7 
+2.2.1.4 Operations and Notifications 8 
+Fault3gpp notification is a JSON encoded VES event sent from Fault Supervision MnS Provider to Fault Supervision 9 
+MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and Fault3gpp Notification Fields. 10 
+The fault3GPP event is specified in 3GPP TS 28.532, which provides the mapping from 3GPP IS notification 11 
+parameters to the VES Common Event Header and the Fault3gpp Event Fields.   12 
+The table below is derived from CR S5-193519 to provide a reference for the mapping of specific parameters for each 13 
+3GPP IS notification type to the fault3gpp Event. 14 
+Table 2.2.1.4-1 15 
+3GPP IS Notification TS 28.532 S5-193519 section Reference 
+notifyNewAlarm 3GPP TS 28.532, S5-193519 Section X.2.2 
+notifyNewSecurityAlarm 3GPP TS 28.532, S5-193519 Section X.2.3 
+notifyAckStateChanged 3GPP TS 28.532, S5-193519 Section X.2.4 
+notifyClearedAlarm 3GPP TS 28.532, S5-193519 Section X.2.5 
+notifyAlarmListRebuilt 3GPP TS 28.532, S5-193519 Section X.2.6 
+notifyChangedAlarm 3GPP TS 28.532, S5-193519 Section X.2.7 
+notifyComments 3GPP TS 28.532, S5-193519 Section X.2.8 
+notifyPotentialFaultyAlarmList 3GPP TS 28.532, S5-193519 Section X.2.9 
+notifyCorrelatedNotificationChanged 3GPP TS 28.532, S5-193519 Section X.2.10 
+notifyChangedAlarmGeneral 3GPP TS 28.532, S5-193519 Section X.2.11 
+ 16 
+Appendix A.x of 3GPP S5-193519 provides the JSON Schema of fault3gppFields. 17 
+2.2.2 Fault Supervision Control 18 
+2.2.2.1 Description 19 
+Starting with 3GPP Release 16, dedicated operations for Management Services Use Cases will be replaced by IOCs 20 
+with attributes that can be read and/or set using generic provisioning mechanisms.   For Fault Supervision, O-RAN 21 
+requires the ability to Get Alarm List and Clear Alarm.    22 
+2.2.2.2 Requirements 23 
+3GPP spec should define a FaultSupervision Control IOC and FaultSupervision Reader IOC with appropriate attributes 24 
+to support the required operations and submit them as a standards contribution using 3GPP TS 28.545 as a reference. 25 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.2.2.3 Procedures 1 
+NETCONF protocol and YANG data models are used to get and set the attributes from the  FaultSupervisionControl 2 
+IOC. 3GPP has not defined yet the FaultSupervisionReader and faultSupervisionControl IOCs .  Refer to Provisioning 3 
+management services section for examples of these definitions. 4 
+2.3 Performance Assurance Management Services 5 
+Performance Assurance Management Services allow a Performance Assurance MnS Provider to report bulk and/or real 6 
+time performance data to a Performance Assurance  MnS Consumer and allows a Performance Assurance  MnS 7 
+Consumer to perform performance assurance operations on the Performance Assurance  MnS Provider, such as 8 
+selecting the measurements to be reported and setting the frequency of reporting.  9 
+Use cases are specified in 3GPP TS 28.550 [10].   10 
+Alignment between 3GPP SA5 and ONAP is described in 3GPP TR 28.890 [2].   11 
+2.3.1 Performance Data File Reporting 12 
+2.3.1.1 Description 13 
+Performance Assurance MnS Provider sends asynchronous FileReady notification event to Performance Assurance 14 
+MnS Consumer sent when PM File is ready for upload. The FileReady notification contains one parameter indicating 15 
+the location at which the file can be retrieved. 16 
+Performance Assurance MnS Consumer uploads Bulk PM File from Performance Assurance MnS Provider via secure 17 
+file transfer protocol, triggered by FileReady event.  18 
+2.3.1.2 Requirements 19 
+Requirements are specified in 3GPP TS 28.550 section 5.2.2. 20 
+2.3.1.3 Procedures 21 
+Procedure is specified in 3GPP TS 28.550 section 5.1.1.2. 22 
+@startuml 23 
+Title Bulk PM File Upload 24 
+Autonumber 25 
+participant "Performance Assurance MnS Consumer” as NMS 26 
+participant "Performance Assurance MnS Provider" as ME 27 
+Note over ME : New PM data file available 28 
+ME ->> NMS : <<HTTP/TLS>> FileReady Event 29 
+NMS -> ME : <<FTPeS or SFTP>> Upload File 30 
+@enduml 31 
+ 32 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+Figure 2.3.1.3-1 Bulk PM File Upload 3 
+Pre-condition:  A new PM data file is available on the Performance Assurance MnS Provider. 4 
+ 5 
+1. Performance Assurance MnS Provider sends FileReady notification VES event to Performance Assurance 6 
+MnS Consumer over HTTP/TLS.  Mutual certificate authentication is performed. 7 
+2. Performance Assurance MnS Consumer sets up a secure FTPeS or SFTP connection to the Performance 8 
+Assurance MnS Provider and uploads the PM data file. SFTP is authenticated with username/password, 9 
+SSH keys or X.509 certificates.  FTPES is authenticated with X.509  certificates.    10 
+ 11 
+2.3.1.4 Operations and Notifications 12 
+FileReady notification is a JSON encoded VES event sent from Performance Assurance MnS Provider to Performance 13 
+Assurance MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and FileReady 14 
+Notification Fields.  15 
+FileReady notification event will be specified in 3GPP TS 28.532 as part of the 3GPP/ONAP alignment normative 16 
+work.  Until that time, the FileReady notification is specified in the VES Event Specification v7.1 [31]. 17 
+2.3.1.5 PM File Generation and Reporting 18 
+PM file generation and reporting are specified in 3GPP 28.532 section 7.2.1.1.  19 
+2.3.1.6 PM File Content 20 
+PM file content is specified in 3GPP TS 28.532 section 7.2.1.2. 21 
+2.3.1.7 PM File Naming 22 
+PM file naming is specified in 3GPP TS 28.532 section 7.2.1.3. 23 
+2.3.1.8 PM File XML Format 24 
+PM file XML format is specified in 3GPP TS 28.550 Section A.4. 25 
+2.3.1.9 5G Performance Measurements 26 
+3GPP defined 5G performance measurements are specified in 3GPP TS 28.552.  In addition to the 3GPP -defined 27 
+measurements, it is possible to have O-RAN defined measurements and vendor supplied measurements.  O-RAN 28 
+defined measurements are named with a “OR.” prefix. Vendor supplied measurements are named with a “VS.” prefix.  29 
+2.3.2 Performance Data Streaming 30 
+Editor’s Note: This section will be updated in subsequent versions of the interface specification as 3GPP Release 16 31 
+changes are approved. 32 
+2.3.2.1 Description 33 
+Performance Assurance MnS Provider steams high volume asynchronous Real Time Performance Measurement 34 
+(RTPM) data to Performance Assurance MnS Consumer at a configurable frequency. 35 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.3.2.2 Requirements 1 
+Requirements will be specified in a 3GPP spec. 2 
+2.3.2.3 Procedures 3 
+Procedures will be specified in a 3GPP spec. 4 
+2.3.3 Performance Assurance Control 5 
+2.3.3.1 Description 6 
+Starting with 3GPP Release 16, dedicated operations for Performance Assurance Control will be replaced by IOCs with 7 
+attributes that can be read and/or set using generic provisioning mechanisms.   For Performance Assurance, this 8 
+includes operations such as Create Measurement Job, Terminate Measurement Job a nd Query Measurement Job.   9 
+Measurement jobs can be created, terminated and queried by setting and/or getting attributes in the 10 
+MeasurementControl and MeasurementReader IOCs.  11 
+2.3.3.2 Requirements 12 
+Measurement Control IOC is specified in 3GPP TS 28.622 [14] section 4.3.12.  Measurement Reader IOC is specified 13 
+in 3GPP TS 28.622 section 4.3.13.  Measurement data type is specified in 3GPP TS 28.622 section 4.3.14.  14 
+2.3.3.3 Procedures 15 
+NETCONF protocol and YANG data models are used to get and/or set the MeasurementControl and 16 
+MeasurementReader IOC attributes.  Refer to Provisioning management services section. 17 
+2.4 Trace Management Services 18 
+Editor’s Note: This section will be updated in subsequent versions of the interface specification as 3GPP Release 16 19 
+changes are approved. 20 
+Trace management services allow a Trace MnS Provider to report high volume asynchronous streaming of Subscriber 21 
+and Equipment Trace data (e.g. Call, Cell, UE) to the Trace MnS Subscriber upon a triggering event and allows the 22 
+Trace MnS Subscriber to configure the trace management capabilities on the Trace MnS Provider. 23 
+Use cases are based on 3GPP TS 32.421. 24 
+Relevant SA5 spec updates to 3GPP TS 32.421, 32.422, 32.423 for SBMA are targeted for Rel 16. 25 
+2.4.1 Trace Data Reporting 26 
+2.4.1.1 Description 27 
+High volume asynchronous streaming of Subscriber and Equipment Trace data (e.g. Call, Cell, UE, MDT) from Trace 28 
+MnS Provider to Trace MnS Subscriber sent upon triggering event. 29 
+2.4.1.2 Requirements 30 
+Requirements will be specified in a 3GPP spec. 31 
+2.4.1.3 Procedures 32 
+Procedures will be specified in a 3GPP spec. 33 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.4.2 Trace Session Activation 1 
+2.4.2.1 Description 2 
+ 3 
+2.4.2.2 Requirements 4 
+ 5 
+2.4.2.3 Procedures 6 
+ 7 
+2.4.3 Trace Session Deactivation 8 
+2.4.3.1 Description 9 
+ 10 
+2.4.3.2 Requirements 11 
+ 12 
+2.4.3.3 Procedures 13 
+ 14 
+2.4.4 Trace Recording Session Activation 15 
+2.4.4.1 Description 16 
+ 17 
+2.4.4.2 Requirements 18 
+ 19 
+2.4.4.3 Procedures 20 
+ 21 
+2.4.5 Trace Recording Session Deactivation 22 
+2.4.5.1 Description 23 
+ 24 
+2.4.5.2 Requirements 25 
+ 26 
+2.4.5.3 Procedures 27 
+ 28 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.5 File Management Services 1 
+File management services allow a File Management MnS Consumer to request the transfer of files between the File 2 
+Management MnS Provider and the File Management MnS Consumer.  3 
+Use cases are based on the O-RAN WG4 Front Haul Management Plane specification. 4 
+Relevant 3GPP specification for file transfer is 3GPP TS 32.341  [15], TS 32.342 [16] and TS 32.346 [17]. 5 
+2.5.1 File Ready Notification 6 
+2.5.1.1 Description 7 
+The File Ready Notification notifies a File Management MnS Consumer that a file is available for upload from the File 8 
+Management MnS Provider.  In general, File Management MnS Provider sends a FileReady notification for files that 9 
+the File Management MnS Consumer has configured the File Management MnS Provider to collect on a periodic basis, 10 
+such as file-based Trace Data or PM Measurement Reports.  11 
+2.5.1.2 Requirements 12 
+FileReady notification event is a JSON encoded VES event, that consists of a Common VES Event Header and 13 
+FileReady Notification Fields. It will be specified in 3GPP TS 28.532 as part of the 3GPP/ONAP alignment normative 14 
+work.  Until that time, the VES Event Specification v7.1 specifies the FileReady notific ation. 15 
+2.5.1.3 Procedures 16 
+File Management MnS Consumer configures a File Management MnS Provider to collect data files with specific 17 
+characteristics that the File Management MnS Consumer desires, such as file-based Trace Data or PM Measurement 18 
+Reports described in the Performance Assurance Section of this document.  After configuration, the File Management 19 
+MnS Consumer terminates the configuration session and waits for the File Management MnS Provider to report that the 20 
+file is ready for collection.   21 
+When a file is available, the File Management MnS Provider sends a FileReady notification to the File Management 22 
+MnS Consumer using REST/HTTPS.   23 
+@startuml 24 
+Title File Ready Notification 25 
+Autonumber 26 
+participant "File Management MnS Consumer” as NMS 27 
+participant "File Management MnS Provider" as ME 28 
+Note over ME : New file is available on ME 29 
+ME ->> NMS : <<HTTP/TLS>> FileReady Event 30 
+@enduml 31 
+ 32 
+ 33 
+ 34 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Figure 2.5.1.3-1 File Available for Upload 1 
+ 2 
+Pre-condition:  A new file is available on the File Management MnS Provider. 3 
+ 4 
+1. File Management MnS Provider sends FileReady notification to File Management MnS Consumer over 5 
+HTTP/TLS.  Mutual certificate authentication is performed.   6 
+ 7 
+2.5.1.4 Standards Additions to support O-RAN 8 
+O-RAN will contact 3GPP reps to propose that the 3GPP/ONAP alignment includes re-naming of some fields within 9 
+the notification to provide more clarity, such as renaming the changeIdentifier field in the Notification event supporting 10 
+VES FileReady to a name more aligned with the field’s purpose, such as fileType.  The 3GPP specification will need to 11 
+be updated if O-RAN wants to put specific naming conventions on the types of files that will be available for upload.  12 
+O-RAN will request that 3GPP add FTPeS to the transport requirements supported in 32.342 . 13 
+2.5.1.5 File Types Supported 14 
+File Type requirements are documented in 3GPP TS 32.341 section 5.2. 15 
+2.5.1.6 File Naming Requirements 16 
+File Naming requirements are specified in 3GPP TS 32.342 Annex A. 17 
+2.5.2 List Available Files 18 
+2.5.2.1 Description  19 
+File Management MnS Consumer queries the File Management MnS Provider to identify files that are available on the 20 
+File Management MnS Provider.  Upon receipt of the available files and their locations, the File Management MnS 21 
+Consumer can determine the next appropriate action. 22 
+2.5.2.2 Requirements 23 
+Requirements are found in section 5.4 of 3GPP TS 32.341. 24 
+2.5.2.3 Procedures 25 
+This Management Services Use Case allows the File Management MnS Consumer to obtain a list of available files and 26 
+their locations.  A File Management MnS Consumer may use this management service in scenarios where the File 27 
+Management MnS Provider is collecting information, such as logs, on a standard basis in support of debugging 28 
+activities.  Under normal operations, the File Management MnS Provider does not send this data to the File 29 
+Management MnS Consumer as the File Management MnS Consumer does not need it.  The File Management MnS 30 
+Provider retains the data with the oldest data being over-written when space is exhausted.  In some scenarios, the File 31 
+Management MnS Consumer may want to upload some, or all, of the available log files to resolve an issue.  In this case, 32 
+File Management MnS Consumer sends a NETCONF RPC command to the File Management MnS Provider to provide 33 
+the list of available files.  File Management MnS Provider responds with list of available files and their locations and 34 
+file types.  File Management MnS Consumer may use this information to upload the desired files.  See Upload File 35 
+Service section 2.5.3. 36 
+The File Management MnS Consumer does not have to initiate a file upload as a result of the list available files 37 
+management service.  There are use cases where the File Management MnS Consumer may want to verify that files are 38 
+being collected or verify that all files of a particular type (PM for example) have been uploaded.  39 
+@startuml 40 
+Title List Available Files 41 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+autonumber "[0]" 1 
+participant "File Management MnS Consumer” as NMS 2 
+participant "File Management MnS Provider" as ME 3 
+NMS <-> ME : Establish NETCONF Session 4 
+NMS -> ME: NETCONF <rpc> <retrieve-file-list> 5 
+Note over ME : Build file list 6 
+ME --> NMS: NETCONF <rpc-reply> <data> 7 
+NMS <-> ME : Terminate NETCONF Session 8 
+@enduml 9 
+ 10 
+ 11 
+ 12 
+ 13 
+Figure 2.5.2.3-1 List Available Files 14 
+ 15 
+1. File Management MnS Consumer establishes NETCONF session with File Management MnS Provider. 16 
+2. File Management MnS Consumer sends NETCONF <rpc> <retrieve-file-list> to the File Management MnS 17 
+Provider.  18 
+a. File Management MnS Provider builds list of available files.   19 
+3. File Management MnS Provider sends NETCONF <rpc-reply> <data>to the File Management MnS Consumer 20 
+with list of available files on the File Management MnS Provider. 21 
+4. File Management MnS Consumer terminates NETCONF session with File Management MnS Provider. 22 
+ 23 
+2.5.3 Upload File 24 
+2.5.3.1 Description 25 
+The Upload File Service provides the capability for a File Management MnS Consumer to upload files from the 26 
+location provided by the File Management MnS Provider.  The File Management MnS Consumer may perform this 27 
+action as a result of a FileReady notification from the File Management MnS Provider informing the File Management 28 
+MnS Consumer that a file is now available to upload, such as a Performance Management Report (see section 2.5.1 ) or 29 
+the File Management MnS Consumer may perform this function after querying the File Management MnS Provider to 30 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+provide the list of available files for upload (see section 2.5.2).  In any case, the file upload is performed using a secure 1 
+file transfer protocol (SFTP or FTPeS) from the location provided by the File Management MnS Provider. 2 
+2.5.3.2 Requirements 3 
+File Upload Requirements are found in Section 5.3 of 3GPP TS 32.341 . 4 
+2.5.3.3 Procedures 5 
+Case 1:  File Management MnS Consumer determines that a file should be uploaded from the the location provided by 6 
+the File Management MnS Provider  as a result of receiving a FileReady notification from the File Management MnS 7 
+Provider (described in 2.5.1). 8 
+The File Management MnS Consumer initiates a secure file transfer using FTPeS or SFTP to upload a file from the File 9 
+Management MnS Provider to the File Management MnS Consumer.  10 
+Case 2:  File Management MnS Consumer determines that a file should be uploaded from the File Management MnS 11 
+Provider  as a result of receiving a list available files from the File Management MnS Provider (described in 2.5.2)  12 
+Case 3:  File Management MnS Consumer determines that a file should be uploaded from the File Management MnS 13 
+Provider from a known location where the files should be available.   14 
+In any case, File Management MnS Consumer initiates a secure file transfer using FTPeS or SFTP to upload a file from 15 
+the File Management MnS Provider to the File Management MnS Consumer. 16 
+@startuml 17 
+Title File Upload  18 
+Autonumber 19 
+participant "File Management MnS Consumer” as NMS 20 
+participant "File Management MnS Provider" as ME 21 
+NMS -> ME : <<FTPeS or SFTP>> Upload File 22 
+@enduml 23 
+ 24 
+ 25 
+ 26 
+Figure 2.5.3.3-1 File Upload 27 
+ 28 
+1. File Management MnS Consumer initiates a secure file transfer using FTPeS or SFTP and uploads a file from 29 
+the File Management MnS Provider to the File Management MnS Consumer.  SFTP is authenticated with 30 
+username/password, SSH keys or X.509 certificates.  FTPES is authenticated with X .509 certificates.   31 
+ 32 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.5.4 Download File 1 
+2.5.4.1 Description  2 
+The File Management MnS Consumer has a file that needs to be downloaded to the File Management MnS Provider 3 
+such as: 4 
+ Software file to upgrade software version executed on the File Management MnS Provider  5 
+ Beamforming configuration file (Opaque Vendor specific data) 6 
+ Machine Learning  7 
+ Certificates 8 
+The File Management MnS Consumer triggers the file download.  The File Management MnS Provider uses a secure 9 
+file transfer protocol to download the file from the location specified by the File Management MnS Consumer and then 10 
+notifies the File Management MnS Consumer of the result of the download. 11 
+2.5.4.2 Requirements 12 
+General File Download requirements are found in section 5.3 of 3GPP TS 32.34 1. 13 
+2.5.4.3 Procedures 14 
+@startuml 15 
+Title File Download 16 
+autonumber "[0]" 17 
+participant "File Management MnS Consumer” as NMS 18 
+participant "File Management MnS Provider" as ME 19 
+Participant “File Server” as FS 20 
+NMS <-> ME : Establish Netconf Session 21 
+NMS -> ME: NETCONF <rpc><file-download><remote-file-path> 22 
+ME --> NMS: NETCONF <rpc-reply><file-download><status> 23 
+NMS <-> ME : Terminate Netconf Session 24 
+ME -> FS : <<FTPeS or SFTP>> file download 25 
+Opt Download Progress Notifications 26 
+ME ->> NMS : <<HTTP/TLS>> downloadFile Event 27 
+End 28 
+||| 29 
+ME ->> NMS : <<HTTP/TLS>> downloadFile Event  30 
+@enduml 31 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.5.4.3-1 File Download 4 
+ 5 
+1. File Management MnS Consumer establishes NETCONF session with File Management MnS Provider. 6 
+2. File Management MnS Consumer sends NETCONF RPC file-download request, including the location of the 7 
+file to download, to the File Management MnS Provider to trigger a file download.  8 
+3. File Management MnS Provider replies with its ability to begin the download. 9 
+4. File Management MnS Consumer terminates NETCONF session with File Management MnS Provider.  10 
+5. File Management MnS Provider sets up a secure connection and downloads the file via FTPeS or SFTP.  SFTP 11 
+is authenticated with username/password, SSH keys or X.509 certificates.  FTPES is authenticated with X.509 12 
+certificates.  13 
+6. (Optional) If the download takes a long time, File Management MnS Provider may send periodic downloadFile 14 
+notifications to the File Management MnS Consumer with the current status of the download (download in 15 
+progress).  16 
+7. When download completes, File Management MnS Provider sends a downloadFile notification to the File 17 
+Management MnS Consumer with the final status of the download (success, file missing, failure). 18 
+2.5.4.4 Operations and Notifications 19 
+downloadFile notification is a JSON encoded VES event sent from File Management MnS Provider to File 20 
+Management MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and fileDownload 21 
+Notification Fields to notify the File Management MnS Consumer of the progress and status of a file download.  This 22 
+event needs to be defined in VES and included in the harmonization activities between 3GPP and ONAP. 23 
+ 24 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.6 Communication Surveillance Management Services 1 
+Communication Surveillance MnS allow a Communication Surveillance MnS Provider to send heartbeats to the 2 
+Communication Surveillance MnS Consumer and allow the Communication Surveillance MnS Consumer to configure 3 
+the communication surveillance services on the Communication Surveillance MnS Provider . 4 
+Use cases are specified in 3GPP TS 28.550.   5 
+Alignment between 3GPP SA5 and ONAP is described in 3GPP T R 28.890 and CR S5-192073 [27].  Normative work 6 
+includes a new SA5 specification for Communication Surveillance based on 3GPP TS 32.352 and an update to 3GPP 7 
+TS 28.532 to add the Heartbeat VES event. 8 
+2.6.1 Heartbeat Notification 9 
+2.6.1.1 Description 10 
+Communication Surveillance MnS Provider sends asynchronous heartbeat event to Communication Surveillance MnS 11 
+Consumer at a configurable frequency to allow Communication Surveillance MnS Consumer to supervise the 12 
+connectivity to the Communication Surveillance MnS Provider. 13 
+2.6.1.2 Requirements 14 
+Requirements are to be specified in a new 3GPP spec for Communication Surveillance as part of the 3GPP/ONAP 15 
+alignment normative work.  Until that time, the requirements are provided in this O1 Interface Specification.  16 
+REQ-HN-FUN-1:  The communications surveillance management service provider shall have the capability to send 17 
+heartbeat notifications to its authorized consumer periodically at the frequency specified in the heartbeatPeriod attribute 18 
+or whenever the countDownTimer attribute is set to 0. 19 
+REQ-HN-FUN-2: The communications surveillance management service provider shall allow the authorized consumer 20 
+to set the destination address for the heartbeat notification. 21 
+2.6.1.3 Procedures 22 
+Procedures are to be specified in a new 3GPP spec for Communication Surveillance as part of the 3GPP/ONAP 23 
+alignment normative work.  Until that time, the procedures are provided in this O1 Interface Specification. 24 
+ 25 
+@startuml 26 
+Title Heartbeat Notification 27 
+Autonumber 28 
+participant "Communication Surveillance MnS Consumer” as NMS 29 
+participant "Communication Surveillance MnS Provider" as ME 30 
+loop heartbeat 31 
+Note over ME : Set countDownTimer to heartbeatPeriod 32 
+Note over ME : When countDownTimer reaches 0 33 
+ME ->> NMS : <<HTTP/TLS>> heartbeat Event 34 
+end 35 
+@enduml 36 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.6.1.3-1 Heartbeat Notification 4 
+ 5 
+ 6 
+Pre-condition:  heartbeatPeriod > 0 7 
+Loop 8 
+The Heartbeat notification provider sets the countDownTimer to the heartbeatPeriod. 9 
+When countDownTimer reaches 0,  10 
+1. Communication Surveillance MnS Provider sends Heartbeat notification VES event to 11 
+Communication Surveillance MnS Consumer over HTTP/TLS.  Mutual certificate authentication is 12 
+performed. 13 
+End Loop 14 
+ 15 
+2.6.1.4 Operations and Notifications 16 
+Heartbeat is a JSON encoded VES event sent from Communication Surveillance MnS Provider to Communication 17 
+Surveillance MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and Heartbeat Fields.  18 
+Heartbeat event will be specified in 3GPP TS 28.532 as part of the 3GPP/ONAP alignment normative work.  Until that 19 
+time, the Heartbeat event is specified in the VES Event Specification v7.1 [31]. 20 
+2.6.2 Communication Surveillance Control 21 
+Starting with 3GPP Release 16, dedicated operations for Management Services Use Cases will be replaced by IOCs 22 
+with attributes that can be read and/or set using generic provisioning mechanisms.   For Communication Surveillance, 23 
+this includes operations Set Heartbeat Period, Get Heartbeat Period, Trigger Heartbeat and Get Countdown Timer 24 
+Value.    25 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+2.6.2.1 Requirements 1 
+Requirements are to be specified in a new 3GPP spec for Communication Surveillance as part of the 3GPP/ONAP 2 
+alignment normative work.  Until that time, the requirements are provided in this O1 Interface Specification.  3 
+REQ-CSC-FUN-1:  The communication surveillance management service provider shall have the capability to allow its 4 
+authorized consumer to set the heartbeat period. 5 
+REQ-CSC-FUN-2:  The communication surveillance management service provider shall have the capability to allow its 6 
+authorized consumer to read the current heartbeat period value. 7 
+REQ-CSC-FUN-3:  The communication surveillance management service provider shall have the capability to allow its 8 
+authorized consumer to read the current count down timer value. 9 
+REQ-CSC-FUN-4:  The communication surveillance management service provider shall have the capability to allow its 10 
+authorized consumer to trigger a Heartbeat Notification by setting the current count down timer value to zero.  11 
+2.6.2.2 Procedures 12 
+NETCONF protocol and YANG data models are used to get and set the heartbeatPeriod and the countDownTimer in 13 
+the HeartbeatControl IOC.  Refer to the Provisioning management services section. 14 
+2.6.2.3 HeartbeatControl IOC Definition 15 
+HeartbeatControl IOC definition is to be specified in a new 3GPP spec for Communication Surveillance as part of the 16 
+3GPP/ONAP alignment normative work.  Until that time, the IOC definition is provided in this O1 Interface 17 
+Specification.  18 
+This IOC represents the capabilities to emit a heartbeat notification periodically. The emission frequency is controlled 19 
+by an attribute named heartbeatPeriod. 20 
+Table 2.6.2.3-1 Heartbeat IOC Attributes 21 
+Attribute name Support Qualifier isReadable isWritable isInvariant isNotifiable 
+heartbeatPeriod M T T F F 
+countDownTimer M T T F F 
+ 22 
+Attribute definitions and legal values are shown in the table below. 23 
+Table 2.6.2.3-2 Heartbeat Attribute Definitions 24 
+Attribute Name Definition Legal Values 
+heartbeatPeriod It specifies the time between two emissions of 
+heartbeat notifications. A value of zero implies there is 
+no heartbeat emission. The unit is minute. 
+Type: Integral numeric value 
+Range: value range of heartbeat period is 
+from 5min to 60min, 0 is also a legal value. 
+countDownTimer It represents the current value of a count down timer. Range: value range of heartbeatPeriod.  
+Heartbeat is emitted when value reaches 
+or is set to 0. 
+ 25 
+ 26 
+2.7 PNF Startup and Registration Management Services 27 
+PNF Startup and Registration management services allow a physical PNF Startup and Registration MnS Provider to 28 
+acquire its network layer parameters either via static procedures (pre-configured in the element) or via dynamic 29 
+procedures (Plug-n-Play) during startup. During this process, the PNF Startup and Registration MnS Provider also 30 
+acquires the IP address of the PNF Startup and Registration MnS Consumer for PNF Startup and Registration MnS 31 
+Provider registration. Once the PNF Startup and Registration MnS Provider registers, the PNF Startup and Registration 32 
+MnS Consumer can then bring the PNF Startup and Registration MnS Provider to an operational state. 33 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Relevant 3GPP specification for PNF Plug-n-Play (PnP) is 3GPP TS 32.508 [21].  Additional Plug-n-Play information 1 
+for IPV6 and other O-RAN extensions can be found in ORAN-WG4.MP.0-v01.00: O-RAN Alliance Working Group 4 2 
+Management Plane Specification. 3 
+Alignment between 3GPP SA5 and ONAP is described in 3GPP TR 28.890 .  Normative work includes an update to 4 
+3GPP TS 28.532 to add the pnfRegistration VES event.  O-RAN may want to propose a new 3GPP SA5 Stage 1 5 
+specification for PNF Plug-n-Play and Registration. 6 
+2.7.1 PNF Plug-n-Play 7 
+2.7.1.1 Description 8 
+PNF Plug-n-Play (PnP) scenario enables a PNF ME to obtain the necessary start -up configuration to allow it to register 9 
+with a PNF Startup and Registration MnS Consumer for subsequent management.   10 
+2.7.1.2 Requirements 11 
+Assuming O-RAN proposes a new Stage 1 spec for PNF Plug-n-Play and Registration, the PNF PnP requirements will 12 
+be specified there.  Until that time, the PNF PnP requirements are found in 3GPP TS 32.508 . 13 
+2.7.1.3 Procedures 14 
+Assuming O-RAN proposes a new Stage 1 spec for PNF Plug-n-Play and Registration, the PNF PnP procedures will be 15 
+specified there.  Until that time, the PNF PnP procedures are found in 3GPP TS 32.508.  16 
+2.7.2 PNF Registration 17 
+2.7.2.1 Description 18 
+PNF Startup and Registration MnS Provider sends an asynchronous pnfRegistration event to a PNF Startup and 19 
+Registration MnS Consumer after PnP to notify PNF Startup and Registration MnS Consumer of new PNF Startup and 20 
+Registration MnS Provider to be managed 21 
+2.7.2.2 Requirements 22 
+Assuming O-RAN proposes a new Stage 1 spec for PNF Plug-n-Play and Registration, the PNF Registration 23 
+requirements will be specified there.  Until that time, the PNF Registration requirements are provided in the ONAP 24 
+VNF Requirements document in the PNF Plug-n-Play section. 25 
+2.7.2.3 Procedures 26 
+Assuming O-RAN proposes a new Stage 1 spec for PNF Plug-n-Play and Registration, the PNF Registration procedures 27 
+will be specified there.  Until that time, the PNF Registration procedures are provided in this O1 Interface Specification.   28 
+2.7.2.4 Procedures 29 
+ 30 
+@startuml 31 
+Title PNF Registration Notification 32 
+Autonumber 33 
+participant "PNF Startup and Registration MnS Consumer” as NMS 34 
+participant " PNF Startup and Registration MnS Provider" as ME 35 
+Note over ME : PnP completes 36 
+ME ->> NMS : <<HTTP/TLS>> pnfRegistration Event 37 
+Note over NMS : Register PNF 38 
+@enduml 39 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.7.2.4-1 PNF Registration Notification 4 
+ 5 
+Pre-condition:  PNF completes Plug-n-Play. 6 
+1. PNF Startup and Registration MnS Provider sends pnfRegistration notification VES event to PNF Startup and 7 
+Registration MnS Consumer over HTTP/TLS.  Mutual certificate authentication is performed. 8 
+Post-condition: PNF Startup and Registration MnS Consumer registers the PNF Startup and Registration MnS 9 
+Provider so that it can be managed. 10 
+2.7.2.5 Operations and Notifications 11 
+pnfRegistration notification is a JSON encoded VES event sent from PNF Startup and Registration MnS Provider to 12 
+PNF Startup and Registration MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and 13 
+pnfRegistration Notification Fields.  14 
+pnfRegistration notification event will be specified in 3GPP TS 28.532 as part of the 3GPP/ONAP alignment normative 15 
+work.  Until that time, the pnfRegistration notification is specified in the VES Event Specification v7.1 [31]. 16 
+2.8 PNF Software Management Services 17 
+Software management services allow a PNF Software MnS Consumer to request a physical PNF Software MnS 18 
+Provider to download, install, validate and activate a new software package and allow a physical PNF Software MnS 19 
+Provider to report its software versions. 20 
+2.8.1 Software Package Naming and Content 21 
+PNF Software Package naming, content and format are vendor specific and do not require standardization in O -RAN.  22 
+A PNF Software Package may contain one or more files.  Some of the files in the Software Package may be op tional for 23 
+the PNF (example: a file that has not changed version).  The PNF is aware of the content and format of its available 24 
+Software Packages and can determine which files it needs to download. 25 
+The softwarePackage Managed Object Class (MOC) contains attributes about a software package such as:  software 26 
+package name, version, fileList, integrityStatus (valid, invalid, empty), runningState (active, passive), vendor, 27 
+productName, softwareType (operational, factory), etc. This MOC is applicable to VNFs and  PNFs and is a generic 28 
+term that O-RAN will use to refer to the software available on the PNF rather than the legacy term of software slot.  On 29 
+a PNF, a softwarePackage MOI corresponds to a hardware software slot.  30 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+The PNF creates one instance of softwarePackage for each software package supported concurrently on the PNF.  1 
+Typically, a PNF will have two softwarePackage MOIs for operational software; one with runningState = active and 2 
+one with runningState = passive.  Some PNFs also have a softwarePackage MOI  for the factory software which would 3 
+be read only.  O-RAN may have PNFs that support more than one passive slot.  In this case the inventory query result 4 
+would show multiple MOIs with runningState=passive. 5 
+2.8.2 Software Inventory 6 
+2.8.2.1 Description 7 
+The PNF Startup and Registration MnS Consumer sends a Software Inventory Request and retrieves information about 8 
+the software packages on the PNF Software MnS Provider. 9 
+2.8.2.2 Requirements 10 
+Requirements are to be specified in a 3GPP spec for PNF Software Management.  Until that time, the requirements are 11 
+provided in this O1 Interface Specification.  12 
+REQ-SWI-FUN-1:  The PNF software management service provider shall have the capability to provide its authorized 13 
+consumer information about the software packages on the PNF software management service provider. 14 
+2.8.2.3 Procedures 15 
+@startuml 16 
+Title Software Inventory 17 
+autonumber "[0]" 18 
+participant "PNF Software MnS Consumer” as NMS 19 
+participant "PNF Software MnS Provider" as ME 20 
+NMS <-> ME : Establish NETCONF Session 21 
+NMS -> ME: NETCONF <rpc> <get><filter> 22 
+Note over ME : Retrieve Software Inventory Information 23 
+ME --> NMS: NETCONF <rpc-reply> <data> 24 
+NMS <-> ME : Terminate NETCONF Session 25 
+@enduml 26 
+ 27 
+ 28 
+ 29 
+Figure 2.8.2.3-1 Software Inventory 30 
+ 31 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+1. PNF Software MnS Consumer establishes NETCONF session with PNF Software MnS Provider.  The 1 
+NETCONF session has authorized read privileges into the identified section of the data store. 2 
+2. PNF Software MnS Consumer sends NETCONF <rpc> <get><filter> to retrieve an optionally filtered subset 3 
+configuration from the running configuration datastore.  <filter> can be used to identify the software package 4 
+MOIs. GET retrieves configuration and operational-state of softwarePackage MOIs. 5 
+a. PNF Software MnS Provider retrieves software inventory information. 6 
+3. PNF Software MnS Provider returns requested data in NETCONF <rpc-reply> response. 7 
+4. PNF Software MnS Consumer termintes NETCONF session with PNF Software MnS Provider. 8 
+ 9 
+2.8.3 Software Download 10 
+2.8.3.1 Description 11 
+Software Download triggers the download of a specific software package to the PNF Software MnS Provider.  This 12 
+download service includes integrity checks on the downloaded software and the installation of the software into the 13 
+software slot corresponding to the softwarePackage MOI. 14 
+2.8.3.2 Requirements 15 
+Requirements are to be specified in a 3GPP spec for PNF Software Management.  Until that time, the requirements are 16 
+provided in this O1 Interface Specification.  17 
+REQ-SWD-FUN-1:  The PNF software management service provider shall have the capability to allow its authorized 18 
+consumer to specify the location of software that is to be downloaded and to specify into which softwarePackage the 19 
+software is to be stored. 20 
+REQ-SWD-FUN-2:  The PNF software management service provider shall have the capability to verify if a software 21 
+download is in progress and the ability to reject subsequent download commands until the one in progress completes . 22 
+REQ-SWD-FUN-3: The PNF software management service provider shall have the capability to deny download of 23 
+software if the download request is not valid for the PNF software management service provider.  24 
+REQ-SWD-FUN-4: The PNF software management service provider shall have the capability to download needed files 25 
+from a software server at a specified location. 26 
+REQ-SWD-FUN-5: The PNF software management service provider shall have the capability to perform integrity 27 
+checks on downloaded software. 28 
+REQ-SWD-FUN-6: The PNF software management service provider  shall have the capability to install the software 29 
+into the software slot corresponding to the softwarePackage MOI identified by its authorized consumer in the download 30 
+command. 31 
+2.8.3.3 Procedures 32 
+@startuml 33 
+Title Software Download 34 
+autonumber "[0]" 35 
+participant "PNF Software MnS Consumer” as NMS 36 
+participant "PNF Software MnS Provider" as ME 37 
+participant "Software Server” as SWS 38 
+NMS <-> ME : Establish NETCONF Session 39 
+NMS -> ME: NETCONF <rpc><software-download><remote-file-path><softwarePackage>  40 
+Note over ME : Validate Request 41 
+ME --> NMS: NETCONF <rpc-reply><software-download-status> 42 
+NMS <-> ME : Terminate NETCONF Session 43 
+ME -> SWS : <<FTPeS or SFTP>> file download 44 
+Note over ME : Integrity check SW 45 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Note over ME : Install SW into slot 1 
+Note over ME : Update softwarePackage 2 
+Opt Download Progress Notifications 3 
+ME ->> NMS : <<HTTP/TLS>> downloadFile Event 4 
+End 5 
+||| 6 
+ME ->> NMS : <<HTTP/TLS>> downloadFile Event 7 
+@enduml 8 
+ 9 
+ 10 
+ 11 
+Figure 2.8.3.3-1 Software Download 12 
+1. PNF Software MnS Consumer establishes NETCONF session with PNF Software MnS Provider.  The 13 
+NETCONF session has authorized execution privileges for retrieve file list and file -download rpcs. 14 
+2. PNF Software MnS Consumer sends NETCONF <rpc><software-download><remote-file-15 
+path><softwarePackage> to trigger a download of the software located at remoteFilePath and save its 16 
+information in softwarePackage.   17 
+a. PNF Software MnS Provider validates the request. Validation includes determining if the operation 18 
+can be performed. This is PNF Software MnS Provider specific but could include things like: 19 
+checking that there is not a software download already in progress, softwarePackage is runningState = 20 
+passive and softwareType = operational, etc. 21 
+3. PNF Software MnS Provider returns NETCONF <rpc-reply><software-download-status>.  22 
+4. PNF Software MnS Consumer terminates NETCONF session with PNF Software MnS Provider. 23 
+5. PNF Software MnS Provider initiates SFTP or FTPES connection and downloads the software package from 24 
+remoteFilePath.  SFTP is authenticated with username/password, SSH keys or X.509 certificates.  FTPES is 25 
+authenticated with X.509 certificates.  PNF Software MnS Provider understands the software package format 26 
+and downloads all the files it needs from the package.  PNF Software MnS Provider decides where to store the 27 
+software internally.  This is PNF Software MnS Provider specific but could be a temporary location like /tmp.  28 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+a. PNF Software MnS Provider integrity checks the downloaded software.  This is PNF Software MnS 1 
+Provider specific but could include checking checksum, correct software for the hardware, etc. 2 
+b. PNF Software MnS Provider installs software into the software slot corresponding to the 3 
+softwarePackage. 4 
+c. PNF Software MnS Provider updates softwarePackage; name, version, fileList, integrityStatus, 5 
+runningState, etc. 6 
+5. (Optional) If the download takes a long time, PNF Software MnS Provider may send periodic downloadFile 7 
+notifications to the PNF Software MnS Consumer with the current status of the download (download in 8 
+progress, integrity checks passed, install complete). 9 
+6. When download operation completes, PNF Software MnS Provider sends downloadFile notification to PNF 10 
+Software MnS Consumer with the final status of the download (success or the reason for failure).  11 
+2.8.3.4 Operations and Notifications 12 
+downloadFile notification is a JSON encoded VES event sent from PNF Software MnS Provider to PNF Software MnS 13 
+Consumer using REST/HTTPS.  It consists of a Common VES Event Header and fileDownload Notification Fields to 14 
+notify the PNF Software MnS Consumer of the progress and status of a file download.  This event needs to be defined 15 
+in VES and included in the harmonization activities between 3GPP and ONAP . 16 
+ 17 
+2.8.4 Software Pre-Check 18 
+2.8.4.1 Description 19 
+Software Pre-check is an optional Use Case that the Service Provider may choose to utilize to confirm that th e PNF 20 
+Software MnS Provider is in a good state to activate the new software and provide information needed for planning the 21 
+timing of the software replacement--such as whether a reset or a data migration is required. 22 
+2.8.4.2 Requirements 23 
+Requirements are to be specified in a 3GPP spec for PNF Software Management.  Until that time, the requirements are 24 
+provided in this O1 Interface Specification.  25 
+REQ-SPC-FUN-1: The PNF software management service provider shall have the capability to confirm that the 26 
+software in the passive slot targeted for activation is good. 27 
+REQ-SPC-FUN-2: The PNF software management service provider shall have the capability to determine whether the 28 
+activation of the targeted software requires a reset and/or data migration. 29 
+2.8.4.3 Procedures 30 
+ 31 
+@startuml 32 
+Title Software Pre-Check 33 
+autonumber "[0]" 34 
+participant "PNF Software MnS Consumer” as NMS 35 
+participant "PNF Software MnS Provider" as ME 36 
+NMS <-> ME : Establish NETCONF Session 37 
+NMS -> ME: NETCONF <rpc><software-pre-check><softwarePackage> 38 
+Note over ME : Perform Pre-Check 39 
+ME --> NMS: NETCONF <rpc-reply> <data> 40 
+NMS <-> ME : Terminate NETCONF Session 41 
+@enduml 42 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.8.4.3-1 Software Pre-Check 4 
+1. PNF Software MnS Consumer establishes NETCONF session with PNF Software MnS Provider. 5 
+2. PNF Software MnS Consumer sends NETCONF <rpc><software-pre-check><softwarePackage> to trigger a 6 
+pre-check of the software stored in softwarePackage and to return the results of the pre-check.   7 
+a. PNF Software MnS Provider performs the pre-check which includes validating that the software in 8 
+softwarePackage is good, whether the activation of the software in softwarePackage will result in a 9 
+reset and whether data migration is needed, etc. 10 
+3. PNF Software MnS Provider returns NETCONF <rpc-reply> to the PNF Software MnS Consumer with the 11 
+results of the pre-check.  12 
+4. PNF Software MnS Consumer terminates NETCONF session with PNF Software MnS Provider. 13 
+ 14 
+2.8.5 Software Activate 15 
+2.8.5.1 Description 16 
+PNF Software MnS Consumer triggers the activation of a software package on the PNF Software MnS Provider 17 
+including data migration and reset if needed. 18 
+2.8.5.2 Requirements 19 
+Requirements are to be specified in a 3GPP spec for PNF Software Management.  Until that time, the requirements are 20 
+provided in this O1 Interface Specification.  21 
+REQ-SWA-FUN-1:  The PNF software management service provider shall have the capability to allow its authorized 22 
+consumer to activate valid software in a specific softwarePackage. 23 
+REQ-SWA-FUN-2:  The PNF software management service provider shall have the capability to verify whether a 24 
+software activation is in progress and deny a concurrent activation of software . 25 
+REQ-SWA-FUN-3: The PNF software management service provider shall have the capability to deny activation of 26 
+software if the activation request is not valid for the PNF software management service provider.  27 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+REQ-SWA-FUN-4: The PNF software management service provider shall have the capability to activate the 1 
+softwarePackage.   2 
+REQ-SWA-FUN-5: The PNF software management service provider shall have the capability to reset the PNF software 3 
+management service provider if the software activation requires it. 4 
+REQ-SWA-FUN-6: The PNF software management service provider shall provide the capability for the PNF software 5 
+management service provider to send a re-set reason notification to its authorized consumer if the activation results in a 6 
+reset. 7 
+REQ-SWA-FUN-7: The PNF software management service provider shall have the capability to perform data migration 8 
+on the PNF software management service provider if the software activation requires it. 9 
+REQ-SWA-FUN-8: The PNF software management service provider shall have the capability to fallback to the 10 
+previously active software if the new software cannot be activated. 11 
+REQ-SWA-FUN-9: The PNF software management service provider shall have the capability to fallback to the factory 12 
+software if the new and the previously active software can not be activated.  13 
+2.8.5.3 Procedures 14 
+ 15 
+@startuml 16 
+Title Software Activate 17 
+autonumber "[0]" 18 
+participant "PNF Software MnS Consumer” as NMS 19 
+participant "PNF Software MnS Provider" as ME 20 
+NMS <-> ME : Establish NETCONF Session 21 
+NMS -> ME: NETCONF <rpc><software-activate><softwarePackage> 22 
+Note over ME : Validate request 23 
+ME --> NMS: NETCONF <rpc-reply> <status> 24 
+NMS <-> ME : Terminate NETCONF Session 25 
+Note over ME : Activate Software 26 
+Alt if Data Migration or Reset are needed then 27 
+Alt if Reset Needed then 28 
+Note over ME : Reset 29 
+ME ->> NMS : <<HTTP/TLS>> resetReason Event 30 
+||| 31 
+End 32 
+Alt if Data Migration Needed then 33 
+Note over ME : Migrate Data if needed 34 
+||| 35 
+End 36 
+||| 37 
+End 38 
+Alt if Activation fails then 39 
+Note over ME : Fallback if failure 40 
+||| 41 
+End 42 
+Opt Activation Progress Notifications 43 
+ME ->> NMS : <<HTTP/TLS>> softwareActivate Event 44 
+End 45 
+||| 46 
+ME ->> NMS : <<HTTP/TLS>> softwareActivate Event 47 
+@enduml 48 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+ 1 
+ 2 
+ 3 
+Figure 2.8.5.3-1 Activate Software 4 
+1. PNF Software MnS Consumer establishes NETCONF session with PNF Software MnS Provider. 5 
+2. PNF Software MnS Consumer sends NETCONF <rpc><software-activate><softwarePackage> to trigger an 6 
+activation of the software in softwarePackage.   7 
+
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+a. PNF Software MnS Provider validates the request. This is PNF Software MnS Provider specific but 1 
+could include things like checking that there is not a software activation already in progress, 2 
+softwarePackage is runningState = passive and integrityStatus = valid, etc.  3 
+3. PNF Software MnS Provider returns status to the PNF Software MnS Consumer in the NETCONF <rpc-reply> 4 
+response.  5 
+a. PNF Software MnS Provider performs the steps needed to make the softwarePackage the active one. 6 
+This is PNF Software MnS Provider specific but includes things like updating the runningState of the 7 
+about-to-be-active and previously-active software packages. 8 
+4. PNF Software MnS Consumer terminates NETCONF session with PNF Software MnS Provider.  9 
+(Optional) PNF Software MnS Provider performs reset if necessary. PNF Software MnS Provider knows 10 
+whether reset is necessary.  11 
+5. (Optional) If a reset occurs, PNF Software MnS Provider sends a resetReason notification to the PNF Software 12 
+MnS Consumer with the reason for the reset; in this case software activation. 13 
+(Optional) PNF Software MnS Provider performs data migration if necessary. PNF Software MnS Provider 14 
+knows whether this is necessary.   15 
+(Optional) If the PNF Software MnS Provider can not activate the software, PNF Software MnS Provider must 16 
+have recovery logic to fallback to the previously active software and potentially fallback to the factory 17 
+software in a worst-case scenario.  18 
+6. (Optional) If the activation takes a long time, PNF Software MnS Provider may send periodic softwareActivate 19 
+notifications to PNF Software MnS Consumer with the current status of the activation (e.g. activation in 20 
+progress, data migration successful). 21 
+7. After activation operation completes, PNF Software MnS Provider sends a softwareActivate notification to 22 
+PNF Software MnS Consumer with the final status of the activation.  23 
+2.8.5.4 Operations and Notifications 24 
+softwareActivate notification is a JSON encoded VES event sent from PNF Software MnS Provider to PNF Software 25 
+MnS Consumer using REST/HTTPS.  It consists of a Common VES Event Header and softwareActivate Notification 26 
+Fields to notify the PNF Software MnS Consumer of the progress and status of a software activation.  27 
+resetReason notification is a JSON encoded VES event sent from PNF Software MnS Provider to PNF Software MnS 28 
+Consumer using REST/HTTPS.  It consists of a Common VES Event Header and resetReason Notification Fields  to 29 
+notify the PNF Software MnS Consumer that a reset has occurred and the reason for the reset. 30 
+These events need to be defined in VES and included in the harmonization activities between 3GPP and ONAP .  31 
+Appendix A 32 
+ 33 
+Service Description ONAP Front Haul (RU) 3GPP 
+Provisioning:  
+Config ME 
+Synchronous 
+configuration 
+management updates 
+sent upon request 
+from MnS 
+Consumer(M) to MnS 
+Provider (MP).    
+YANG/NETCONF/SSH 
+or 
+YANG/NETCONF/TLS 
+5G Use Case, VNF 
+Reqts 
+YANG/NETCONF/SSH  
+O-RAN FH M-Plane 
+Spec. 
+YANG/NETCONF/SSH 
+or 
+YANG/NETCONF/TLS 
+or 
+RESTful HTTP based 
+operations with 
+JSON payload 
+3GPP TR 28.890, 
+To be added to   
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+3GPP TS 28.531 
+Provisioning:  
+Notification of 
+Config change 
+Asynchronous 
+Configuration Change 
+Notification (CCN) 
+from MP to M to 
+notify M of a 
+configuration change 
+on the MP. 
+Netconf Notification 
+RFC 5277 and RFC 
+6470 
+No RAN Use Case 
+Defined 
+Not supported in FH HTTPS 
+3GPP TS 28.532  
+Fault 
+Supervision:  
+FM Alarm 
+Notification 
+Asynchronous Fault 
+events sent from MP 
+to M when an alarm 
+occurs. 
+JSON/REST/HTTPS 
+5G Use Case, VES 
+7.1, VNF Reqts 
+Netconf Notification 
+RFC 5277 and RFC 
+6470 
+O-RAN FH M-Plane 
+Spec. 
+HTTPS 
+3GPP TR 28.890,  
+TS 28.545, 28.532 
+JSON/REST/HTTPS 
+with two variants: 
+1 3GPP legacy 
+2 Compliant to VES 
+7.1 
+Fault 
+Supervision:  
+Get Alarm List   
+Synchronous request 
+from M to ME to 
+supervise and manage 
+alarms, such as alarm 
+subscription, alarm 
+acknowledgement, 
+alarm clearing, get 
+Active Alarm List 
+(AAL). 
+Not defined in ONAP NETCONF RPC 
+Support get AAL and 
+alarm subscription 
+O-RAN FH M-Plane 
+Spec. 
+Provisioning IOC and 
+Attributes 
+3GPP TR 28.890,  
+TS 28.545, 28.532, 
+28.622 
+Performance 
+Assurance:  PM 
+File Notification 
+Asynchronous Bulk 
+PM FileReady 
+notification event 
+from MP to M sent 
+when PM File is ready 
+for upload. 
+JSON/REST/HTTPS 
+5G Use Case, VES 
+7.1, VNF Reqts 
+Not supported in FH HTTPS 
+3GPP TR 28.890,  
+TS 28.550, 28.532 
+Performance 
+Assurance:  PM 
+File Upload 
+Bulk PM File uploaded 
+from MP by M via 
+secure file transfer 
+protocol, triggered by 
+FileReady event. 
+3GPP XML/FTPES 
+5G Use Case, VNF 
+Reqts (based on 
+3GPP TS 28.550, 
+28.552) 
+YANG/SFTP 
+O-RAN FH M-Plane 
+Spec. 
+3GPP XML/SFTP 
+FTPES to be added 
+3GPP TR 28.890,  
+TS 28.550, 28.552 
+Performance 
+Assurance:  
+RTPM 
+streaming 
+High volume 
+asynchronous 
+streaming of Real 
+Time PM data sent 
+from ME to M at a 
+configurable 
+frequency. 
+GPB/TLS/TCP 
+5G Use Case, VES 
+7.1, VNF Reqts 
+Not applicable to FH SA5 proposing 
+ASN/TLS/TCP  
+3GPP TR 28.890,  
+TS 28.550 
+TBD SBMA updates 
+targeted for Rel 16 
+Trace 
+Management:  
+Subscriber and 
+High volume 
+asynchronous 
+streaming of 
+Not defined in ONAP Not applicable to FH 3GPP TS 32.421, 
+32.422, 32.423 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Equipment 
+Trace 
+Subscriber and 
+Equipment Trace data 
+(e.g. Call, Cell, UE) 
+from MP to M sent 
+upon triggering event. 
+TBD SBMA updates 
+targeted for Rel 16 
+File 
+Management 
+Synchronous request 
+from M to MP to 
+manage files on the 
+MP (e.g. list, upload, 
+download, delete, 
+move, copy, prune or 
+archive).  
+ONAP has a Data File 
+Collector (DFC) 
+which can upload 
+files but generic file 
+mgmt is not defined 
+in ONAP 
+NETCONF RPC + 
+SFTP 
+O-RAN FH M-Plane 
+Spec. 
+3GPP TS 32.341 
+ 
+Software 
+Management:  
+VNF SW 
+Upgrade 
+In service SW upgrade 
+of a VNF MP triggered 
+from M with zero 
+traffic loss.  
+Proposed for El Alto 
+to upgrade a single 
+VNF with build and 
+replace and traffic 
+migration. This is not 
+sufficient for 5gNB 
+service.   In service 
+upgrade of a 
+complex 5gNB 
+service not 
+addressed yet. 
+Change 
+Management Use 
+Case 
+Not specified in FH 
+spec 
+ETSI NFV SOL001, 
+SOL002, SOL003, 
+SOL004, SOL005 
+Software 
+Management:  
+PNF SW 
+Upgrade 
+SW Upgrade of a PNF 
+MP (pNB, pDU, pRAP, 
+pRU) triggered from 
+M. 
+Proposed for El Alto 
+to use an External 
+Controller provided 
+by PNF vendor that 
+implements the 
+ONAP compliant SW 
+management APIs 
+(UpgradePrecheck, 
+UpgradeSoftware, 
+UpgradePostcheck) 
+northbound (NB) to 
+the ONAP Controller 
+(APPC, SDNC, VFC) 
+and the proprietary 
+PNF SW 
+management 
+protocol 
+southbound (SB) to 
+the PNF. 
+5G Use Case, VNF 
+Reqts 
+NETCONF RPC 
+O-RAN FH M-Plane 
+Spec. 
+Not specified 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Communication 
+Surveillance 
+Management 
+Asynchronous 
+Heartbeat event sent 
+by MP to M at a 
+configurable 
+frequency to allow M 
+to supervise the 
+connectivity to the 
+MP. 
+JSON/REST/HTTPS 
+VES 7.1, VNF Reqts 
+Watchdog timer HTTPS 
+3GPP TR 28.890,  
+TS 28.532 
+Start Up and 
+Registration 
+Management:  
+PNF PnP 
+PNF Plug-n-Play (PnP) 
+scenario to provision 
+a PNF MP (physical 
+gNB/physical 
+DU/physical 
+RAP/physical RU) to 
+allow it to register 
+with M for 
+subsequent 
+management.   
+5G Use case, VNF 
+Reqts (based on 
+3GPP TS 32.508) 
+NETCONF Call Home 
+RFC 8071 
+3GPP TS 32.508 
+Start Up and 
+Registration 
+Management:  
+PNF  
+Registration 
+Asynchronous 
+Registration event 
+sent by PNF MP 
+(pNB/pDU/pRAP/pRU) 
+to M during PnP to 
+notify M of new PNF 
+MP. 
+JSON/REST/HTTPS 
+5G Use Case, VES 
+7.1, VNF Reqts 
+NETCONF Call Home 
+RFC 8071 
+HTTPS 
+3GPP TR 28.890,  
+TS 28.532 
+Start Up and 
+Registration 
+Management:  
+VNF 
+onboarding & 
+Instantiation 
+Package onboarding 
+and instantiation of a 
+VNF MP (vRIC, vCP, 
+vUP, vDU, vRU) from 
+M 
+ONAP supports 
+onboarding and 
+instantiation of a 
+simple VNF.  
+Instantiating a 
+complex 5gNB 
+service with multiple 
+VNFs and PNFs not 
+addressed yet. 
+VNF Reqts 
+Not specified in FH 
+spec 
+ETSI NFV SOL001, 
+SOL002, SOL003, 
+SOL004, SOL005 
+  1 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+VNF Scaling 
+Management:  
+Scale in/out 
+Scaling a VNF ME in or 
+out 
+ONAP supports scale 
+out for a simple VNF.  
+Scale out of a 
+particular VNF (e.g. 
+vUP) that is part of a 
+complex 5gNB 
+service has not yet 
+been addressed. 
+Scaling Use Case 
+Not specified in FH 
+spec 
+ETSI NFV SOL001, 
+SOL002, SOL003, 
+SOL004, SOL005 
+ 1 
+  2 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Annex ZZZ O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and bet ween the O-RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 11 
+software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implement ation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of t he art 24 
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 27 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 28 
+claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an ORAN Specification. 38 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 39 
+agreement with O-RAN Alliance. 40 
+Section 3: FRAND LICENSE 41 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 42 
+Patent License Agreement to each Adopter under Fair Reasonable And Non - Discriminatory (FRAND) terms and 43 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 44 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 1 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 2 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 3 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 4 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 5 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 6 
+customers of such licensed Compliant Implementations. 7 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 8 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 9 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 10 
+its Affiliates for its license of Necessary Claims to its licensees. 11 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 12 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 13 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 14 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non -sublicensable, worldwide patent 15 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 16 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 17 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 18 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 19 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing l icensing commitment includes 20 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 21 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers  of such 22 
+licensed Compliant Implementations. 23 
+ection 4: TERM AND TERMINATION 24 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.  25 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors m ay terminate this Agreement 26 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 27 
+(30) days after being given notice specifying the breach. 28 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 29 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 30 
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 31 
+version that was current as of the date of termination. 32 
+Section 5: CONFIDENTIALITY 33 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 34 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 35 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 36 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 37 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 38 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 39 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 40 
+confidentiality on such third party; (5) independently developed by Adopter; (6) d isclosed pursuant to the order of a 41 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 42 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 43 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 44 
+Alliance’s prior written approval. 45 
+Section 6: INDEMNIFICATION 46 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 47 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 48 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) inc urred by or 49 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 1 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 2 
+products that comply with O-RAN Specifications. 3 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 4 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 5 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 6 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 7 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON -PERFORMANCE UNDER THIS AGREEMENT, 8 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 9 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES.  10 
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS 11 
+WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIANCE 12 
+AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS E XPRESSLY DISCLAIM ANY 13 
+WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, 14 
+NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY 15 
+WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 16 
+Section 8: ASSIGNMENT 17 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 18 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 19 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 20 
+Alliance may freely assign this Agreement. 21 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 22 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (i ncluding future Members, 23 
+Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, 24 
+including as licensees under Section 3. 25 
+Section 10: BINDING ON AFFILIATES 26 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 27 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 28 
+and are also entitled to the benefits of the rights of Adopter hereunder. 29 
+Section 11: GENERAL 30 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  31 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and  expressly 32 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 33 
+to the subject matter of this Agreement.  34 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 35 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 36 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges tha t this Agreement 37 
+prohibits any communication that would violate the antitrust laws. 38 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 39 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 40 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 41 
+Contributors or Academic Contributors. 42 
+
+  
+Copyright © 2019 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ 
+O-RAN-WG1.OAM Interface 
+Specification-v1.0 O-RAN-WG1.OAM Interface Specification 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 1 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 2 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 3 
+full force and effect. 4 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 5 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 6 
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 7 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 8 
+force and effect. 9 
+ 10 
+ 11 
+ 12 

@@ -1,0 +1,539 @@
+O-RAN-WG11.AppLCM-Security-TR.0-R003-v01.00
+Technical Report
+O-RAN Working Group 11 (Security Work Group)
+Study on Security for Application Lifecycle Management
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this document in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this document for your personal use, or copy the material of this document for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Contents
+List of figures	4
+List of tables	4
+Foreword	5
+Modal verbs terminology	5
+Introduction	5
+1	Scope	6
+2	References	6
+2.1	Informative references	6
+3	Definition of terms, symbols and abbreviations	7
+3.1	Terms	7
+3.2	Abbreviations	8
+4	Application Lifecycle Management background and assets	9
+4.1	Introduction	9
+4.2	Application Lifecycle	9
+4.3	Assets	10
+5	Key issues	11
+5.1	Introduction	11
+5.2	Development of Application Package	11
+5.2.1	Key Issue Dev-1: Package Authenticity and Integrity	11
+5.2.2	Key Issue Dev-2: Software Bill of Materials (SBOM) for Applications	11
+5.2.3	Key Issue Dev-3: Security Descriptor	12
+5.3	Onboarding and Deployment of Application	12
+5.3.1	Key Issue Onboard-1: Initial Authentication of App/VNF/CNF Package	12
+5.3.2	Key Issue Onboard-2: Image Tampering during Application Onboarding	13
+5.3.3	Key Issue Onboard-3: Risk of Deploying a Malicious Application	14
+5.4	Operation and Maintenance of Application	14
+5.4.1	Key Issue Op-1: Security for Application Updates	14
+5.4.2	Key Issue Op-2: Application Integrity during Operation	15
+5.4.3	Key Issue Op-3: Security Logging and Monitoring of Applications	16
+5.4.4	Key Issue Op-4: Secure Decommissioning of Applications	16
+5.4.5	Key Issue Op-5: Exploitation of Application Vulnerabilities	17
+5.4.6	Key Issue Op-6: PNF Software Lifecycle Security	17
+5.4.7	Key Issue Op-7: Application Misconfiguration	18
+6	Potential Solutions	19
+6.1	Solution #1: Application Package Authenticity and Integrity	19
+6.1.1	Introduction	19
+6.1.2	Solution details	19
+6.2	Solution #2: Secure Update of Applications	20
+6.2.1	Introduction	20
+6.2.2	Solution details	20
+6.3	Solution #3 Application Security Descriptor	21
+6.3.1	Introduction	21
+6.3.2	Solution details	22
+6.4	Solution 4: Secure Logging and Monitoring for Applications	26
+6.4.1	Introduction	26
+6.4.2	Solution details	26
+6.5	Solution 5: Software Bill of Materials Requirement for Applications	27
+6.5.1	Introduction	27
+6.5.2	Solution details	27
+7	Conclusions	28
+7.1	Key Issue Solution Mapping	28
+7.2	Recommendations	29
+History	30
+List of figures
+Figure 4.1-1: SDLC Model [4]	9
+Figure 4.2-1: Application Lifecycle Phases [4]	10
+Figure 6.1-1 Application Package authenticity and integrity protection	20
+Figure 6.2-1 Application update authenticity and integrity protection	21
+Figure 6.3-1: Preliminary security descriptor proposed by WG10	22
+Figure 6.3-2: Application interconnection	22
+List of tables
+Table 6.3-1: Security group rules descriptor	23
+Table 6.3-2: SAL requirements descriptor	25
+Table 6.4-1: Application LCM Logging Event Coverage	26
+Table 7.1-1 - Mapping of Key Issues to Solutions	28
+Foreword
+This Technical Report (TR) has been produced by the O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+Introduction
+This technical report focuses on the security of O-RAN applications during their lifecycle phases as defined in WG10 OAM Architecture [4]: development, onboarding, and operation. O-RAN applications in the scope of this technical report include VNFs/CNFs such as xApps, rApps, O-CU, O-DU, and Near-RT RIC, as well as software for physical network functions such as O-RU and O-DU.
+The technical report takes into consideration the threats identified in the O-RAN Threat Modelling and Remediation specification [1] and develops a list of key issues from this. The key issues relating to application life cycle management are divided into the appropriate lifecycle phase and include a description, security threats, and potential requirements to mitigate these threats. Solutions are proposed to address the key issues. The conclusion section contains a mapping between key issues and solutions, as well as additional recommendations.
+The order of the chapters of this document is as follows:
+Scope
+References
+Definition of terms, symbols, and abbreviations
+Application LCM background and assets
+Key Issues
+Potential Solutions
+Conclusions
+Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+This technical report is the study of security of applications throughout the lifecycle management phases (development, onboarding, and operation)
+Taking into consideration the threats and risks identified in O-RAN Threat Model specification [1], this study analyzes a list of key issues for applications during their lifecycle in order to derive security requirements, intended to be part of O-RAN Security Requirements Specifications [2].
+References
+Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are not necessary for the application of the present document but they assist the user with regard to a particular subject area.
+[1] O-RAN ALLIANCE, “O-RAN Security Threat Modelling and Remediation Analysis”
+[2] O-RAN ALLIANCE, “O-RAN Security Requirements Specifications”
+[3] O-RAN ALLIANCE, “O-RAN Architecture Description”
+[4] O-RAN ALLIANCE, “O-RAN OAM Architecture”
+[5] O-RAN ALIANCE, “O-RAN Information Model and Data Models”
+[6] “The Minimum Elements for a Software Bill of Materials (SBOM), Pursuant to Executive Order 14028 on Improving the Nation’s Cybersecurity”, U.S. DoC and NTIA, July 2021.
+[7] The MITRE Corporation, “MITRE ATT&CK® Containers Matrix”, Accessed on 03 AUG 2022, https://attack.mitre.org/matrices/enterprise/containers/
+[8] The MITRE Corporation, “MITRE FiGHT™ Matrix”, Accessed on 16 AUG 2022, https://fight.mitre.org/
+[9] O-RAN ALLIANCE, “O-RAN R1 Use Cases and Requirements”
+[10] O-RAN ALLIANCE, “O-RAN Near-RT RIC Architecture”
+[11] ETSI GS NFV-IFA 011 - VNF Descriptor and Packaging Specification,
+https://www.etsi.org/deliver/etsi_gs/NFV-IFA/001_099/011/04.02.01_60/gs_NFV-IFA011v040201p.pdf
+[12] IANA Protocol Registries, https://www.iana.org/protocols
+[13] The "Fossies" Software Archive – VNFD TOSCA template
+https://fossies.org/linux/tacker/samples/vnf_packages/Definitions/etsi_nfv_sol001_vnfd_types.yaml
+[14] O-RAN ALLIANCE, “O-RAN Study on Security Log Management”
+Definition of terms, symbols and abbreviations
+Terms
+For the purposes of the present document, the terms and definitions provided in O-RAN Architecture Description [3] and O-RAN Operations and Maintenance Architecture [4] apply:
+Application Package: The basic unit exchanged between the Solution Provider and Service Provider.
+Near-RT RIC: O-RAN Near-Real-Time RAN Intelligent Controller: A logical function that enables near-real-time control and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface. It may include AI/ML (Artificial Intelligence / Machine Learning) workflow including model training, inference and updates.
+Non-RT RIC: O-RAN Non-Real-Time RAN Intelligent Controller: A logical function within SMO that drives the content carried across the A1 interface.  It is comprised of the Non-RT RIC Framework and the Non-RT RIC Applications (rApps) whose functions are defined below.
+O-Cloud: O-Cloud is a cloud computing platform comprising a collection of physical infrastructure nodes that meet O-RAN requirements to host the relevant O-RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP, and O-DU), the supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and the appropriate management and orchestration functions.
+Non-RT RIC Applications (rApps): Modular applications that leverage the functionality exposed via the Non-RT RIC Framework’s R1 interface to provide added value services relative to RAN operation, such as driving the A1 interface, recommending values and actions that may be subsequently applied over the O1/O2 interface and generating “enrichment information” for the use of other rApps.  The rApp functionality within the Non-RT RIC enables non-real-time control and optimization of RAN elements and resources and policy-based guidance to the applications/features in Near-RT RIC.
+Service Planning: Activities internal to the Service Provider
+Service Provider: A network provider who is planning to deploy applications into their network.
+Solution Provider: An application developer who delivers applications to Service Providers.
+SP Exchange: Not a formal interface in terms of between systems. However, the structure and content of the exchange is defined such that a Solution Provider can deliver applications to a Service Provider for deployment.
+xApps:  Applications designed to run on the Near-RT RIC. Such an application is likely to consist of one or more microservices and at the point of on-boarding will identify which data it consumes and which data it provides. The application is independent of the Near-RT RIC and may be provided by any third party. The E2 enables a direct association between the xApp and the RAN functionality.
+Abbreviations
+For the purposes of the present document, the following abbreviations apply:
+AI/ML	Artificial Intelligence/Machine Learning
+API	Application Programming Interface
+AppPackage	Application Package
+CNF 	Containerized Network Function
+eNB	eNodeB (applies to LTE)
+gNB	gNodeB (applies to NR)
+KPI	Key Performance Indicator
+LCM 	Lifecycle Management
+ML	Machine Learning
+MNO	Mobile Network Operator
+NF	Network Function
+NFV	Network Function Virtualisation
+O-CU 	O-RAN Central Unit as defined by O-RAN ALLIANCE
+O-CU-CP 	O-CU Control Plane
+O-DU-UP 	O-CU User Plane
+O-DU 	O-RAN Distributed Unit (uses Lower-level Split)
+O-RU 	O-RAN Radio Unit
+RAN 	Radio Access Network
+RIC	O-RAN RAN Intelligent Controller
+SBOM	Software Bill of Materials
+SDLC	Software Development Lifecycle
+SMO	Service Management and Orchestration
+VM 	Virtual machine
+VNF	Virtualised Network Function
+Application Lifecycle Management background and assets
+Introduction
+Lifecycle Management of applications deployed in O-RAN follows standard Software Development Lifecycle (SDLC) basic models. Figure 4.1-1 depicts the model that applications described in this document generally follow. The states in this SDLC model can be generally classified into three categories: Development, Onboarding, and Operation. Two entities involved in Lifecycle Management are the Solution Provider and the Service Provider. A Solution Provider provides the application that fulfils the requirements and needs of a Service Provider, who deploys the application on the platform. The basic unit exchanged between the Solution Provider and Service Provider is the Application package (AppPackage). The AppPackage contains data including the application itself, as well as its descriptors. For more details on the AppPackage, please refer to [4].
+Figure 4.1-1: SDLC Model [4]
+Application Lifecycle
+The three application lifecycle phases defined in [4] are Development, Onboarding, and Operation. Development involves the creation of the application, preparation, and delivery from Solution Provider to Service Provider. Onboarding consists of the onboarding of the application onto its ultimate runtime environment. Some activities included in this phase are establishment of configurations, content verification, and app/AppPackage cataloguing. Operation encompasses the runtime of the application. In this phase, applications are deployed, updated, monitored, managed and ultimately after some analysis, either terminated or healed/scaled.
+Figure 4.2-1: Application Lifecycle Phases [4]
+Assets
+The assets within scope of this study are Application Packages for virtualized network functions, i.e., xApps, rApps, O-CU, O-DU, and Near-RT RIC, and software packages for physical network functions, i.e., O-RU and O-DU. This aligns with WG10 Application Lifecycle Management [4]. The application packages include the following assets already defined in [1]:
+Data assets:
+ASSET-D-15: App/VNF/CNF software package
+ASSET-D-23: Patches for vulnerable SW components
+Secure stores:
+ASSET-D-16: X.509 certificates
+ASSET-D-17: Private keys
+ASSET-D-32: Cryptographic keys used during secure boot
+AI/ML Data:
+ASSET-D-25: Training or test data
+ASSET-D-26: The trained ML model
+ASSET-D-27: The ML prediction results built into the model
+ASSET-D-28: The behaviour of the ML system
+Components:
+ASSET-C-02: Near-RT RIC software
+ASSET-C-03: O-CU-CP software
+ASSET-C-04: O-CU-UP software
+ASSET-C-05: O-DU software
+ASSET-C-06: O-RU software
+ASSET-C-09: xApps
+ASSET-C-10: rApps
+ASSET-C-11: Non-RT RIC software
+Software for PNFs is included in this study to the extent of defining high-level security requirements for the software package. Management for PNFs, to include PNF registration and management, is out of scope for this study. PNF registration and management is an important topic and may require additional security analysis when the 3GPP specifications are adopted by O-RAN [5].
+Note: ‘Application’ in this document refers to xApps, rApps, O-CU, etc. and could be implemented as a VNF or CNF. Software for PNFs is not included in this definition and will still be referred to as “PNF” or “PNF software package”.
+Key issues
+Introduction
+This section details the key issues identified for security aspects related to application lifecycle management, subdivided into the LCM areas of 1) Development of App/VNF/CNF Package, 2) Onboarding and Deployment of Application, and 3) Operation and Maintenance of Application. Each key issue details the general description of the key issue, defines the threats related to the issue, and proposes requirements that resolve or mitigate the key issue.
+Development of Application Package
+Key Issue Dev-1: Package Authenticity and Integrity
+General description
+The Solution Provider is responsible for creating an application that fulfils the needs of a Service Provider. An App/VNF/CNF package delivered to the Service Provider that goes unverified in terms of authenticity and integrity is subject to multiple threats. For example, the Service Provider may unintentionally deploy an application that is either not actually provided by the Solution Provider, or that is from the Solution Provider but its integrity was compromised during transit. Such an occurrence may disrupt Service Provider operation and/or present security risks.
+Security threats
+The security threats associated with Package Authenticity and Integrity are:
+Malicious actor replacing the Service Provider’s package with their own package
+Service disruption caused by deploying an application with degraded functionality caused by compromise of App/VNF/CNF package integrity
+Insider threat
+The following threat(s) from [1] are applicable to Dev-1:
+T-O-RAN-09: An attacker compromises O-RAN components integrity and availability
+T-IMG-01: VM/Container images tampering
+T-NEAR-RT-02: Risk of deployment of a malicious xApp on Near-RT RIC
+T-rApp-05: An attacker deploys and exploits malicious rApp
+Potential security requirements
+The following security requirements from [2] involving App/VNF/CNF software package protection are proposed to mitigate the threats stemming from the key issue of package authenticity and integrity.
+REQ-SEC-OCLOUD-IMG-2
+REQ-SEC-OCLOUD-IMG-3
+REQ-SEC-OCLOUD-IMG-4
+REQ-SEC-OCLOUD-IMG-5
+Key Issue Dev-2: Software Bill of Materials (SBOM) for Applications
+General description
+Software bill of materials for O-RAN software products is an important part of the software development process and applies also to the application life cycle process. SBOMs document the software used in software products in order to understand the software supply chain for proper notification of vulnerabilities and updates.
+Security threats
+The security threats that arise from not properly documenting software products via an SBOM includes:
+Lack of process to detect known software vulnerabilities and lack of accountability for notification
+The following threat(s) from [1] are applicable to Dev-2:
+T-GEN-01: Software flaw attack
+T-OPENSRC-01: Developers use SW components with known vulnerabilities and untrusted libraries that can be exploited by an attack through a backdoor attack
+Potential security requirements
+Chapter 6 of the WG11 Security Requirements Specification [2] provides SBOM guidelines and requirements for O-RAN, based on guidance from NTIA [6]. This covers requirements on the minimum data fields and depth for SBOMs for O-RAN software.
+An additional potential requirement could explicitly state that application packages also need SBOMs from the application provider with the same fields and to the same depth as other O-RAN software products as specified.
+Key Issue Dev-3: Security Descriptor
+General description
+WG10 has proposed a SecurityDescriptor in the App/VNF/CNF Package, to be reviewed by WG11 to ensure all security aspects are being considered and it is in line with WG11 requirements.
+Security threats
+The following threat(s) are applicable to Dev-3:
+Missing or improperly defined elements of the SecurityDescriptor, such as information regarding the application certificate and security rules, could lead to unauthorized access to data and services.
+Potential security requirements
+Proper and comprehensive definition of the SecurityDescriptor helps ensure elements of security needed for the App/VNF/CNF package are present.
+The SecurityDescriptor is part of the App/VNF/CNF package and therefore it should be protected in terms of authenticity and integrity.
+Onboarding and Deployment of Application
+Key Issue Onboard-1: Initial Authentication of App/VNF/CNF Package
+General description
+After the App/VNF/CNF package has been delivered from the Solution Provider to the Service Provider, preparation for application deployment commences where it goes through the Onboarding phase prior to deployment. If the application is unauthenticated during onboarding, Service Providers can unintentionally deploy an application that can cause harm to their platforms. Depending on the platform, the unauthenticated application could be also used by a threat actor to perform malicious activities on the Near-RT RIC, Non-RT RIC, and O-Cloud platforms.
+Security threats
+The security threats associated with Initial Authentication of App/VNF/CNF package are:
+Unauthenticated application onboarded in the O-Cloud Image Repository
+Unauthenticated application running on the Service Provider/SMO platform
+The following threat(s) from [1] are applicable to Onboard-1:
+T-O-RAN-06: An attacker exploits insufficient/improper mechanisms for authentication and authorization to compromise O-RAN components
+T-O-RAN-08: An attacker compromises O-RAN data integrity, confidentiality and traceability
+T-O-RAN-09: An attacker compromises O-RAN components integrity and availability
+T-IMG-01: VM/Container images tampering
+T-NEAR-RT-02: Risk of deployment of a malicious xApp on Near-RT RIC
+T-xApp-01: An attacker exploits xApp vulnerabilities and misconfigurations
+T-rApp-05: An attacker deploys and exploits malicious rApp
+Potential security requirements
+The following security requirements from [2] involving App/VNF/CNF software package protection are proposed to mitigate the threats stemming from the key issue of initial authentication of application/VNF.
+REQ-SEC-OCLOUD-IMG-2
+REQ-SEC-OCLOUD-IMG-3
+REQ-SEC-OCLOUD-IMG-4
+REQ-SEC-OCLOUD-IMG-5
+REQ-SEC-OCLOUD-IMG-7
+Key Issue Onboard-2: Image Tampering during Application Onboarding
+General description
+An attacker can inject malicious code or tamper with the information in the App/VNF/CNF package during onboarding. After instantiation of the application, the tampered code can cause DoS, information stealing, etc.
+Security threats
+The following threat(s) from [1] are applicable to Onboard-2:
+T-O-RAN-09: An attacker compromises O-RAN components integrity and availability
+T-IMG-01: VM/Container images tampering
+Potential security requirements
+The following security requirements from [2] involving App/VNF/CNF software package protection are proposed to mitigate the threats stemming from the key issue of image tampering during onboarding.
+REQ-SEC-OCLOUD-IMG-7
+REQ-SEC-OCLOUD-IMG-13
+REQ-SEC-OCLOUD-IMG-14
+Key Issue Onboard-3: Risk of Deploying a Malicious Application
+General description
+Deploying a malicious application can negatively affect the O-RAN platform and its functions. Malicious xApps can impact radio service and provide unauthorized access to subscriber information. Malicious rApps may disrupt offered network service and affect Non-RT RIC functions. Malicious code in VM/Container images can cause DoS, information stealing, etc., when the VNF/CNF is instantiated.
+Security threats
+The following threat(s) from [1] are applicable to Onboard-3:
+T-rApp-05: An attacker deploys and exploits malicious rApp
+T-NEAR-RT-01: Malicious xApps can exploit UE identification, track UE location and change UE priority
+T-IMG-01: VM/Container images tampering
+Potential security requirements
+The following security requirements from [2] involving App/VNF/CNF software package protection are proposed to help mitigate the threats stemming from the key issue of the risk of deploying a malicious application. Properly verifying authenticity and integrity of the App/VNF/CNF package and testing the package for known vulnerabilities help address the threats from deploying a malicious application.
+REQ-SEC-OCLOUD-IMG-2
+REQ-SEC-OCLOUD-IMG-3
+REQ-SEC-OCLOUD-IMG-4
+REQ-SEC-OCLOUD-IMG-5
+REQ-SEC-OCLOUD-IMG-7
+Operation and Maintenance of Application
+Key Issue Op-1: Security for Application Updates
+General description
+According to OAM architecture [4], the update process is an orchestrated process of deploy and terminate, and it is possible for two versions of an application to be active at the same time. Examples of situations where an update may be made available are when new features are introduced for the application or when the update addresses a vulnerability. In any situation where the application is updated, it must be ensured that the update is delivered, onboarded, and deployed in a secure manner involving authentication and integrity checks.
+The timeline for an update will remain a Service Provider implementation decision, although Service Providers should prioritize security updates and apply critical ones in a timely manner.
+Security threats
+The security threats associated with Security for Application Updates are:
+Malicious actor replacing the Service Provider’s package with their own package
+Service disruption caused by deploying an application with degraded functionality caused by compromise of App/VNF/CNF package integrity
+Insider threat
+The following threats from [1] are applicable to Op-1:
+T-O-RAN-01: An attacker exploits insecure designs or lack of adoption in O-RAN components
+T-O-RAN-06: An attacker exploits insufficient/improper mechanisms for authentication and authorization to compromise O-RAN components
+T-O-RAN-08: An attacker compromises O-RAN data integrity, confidentiality and traceability
+T-O-RAN-09: An attacker compromises O-RAN components integrity and availability
+T-IMG-01: VM/Container images tampering
+T-NEAR-RT-02: Risk of deployment of a malicious xApp on Near-RT RIC
+T-xApp-01: An attacker exploits xApp vulnerabilities and misconfigurations
+T-rApp-05: An attacker deploys and exploits malicious rApp
+Potential security requirements
+Note: The security requirements from [2] involving authentication of application by Solutions Providers and Service Providers is proposed to mitigate the key issue of onboarding a malicious application. These same requirements shall be applied to address security threats of onboarding an update to an existing application. This is due to updates to applications being treated in the same manner as an application’s initial installation onto its respective platform in terms of delivery, onboarding, and deployment.
+REQ-SEC-OCLOUD-IMG-2
+REQ-SEC-OCLOUD-IMG-3
+REQ-SEC-OCLOUD-IMG-4
+REQ-SEC-OCLOUD-IMG-5
+REQ-SEC-OCLOUD-IMG-7
+Key Issue Op-2: Application Integrity during Operation
+General description
+The operation and maintenance phase of the application represents an opportunity for malicious actors to negatively affect the O-RAN platform. While an application is running on its respective platform, it may be susceptible to malicious activities such as the overwriting of the application. Vulnerabilities in the application could also be exploited to execute malicious behavior. Verifying the integrity of running applications could ensure no modifications were made to introduce malicious behavior into the applications.
+Security threats
+Examples of security threats associated with xApp integrity during operation are:
+Vulnerabilities in trusted xApps (T-xApp-01)
+Security misconfiguration (T-xApp-01)
+Compromise of xApp isolation (T-xApp-03)
+Examples of the security threats associated with rApp integrity during operation are:
+Exploitation of services across R1 interface (T-rAPP-07)
+Security misconfiguration (T-rAPP-03)
+Examples of the security threats associated with VNF/CNF integrity during operation are:
+VM/Container escape (T-VM-C-02)
+VM/Container data theft (T-VM-C-03)
+Changing virtualization resources without authorization (T-VM-C-05)
+Other threats during runtime operation include:
+Buffer overflow (T-O-RAN-01)
+Potential security requirements
+Integrity of running applications shall be periodically verified by comparing the cryptographic hash of the application with a known good hash.
+Key Issue Op-3: Security Logging and Monitoring of Applications
+General description
+Security logging and monitoring for applications needs to be properly defined so that threats during the application lifecycle management process can be detected.
+Security threats
+The following security threats are an example of threats that could be detected by logging a comprehensive set of security events:
+Adversaries may exploit software vulnerabilities of the application in an attempt to elevate privileges [7, T1068]
+Adversaries may implant application images with malicious code to establish persistence after gaining access to an environment [7, T1525].
+Adversaries may deploy fake VNFs to collect information from the network [8, FGT5013]
+The following threats from [1] are applicable to Op-3:
+T-O-RAN-07: An attacker compromises O-RAN monitoring mechanisms and log files integrity and availability
+Potential security requirements
+To detect these threats, the following application life cycle events are recommended for security logging. This list of events may be used to develop security analytics that have the potential to detect anomalous behavior. The specific development of analytics and the definition of anomalous behavior depend on the operational environment:
+Cryptographic hash of application package
+Onboarding of application packages
+Instantiation of application packages
+Creation of app IDs (for x/rApps)
+Changes to application configuration
+Updates to applications (REQ-SEC-OCLOUD-IMG-15)
+Creation, modification, or deletion of identities; and transactions executed by users in applications.
+Application resource usage (disk space, CPU load)
+Decommissioning of applications
+Application API calls
+Key Issue Op-4: Secure Decommissioning of Applications
+General description
+The decommissioning process for applications is an important part of the lifecycle management. During application operation, an application may perform operations on data, use resources and access secrets. The proper termination of an application can prevent excessive resource usage, accidental deletion of pertinent data (application data, cryptographic keys, etc.), and misallocation to a malicious application by a malicious actor.
+Security threats
+The following threat(s) from [1] are applicable to Op-4:
+T-VM-C-06: Failed or incomplete VNF/CNF termination or releasing of resources
+Potential security requirements
+The following prospective requirement may help mitigate key issue Op-4:
+Applications shall be properly decommissioned after operation to ensure proper release of resources and proper handling of data and secrets used in operation.
+Key Issue Op-5: Exploitation of Application Vulnerabilities
+General description
+Vulnerabilities in an application can be exploited by a malicious actor to disrupt network service, degrade network performance, extract sensitive information, alter data, etc.
+Security threats
+The following threats from [1] are applicable to Op-5:
+T-O-RAN-01: An attacker exploits insecure designs or lack of adoption in O-RAN components
+T-xApp-01: An attacker exploits xApp vulnerabilities and misconfigurations
+T-rApp-02: An attacker exploits rApp vulnerabilities
+Potential security requirements
+The following security requirements from [2] involving testing, discovery, and identification of vulnerabilities are proposed to assist in the mitigation of this key issue involving the exploitation of application vulnerabilities.
+REQ-SEC-OCLOUD-IMG-6
+REQ-SEC-SYS-1
+Key Issue Op-6: PNF Software Lifecycle Security
+General description
+PNFs may include software packages that will also require lifecycle management events, including updates. Updates to PNF software could be used to inject malicious code to compromise the PNF in order to launch reverse attacks and other attacks against VNFs/CNFs. In addition, failure to implement updates that affect security of the system may result in exploitation of the vulnerabilities addressed in the updates to gain access into the system.
+This work item will propose general abstract security requirements for PNF lifecycle management; however, the PNF vendor would ultimately be responsible for PNF software management and its security.
+Security threats
+The following threats from [1] are applicable to Op-6:
+T-PNF-01: An attacker compromises a PNF to launch reverse attacks and other attacks against VNFs/CNFs
+Potential security requirements
+Although general security recommendations may be proposed for PNF Software in this report, vendors are ultimately responsible for the security of their products.
+PNF Software packages shall be protected in terms of integrity and authenticity.
+Key Issue Op-7: Application Misconfiguration
+General description
+Security misconfigurations can exist in an application which can provide an attacker an exploit that they can use to disrupt network service, degrade network performance, extract sensitive information, alter data, etc. These misconfigurations could include improperly configured application permissions and accesses, unnecessary open ports, and unused protocols enabled.
+Security threats
+The following threats from [1] are applicable to Op-7:
+T-O-RAN-02: An attacker exploits misconfigured or poorly configured O-RAN components
+T-rApp-03: An attacker exploits rApps misconfiguration
+T-xApp-01: An attacker exploits xApps vulnerabilities and misconfiguration
+Potential security requirements
+REQ-SEC-OCLOUD-IMG-1 from [2] may help in mitigating application misconfiguration, and additional security controls on configuration validation and maintaining up-to-date applications may be recommended.
+Potential Solutions
+Solution #1: Application Package Authenticity and Integrity
+Introduction
+The WG11 Security Requirements Specification [2] contains a set of requirements and security control(s) pertaining to authentication and integrity-checking of the App/VNF/CNF package that help ensure the package has not been tampered with or damaged in transit and that the package does indeed come from the Solution Provider. The set of requirements and security controls from [2] provide a baseline level of security for App/VNF/CNF packages.
+Solution details
+Figure 6.1-1 provides an overview of requirements from [2] as specified by SEC-CTL-OCLOUD-IMG-1 that help provide integrity and authentication to the App/VNF/CNF package throughout its lifecycle.
+During the development phase:
+The Solution Provider signs the App/VNF/CNF package which includes the image, signing certificate, and Solution Provider’s signature(s).
+Note: Before the onboarding of application, the NFO shall contain a pre-installed Root CA certificate for verifying the application integrity and authenticity.
+During the onboarding phase:
+After the App/VNF/CNF package is sent to the Service Provider, the Service Provider verifies the integrity of the App/VNF/CNF package and re-signs the package before it is onboarded to the O-Cloud Image Repository.
+Signing of the App/VNF/CNF package by the Service Provider prior to its onboarding is required for the following reasons:
+For checking the Solution Provider signature during the application instantiation, it is not needed that the O-Cloud Platform contact the Solution Provider outside of the Service Provider's security domain.
+It gives the Service Provider the opportunity and means to authorize App/VNF/CNF packages for deployment on its network (e.g., avoid an App/VNF/CNF package intended for one Service Provider with a valid Solution Provider certificate being loaded by an attacker into another Service Provider’s network).
+Furthermore, some Service Providers might wish to undertake additional security validation of the App/VNF/CNF package during the onboarding process and Service Provider signing could be used to certify the application as authorized to onboard into the Service Provider’s network.
+During the operation phase:
+During application instantiation, the App/VNF/CNF package is authenticated and verified using signatures from Solution Provider and Service Provider.
+Figure 6.1-1 Application Package authenticity and integrity protection
+(This figure is a work in progress and may be updated based on future work.)
+Solution #2: Secure Update of Applications
+Introduction
+During operation, an application may need to update to a newer version to modify its features or address security. As stated in Solution #1, Application package authenticity and integrity, existing requirements in [2] relating to integrity and authentication of an App/VNF/CNF package help provide a baseline level of application security that can be also applied to their updates.
+Solution details
+According to WG10 OAM Architecture [4], the update process consists of terminating the older version of the application and deploying the newer version of the application, as applications are atomic. This solution proposes that the deployment of the newest version of the application will follow the standard process of the onboarding of any application, which is subject to authenticity and integrity controls. Figure 6.2-1 below is tailored to application updates and depicts the set of requirements from [2] as per SEC-CTL-OCLOUD-IMG-1 that are proposed to help secure the updating of applications in O-RAN.
+Figure 6.2-1 Application update authenticity and integrity protection
+(This figure is a work in progress and may be updated based on future work.)
+Solution #3 Application Security Descriptor
+Introduction
+O-RAN WG10 proposed a preliminary security descriptor in an application focusing on privileges, roles, users and certificates as illustrated in the following figure. In order to completely define the characteristics of a security descriptor of an O-RAN application, this chapter proposes an extension to the preliminary O-RAN WG10 security descriptor by capturing and analysing additional security attributes applicable to O-RAN application. These security attributes should be packaged with the application image, forming an App/VNF/CNF package.
+It is expected that information in this chapter may face changes and adjustments to accommodate unforeseen needs that may arise from O-RAN WG10.
+Figure 6.3-1: Preliminary security descriptor proposed by WG10
+The following figure shows a basic representation of the structure of an application. An application is composed of VMs/CNs that are interconnected. In the definition of this interconnection, the expected security policies for the traffic and communication need to be provided. Further, an application exposes services to external applications or users, in the form of APIs or dashboards. An application should support the definition of Service Availability Level (SAL) with requirements on scaling and migration over the set of metrics exposed by an application for ensuring availability and continuity of the provided services.
+Figure 6.3-2: Application interconnection
+Solution details
+ETSI GS NFV-IFA 011 [11] specifies the following requirements applicable to application descriptor attributes:
+VNF_PACK.META.025: The VNFD shall support a description of the security rules to filter the ingress/egress packets related to the VNF.
+The filtering rules include, but are not limited to, the packet direction, TCP/UDP port range, IP protocol, etc.
+VNF_PACK.META.026: The VNFD shall support associating the security rules to the relevant VNF connection points.
+VNF_PACK.META.017: The VNFD shall support a description of Service Availability Level (SAL) requirements for virtual resources on the underlying NFVI.
+For fulfilling the ETSI security requirement on application descriptors, the following two categories of attributes are proposed:
+Security group rules descriptor
+Service Availability Level (SAL) requirements descriptor
+Security group rules descriptor
+Related ETSI requirement: VNF_PACK.META.025, VNF_PACK.META.026
+Security group rules are policies for specifying the matching criteria for the ingress and/or egress traffic to/from visited connection points as defined in ETSI GS NFV-IFA 011 [11]. These rules aim to enforce security for applications at the Ethernet and IP layers by disallowing sniffing of network traffic. They cover the following elements:
+The direction of traffic in which the security group rule is applied. The direction of ‘ingress’ or ‘egress’ is specified against the associated CP/ECP, i.e., ‘ingress’ means the packets entering a CP/ECP (response), while ‘egress’ means the packets sent out of a CP/ECP (request).
+Protocol to filter on over the Ethernet layer. Permitted values include IPV4 and IPV6.
+Protocol to filter on over the IP layer. Permitted values include any protocol defined in the IANA protocol registry [12], e.g., TCP, UDP, ICMP, etc.
+Start of port range (inclusive). It indicates minimum port number in the range that is matched by the security group rule. If a value is provided at design-time, this value may be overridden at run-time based on other deployment requirements or constraints. It is required if protocol is ‘tcp’ or ‘udp’: Defaults to 0.
+End of port range (inclusive). It indicates maximum port number in the range that is matched by the security group rule. If a value is provided at design-time, this value may be overridden at run-time based on other deployment requirements or constraints. It is required if protocol is ‘tcp’ or ‘udp’: Defaults to 65535.
+Each of the elements outlined here above are translated to security group rules attributes and summarized in this table.
+Table 6.3-1: Security group rules descriptor
+Here below an example of an application descriptor template structure and its security group rules attributes based on TOSCA standards and written in YAML [13]. It should be on-boarded in the App/VNF/CNF package.
+tosca.policies.nfv.SecurityGroupRule:
+derived_from: tosca.policies.Root
+description: The SecurityGroupRule type is a policy type specified the matching criteria for the ingress and/or egress traffic to/from visited connection points as defined in ETSI GS NFV-IFA 011 [11].
+properties:
+description:
+type: string
+description: Human readable description of the security group rule.
+required: false
+direction:
+type: string
+description: The direction in which the security group rule is applied. The direction of 'ingress' or 'egress' is specified against the associated CP. I.e., 'ingress' means the packets entering a CP, while 'egress' means the packets sent out of a CP.
+required: false
+constraints:
+- valid_values: [ ingress, egress ]
+default: ingress
+ether_type:
+type: string
+description: Indicates the protocol carried over the Ethernet layer.
+required: false
+constraints:
+- valid_values: [ ipv4, ipv6 ]
+default: ipv4
+protocol:
+type: string
+description: Indicates the protocol carried over the IP layer. Permitted values include any protocol defined in the IANA protocol registry, e.g. TCP, UDP, ICMP, etc.
+required: false
+constraints:
+- valid_values: [ hopopt, icmp, igmp, ggp, ipv4, st, tcp, cbt, egp, igp, bbn_rcc_mon, nvp_ii, pup, argus, emcon, xnet, chaos, udp, mux, dcn_meas, hmp, prm, xns_idp, trunk_1, trunk_2, leaf_1, leaf_2, rdp, irtp, iso_tp4, netblt, mfe_nsp, merit_inp, dccp, 3pc, idpr, xtp, ddp, idpr_cmtp, tp++, il, ipv6, sdrp, ipv6_route, ipv6_frag, idrp, rsvp, gre, dsr, bna, esp, ah, i_nlsp, swipe, narp, mobile, tlsp, skip, ipv6_icmp, ipv6_no_nxt, ipv6_opts, cftp, sat_expak, kryptolan, rvd, ippc, sat_mon, visa, ipcv, cpnx, cphb, wsn, pvp, br_sat_mon, sun_nd, wb_mon, wb_expak, iso_ip, vmtp, secure_vmtp, vines, ttp, iptm, nsfnet_igp, dgp, tcf, eigrp, ospfigp, sprite_rpc, larp, mtp, ax.25, ipip, micp, scc_sp, etherip, encap, gmtp, ifmp, pnni, pim, aris, scps, qnx, a/n, ip_comp, snp, compaq_peer, ipx_in_ip, vrrp, pgm, l2tp, ddx, iatp, stp, srp, uti, smp, sm, ptp, isis, fire, crtp, crudp, sscopmce, iplt, sps, pipe, sctp, fc, rsvp_e2e_ignore, mobility, udp_lite, mpls_in_ip, manet, hip, shim6, wesp, rohc ]
+default: tcp
+port_range_min:
+type: integer
+description: Indicates minimum port number in the range that is matched by the security group rule. If a value is provided at design-time, this value may be overridden at run-time based on other deployment requirements or constraints.
+required: false
+constraints:
+- greater_or_equal: 0
+- less_or_equal: 65535
+default: 0
+port_range_max:
+type: integer
+description: Indicates maximum port number in the range that is matched by the security group rule. If a value is provided at design-time, this value may be overridden at run-time based on other deployment requirements or constraints.
+required: false
+constraints:
+- greater_or_equal: 0
+- less_or_equal: 65535
+default: 65535
+targets: [ tosca.nodes.nfv.VduCp, tosca.nodes.nfv.VnfExtCp ]
+Service Availability Level (SAL) requirements descriptor
+Editor’s Note: It may be necessary to liaise very closely with WG6 and WG10 on the SAL descriptor to ensure that the proposed descriptor is in line with the descriptor under progress by WG6/WG10.
+Related ETSI requirement: VNF_PACK.META.017
+An application should support the definition of SALs with requirements over the set of metrics exposed by the applications, which can be used to trigger resource scaling or migration actions for avoiding resource overloading and application downtime. By performing these actions, the compliance with the defined SALs in the security descriptor can be guaranteed.
+Monitoring the status of an application is crucial to provide correct service availability and continuity. The monitoring should not only check if an application is “up and running”, but also it should provide resource provisioning and detect resource overloading. This requires two efforts from application providers. Firstly, they must expose a way to extract the real-time value of their SLI (Service Level Indicator). Secondly, they must instruct the SMO and O-Cloud on how to collect, analyse, and react whenever an SAL is being breached. While the first effort is about creating an HTTP endpoint, the second is to provide an application descriptor that describes: HTTP endpoints, expression to evaluate every SAL, and the instructions to follow when a SAL is being breached (e.g., migrate service, change the number of resources allocated, etc.).
+The SAL requirements descriptor should cover the following elements:
+Support of SAL requirements over the set of metrics exposed by the VNFs, which can be used by SMO (NFO, FOCOM) and O-Cloud to trigger scaling or migration actions.
+Required resources (CPU, Memory, Storage, ...): Namespace quotas, required (initial deployment) or Limit (runtime/scaling) Quota
+Monitoring the status of an application is crucial to provide correct service availability and continuity.
+Descriptor for SMO (NFO, FOCOM) on how to collect, analyse, and react whenever a SAL requirement is being breached. It should describe, among others:
+Expression to evaluate every requirement, and
+Instructions to follow when a requirement is being breached (e.g., migrate service, change the number of resources allocated, etc.).
+The proposed SAL requirements descriptor is described in the following table:
+Table 6.3-2: SAL requirements descriptor
+Solution 4: Secure Logging and Monitoring for Applications
+Introduction
+Key Issue Op-3 identified security threats that could be detected by logging application life cycle events and recommended a set of application life cycle events for security logging. These events were mapped to Key Issue SLC#1 Logging Security Related Activity and Events in the WG11 technical report “Study on Security Log Management” [14] in order to ensure coverage of these events. Within that technical report, Key Issue SLC#1 was updated to account for missing application life cycle logging events.
+Solution details
+Table 6.4-1 shows the mapping of specific application LCM events to the categories described in the updated Secure Log Management Key Issue SLC#1 to show coverage of the application events. The application events recommended to be logged are fully covered by the events listed in the Secure Log Management technical report [14] and are planned to be included in subsequent solutions and requirements from the Secure Log Management Work Item.
+Table 6.4-1: Application LCM Logging Event Coverage
+Solution 5: Software Bill of Materials Requirement for Applications
+Introduction
+The requirements in Chapter 6 of the WG11 Security Requirements Specification [2] for Software Bill of Materials for O-RAN were reviewed to ensure coverage for application packages.
+Solution details
+It was determined that the initial requirement REQ-SBOM-001 covers O-RAN applications, and the subsequent requirements REQ-SBOM-002 through REQ-SBOM-011 cover the necessary fields, depth, format, and signature and encryption requirements for SBOMs for applications.
+REQ-SBOM-001: The O-RAN vendor should provide the SBOM with every O-RAN software delivery, including patches, to the network operator.
+This solution recommends to change REQ-SBOM-001 to be a mandatory requirement in the WG11 Security Requirements Specification [2], instead of optional, to comply with current supply chain security best practices.
+Conclusions
+Key Issue Solution Mapping
+This document currently contains 13 key issues across the application life cycle stages and 5 solutions proposals to address or reduce the risk associated with the key issues. The solutions are listed here for reference, followed by a mapping of the proposed solutions to the key issues in Table 7.1-1.
+Solution #1: Application Package Authenticity and Integrity
+Solution #2: Secure Update of Applications
+Solution #3: Application Security Descriptor
+Solution #4: Secure Logging and Monitoring for Applications
+Solution #5: Software Bill of Materials Requirement for Applications
+Table 7.1-1 - Mapping of Key Issues to Solutions
+Recommendations
+The following is a list of preliminary recommendations coming from this work item which will be addressed in future updates to this technical report and other specifications.
+Provide recommendations for PNF software lifecycle security
+Provide recommendations for application vendors in updating their software to address vulnerabilities
+Provide recommendations for application vendors to scan their software throughout the application lifecycle for vulnerabilities using static application security testing (SAST), software composition analysis (SCA), and dynamic application security testing (DAST)
+Provide solutions for secure decommissioning of applications
+Investigate solutions to provide integrity during application operation
+Collaborate with WG10 and WG6 on App Package SecurityDescriptor to ensure appropriate security details are included
+Collaborate with other Work Items in WG11 and other Work Groups on security verification during the application registration procedure
+Update WG11 Threat Modelling and Remediation Analysis specification [1] with new threats
+Update WG11 Security Requirements specification [2] with new requirements and security controls
+History

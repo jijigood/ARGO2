@@ -1,0 +1,2460 @@
+Contents
+Foreword	5
+Modal verbs terminology	5
+1	Scope	6
+2	References	6
+2.1	Normative references	6
+2.2	Informative references	7
+3	Definition of terms, symbols and abbreviations	7
+3.1	Terms	7
+3.2	Symbols	8
+3.3	Abbreviations	8
+4	General Principles	8
+5	Near-RT RIC Architecture	9
+5.1	Requirements	9
+5.1.0	Overall Requirements	9
+5.1.1	Platform Requirements	9
+5.1.2	xApp Requirements	9
+5.1.3	Near-RT RIC API Requirements	10
+5.2	Overall Architecture Description	11
+6	Near-RT RIC Functional Description	11
+6.1	General	11
+6.2	Functionalities of the Near-RT RIC platform	12
+6.2.1	Database and SDL	12
+6.2.2	xApp Subscription Management	13
+6.2.3	Conflict Mitigation	13
+6.2.4	Messaging Infrastructure	13
+6.2.5	Security	14
+6.2.6	Management	14
+6.2.7	Interface Termination	14
+6.2.8	API Enablement	15
+6.2.9	AI/ML Support	16
+6.2.10	xApp Repository Function	16
+6.3	xApps	16
+6A	Services of Near-RT RIC platform and xApps	17
+6A.1	General	17
+6A.2	Services provided by Near-RT RIC platform	18
+6A.2.1	Overview	18
+6A.2.2	A1 related services	19
+6A.2.3	E2 related services	19
+6A.2.4	Management related services	20
+6A.2.5	SDL services	20
+6A.2.6	Enablement services	21
+6A.2.7	AI/ML services	22
+6A.3	Services provided by xApps	22
+6A.3.1	Overview	22
+6A.3.2	A1 related services	23
+6A.3.3	E2 related services	23
+6A.3.4	Management related services	23
+6A.3.5	SDL services	23
+6A.3.6	Enablement services	24
+7	Near-RT RIC APIs	24
+7.1	Overall Description	24
+7.1.1	Introduction	24
+7.1.2	Near-RT RIC API approaches	24
+7.1.3	Network API approach	26
+7.1.4	SDK approach	27
+7.1.5	Near-RT RIC API support options	27
+7.2	Void	30
+7.3	Void	30
+7.4	Void	30
+7.5	Void	30
+7.6	Void	30
+7.7	Void	30
+8	External Interfaces of Near-RT RIC	30
+8.1	E2 Interface	30
+8.2	A1 Interface	30
+8.3	O1 Interface	30
+8.4	Y1 Interface	30
+9	Near-RT RIC API Procedures	31
+9.1	Disclaimer	31
+9.2	A1 Related API Procedures	31
+9.2.1	Introduction	31
+9.2.2	A1 Policy procedures	32
+9.2.3	A1-EI related procedures	40
+9.3	E2 Related API Procedures	51
+9.3.1	Introduction	51
+9.3.2	RIC Functional Procedures	51
+9.3.3	E2 Guidance related procedures	66
+9.4	Management API Procedures	69
+9.4.1	xApp Registration procedure	69
+9.4.2	xApp Deregistration procedure	71
+9.4.3	Void	71
+9.4.4	Create MOI	71
+9.4.5	Modify MOI attributes	72
+9.4.6	Delete MOI	73
+9.4.7	Read MOI attributes	74
+9.4.8	Notify MOI changes	75
+9.4.9	Subscription Control	76
+9.4.10	Fault Notification	77
+9.4.11	Fault Supervision Control	78
+9.4.12	Performance Data File Reporting	79
+9.4.13	Report Streamed Data	79
+9.4.14	Measurement Job Control	80
+9.5	SDL API Procedures	81
+9.5.1	SDL Client Registration procedure	81
+9.5.2	SDL Client Deregistration procedure	82
+9.5.3	Fetch Data procedure	83
+9.5.4	Subscribe/Update-Notify procedure	83
+9.5.5	Store Data procedure	84
+9.5.6	Modify Data procedure	85
+9.5.7	Subscribe/Push procedure	86
+9.5.7A	xApp Shared Data Fetch procedure	86
+9.5.7B	Procedures related to xApp Shared Data Subscription and Notification	87
+9.5.8	Use cases of SDL APIs	89
+9.5.9	SDL API data structures	96
+9.6	API Enablement Procedures	97
+9.6.1	API Discovery procedure	97
+9.6.2	Procedures related to API Event Subscription and Notification	99
+9.6.3	Procedures related to API Registration	102
+9.7	AI/ML API Procedures	107
+9.7.1	Data Pipelining service procedures	107
+9.7.2	Training service procedures	112
+9.7.3	Inference service procedures	116
+Annex A (informative): Potential conflict types among xApps for RRM optimization	122
+Annex (informative):  Change History	123
+Foreword
+This Technical Specification (TS) has been produced by WG3 of the O-RAN Alliance.
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+1	Scope
+The present document specifies the overall Near-RT-RIC (Near-real-time RAN Intelligent Controller) architecture and functionalities, including interaction between hosted applications and common functions in the Near-RT RIC platform.
+2	References
+2.1	Normative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are necessary for the application of the present document.
+[1] 	Void
+[2]	O-RAN.WG3.E2GAP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 General Aspects and Principles”.
+[3]	O-RAN.WG3.E2AP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 Application Protocol (E2AP)”.
+[4]	O-RAN.WG10.OAM-Architecture, “O-RAN Operations and Maintenance Architecture”.
+[5]	O-RAN.WG10.O1-Interface, “O-RAN Operations and Maintenance Interface Specification”.
+[6]	3GPP TS 33.401: “3GPP System Architecture Evolution (SAE); Security architecture”.
+[7]	3GPP TS 33.501: “Security architecture and procedures for 5G System”.
+[8]	O-RAN.WG2.A1GAP, “O-RAN Working Group 2, A1 interface: General Aspects and Principles”.
+[9]	O-RAN.WG2.A1AP, “O-RAN Working Group 2, A1 Interface: Application Protocol”.
+[10]	O-RAN.WG1.OAD, “O-RAN Working Group 1, O-RAN Architecture Description”.
+[11]	3GPP TS 36.401: "Evolved Universal Terrestrial Radio Access Network (E-UTRAN); Architecture Description".
+[12]	3GPP TS 38.300: “NR; NR and NG-RAN Overall Description; Stage 2”.
+[13]	3GPP TS 37.324: “Evolved Universal Terrestrial Radio Access (E-UTRA) and NR; Service Data Adaptation Protocol (SDAP) specification”.
+[14]	3GPP TS 38.331: “NR; Radio Resource Control (RRC); Protocol specification”.
+[15]	3GPP TS 38.323: “NR; Packet Data Convergence Protocol (PDCP) specification”.
+[16]	3GPP TS 38.322: “NR; Radio Link Control (RLC) protocol specification”.
+[17]	3GPP TS 38.321: “NR; Medium Access Control (MAC) protocol specification”.
+[18]	3GPP TS 38.201: “NR; Physical layer; General description”.
+[19]	Void
+[20] 	O-RAN.WG6.ORCH-USE-CASES, "Orchestration Use Cases and Requirements for O-RAN Virtualized RAN".
+[21] 	3GPP TS 28.622: “Generic Network Resource Model (NRM)”.
+[22]	O-RAN ALLIANCE TS: “Security Requirements and Controls Specification”.
+2.2	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+[i.1]	3GPP TR 21.905: “Vocabulary for 3GPP Specifications”.
+[i.2]	O-RAN.WG2.AIML: “O-RAN Working Group 2, AI/ML Workflow description and requirements”.
+3	Definition of terms, symbols and abbreviations
+3.1	Terms
+For the purposes of the present document, the terms [given in [i.1] and the following] apply:
+Near-RT RIC: O-RAN Near-Real-Time RAN Intelligent Controller: A logical function that enables near-real-time control and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface.
+Non-RT RIC: O-RAN Non-Real-Time RAN Intelligent Controller: A logical function within SMO that drives the content carried across the A1 interface. It is comprised of the Non-RT RIC Framework and the Non-RT RIC Applications. Please refer to [8] for more information.
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting RRC [14] and the control plane part of PDCP protocol [15].
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of PDCP protocol [15] and SDAP protocol [13].
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC [16]/MAC [17]/High-PHY [18] layers based on a lower layer functional split.
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional split. This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH extraction).
+O-eNB: An eNB [10] or ng-eNB [11] that supports E2 interface.
+O1: An interface between SMO and O-RAN managed elements, for operation and management, by which FCAPS management, PNF (Physical Network Function) Software management, File management shall be achieved.
+SMO: A Service Management and Orchestration system as described in [4].
+A1: An interface between Non-RT RIC and Near-RT RIC to enable policy-driven guidance of Near-RT RIC applications/functions, and support AI/ML workflow. Please refer to [8] for more information.
+E2: An interface connecting Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, or one or more O-DUs.
+E2 Node: A logical node terminating E2 interface. In this version of the specification, O-RAN nodes terminating E2 interface are:
+-	for NR access: O-CU-CP, O-CU-UP, O-DU or any combination as defined in [4];
+-	for E-UTRA access: O-eNB.
+xApp: An application designed to run on Near-RT RIC. It may consist of one or more microservices and at the point of on-boarding it identifies which data it consumes and which data it provides. It is independent of Near-RT RIC and may be provided by any third party. The E2 interface enables a direct association between xApp and RAN functionalities.
+O-Cloud: O-Cloud is a cloud computing platform comprising a collection of physical infrastructure nodes that meet O-RAN requirements to host the relevant O-RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP, and O-DU), the supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and the appropriate management and orchestration functions.
+Y1: An interface between Near-RT RIC and Y1 consumers [10]. The interface enables RAN analytics information exposure from Near-RT RIC.
+3.2	Symbols
+For the purposes of the present document, the symbols [given in [i.1] and the following] apply:
+Void
+3.3	Abbreviations
+For the purposes of the present document, the abbreviations [given in [i.1] and the following] apply:
+API	Application Programming Interface
+FM	Fault Management
+LCM	Life-Cycle Management
+ML	Machine Learning
+Non-RT RIC	Non-real-time RAN Intelligent Controller:
+Near-RT RIC	Near-real-time RAN Intelligent Controller
+O-CU-CP	O-RAN Central Unit – Control Plane
+O-CU-UP	O-RAN Central Unit – User Plane
+O-DU	O-RAN Distributed Unit
+O-RU	O-RAN Radio Unit
+PM	Performance Management
+R-NIB 	Radio-Network Information Base
+SCTP 	Stream Control Transmission Protocol
+SDL 	Shared Data Layer
+SMO	Service Management and Orchestration
+UE-NIB 	UE-Network Information Base
+4	General Principles
+The general principles for Near-RT RIC architecture are as follows:
+-	The Near-RT RIC architecture and internal interfaces shall be open to support 3rd party xApps.
+5	Near-RT RIC Architecture
+5.1	Requirements
+5.1.0	Overall Requirements
+-	[REQ-Overall-001] Near-RT RIC shall consist of one or more xApps and a set of platform functions that are commonly used to support the specific functions hosted by xApps.
+5.1.1	Platform Requirements
+-	[REQ-Platform-Generic-001] Near-RT RIC platform shall provide a database that stores an up-to-date RAN information, history of time-varying network state, as well as configurations related to E2 Nodes, Cells, Bearers, Flows, UEs, etc., and the mapping between them. This information shall be provided as a service to any xApp that requests it;
+-	[REQ-Platform-Generic-002] Near-RT RIC platform shall provide AI/ML tools that support for data pipelining, model management, training, and inference;
+-	[REQ-Platform-Generic-003] Near-RT RIC platform shall provide a messaging infrastructure;
+-	[REQ-Platform-Generic-004] Near-RT RIC platform shall provide logging, tracing and metrics collected from Near-RT RIC platform and xApps toward SMO;
+-	[REQ-Platform-Generic-005] Near-RT RIC platform shall provide security functions;
+-	[REQ-Platform-Generic-006] Near-RT RIC platform shall support resolution of potential conflicts or overlaps of controls from xApps toward an E2 node;
+-	[REQ-Platform-API-001] Near-RT RIC platform shall communicate with xApp(s) via Near-RT RIC APIs;
+-	[REQ-Platform-API-002] Near-RT RIC platform shall register the Near-RT RIC APIs it produces;
+-	[REQ-Platform-API-003] Near-RT RIC platform shall be capable of discovering the Near-RT RIC APIs it consumes;
+-	[REQ-Platform-Generic-007] Near-RT RIC platform shall provide means to resolve compatibility clashes between xApps and the Near-RT RIC services they access;
+-	[REQ-Platform-Generic-008] Near-RT RIC platform shall support subscription merging from multiple xApps to avoid unnecessary network load;
+-	[REQ-Platform-Generic-009] Near-RT RIC platform shall provide an O1 interface;
+-	[REQ-Platform-Generic-010] Near-RT RIC platform shall be able to route A1 policy management messages to the registered xApps based on A1 policy type and operator policies;
+-	[REQ-Platform-Generic-011] Near-RT RIC platform shall control access of A1-EI types for xApps based on operator policies.
+5.1.2	xApp Requirements
+-	[REQ-xApp-Generic-001] xApp may enhance the RRM capabilities of Near-RT RIC;
+-	[REQ-xApp-E2Related-001] xApp may be associated with zero, one or more E2SMs;
+-	[REQ-xApp-E2Related-002] xApp shall use Near-RT RIC APIs to make use of the Information Elements (IEs) of E2SMs that are associated with it;
+-	[REQ-xApp-E2Related-003] xApp that is associated with a given E2SM shall be able to interface with any E2 Node that supports that E2SM without any intermediary xApp;
+-	[REQ-xApp-E2Related-004] xApp shall be able to receive event-triggered information on RAN information and time-varying network state.
+-	[REQ-xApp-Generic-002] xApp shall provide collected logging, tracing and metrics information to Near-RT RIC;
+-	[REQ-xApp-Descriptor-001] xApp shall provide a descriptor that includes the following basic information of the xApp:
+-	Configuration: It includes a data dictionary for configuration data, i.e., meta data such as a YANG definition or a list of configuration parameters and their semantics. It may also include an initial configuration of xApp;
+-	Control: It includes the types of data that an xApp consumes and generates, in order to perform control capabilities (e.g., xApp URL, parameters, input/output type);
+-	Metrics: It includes a list of metrics (e.g., metric name, type, unit and semantics) provided by the xApp.
+-	[REQ-xApp-Descriptor-002] The xApp descriptor shall also provide the necessary data to enable management and orchestration of the xApp, aligned with [4];
+-	[REQ-xApp-API-001] xApps shall communicate with Near-RT RIC platform via Near-RT RIC APIs;
+-	[REQ-xApp-API-002] xApp shall register the Near-RT RIC APIs it produces;
+-	[REQ-xApp-API-003] xApp shall be capable of discovering the Near-RT RIC APIs it consumes.
+5.1.3	Near-RT RIC API Requirements
+-	[REQ-API-Generic-001] Near-RT RIC APIs shall enable the hosting of 3rd party xApps and xApps from the Near-RT RIC platform vendor;
+-	[REQ-API-Generic-002] Near-RT RIC APIs shall not adversely impact low-latency and high throughput operations of Near-RT RIC. Specifically, the Near-RT RIC APIs shall support the Near-RT RIC control loop of execution time from 10 milliseconds to 1 second;
+-	[REQ-API-Generic-003] Near-RT RIC APIs shall be decoupled from specific implementation solutions, including a Shared Data Layer (SDL) that works as an overlay for underlying databases and enables simplified data access;
+-	[REQ-API-Generic-004] Near-RT RIC APIs shall support an API repository/registry for the services provided by the Near-RT RIC platform and/or xApps;
+-	[REQ-API-Generic-005] Near-RT RIC APIs shall provide means for xApps to discover the published APIs based on the xApps’ needs;
+-	[REQ-API-Generic-006] Near-RT RIC APIs shall provide means to restrict xApps from discovering some published APIs based on configured policies;
+-	[REQ-API-E2Related-001] Near-RT RIC APIs shall enable all xApps to directly use the information elements of E2SMs with which they are associated;
+-	[REQ-API-Generic-007] Near-RT RIC APIs shall aim to simplify the development of xApps and enable rapid innovation;
+-	[REQ-API-Generic-008] Near-RT RIC APIs shall support xApp development in multiple programming languages (e.g., C, C++, Python, Go);
+-	[REQ-API-Generic-009] Near-RT RIC APIs shall support xApp subscription management based on operators’ policies. An xApp may be restricted to interface with only a subset of E2 Nodes by such policies. Near-RT RIC shall be responsible for routing messages between this xApp and the subset of E2 Nodes;
+-	[REQ-API-Management-001] The Near-RT RIC APIs for xApp management shall provide the capability to configure the xApp;
+-	[REQ-API-Management-002] The Near-RT RIC APIs for xApp management shall provide the capability to change the administrative state of the xApp;
+-	[REQ-API-Management-003] The Near-RT RIC APIs for xApp management shall provide the capability to read the current configuration of the xApp;
+-	[REQ-API-Management-004] The Near-RT RIC APIs for xApp management shall provide the capability for the xApp to notify the Management Function of any change in the xApp configuration;
+-	[REQ-API-Management-005] The Near-RT RIC APIs for xApp management shall provide the capability for the xApp to notify the Management Function of an associated MOI Creation;
+-	[REQ-API-Management-006] The Near-RT RIC APIs for xApp management shall provide the capability for the xApp to notify the Management Function of an associated MOI Deletion;
+-	[REQ-API-Management-007] The Near-RT RIC APIs for xApp management shall provide the capability for the xApp to notify the Management Function of a fault detection;
+-	[REQ-API-Management-008] The Near-RT RIC APIs for xApp management shall provide the capability for the Consumer (SMO) to fetch the list of Active Faults on the xApp;
+-	[REQ-API-Management-009] The Near-RT RIC APIs for xApp management shall provide the capability for the xApp to notify the Management Function that there is a file available;
+-	[REQ-API-Management-010] The Near-RT RIC APIs for xApp management shall provide the capability for the Management Function to configure the xApp to send streaming data;
+-	[REQ-API-Management-011] The Near-RT RIC APIs for xApp management shall provide the capability for the Management Function to configure the xApp to collect specific PM data;
+NOTE: 	Communication between xApps is not specified in the present document.
+5.2	Overall Architecture Description
+The overall O-RAN architecture specified in [10] describes the location and interfaces of Near-RT RIC, as well as possible deployment options.
+A Near-RT RIC is connected to only one Non-RT RIC.
+A Near-RT RIC is connected to one or more E2 Nodes as described in [2].
+The RRM functional allocation between Near-RT RIC and E2 Node is described in [2].
+6	Near-RT RIC Functional Description
+6.1	General
+A Near-RT RIC is composed of a Near-RT RIC platform and one or more xApps. An overview in shown in Figure 6.1-1.
+Figure 6.1-1 also shows the functionalities of the Near-RT RIC platform. Those functionalities are further described in clause 6.2.
+Figure 6.1-1: Near-RT RIC Architecture Overview
+6.2	Functionalities of the Near-RT RIC platform
+6.2.1	Database and SDL
+6.2.1.0	Overview
+The database and SDL functionalities enable the Near-RT RIC platform to maintain and expose RAN/UE information and other information required to support specific use cases.
+6.2.1.1	UE-NIB
+This functionality enables the Near-RT RIC platform to maintain UE related information:
+-	Maintaining a list of UEs and associated data;
+-	Tracking and correlation of the UE identities associated with the connected E2 Nodes.
+Such information may be generated and accessed by the Near-RT RIC platform or authorized xApps.
+6.2.1.2	R-NIB
+This functionality enables the Near-RT RIC platform to maintain RAN related information:
+-	Maintaining the configurations and near real-time information relating to connected E2 Nodes and the mappings between them.
+Such information may be generated and accessed by the Near-RT RIC platform or authorized xApps.
+6.2.1.3	SDL
+This functionality enables the Near-RT RIC platform to provide SDL services for xApps, which can be used to subscribe to database notifications and to read, write and modify information stored on the database. UE-NIB, R-NIB and other use case specific information may be exposed using the SDL services.
+6.2.2	xApp Subscription Management
+This functionality enables the Near-RT RIC platform to handle subscription requests from different xApps for E2 related data, and provide unified data distribution to xApps for those data:
+-	Managing subscriptions from xApps to E2 Nodes;
+-	Enforcing authorization of policies controlling xApp access to messages;
+-	Enabling merging of identical subscriptions from different xApps into a single subscription toward an E2 Node;
+-	Enabling audit of existing subscriptions and initiating associated corrective actions.
+6.2.3	Conflict Mitigation
+This functionality enables the Near-RT RIC platform to detect and resolve potentially overlapping or conflicting requests from multiple xApps.
+In the context of Near-RT RIC, Conflict Mitigation is about addressing conflicting interactions between different xApps. An application will typically change one or more parameters with the objective of optimizing a specific metric. Conflict Mitigation is necessary because xApps objectives may be chosen/configured such that they result in conflicting actions.
+6.2.4	Messaging Infrastructure
+This functionality enables the Near-RT RIC platform with low-latency message delivery between Near-RT RIC internal endpoints.
+-	It supports registration/discovery/deletion of endpoints:
+-	Registration: Endpoints register themselves to the messaging infrastructure;
+-	Discovery: Endpoints are discovered by the messaging infrastructure initially and registered to the messaging infrastructure;
+-	Deletion: Endpoints are deleted once they are not used anymore.
+-	It provides the following APIs:
+-	An API for sending messages to the messaging infrastructure;
+-	An API for receiving messages from the messaging infrastructure.
+-	It supports multiple messaging modes, e.g., point-to-point mode (e.g., message exchange among endpoints), publish/subscribe mode (e.g., real-time data dispatching from E2 termination to multiple subscriber xApps);
+-	It provides message routing, namely according to the message routing information, messages can be dispatched to different endpoints;
+-	It supports message robustness to avoid data loss during a messaging infrastructure outage/restart or to release resources from the messaging infrastructure once a message is outdated.
+6.2.5	Security
+The security functionality given in this clause only applies to Near-RT RIC. One of the targets is to prevent malicious xApps from abusing radio network information (e.g., exporting to unauthorized external systems) and/or control capabilities over RAN functions. The security requirements for the 3GPP LTE eNB is defined in [6] and for the 5G NR gNB in [7].
+NOTE: 	The description of security functionalities is not included in the release.
+6.2.6	Management
+6.2.6.1	Void
+6.2.6.2	OAM Management of Near-RT RIC
+OAM management consists of fault, configuration, accounting, performance, file, security and other management plane services. OAM management follows O1 related management aspects defined in [4].
+To support OAM management services, Near-RT RIC platform provides the following capabilities:
+-	Fault Management: The Near-RT RIC platform provides Near-RT RIC Fault Supervision MnS over the O1 interface as defined in [4];
+-	Configuration management: The Near-RT RIC platform provides Near-RT RIC Provisioning MnS over the O1 interface as defined in [4];
+-	Logging: logging is to capture information needed to operate, troubleshoot and report on the performance of the Near-RT RIC platform and its constituent components. Log records may be viewed and consumed directly by users and systems, indexed and loaded into a data storage, and used to compute metrics and generate reports. Near-RT RIC components log events according to a common logging format. Different logs can be generated (e.g., audit log, metrics log, error log and debug log).
+-	Tracing: tracing mechanisms are needed to monitor the transactions or a workflow. An example subscription workflow can be broken into two traces namely, a subscription request trace followed by a response trace. Individual traces can be analysed to understand timing latencies as the workflow traverses a particular Near-RT RIC component.
+-	Metrics collection: metrics for performance and fault management specific to each xApp logic and other internal functionalities are collected and published for authorized consumer (e.g., SMO). A metrics collection mechanism is needed to collect and report metrics.
+6.2.7	Interface Termination
+6.2.7.1	E2 Termination
+This functionality enables termination of E2 interface with the following:
+-	Terminating SCTP connection from each E2 Node;
+-	Routing messages from xApps through the SCTP connection to an E2 Node;
+-	Decoding the payload of an incoming ASN.1 message enough to determine message type;
+-	Handling incoming E2 messages related to E2 connectivity;
+-	Receiving and responding to the E2 Setup Request from an E2 Node;
+-	Notifying xApps of the list of RAN functions supported by an E2 Node based on information derived from the E2 Setup and RIC Service Update procedures [3];
+-	Notifying the newly connected E2 Node of the list of accepted functions.
+6.2.7.2	A1 Termination
+This functionality enables termination of A1 interface with the following:
+-	Providing a generic API by means of which Near-RT RIC can receive and send messages via A1 interface [8]. These include, e.g., A1 policies and enrichment information received from Non-RT RIC, or A1 policy feedback sent towards Non-RT RIC.
+-	Sending A1 policy that is set or updated by the Non-RT RIC to suitable xApp(s) based on a list of candidate xApp(s) provided by xApp Repository functionality.
+6.2.7.3	O1 Termination
+This functionality enables termination of O1 interface.
+An implementation of O1 Termination at Near-RT RIC depends on the deployment options described in [4], i.e., when Near-RT RIC is modelled as a stand-alone Managed Element.
+Near-RT RIC platform communicates with SMO via O1 interface and exposes O1-related management services [5] from Near-RT RIC. For the O1 management services (MnS) shown below, Near-RT RIC platform is the MnS producer and SMO is the MnS consumer:
+-	Exposing provisioning management services from Near-RT RIC to O1 provisioning management service consumer;
+-	Translating O1 management services to Near-RT RIC internal APIs;
+-	Exposing FM services to report faults and events from Near-RT RIC to O1 FM service consumer;
+-	Exposing PM services to report bulk and real-time PM data from Near-RT RIC to O1 PM service consumer;
+-	Exposing file management services to download ML files, software files, etc. and upload log/trace files to/from file MnS consumer;
+-	Exposing communication surveillance services to O1 communication surveillance service consumer.
+6.2.7.4	Y1 Termination
+This functionality enables termination of Y1 interface.
+It provides support for exposing RAN analytics information from Near-RT RIC to Y1 consumers.
+6.2.8	API Enablement
+In the context of Near-RT RIC, the Near-RT RIC APIs can be categorized based on the interaction with the Near-RT RIC platform and can be related to E2-related services, A1-related services, Management related services, and SDL services.
+This functionality provides support for registration, discovery and consumption of Near-RT RIC APIs within the Near-RT RIC scope. In particular, the API enablement services include:
+-	Repository / Registry services for the Near-RT RIC APIs;
+-	Services that allow discovery of the registered Near-RT RIC APIs;
+-	Services to authenticate xApps for use of the Near-RT RIC APIs;
+-	Services that enable generic subscription and event notification;
+-	Means to avoid compatibility clashes between xApps and the services they access.
+The API enablement services can be accessed by the xApps via one or more enablement APIs.
+NOTE: 	The provided enablement APIs may need to consider the level of trust related to the xApp (e.g., 3rd party xApp, RIC-owned xApp, etc.).
+6.2.9	AI/ML Support
+6.2.9.0	Introduction
+The AI/ML support functionality enables the Near-RT RIC platform with data pipelining, model management, training and inference, which constitute complete AI/ML workflow support for xApps to implement AI/ML algorithms. xApps may use none, part, or all of this functionality, depending on its design.
+6.2.9.1	Data Pipelining
+This functionality enables the Near-RT RIC platform with data ingestion and preparation for xApps.
+The input may include E2 node data collected over E2 interface, enrichment information over A1 interface, information from xApps, and data retrieved from the Near-RT RIC database through the messaging infrastructure.
+The output is data sets that are ready to be consumed by AI/ML Model. The output may be stored in an xApp specific space (e.g., a dedicated space in database) or used as input for inference (see clause 6.2.9.3).
+6.2.9.1A	Model Management
+The Near-RT RIC platform offers storage, retrieval, and version control of AI/ML models for xApps. The Near-RT RIC platform may store the model in an xApp specific space (e.g., a dedicated space in database), and tracks the version change of the model if the model is retrained or updated later.
+6.2.9.2	Training
+This functionality enables training of AI/ML Models for xApps within Near-RT RIC [i.2]. The Near-RT RIC platform provides generic and use case-independent capabilities to AI/ML-based xApps that may be useful to multiple use cases. The associated AI/ML models are managed by the Near-RT RIC platform (see clause 6.2.9.1A). The input data for training may come from an xApp specific space (e.g., dedicated space in database).
+6.2.9.3	Inference
+Near-RT RIC platform offers inference of AI/ML Models for xApps. The associated AI/ML models are managed by the Near-RT RIC platform (see clause 6.2.9.1A). The input data may be the output of data pipelining, or come from an xApp specific space (e.g., a dedicated space in database). The inferred result may be provided to the requesting xApp or stored in an xApp specific space (e.g., a dedicated space in database).
+6.2.10	xApp Repository Function
+This functionality enables the Near-RT RIC platform with the following:
+-	Maintaining a list of candidate xApp(s) to A1 Termination for sending A1 policy or policy update to suitable xApp(s) based on policy type and operator policies;
+-	Maintaining the policy types supported in Near-RT RIC. The supported policy types are based on policy types supported by the registered xApps and operator policies;
+-	Performing xApp access control to requested A1-EI type based on operator policies.
+6.3	xApps
+The xApps collaborate with the Near-RT RIC platform to support various specialized use cases.
+Upon registration to the Near-RT RIC platform, an xApp informs the Near-RT RIC platform of its OAM and control information to enable relevant functionalities.
+NOTE: 	The LCM of xApp is performed by SMO and O-Cloud as specified in [4] and [20].
+6A	Services of Near-RT RIC platform and xApps
+6A.1	General
+Among the Near-RT RIC platform and the xApps, their capabilities are exposed as services. Both the Near-RT RIC platform and an xApp can be a service producer and/or a service consumer. Those services can be leveraged via the Near-RT RIC APIs described in clause 7.
+The interactions between service consumer and service producer are generalized that the service requests are sent from the service consumer and responses and notifications are sent from the service producer. It is the service producer that handles the resources on which the service consumer performs operations. The terms service consumer and service producer thus, do not refer to the direction of the data transfer over the Near-RT RIC APIs.
+A service-based representation is illustrated in Figure 6A.1-1.
+Figure 6A.1-1: Service-based representation for internal Near-RT RIC
+The services can be classified into the following categories, in regard to the relevant functionalities:
+-	A1 related services;
+-	E2 related services;
+-	Management related services;
+-	SDL services;
+-	Enablement services;
+-	AI/ML workflow services.
+The services provided by the Near-RT RIC platform and the xApps are described in clause 6A.2 and 6A.3, respectively.
+6A.2	Services provided by Near-RT RIC platform
+6A.2.1	Overview
+An overview of the services that can be provided by the Near-RT RIC platform is shown in Table 6A.2.1-1:
+Table 6A.2.1-1: Services provided by the Near-RT RIC platform
+6A.2.2	A1 related services
+6A.2.2.1	A1 EI service
+The A1 EI service supports the following operations in Table 6A.2.2.1-1.
+Table 6A.2.2.1-1: List of A1 EI service operations
+6A.2.3	E2 related services
+6A.2.3.1	E2 Subscription service
+The E2 Subscription service supports the following operations in Table 6A.2.3.1-1.
+Table 6A.2.3.1-1: List of E2 Subscription service operations
+6A.2.3.2	E2 Indication service
+The E2 Indication service supports the following operations in Table 6A.2.3.2-1.
+Table 6A.2.3.2-1: List of E2 Indication service operations
+6A.2.3.3	E2 Control service
+The E2 Control service supports the following operations in Table 6A.2.3.3-1.
+Table 6A.2.3.3-1: List of E2 Control service operations
+6A.2.3.4	E2 Guidance service
+The E2 Guidance service supports the following operations in Table 6A.2.3.4-1.
+Table 6A.2.3.4-1: List of E2 Guidance service operations
+6A.2.4	Management related services
+6A.2.4.1	xApp Registration service
+The xApp Registration service supports the following operations in Table 6A.2.4.1-1.
+Table 6A.2.4.1-1: List of xApp Registration service operations
+6A.2.5	SDL services
+6A.2.5.1	SDL Information service
+The SDL Information service supports the following operations in Table 6A.2.5.1-1.
+Table 6A.2.5.1-1: List of SDL Information service operations
+6A.2.6	Enablement services
+6A.2.6.1	Enabl Registration service
+The Enabl Registration service supports the following operations in Table 6A.2.6.1-1.
+Table 6A.2.6.1-1: List of Enabl Registration service operations
+6A.2.6.2	Enabl Discovery service
+The Enabl Discovery service supports the following operations in Table 6A.2.6.2-1.
+Table 6A.2.6.2-1: List of Enabl Discovery service operations
+6A.2.6.3	Enabl Events service
+The Enabl Events service supports the following operations in Table 6A.2.6.3-1.
+Table 6A.2.6.3-1: List of Enabl Events service operations
+6A.2.7	AI/ML services
+6A.2.7.1	Data Pipelining service
+The Data Pipelining service supports the following operations in Table 6A.2.7.1-1.
+6A.2.7.2	Training service
+The Training service supports the following operations in Table 6A.2.7.2-1.
+Table 6A.2.7.2-1: List of Training service operations
+6A.2.7.3	Inference service
+The Inference service supports the following operations in Table 6A.2.7.3-1.
+Table 6A.2.7.3-1: List of Inference service operations
+6A.3	Services provided by xApps
+6A.3.1	Overview
+An overview of the services that can be provided by the xApps is shown in Table 6A.3.1-1:
+Table 6A.3.1-1: Services provided by the xApps
+6A.3.2	A1 related services
+6A.3.2.1	Void
+6A.3.3	E2 related services
+In the current release of specification, no E2 related services can be provided by the xApp.
+6A.3.4	Management related services
+6A.3.4.1	xApp Configuration service
+void
+6A.3.4.3	xApp PM service
+void
+6A.3.4.4	xApp FM service
+void
+6A.3.5	SDL services
+6A.3.5.1	xApp data sharing service
+The xApp data sharing service supports the following operations in Table 6A.3.5.1-1.
+Table 6A.3.5.1-1: List of xApp Data sharing service operations
+6A.3.6	Enablement services
+In the current release of specification, no Enablement services can be provided by the xApp.
+7	Near-RT RIC APIs
+7.1	Overall Description
+7.1.1	Introduction
+The Near-RT RIC APIs are a collection of well-defined interfaces providing Near-RT RIC platform and xApp services. These APIs need to explicitly define the possible types of information flows and data models. The Near-RT RIC APIs are essential to host 3rd party xApps in an inter-operable way on different Near-RT RIC platforms.
+Near-RT RIC provides the following Near-RT RIC APIs for xApps:
+-	A1 related APIs: APIs to access A1 related services;
+-	E2 related APIs: APIs to access E2 related services;
+-	Management APIs: APIs to access management related services;
+-	SDL APIs: APIs to access Shared Data Layer related services;
+-	Enablement APIs: APIs to access enablement services;
+-	AI/ML workflow APIs: APIs to access AI/ML workflow services.
+7.1.2	Near-RT RIC API approaches
+Near-RT RIC APIs may be implemented using two approaches:
+-	Network API approach: Each relevant Near-RT RIC endpoint exposes a network endpoint and specifies a particular data encoding protocol and a network transport protocol that should be used to communicate with it. A different network API may be specified for each Near-RT RIC API reflecting a trade-off between different service requirements.
+-	SDK approach: The Near-RT RIC vendor provides an SDK (software development kit). This SDK is a software library which handles all connection management and exposes a simple API for the xApp to interact with the Near-RT RIC. The interface between the SDK library embedded in the xApp and the Near-RT RIC Platform may be either vendor proprietary or aligned to the specified Network API.
+Both approaches use similar methodologies of interaction with Near-RT RIC as defined in clauses 6A and 9. Furthermore, the detailed messages and IEs for each Near-RT RIC API that the xApp will use largely stay the same in the two approaches.
+These two approaches are presented in figure 7.1.2-1 for the Network API approach and figure 7.1.2-2 for the SDK approach.
+Both approaches assume that the Near-RT RIC platform provides appropriate support services. These services, labelled “Network API support” and “SDK support” respectively in figures 7.1.2-1 and 7.1.2-2, may be integrated into other platform services (i.e., A1 Termination may provide the support services for A1 related APIs) or implemented as independent services.
+@startuml
+skin rose
+card Near-RT-RIC {
+node xApp2 as "xApp"
+node xApp1 as "xApp"
+frame Platform {
+agent Netsup as "Network API support"
+node Serv1
+node Serv2
+node Serv3
+}
+}
+xApp1 –- Netsup: “Network APIs”
+xApp2 -– Netsup: “Network APIs”
+Netsup -- Serv1
+Netsup -- Serv2
+Netsup -- Serv3
+@enduml
+Figure 7.1.2-1: Near-RT RIC platform supporting RIC APIs using Network API approach
+@startuml
+skin rose
+card Near-RT-RIC {
+frame xApp2 {
+collections Logic2 as "Business Logic "
+agent SDK2 as "SDK library"
+}
+frame xApp1 {
+collections Logic1 as "Business Logic "
+agent SDK1 as "SDK library"
+}
+frame Platform {
+agent SDKsup as "SDK support"
+node Serv1
+node Serv2
+node Serv3
+}
+}
+Logic1 -- SDK1: SDK APIs
+Logic2 -- SDK2: SDK APIs
+SDK1 -- SDKsup: "Not specified"
+SDK2 -- SDKsup: "Not specified"
+SDKsup -- Serv1
+SDKsup -- Serv2
+SDKsup -- Serv3
+@enduml
+Figure 7.1.2-2: Near-RT RIC platform supporting RIC APIs using SDK approach
+7.1.3	Network API approach
+A Network API is defined in terms of a protocol stack including the definition:
+-	An application layer protocol used to carry a set of messages which normally contain multiple Information Elements (IEs);
+-	A data encoding protocol (ASN.1, Protobuf, JSON, etc.);
+-	A network transport protocol (SCTP, HTTPS, gRPC, etc.);
+-	Associated security and encryption methods.
+For the Network API approach for Near-RT RIC APIs, it is expected that each case listed in clause 7.1.1 may require a unique protocol stack definition which offers an optimal solution balancing the trade-offs between service requirements, Near-RT RIC platform complexity and xApp implementation overheads.
+Furthermore, each Network API will require a unique endpoint that the API consumer will need to discover using a combination of configuration and use of the Enablement APIs (also see clause 6A.2.6).
+Open O-RAN specified Network APIs for each case listed in clause 7.1.1 are defined in terms of the corresponding protocol stack.
+7.1.4	SDK approach
+An SDK (Software Development Kit) is defined as a set of software tools/libraries provided by platform vendors which helps developers in building applications on the platform. An SDK simplifies application development by:
+-	Providing simple APIs to trigger commonly used functionality;
+-	Handling routine management tasks “under the hood”;
+-	Providing tools for debugging, building, testing applications.
+For the SDK approach for Near-RT RIC APIs, it is expected that a given Near-RT RIC vendor offers an SDK library that provides a language specific implementation of each case listed in clause 7.1.1. This provides a common interface to interact with all the Near-RT RIC endpoints as well as other xApps.
+The Near-RT RIC SDK library functionality would include:
+-	Discovery of relevant endpoints for and connection to Near-RT RIC platform services and other xApps.
+-	Handles all connection management of the xApp with all relevant Near-RT RIC platform endpoints as well as other xApps. This includes:
+-	Authentication;
+-	Registration;
+-	Encryption/Decryption (if required);
+-	Failovers if any endpoint crashes.
+-	Presents a simple API as function definitions for sending/receiving messages;
+-	Provides tools for xApp debugging, building and testing.
+These services would be provided by the SDK library and so would not be exposed to the business logic within an xApp.
+Open O-RAN specified SDK APIs for each case listed in clause 7.1.1 would need to be defined for each supported programming language.
+The actual protocol stack implemented by the SDK library and used to communicate with the SDK support service in the Near-RT RIC platform may be either based on the Network APIs or left not specified and so may be vendor proprietary.
+7.1.5	Near-RT RIC API support options
+The two approaches to Near-RT RIC APIs are not necessarily mutually exclusive.
+For example, an xApp designed to support the Network API approach may be implemented using either an internal SDK library that provides the Network API interface or a direct implementation the Network API interface. Both of these cases are presented in figure 7.1.5-1.
+@startuml
+skin rose
+card Near-RT-RIC {
+frame xApp2 {
+collections Logic2 as "Business Logic "
+agent IF2 as "Network API client"
+}
+frame xApp1 {
+collections Logic1 as "Business Logic "
+agent SDK1 as "SDK library \nincluding Network API client"
+}
+frame Platform {
+agent Netsup as "Network API support"
+node Serv1
+node Serv2
+node Serv3
+}
+}
+Logic1 -- SDK1: SDK APIs
+Logic2 -- IF2 #line.dashed
+SDK1 -- Netsup: "Network APIs"
+IF2 -– Netsup: "Network APIs"
+Netsup -- Serv1
+Netsup -- Serv2
+Netsup -- Serv3
+@enduml
+Figure 7.1.5-1: Near-RT RIC platform supporting RIC APIs using Network API approach with optional use of SDK APIs
+Likewise, a Near-RT RIC Platform may be designed to support both the Network API approach and the SDK approach and so xApps implemented using either approach may access platform services. Both of these cases are presented in figure 7.1.5-2.
+@startuml
+skin rose
+card Near-RT-RIC {
+frame xApp2 {
+collections Logic2 as "Business Logic"
+agent SDK2 as "SDK library"
+}
+frame xApp1 {
+collections Logic1 as "Business Logic"
+agent SDK1 as "SDK library \nincluding Network API client"
+}
+frame Platform {
+agent Netsup as "Network API support"
+agent SDKsup as "SDK support"
+node Serv1
+node Serv2
+node Serv3
+}
+}
+Logic1 -- SDK1: SDK APIs
+Logic2 -- SDK2: SDK APIs
+SDK1 -- Netsup: “Network APIs”
+SDK2 –- SDKsup: "Not specified"
+Netsup -- Serv1
+Netsup -- Serv2
+Netsup -- Serv3
+SDKsup -- Serv1
+SDKsup -- Serv2
+SDKsup -- Serv3
+@enduml
+Figure 7.1.5-2: Near-RT RIC platform supporting both Network API and SDK approaches
+7.2	Void
+7.3	Void
+7.4	Void
+7.5	Void
+7.6	Void
+7.7	Void
+8	External Interfaces of Near-RT RIC
+8.1	E2 Interface
+O-RAN-WG3.E2GAP [2] specifies E2 interface general aspects and principles.
+O-RAN-WG3.E2AP [3] specifies E2 interface application protocols.
+8.2	A1 Interface
+O-RAN-WG2.A1.GA&P [8] specifies A1 interface general aspects and principles.
+O-RAN-WG2.A1AP [9] specifies A1 interface application protocols.
+8.3	O1 Interface
+An implementation of O1 interface at Near-RT RIC depends on the deployment options described in [4], i.e., when Near-RT RIC is modelled as a stand-alone Managed Element.
+O-RAN-WG1.O1-Interface [5] specifies O1 interface related aspects.
+8.4	Y1 Interface
+Y1 interface allows the Y1 consumers to subscribe to or request the RAN analytics information service(s) provided by Near-RT RIC [10].
+NOTE: 	The Stage 2 and Stage 3 aspects of Y1 interface are not addressed in the present document.
+9	Near-RT RIC API Procedures
+9.1	Disclaimer
+Procedures described in this clause assume the Near-RT RIC platform contains the functionalities listed in clause 6.2.
+API endpoints associated with the platform functionalities may vary depending on implementation.
+9.2	A1 Related API Procedures
+9.2.1	Introduction
+The following procedures are described in this clause:
+1) Policy Management Service.
+In this case the A1 Service Producer role (A1AP [9] clause 3.1) resides in the Near-RT RIC.
+a) Non-RT RIC (A1 Service Consumer) originated procedures:
+-	Create Single Policy procedure (A1AP [9] clause 3.2.2.2.2) using A1 Related API: A1 Policy Setup (request, result);
+-	Query Single Policy procedure (A1AP [9] clause 3.2.2.3.2) using A1 Related API: A1 Policy Query (request, result);
+-	Query All Policy Identifiers procedure (A1AP [9] clause 3.2.2.3.5) using A1 Related API: A1 Policy Query (request, result);
+-	Query Policy Status procedure (A1AP [9] clause 3.2.2.3.6) using A1 Related API: A1 Policy Query (request, result);
+-	Update Single Policy procedure (A1AP [9] clause 3.2.2.4.2) using A1 Related API: A1 Policy Update (request, result);
+-	Delete Single Policy procedure (A1AP [9] clause 3.2.2.5.2) using A1 Related API: A1 Policy Delete (request, result);
+-	Query All Policy Type Identifiers procedure (A1AP [9] clause 3.2.2.7.2) using A1 Related API: A1 Policy Query (request, result);
+-	Query Single Policy Type procedure (A1AP [9] clause 3.2.2.7.3) using A1 Related API: A1 Policy Query (request, result).
+b) Near-RT RIC (A1 Service Producer) originated procedures:
+-	Policy Status Update procedure (A1AP [9] clause 3.2.2.6.2) using A1 Related API: A1 Policy Status (status, ack).
+2) A1AP Enrichment Information (EI) Service
+In this case the A1 Service Producer role (A1AP [9] clause 3.1) resides in the Non-RT RIC.
+a) Near-RT RIC (A1 Service Consumer) originated procedures:
+-	Query EI Type Identifiers procedure (A1AP [9] clause 3.3.2.2.2) using A1 Related API: A1 EI Query (request, result);
+-	Query EI Type procedure (A1AP [9] clause 3.3.2.2.3) using A1 Related API: A1 EI Query (request, result);
+-	Query EI Job Identifiers procedure (A1AP [9] clause 3.3.3.2.2) using A1 Related API: A1 EI Query (request, result);
+-	Create EI Job procedure (A1AP [9] clause 3.3.3.3.2) using A1 Related API: A1 EI Job Setup (request, result);
+-	Query EI Job procedure (A1AP [9] clause 3.3.3.3.3) using A1 Related API: A1 EI Query (request, result);
+-	Update EI Job procedure (A1AP [9] clause 3.3.3.3.4) using A1 Related API: A1 EI Job Update (request, result);
+-	Delete EI Job procedure (A1AP [9] clause 3.3.3.3.5) using A1 Related API: A1 EI Job Delete (request, result);
+-	Query EI Job Status procedure (A1AP [9] clause 3.3.3.4.2) using A1 Related API: A1 EI Job Status Query (request, result).
+b) Non-RT RIC (A1 Service Producer) originated procedures:
+-	Notify EI Job Status procedure (A1AP [9] clause 3.3.3.4.3) using A1 Related API: A1 EI Job Status Notify (status, ack);
+-	Deliver EI Job Result procedure (A1AP [9] clause 3.3.4.2.2) using A1 Related API: A1 EI Job Result Delivery (result, ack).
+9.2.2	A1 Policy procedures
+9.2.2.1	A1 Policy Setup procedure
+The purpose of A1 Policy Setup procedure in Near-RT RIC is to support the A1AP [9] Create Single Policy procedure from the Non-RT RIC and to request and activate an A1 policy enforcement toward a suitable xApp.
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+Non -> plt:<<A1AP>>PUT .../policytypes/{policyTypeId}/policies/{policyId}(PolicyObject)
+plt <-plt: Policy type check
+alt policy type is not supported in Near-RT RIC
+plt -> Non: <<A1AP>>400
+else policy type is supported in Near-RT RIC
+plt -> plt: Policy mapping check
+plt ->plt: xApp selection process
+alt suitable xApp is identified
+plt -> xApp: A1 POLICY SETUP REQUEST
+alt success
+xApp -> plt: A1 POLICY SETUP RESULT\n[success]
+plt -> Non:<<A1AP>>201 Created (PolicyObject)
+else failure
+xApp -> plt: A1 POLICY SETUP RESULT \n[failure, reason]
+plt -> Non:<<A1AP>>error code xxx
+end
+else no suitable xApp is identified
+plt -> Non:<<A1AP>>503
+end
+end
+...
+@enduml
+Figure 9.2.2.1-1: A1 Policy Setup procedure
+9.2.2.2	A1 Policy Update procedure
+The purpose of A1 Policy Update procedure in Near-RT RIC is to support A1AP Update Single Policy procedure from Non-RT RIC.
+@startuml
+skin rose
+skinparam ParticipantPadding 3
+skinparam BoxPadding 6
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+Non -> plt: <<A1AP>>PUT .../policytypes/{policyTypeId}/policies/{policyId}(PolicyObject)
+plt <-plt: Policy type check
+alt policy type is not supported in Near-RT RIC
+plt -> Non:<<A1AP>>400
+else policy type is supported in Near-RT RIC
+plt -> plt: Policy mapping check
+plt -> xApp: A1 POLICY UPDATE REQUEST
+alt success
+xApp -> plt: A1 POLICY UPDATE RESULT\n[success]
+plt -> Non: <<A1AP>>200 OK(PolicyObject)
+else failure
+xApp -> plt: A1 POLICY UPDATE RESULT\n[failure, reason]
+plt -> Non: <<A1AP>>error code xxx
+end
+end
+...
+@enduml
+Figure 9.2.2.2-1: A1 Policy Update procedure
+9.2.2.3	A1 Policy Delete procedure
+The purpose of A1 Policy Delete procedure is to support the A1AP Delete Policy procedure from Non-RT RIC.
+@startuml
+skin rose
+skinparam ParticipantPadding 3
+skinparam BoxPadding 6
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+Non -> plt: <<A1AP>>DELETE .../policytypes/{policyTypeId}/policies/{policyId}
+plt <-plt: Policy type check
+alt policy type is not supported in Near-RT RIC
+plt -> Non: <<A1AP>>400
+else policy type is supported in Near-RT RIC
+plt -> plt: Policy mapping check
+alt policy mapped
+plt -> xApp: A1 POLICY DELETE REQUEST
+alt success
+xApp -> plt: A1 POLICY DELETE RESULT\n[success]
+plt -> Non: <<A1AP>>204 No content
+else failure
+xApp -> plt: A1 POLICY DELETE RESULT\n[failure, reason]
+plt -> Non:<<A1AP>>error code xxx
+end
+else policy not mapped
+plt -> Non: <<A1AP>>503
+end
+end
+...
+@enduml
+Figure 9.2.2.3-1: A1 Policy Delete procedure
+9.2.2.4	A1 Policy Query procedure
+The purpose of A1 Policy Query procedure is to support the following A1AP procedures initiated by the Non-RT RIC:
+-	A1AP Query Single Policy procedure;
+-	A1AP Query All Policy Identifiers procedure;
+-	A1AP Query Policy Status procedure;
+-	A1AP Query All Policy Type Identifiers procedure;
+-	A1AP Query Single Policy Type procedure.
+Table 9.2.2.4-1 provides the list of expected xApp response for each Near-RT RIC Platform Policy query. The query may come from Near-RT platform or from the Non-RT RIC.
+Table 9.2.2.4-1: Supported A1AP Policy Query procedures
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Collections xApp
+End box
+autonumber
+Non -> plt: <<A1AP>>GET (URI)
+plt -> plt: Inspect URI to determine nature of query
+plt -> plt: xApp selection process
+loop For each xApp selected by Near-RT RIC platform
+plt ->xApp: A1 POLICY QUERY REQUEST (URI)
+alt Success
+xApp -> plt: A1 POLICY QUERY RESULT\n[success, result]
+plt --> plt: store query result
+else Failure
+xApp -> plt: A1 POLICY QUERY RESULT \n[failure, reason]
+end
+end
+plt -> plt: Consolidate responses
+alt Response available
+plt -> Non: <<A1AP>> 200 OK (response)
+else Response not available
+plt ->Non: <<A1AP>>Error code
+end
+Non --> Non: Determine if subsequent query is required
+@enduml
+Figure 9.2.2.4-1: A1 Policy Query procedure
+9.2.2.5	A1 Policy Status Update procedure
+The purpose of A1 Policy Status Update procedure in Near-RT RIC is to support the A1AP Policy Status Update procedure (A1AP [9] clause 3.2.2.6) from the Near-RT RIC.
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Collections xApp
+End box
+autonumber
+xApp -> plt: A1 POLICY STATUS UPDATE (PolicyStatusObject)
+Alt If Near-RT RIC platform rejects message from xApp
+plt --> xApp: A1 POLICY STATUS UPDATE (error)
+Else IF Near-RT RIC platform accepts message from xApp
+plt -> Non: <<A1AP>>POST (PolicyStatusObject)
+Non -> plt: <<A1AP>> 204 (No content)
+plt -> xApp: A1 POLICY STATUS UPDATE (Ack)
+End
+@enduml
+Figure 9.2.2.5-1: A1 Policy Status Update procedure
+9.2.3	A1-EI related procedures
+9.2.3.1	A1-EI Query procedure
+The purpose of A1 EI Query procedure is to support the following A1AP procedures initiated by the Near-RT RIC:
+-	Query EI Type Identifiers procedure;
+-	Query EI Type procedure;
+-	Query EI Job Identifiers procedure;
+-	Query EI Job procedure;
+-	Query EI Job Status procedure.
+Table 9.2.3.1-1 provides the expected response from Near-RT RIC platform for each EI query request. The information may come from the platform or the Non-RT RIC.
+Table 9.2.3.1-1: Supported A1AP Query EI procedures
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Collections xApp
+End box
+autonumber
+xApp -> plt: A1 EI QUERY REQUEST (URI)
+Alt EI query rejected by Near-RT RIC platform
+plt -> xApp: A1 EI QUERY RESULT (error)
+Else EI query accepted by Near-RT RIC platform
+plt -> Non: <<A1AP>>GET (URI)
+Non -> Non: Inspect URI to determine \nnature of query
+alt EI query accepted
+Non ->plt: <<A1AP>> 200 OK (EI information)
+plt -> xApp: A1 EI QUERY RESULT (EI information)
+else EI query rejected
+Non -> plt: <<A1AP>>Error code
+plt -> xApp: A1 EI QUERY RESULT (error)
+end
+end
+xApp <-- xApp: Determine if subsequent \nquery is required
+@enduml
+Figure 9.2.3.1-1: A1 EI Query procedure
+9.2.3.2	A1-EI subscription setup procedure
+The A1-EI subscription setup procedure enables xApp to setup a new A1-EI subscription toward Near-RT RIC Platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+xApp -> plt: A1-EI SUBSCRIPTION SETUP REQUEST\n[A1-EI Subscription ID, A1-EI Subscription Setup Details]
+plt <-> plt: Check the originating xApp's\naccess permission to requested A1-EI(s)
+alt The originating xApp is NOT allowed to access some of requested A1-EI(s)
+plt -> xApp: A1-EI SUBSCRIPTION SETUP RESULT [Result{failure}, Reason]
+else The originating xApp is allowed to access all requested A1-EI(s)
+plt -> plt: Checks for A1-EI(s) support in Non-RT RIC
+alt Some of requested A1-EI(s) is NOT supported in Non-RT RIC
+plt -> xApp: A1-EI SUBSCRIPTION SETUP RESULT [Result{failure}, Reason]
+else All requested A1-EI(s) is supported in Non-RT RIC
+plt -> plt: Checks created EiJobObject(s) against\nthe originating xApp's request
+alt Created EiJobObject(s) satisfies the originating xApp's request
+plt -> xApp: A1-EI SUBSCRIPTION SETUP RESULT [Result{success}]
+else Created EiJobObject(s) does not satisfy the originating xApp's request
+loop for each requested A1-EI does not have created EiJobObject association
+plt -> plt: A1 interface EiJobObject\ncreate/update decide process
+alt A1 interface EiJobObject create decision is made
+plt <-> Non: Create EI job procedure
+else A1 interface EiJobObject update decision is made
+plt <-> Non: Update EI job procedure
+end
+end loop
+alt EiJobObject(s) create/update full success
+plt -> xApp: A1-EI SUBSCRIPTION SETUP RESULT [Result{success}]
+else EiJobObject(s) create/update NOT full success
+plt -> xApp: A1-EI SUBSCRIPTION SETUP RESULT [Result{failure}, Reason]
+end
+end
+end
+end
+...
+@enduml
+Figure 9.2.3.2-1: A1-EI subscription setup procedure
+9.2.3.3	A1-EI subscription update procedure
+The A1-EI subscription update procedure enables xApp to update an existing A1-EI subscription toward Near-RT RIC Platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 4
+skinparam BoxPadding 8
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC Platform”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+xApp -> plt: A1-EI SUBSCRIPTION UPDATE REQUEST\n[A1-EI Subscription ID, A1-EI Subscription Update Details]
+plt -> plt:(1)Filter A1-EI(s) requested for unsubscribing;\n(2)Filter A1-EI(s) requested for subscribing.
+group For A1-EI(s) requested for unsubscribing
+plt -> plt: Delete corresponding A1-EI subscription(s)
+loop For each requested A1-EI
+plt -> plt: A1 interface EiJobObject\ndelete/update decide process
+alt A1 interface EiJobObject delete decision is made
+plt <-> Non: Delete EI job procedure
+else A1 interface EiJobObject update decision is made
+plt <->Non: Update EI job procedure
+end
+end loop
+end group
+group For A1-EI(s) requested for subscribing
+plt <-> plt: Check the originating xApp's\naccess permission to requested A1-EI(s)
+alt The originating xApp is NOT allowed to access some of requested A1-EI(s)
+plt -> xApp: A1-EI SUBSCRIPTION UPDATE RESULT [Result{failure}, Reason]
+else The originating xApp is allowed to access all requested A1-EI(s)
+plt -> plt: Checks for A1-EI(s) support in Non-RT RIC
+alt Some of requested A1-EI(s) is NOT supported in Non-RT RIC
+plt -> xApp: A1-EI SUBSCRIPTION UPDATE RESULT [Result{failure}, Reason]
+else All requested A1-EI(s) is supported in Non-RT RIC
+plt -> plt :Checks created EiJobObject(s) against\nthe originating xApp's request
+alt Created EiJobObject(s) satisfies the originating xApp's request
+plt -> xApp: A1-EI SUBSCRIPTION UPDATE RESULT [Result{success}]
+else Created EiJobObject(s) does not satisfy the originating xApp's request
+loop For each requested A1-EI does not have created EiJobObject association
+plt -> plt: A1 interface EiJobObject\ncreate/update decide process
+alt A1 interface EiJobObject create decision is made
+plt <-> Non: Create EI job procedure
+else A1 interface EiJobObject update decision is made
+plt <-> Non: Update EI job procedure
+end
+end loop
+alt EiJobObject(s) create/update full success
+plt -> xApp: A1-EI SUBSCRIPTION UPDATE RESULT [Result{success}]
+else EiJobObject(s) create/update NOT full success
+plt -> xApp: A1-EI SUBSCRIPTION UPDATE RESULT [Result{failure}, Reason]
+end
+end
+end
+end
+end group
+...
+@enduml
+Figure 9.2.3.3-1: A1-EI subscription update procedure
+9.2.3.4	A1-EI subscription delete procedure
+A1-EI subscription delete procedure allows xApp to delete an existing A1-EI subscription toward Near-RT RIC Platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 3
+skinparam BoxPadding 6
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+xApp -> plt: A1-EI SUBSCRIPTION DELETE REQUEST\n[A1-EI Subscription ID]
+plt -> plt: Check originating xApp's access\npermission to requested A1-EI subscription.
+alt Originating xApp is not allowed to access to the requested A1-EI subscription
+plt -> xApp: A1-EI SUBSCRIPTION DELETE RESULT\n[Result{failure}, Reason]
+else Originating xApp is allowed to access to the requested A1-EI subscription
+plt -> plt: Finds the created EiJobObjects associated\nwith the requested A1-EI subscription
+loop For each created EiJobObject associated\nwith the requested A1-EI subscription
+plt -> plt: A1 interface EiJobObject\ndelete/update decide process
+alt A1 interface EiJobObject delete decision is made
+plt <-> Non: Delete EI job procedure
+else A1 interface EiJobObject update decision is made
+plt <-> Non: Update EI job procedure
+end
+end loop
+plt -> xApp: A1-EI SUBSCRIPTION DELETE RESULT\n[Result{success}]
+end
+...
+@enduml
+Figure 9.2.3.4-1: A1-EI subscription delete procedure
+9.2.3.5	A1-EI delivery procedure
+The A1-EI delivery procedure allows xApp to be deliveried with subscribed A1-EI from Near-RT RIC Platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 3
+skinparam BoxPadding 6
+skinparam defaultFontSize 12
+Participant Non as “Non-RT RIC”
+Box “Near-RT RIC”
+Participant plt as “Near-RT RIC platform”
+Participant xApp
+End box
+autonumber
+Non -> plt: <<A1AP>>POST  {jobResultUri} (EiJobResultObject)
+plt -> plt: Mapping jobResultUri to target xApps
+alt Target xApps identified
+plt -> Non: <<A1AP>>204 No Content
+loop For each target xApp
+plt -> xApp: A1-EI DELIVERY\n[A1-EI Subscription ID, A1-EI]
+end loop
+else Target xApps NOT identified
+plt -> Non: <<A1AP>>error code 4xx/5xx (error information)
+plt <-> Non: Delete EI job procedure
+end
+...
+@enduml
+Figure 9.2.3.5-1: A1-EI delivery procedure
+9.3	E2 Related API Procedures
+9.3.1	Introduction
+The following procedures are described in this clause:
+E2AP RIC Functional procedures:
+-	RIC Subscription using E2 Related API: E2 Subscription (request, reject, success, failure) and E2 Related API: E2 Guidance (request, response);
+-	RIC Subscription Delete using E2 Related API: E2 Subscription Delete (request, reject, success, failure);
+-	RIC Subscription Delete Required using E2 Related API: E2 Subscription Delete Query (required, accept, decline) and E2 Related API: E2 Subscription Delete Notification (Deleted);
+-	RIC Subscription Audit using E2 Related API: E2 Subscription Audit (request, reject, success, failure);
+-	RIC Indication using E2 Related API: E2 Indication (push, failure);
+-	RIC Control using E2 Related API: E2 Control (request, reject, success, failure) and E2 Related API: E2 Guidance (request, response).
+E2 Guidance related procedures:
+-	xApp initiated conflict mitigation using E2 Related API: E2 Guidance (request, response);
+-	xApp Subscription Management initiated conflict mitigation using E2 Related API: E2 Guidance (modification);
+-	Conflict mitigation related message monitoring using E2 Related API: E2 Guidance (modification);
+-	Conflict mitigation initiated conflict mitigation using E2 Related API: E2 Guidance (modification).
+Other conflict mitigation related procedures are for future study.
+9.3.2	RIC Functional Procedures
+9.3.2.1	E2 Subscription procedure
+The purpose of the E2 Subscription procedure in the Near-RT RIC is to enable an xApp to request subscriptions for REPORT, INSERT and/or POLICY service(s) from E2 interface, and to ensure that only validated and non-duplicate subscriptions are maintained by the Near-RT RIC over the E2 interface to the E2 Node and that duplicated E2 Subscription Request messages from xApps are handled gracefully.
+This procedure is based on the following assumptions:
+-	xApp may obtain guidance from Near-RT RIC Platform (i.e., conflict mitigation processing) to resolve potential conflicts and/or detect partial duplications prior to sending a E2 Subscription Request (see clause 9.3.3.1);
+-	xApp has been configured with a trusted xApp ID;
+-	Near-RT RIC platform maintains all previous successful RIC Subscriptions towards the E2 Node listed in xApp’s E2 Subscription request and is able to detect duplications and recover E2 Node response messages;
+-	Near-RT RIC platform may leverage its conflict mitigation functionality in managing E2 subscriptions (see clause 9.3.3.5);
+-	Near-RT RIC platform decides initiation of appropriate E2AP procedure(s), if needed, to fulfil the E2 Subscription request.
+-	E2 Request ID is used on E2-related APIs to identify an active RIC subscription. Near-RT Platform maintains the 1:1 mapping between E2 Request ID, used on E2 related APIs, and RIC Request ID, used on E2 interface.
+-	Near-RT RIC platform routes requests for E2AP procedure(s) to appropriate E2 interface;
+-	Near-RT RIC platform maintains a mapping of active Subscriptions (identified on E2 interface by E2 Node ID and RIC Request ID) of validated xApps. Near-RT RIC platform uses the mapping when sending E2 INDICATION messages to the correct xApp or xApps.
+-	Near-RT RIC platform sends the E2 Subscription response prior to sending any associated E2 Indication message to the xApp.
+The procedure is initiated by an xApp using E2 Related API: E2 Subscription request for a specific E2 Node. The following outcomes are considered:
+-	Request fails following rejection by Near-RT RIC platform and an E2 related API: E2 Subscription response (Reject) is sent to xApp without E2 interface transaction. Response contains Cause (i.e., xApp not authorized to request specific subscription);
+-	Request towards a specific E2 Node is handled successfully following acceptance by Near-RT RIC platform but detected as duplicate and so acknowledged with an E2 related API: E2 Subscription response (Success) to xApp for a specific E2 Node without corresponding E2 interface transaction;
+-	Request towards a specific E2 Node is handled successfully following acceptance by Near-RT RIC Platform and acceptance by E2 Node and so acknowledged with an E2 related API: E2 Subscription response (Success) to xApp for a specific E2 Node following corresponding E2 interface transaction;
+-	Request towards a specific E2 Node fails following acceptance by Near-RT RIC Platform but is either rejected by E2 Node or corresponding E2AP timer expires prior to a response from E2 Node and so declined using an E2 related API: E2 Subscription response (Failure) to xApp for a specific E2 Node following corresponding E2 interface transaction. Response contains Cause (i.e., Request contents not accepted by E2 Node, E2AP timeout, etc.).
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC"
+Collections “xApp” as xApp
+Participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+xApp <--> plt: 1: (E2 related API) E2 Guidance (Request/Response)
+xApp -> plt: 2: (E2 related API) E2 Subscription (Request, E2 Node ID)
+plt -> plt: 3. Conflict mitigation processing
+Alt Near-RT RIC platform rejects
+plt -> xApp: 4: (E2 related API) E2 Subscription (Reject, E2 Node ID, Cause)
+Else Near-RT RIC platform accepts
+plt -> plt: 5: Detect duplication
+alt E2AP procedure(s) needed
+plt <-> ran: 6: <<E2>> Appropriate E2AP procedure(s)
+alt E2AP procedure(s) succeeds
+plt -> plt: 7: Update subscription records and\n add the xApp to the distribution list
+plt -> xApp: 8: (E2 related API) E2 Subscription \n(Success, E2 Node ID, E2 Request ID(s), E2 Action ID(s))
+else E2AP procedure(s) fails
+plt -> xApp: 9: (E2 related API) E2 Subscription \n (Failure, E2 Node ID, Cause)
+end
+else Existing subscription(s) can be reused
+plt -> plt: 10: Update subscription records and\n add the xApp to the distribution list
+plt -> xApp: 11: (E2 related API) E2 Subscription \n (Success, E2 Node ID, E2 Request ID(s), E2 Action ID(s))
+end
+end
+@enduml
+Figure 9.3.2.1-1: E2 Subscription procedure
+9.3.2.2	E2 Subscription Delete procedure
+The purpose of the E2 Subscription Delete procedure in the Near-RT RIC is to ensure that a) only validated RIC Subscription Delete Request messages are issued by the Near-RT RIC over the E2 interface to the E2 Node; b) deletion requests for duplicated Subscription Requests are handled gracefully.
+This procedure is based on the following assumptions:
+-	xApp has been configured with a trusted xApp ID;
+-	Near-RT RIC platform maintains all active subscriptions towards the E2 Node listed in xApp’s E2 Subscription Delete request and is able to detect when and if the delete request shall result in a corresponding E2 message;
+-	Near-RT RIC platform routes the subscription delete requests to an appropriate E2interface;
+-	Near-RT RIC platform maintains a mapping of active subscriptions (identified on E2 interface by E2 Node ID and RIC Request ID) of the validated xApps. Near-RT RIC platform uses the mapping when sending RIC INDICATION messages to the correct xApp;
+The procedure initiated by an xApp uses E2 Related API: E2 Subscription Delete to request subscription deletion for a specific E2 Node. The following outcomes are considered:
+-	Request fails following rejection by Near-RT RIC platform and an E2 Related API: E2 Subscription Delete response (Reject) is sent to xApp without E2 interface transaction (i.e., xApp not previously associated with validated subscription);
+-	Request succeeds following acceptance by Near-RT RIC platform but other subscriber(s) detected for the subscription, and an E2 Related API: E2 Subscription Delete response (Success) is sent to xApp without corresponding E2 transaction;
+-	Request succeeds following acceptance by Near-RT RIC platform and accepted by E2 Node, and an E2 Related API: E2 Subscription Delete response (Success) is sent to xApp following corresponding E2 transaction;
+-	Request fails following acceptance by Near-RT RIC platform but is either rejected by E2 Node or corresponding E2AP timer expires prior to a response from E2 Node, and an E2 Related API: E2 Subscription Delete response (Failure) is sent to xApp following corresponding E2 interface transaction (i.e., RIC Request ID is not known by E2 Node, time out, etc.);
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC platform"
+Collections “xApp” as xApp
+participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+xApp -> plt: 1: (E2 related API) E2 Subscription Delete \n(Request, E2 Node ID, E2 Request ID)
+plt -> plt: 2: Confirm that xApp had previously subscribed \n(i.e. record found for xApp ID)
+plt -> plt: 3: Accept/Reject decision
+Alt Near-RT RIC platform rejects
+plt -> xApp: 4: (E2 related API) E2 Subscription Delete \n(Reject, E2 Node ID, E2 Request ID, Cause)
+Else Near-RT RIC platform accepts
+plt -> plt: 5: Count valid records
+alt Single xApp record
+plt -> ran: 6: <<E2>> RIC SUBSCRIPTION DELETE REQUEST \n(RIC Request ID)
+alt E2 Node accepts delete request
+ran -> plt: 7: <<E2>> RIC SUBSCRIPTION DELETE RESPONSE
+plt -> plt: 8: Update the subscription records, \nand delete the distribution list
+plt-> xApp: 9: (E2 related API) E2 Subscription Delete \n(Success, E2 Node ID, E2 Request ID)
+else E2 Node rejects delete request
+ran -> plt: 10: <<E2>> RIC SUBSCRIPTION DELETE FAILURE
+plt -> xApp: 11: (E2 related API) E2 Subscription Delete \n(Failure, E2 Node ID, E2 Request ID, Cause)
+else Near-RT detects E2AP timeout
+plt->plt: 12a. E2AP time out
+plt -> xApp: 12b. (E2 related API) E2 Subscription Delete \n(Failure, E2 Node ID, E2 Request ID, Cause)
+End
+Else Multiple xApp records
+plt -> plt: 12: Update the subscription records, \nand delete the xApp from the distribution list
+plt -> xApp: 13: (E2 related API) E2 Subscription Delete \n(Success, E2 Node ID, E2 Request ID)
+end
+end
+@enduml
+Figure 9.3.2.2-1: E2 Subscription Delete procedure
+9.3.2.2A	E2 Subscription Delete Query procedure and E2 Subscription Delete Notification procedure
+The purpose of the E2 Subscription Delete Query procedure and E2 Subscription Delete Notification Procedure in the Near-RT RIC is to ensure that deletion request of the existing subscriptions from an E2 Node is handled properly.
+The two procedures are based on the following assumptions:
+-	The Near-RT RIC platform maintains the list of xApps associated with the subscription removal request from an E2 Node and, if decides to accept, uses the E2 related API: E2 Subscription Delete Notification (Deleted) to delete subscriptions toward xApps. Prior to determining whether or not to accept the subscription delete required request, the Near-RT RIC platform may send E2 related API: E2 Subscription Delete Query (required) to each xApp with an active subscription, each xApp may respond with E2 related API: E2 Subscription Delete (accept) or E2 related API: E2 Subscription Delete (decline).The procedures may be initiated by theNear-RT RIC platform, when RIC Subscription Delete Required is received from an E2 Node. The Near-RT RIC platform may use the E2 Related API: E2 Subscription Delete Query (required) to consult xApps. The following outcomes are considered:
+-	xApp accepts request to delete subscription and sends E2 Related API: E2 Subscription Delete Query (accept) to accept subscription deletion.
+-	xApp declines request to delete subscription and sends E2 Related API: E2 Subscription Delete Query (decline) to inform Near-RT RIC platform.
+In both cases, the Near-RT RIC platform may decide whether to delete the subscription.
+The Near-RT RIC platform may also decide whether to delete the subscription without consulting xApps.
+If the Near-RT RIC platform decides to delete the subscription, it uses E2 Related API: E2 Subscription Delete Notification (Deleted) to inform each xApp for the eventual outcome.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC"
+Collections “xApp” as xApp
+participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+ran -> plt: 1. <<E2>> RIC SUBSCRIPTION DELETE REQUIRED
+Loop For each RIC Request ID
+plt -> plt: 2. Check subscription records for concerned xApps \n(RIC Request ID, E2 Node ID)
+opt Optional
+Loop For each xApp with E2 Request ID
+plt -> xApp: 3. (E2 related API) E2 Subscription Delete Query \n(Required, E2 Node ID, E2 Request ID, Cause)
+alt xApp accepts delete required
+xApp -> plt: 4. (E2 related API) E2 Subscription Delete Query \n(Accept, E2 Node ID, E2 Request ID)
+else xApp rejects delete required
+xApp -> plt: 5. (E2 related API) E2 Subscription Delete Query \n(Decline, E2 Node ID, E2 Request ID)
+end
+end
+end
+plt -> plt: 6. Accept/Reject decision
+opt Near-RT RIC platform accepts
+plt -> ran: 7. <<E2>> RIC SUBSCRIPTION DELETE REQUEST
+alt E2 Node accepts delete request
+ran -> plt: 8. <<E2>> RIC SUBSCRIPTION DELETE RESPONSE
+plt -> plt:  9. Update subscription records, and delete the distribution list
+loop For each xApp with E2 Request ID
+plt -> xApp: 10. (E2 related API) E2 Subscription Delete Notification \n(Deleted, E2 Node ID, E2 Request ID, Cause)
+end
+else E2 Node rejects delete request
+ran -> plt: 11. <<E2>> RIC SUBSCRIPTION DELETE FAILURE
+plt -> plt: 12. Decide subsequent processing \n(e.g., retry RIC subscription delete)
+else Near-RT detects E2AP timeout
+plt->plt: 13. E2AP time out. Decide subsequent processing \n(e.g., retry RIC subscription delete)
+end
+end
+end
+@enduml
+Figure 9.3.2.2A-1: E2 Subscription Delete Query and E2 Subscription Delete Notification procedure
+9.3.2.3	E2 Indication procedure
+The purpose of the E2 Indication procedure in the Near-RT RIC is to ensure delivery of RIC INDICATION messages to one or more validated xApps.
+This procedure is based on the following assumptions:
+-	Near-RT RIC platform maintains a list for each E2 Node of validated xApps and the corresponding assigned E2 Request ID and E2 Action ID(s) associated with an E2 node ID, RIC REQUEST ID and RIC Action ID(s);
+-	E2 related API ensures delivery of E2 Indication messages from Near-RT RIC platform to all validated xApp;
+-	Near-RT RIC platform may support distribution of messages to multiple destinations.
+The following outcomes are considered:
+-	Message is received, using E2 related API: E2 Indication (push), and successfully processed by xApp;
+-	Message is received, using E2 related API: E2 Indication (push), but an error is detected by the xApp and so declined using an E2 related API: E2 Indication (failure) from xApp for a specific E2 Node, E2 Request ID, E2 Action ID and E2 Indication SN. Response contains Cause (i.e., Request contents not accepted by xApp).
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC"
+Collections “xApp” as xApp
+Participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+ran -> plt: <<E2>> 1: RIC INDICATION
+plt -> plt: 2: Check distribution list
+plt -> xApp: 3. (E2 related API) E2 Indication (push)
+Opt error detected
+xApp --> plt: 4: (E2 related API) E2 Indication (failure, Cause)
+plt --> ran: 5: <<E2AP>> E2AP Procedure
+end
+@enduml
+Figure 9.3.2.3-1: E2 Indication procedure
+9.3.2.4	E2 Control procedure
+The purpose of the E2 Control procedure in the Near-RT RIC is to ensure that only authorized xApp may initiate RIC Control Request messages issued by the Near-RT RIC over the E2 interface to the E2 Node.
+This procedure is based on the following assumptions:
+-	xApp may obtain guidance from Near-RT RIC platform to resolve potential conflicts prior to sending a E2 Control Request (see clause 9.3.3.1);
+-	xApp has been configured with a trusted xApp ID;
+-	Near-RT RIC platform may be configured to route E2 Control Request messages for a E2 node from xApp either to trigger conflict mitigation for acceptance or directly towards an appropriate E2interface;
+-	Near-RT RIC platform ensures that only authorized xApp may send E2 Control Request messages to appropriate E2 interface;
+-	Near-RT RIC platform ensures that it systematically forwards any received RIC Control Response or RIC Control Failure to appropriate xApp.
+The procedure is initiated by an xApp using E2 Related API: E2 Control request to send a request of a RIC Control for an E2 Node. The following outcomes are considered:
+-	Request successful following acceptance by Near-RT RIC platform and accepted by E2 Node and so an E2 Related API: E2 Control response (Success with outcome) is sent to xApp following corresponding E2 transaction;
+-	Request fails following acceptance by Near-RT RIC platform but is either rejected by E2 Node or corresponding E2AP timer expires prior to a response from E2 Node and so an E2 Related API: E2 Control response (Failure with cause) is sent to xApp following corresponding E2 interface transaction (i.e., Request contents is not compliant, E2AP timeout, etc.);
+-	Request rejected by Near-RT Platform and so an E2 Related API: E2 Control response (Reject) is sent to xApp (i.e., rejected due to conflict mitigation).
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp
+Participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+xApp <--> plt: 1: (E2 related API) Guidance (Request/Response)
+xApp -> plt: 2. (E2 related API) E2 Control (Request)
+plt -> plt: 3. Near-RT RIC platform processes request
+alt Near-RT RIC platform rejects request
+plt -> xApp: 4. (E2 related API) E2 Control (Reject)
+else Near-RT RIC platform accepts request
+plt -> plt: 5: Select appropriate E2 interface and assigns RIC Request ID
+plt -> ran: 6: <<E2>> RIC CONTROL REQUEST
+alt E2 node accepts request
+ran -> plt: 7: <<E2>> RIC CONTROL ACKNOWLEDGE
+plt -> xApp: 8. (E2 related API) E2 Control (Success)
+else E2 node rejects request
+ran -> plt: 9: <<E2>> RIC CONTROL FAILURE
+plt -> xApp: 10. (E2 related API) E2 Control (Failure)
+else Near-RT detects E2AP timeout
+plt-> plt: 11a. E2AP time out
+plt -> xApp: 11b. (E2 related API) E2 Control (Failure)
+end
+end
+@enduml
+Figure 9.3.4-1 E2 Control Procedure
+9.3.2.5	E2 Subscription Audit procedure
+The purpose of the E2 Subscription Audit procedure in the Near-RT RIC is to enable an xApp to initiate an audit of one or more existing E2 subscriptions.
+This procedure is based on the following assumptions:
+-	xApp has been configured with a trusted xApp ID;
+-	Near-RT RIC platform maintains all active subscriptions towards the E2 Node listed in xApp’s E2 Subscription Audit request and is able to detect when and if the audit request shall result in a corresponding E2 message;
+-	Near-RT RIC platform routes the subscription audit requests to an appropriate E2 interface;
+-	Near-RT RIC platform maintains a mapping of active subscriptions (identified on E2 interface by E2 Node ID and RIC Request ID) of the validated xApps. Near-RT RIC platform uses the mapping when sending RIC INDICATION messages to the correct xApp;
+The procedure initiated by an xApp uses E2 Related API: E2 Subscription Audit to request subscription audit for a specific E2 Node. The following outcomes are considered:
+-	Request fails following rejection by Near-RT RIC platform and an E2 Related API: E2 Subscription Audit response (Reject) is sent to xApp without E2 interface transaction (i.e., xApp not previously associated with one or more validated subscription);
+-	Request succeeds following acceptance by Near-RT RIC platform and accepted by E2 Node, and an E2 Related API: E2 Subscription Audit response (Success) is sent to xApp following corresponding E2 interface transaction;
+-	Request succeeds following acceptance by Near-RT RIC platform and an E2 Related API: E2 Subscription Audit response (Success) is sent to xApp without E2 interface transaction;
+-	Request fails following acceptance by Near-RT RIC platform but is either rejected by E2 Node or corresponding E2AP timer expires prior to a response from E2 Node, and an E2 Related API: E2 Subscription Audit response (Failure) is sent to xApp following corresponding E2 interface transaction (i.e., RIC Request ID is not known by E2 Node, E2AP timeout, etc.);
+-	Request fails following acceptance by Near-RT RIC platform and an E2 Related API: E2 Subscription Audit response (Failure) is sent to xApp without E2 interface transaction.
+This procedure may result in the Near-RT RIC platform issuing E2 related API: E2 Subscription Delete Notification (with E2 Node ID, E2 Request ID, Cause) message(s) to inform other xApp that a subscription has been deleted.  This may also occur if the Near-RT RIC platform independently initiates a RIC Subscription Audit procedure.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC platform"
+participant “xApp” as xApp
+collections "Other xApp" as xApp2
+participant "Near-RT RIC platform" as plt
+endbox
+Collections “E2 Node” as ran
+xApp -> plt: 1: (E2 related API) E2 Subscription Audit \n(Request, E2 Node ID, List of E2 Request ID)
+plt -> plt: 2: Confirm that xApp had previously subscribed \n(i.e. record found for xApp ID)
+plt -> plt: 3: Accept/Reject decision
+Alt Near-RT RIC platform rejects
+plt -> xApp: 4: (E2 related API) E2 Subscription Audit \n(Reject, E2 Node ID, List of E2 Request ID, Cause)
+Else Near-RT RIC platform accepts
+Alt Near-RT RIC initiates E2 interface transaction
+plt -> ran: 5: <<E2>> RIC SUBSCRIPTION AUDIT REQUEST \n(Audit flag, List of RIC Request ID)
+alt E2 Node accepts audit request
+ran -> plt: 6: <<E2>> RIC SUBSCRIPTION AUDIT RESPONSE \n(Confirmed, Unknown and/or \nMissing list of RIC Request ID)
+plt-> xApp: 7: (E2 related API) E2 Subscription Audit \n(Success, E2 Node ID, Confirmed, Unknown and/or \nMissing list of E2 Request ID)
+else E2 Node rejects audit request
+ran -> plt: 8: <<E2>> RIC SUBSCRIPTION AUDIT FAILURE
+plt -> xApp: 9: (E2 related API) E2 Subscription Audit \n(Failure, E2 Node ID, Cause)
+else Near-RT detects E2AP timeout
+plt-> plt: 10a. E2AP time out
+plt -> xApp: 10b. (E2 related API) E2 Subscription Audit (Failure)
+end
+plt -> plt: 11: Update the subscription records
+plt <--> ran: 12: <<E2>> RIC Subscription Delete procedure (RIC Request ID)
+else Near-RT RIC responses without E2 interface transaction
+alt Result is success
+plt-> xApp: 13: (E2 related API) E2 Subscription Audit \n(Success, E2 Node ID, Confirmed, Unknown and/or \nMissing list of E2 Request ID)
+else Result is failure
+plt -> xApp: 14: (E2 related API) E2 Subscription Audit \n(Failure, E2 Node ID, Cause)
+end
+end
+plt --> xApp: 15a: (E2 related API) E2 Subscription Delete Notification \n(Deleted, E2 Node ID, E2 Request ID, Cause)
+plt --> xApp2: 15b: (E2 related API) E2 Subscription Delete Notification \n(Deleted, E2 Node ID, E2 Request ID, Cause)
+end
+@enduml
+Figure 9.3.2.5-1: E2 Subscription Audit procedure
+9.3.3	E2 Guidance related procedures
+9.3.3.1	E2 Guidance procedure
+The purpose of the xApp initiated E2 Guidance request/response API procedure in the Near-RT RIC is to allow authorized xApp to obtain guidance from the Near-RT RIC platform (with the conflict mitigation functionality) prior to initiating an action.
+Guidance from Near-RT RIC platform may include:
+-	Indication on whether or not the xApp proposed E2 Related API message or series of messages may result in a conflict with E2 related API messages from other xApps;
+-	Recommendations on how the proposed E2 Related message or series of messages should be modified to avoid conflict;
+-	Modification of previous guidance to other xApps and/or Near-RT RIC platform internal processes.
+This procedure is based on the following assumptions:
+-	xApp may use E2 Related API to obtain guidance from Near-RT RIC platform to resolve potential conflicts prior to initiating a RIC function procedure;
+-	xApp may use Near-RT RIC platform response in a subsequent procedure (i.e., for a RIC Functional Procedure).
+This procedure is initiated by an xApp using E2 Related API: E2 Guidance request. The following outcomes are considered:
+-	Near-RT RIC Platform provides guidance to requesting xApp using E2 Related API: E2 Guidance response;
+-	Near-RT RIC Platform provides modified guidance to another xApp and/or its internal processes.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box “Near-RT RIC”
+Collections “Other xApp” as xApp
+participant “xApp” as xApp2
+Participant plt as "Near-RT RIC platform"
+end box
+xApp2 -> plt: 1: (E2 related API) E2 Guidance (Request)
+plt -> plt: 2: Collect related information
+plt -> plt: 3: Conflict mitigation processing
+plt --> plt: 4:  Guidance to internal processes
+xApp <-- plt: 5: (E2 related API) E2 Guidance (Modification)
+plt -> xApp2: 6: (E2 related API) E2 Guidance (Response)
+@enduml
+Figure 9.3.3.1-1: xApp initiated E2 guidance request/response procedure
+9.3.3.2	Void
+9.3.3.3	Void
+9.3.3.4	Void
+9.3.3.5	E2 Guidance modification procedure
+The purpose of the E2 Guidance modification procedure is to allow Near-RT RIC platform to signal a modified guidance to the xApp, which can be triggered by the Near-RT RIC platform’s internal process (e.g., xApp subscription management), or by a message from the other xApps or external interfaces.
+The guidance may also be used for Near-RT RIC platform internal purposes.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+Box "Near-RT RIC"
+Participant xApp
+Collections “Other xApp(s)” as OtherxApp
+Participant “Near-RT RIC platform” as plt
+endbox
+Collections “External entity (e.g. Non-RT RIC)” as Otherentity
+Alt message from other xApp(s) triggers conflict mitigation
+OtherxApp -> plt: Message that may introduce conflict
+Else message from external entity triggers conflict mitigation
+Otherentity -> plt: Message that may introduce conflict
+Else internal processing triggers conflict mitigation
+plt -> plt: internal process that may introduce conflict
+End
+plt -> plt: 1. Conflict mitigation processing
+plt --> xApp: 2: E2 Guidance (Modification)
+plt --> plt: 3: Guidance for internal purposes
+@enduml
+Figure 9.3.3.5-1 E2 Guidance Modification Procedure
+9.4	Management API Procedures
+9.4.1	xApp Registration procedure
+This procedure registers the xApp to the Near-RT RIC platform so that it can be managed by the SMO via the Near-RT RIC platform. When the xApp is deployed, it will register itself as a managed application to the Near-RT RIC platform by passing the relevant info through the API. Relevant info may include the xApp name, vendor, software version, YANG schemas for configuration management, faults raised, metrics generated, ports for messaging, supported commands (e.g., health check, aliveness probe) and other information needed by the Near-RT RIC platform and/or the SMO for managing the xApp.
+In response to an xApp Registration, Near-RT RIC platform performs the following:
+-	Authenticates the xApp;
+-	Validates that this xApp can run on this Near-RT RIC platform; e.g., RIC has the capacity;
+-	Assigns an ID to the xApp;
+-	May act as Registration Authority (RA) of the operator Certification Authority (CA), and fetch from the CA a new End Entity (EE) operator certificate for the xApp containing the assigned xApp ID in SubjectAltName (SAN) field.
+NOTE:	Refer to [22] clause 5.1.3.2 for more detailed information on the security procedure.
+-	Creates an xApp Managed Object Instance (MOI) in the Near-RT RIC Config DB and populates it with the relevant information passed from the xApp;
+-	Sends a Notify MOI Creation to SMO if subscribed.
+The data type of the xApp ID shall be a character string that uniquely identifies the xApp instance. The format of this string shall be a Universally Unique Identifier (UUID) version 4 (as described in IETF RFC 4122).
+@startuml
+skin rose
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+Box “Near-RT RIC”
+Participant "xApp" as xApp
+Participant plt as “Near-RT RIC platform”
+endbox
+xApp -> plt: 1. Registration request
+plt -> plt: 2. Registration processing \n(validate, assign xApp ID, \nissue xApp cert, create xApp MOI)
+plt -> xApp: 3. Registration response
+Opt If SMO has subscribed
+plt -> smo: 4. <<O1>> Notify MOI Creation
+End
+@enduml
+Figure 9.4.1-1: xApp Registration procedure
+9.4.2	xApp Deregistration procedure
+This procedure deregisters the xApp from the Near-RT RIC platform.
+The message flow is not specified in the present document.
+9.4.3	Void
+9.4.4	Create MOI
+An xApp must be instantiated before its associated MOI can be created. The SMO interacts with the MOI to manage the xApp. The Near-RT RIC platform is responsible for updating the xApp over the Management API to ensure that its attribute values are aligned with those of the MOI.
+@startuml
+skin rose
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC Platform”
+participant xApp as “xApp”
+endbox
+smo -> plt: <<O1>> createMOI(…)
+plt -> xApp: 1. <<API>> xApp Configuration Request
+plt <-- xApp: 2. <<API>> Result
+smo <-- plt: <<O1>> Result
+@enduml
+Figure 9.4.4-1: xApp Create MOI
+9.4.5	Modify MOI attributes
+The Near-RT RIC platform is responsible for updating the xApp over the Management API to ensure its attribute values are aligned with those of the MOI.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC Platform”
+participant xApp as "xApp"
+end box
+smo -> plt: <<O1>> ModifyMOIAttributes(…)
+plt -> xApp: 1. (API) xApp Configuration Request
+plt <-- xApp: 2. (API) Result
+smo <-- plt: <<O1>> Result
+@enduml
+Figure 9.4.5-1: xApp Modify MOI
+9.4.6	Delete MOI
+This procedure removes the MOI for an an xApp when an edit-config delete request is received from the SMO over the O1 interface. See [5] clause 2.1.3. The SMO sends the deleteMOI request via a NETCONF command over the O1 to the Near-RT RIC platform. The Near-RT RIC platform may optionally take the xApp out of service sending a confirmation of the state change before the MOI gets deleted. Once the MOI is deleted, the Near-RT RIC platform sends a NETCONF response confirming the success or failure to the MnS Consumer (SMO).
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+participant xApp as "xApp"
+end box
+smo -> plt: <<O1>> DeleteMOIRequest
+Opt Lock xApp state
+plt -> xApp: 1. API Configuration Write \n(Change Adminstrative State to “Locked”)
+end
+plt -> plt: 2. MOI Deleted
+smo <-- plt: <<O1>> Result
+@enduml
+Figure 9.4.6-1: xApp Delete MOI
+9.4.7	Read MOI attributes
+The O1 Read MOI Attributes service is supported by the xApp API Configuration Read. On receipt of a Read MOI Attributes request for an xApp, the Near-RT RIC platform uses the API Configuration Read to retrieve the current configuration values.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+participant xApp as "xApp"
+end box
+smo -> plt: <<O1>> Read MOI Attributes(…)
+Opt Sync MOI with xApp
+plt -> xApp: 1. (API) xApp Configuration Request
+plt <--xApp: 2. (API) Result
+end
+smo <-- plt: <<O1>> Result
+@enduml
+Figure 9.4.7-1: Read MOI Attributes
+9.4.8	Notify MOI changes
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC Platform”
+participant xApp as "xApp"
+end box
+alt Attribute Value Change Notification
+plt <- xApp: <<API>> xApp Notify Change
+loop for each subscription
+smo <- plt: <<O1>> Notify MOI Change(AVCN)
+end
+else MOI Creation Notification
+plt -> plt: MOI Creation
+loop for each subscription
+smo <- plt: <<O1>> Notify MOI Change(MOI Created)
+end
+else MOI Deletion Notification
+plt -> plt: MOI Deletion
+loop for each subscription
+smo <- plt: <<O1>> Notify MOI Change(MOI Deleted)
+end
+end
+@enduml
+Figure 9.4.8-1: Notify MOI Changes
+9.4.9	Subscription Control
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+participant xApp as "xApp"
+endbox
+smo -> plt: <<O1>> createMOI(xApp subscription)
+Opt message received from xApp
+plt <- xApp: 1. (API) xApp Notify Change
+end
+smo <-- plt: <<O1>> Notification
+@enduml
+Figure 9.4.9-1: xApp Subscription Control
+9.4.10	Fault Notification
+This procedure enables the xApps to notify the Near-RT RIC of a Fault Condition. Near-RT RIC platform may create an Alarm notification based on the fault reported over the API, and supplement it with additional information from the Alarm Dictionary. The notification is also used to notify Alarms changes.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+collections xApp as "xApp"
+end box
+xApp -> plt: 1. Fault condition detected
+Opt Create Alarm
+plt --> plt: 2. If the reported fault condition maps to a subscribed Alarm
+end
+smo <-- plt: <<O1>> Fault Notification
+@enduml
+Figure 9.4.10-1: Fault Notification
+9.4.11	Fault Supervision Control
+The O1 Interface supports the 3GPP “getAlarmList”. The Alarm list for the xApps is maintained on the Near-RT RIC. 
+The xApp can notify the Near-RT RIC platform of a detected fault. Each xApp shall maintain a list of any faults that are active. These faults are notified to the Near RT RIC platform where the necessary Alarms are created.
+The SMO (consumer) may need to verify which alarms are currently active and so may request that the Near-RT RIC (producer) provides an updated list of Alarms. In order to verify that its Alarm list correctly reflects the state of faults at the xApp, the Near RT RIC platform can request an updated list of faults from the xApp.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+Collections xApp as "xApp"
+End box
+smo -> plt: <<O1>> getAlarmList
+plt -> xApp: 1. (API) Get Fault List
+plt <-- xApp: 2. (API) Return Fault list
+smo <-- plt: <<O1>> Alarm InformationList
+@enduml
+Figure 9.4.11-1: Get Alarm List
+9.4.12	Performance Data File Reporting
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+Collections xApp as "xApp"
+End box
+plt <- xApp: (API) 1. xApp Notify File Ready
+plt -> plt: New PM data file available
+smo <- plt: 2. <<O1>> notifyFileReady Notification
+@enduml
+Figure 9.4.12-1: Performance Data File Reporting
+9.4.13	Report Streamed Data
+When the ReportingCtrl Attribute of the PerfMetricJob ([21] Clause 4.3.33) is set to streamTarget, the Near-RT RIC shall stream the PM data to the target consumer destination based on the value of the “streamTarget” attribute.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+Collections xApp as "xApp"
+endbox
+Note over plt: Streaming target specified in PerfMetricJob
+plt -> xApp: 1. (API) Start Streaming
+Loop While streaming is active
+xApp -> plt: 2. (API) Sending streamed data
+smo <- plt: 3. <<O1>> reportStreamData operation
+end
+@enduml
+Figure 9.4.13-1 Report Streamed Data
+9.4.14	Measurement Job Control
+Both the selection of the data at the xApp and the formatting of the data at the Near-RT RIC platform are in scope for this procedure. The CreateMeasurementJobControl request received over O1 also determines whether the PM data would be file based or streamed.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+participant smo as “SMO”
+box “Near-RT RIC”
+participant plt as “Near-RT RIC platform”
+Collections xApp as "xApp"
+Endbox
+smo -> plt: <<O1>> Create PerfMetricJobMOI
+plt -> xApp: 1. (API) xApp Configuration Request\n (configure Measuremnt Job)
+plt <-- xApp: 2. (API) Result
+smo <-- plt: <<O1>> Result
+@enduml
+Figure 9.4.14-1	Measurement Job Control
+9.5	SDL API Procedures
+9.5.1	SDL Client Registration procedure
+The SDL Client Registration procedure in the Near-RT RIC enables an xApp to register with the Near-RT RIC platform for permission to access the database.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: 1.  SDL Client Registration request
+plt -> plt: 2. Process registration request
+plt -> xApp: 3. SDL Client Registration response
+@enduml
+Figure 9.5.1-1: SDL Client Registration procedure
+9.5.2	SDL Client Deregistration procedure
+The SDL Client Deregistration procedure in the Near-RT RIC enables an xApp to request the Near-RT RIC platform to release the registration as SDL client.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+endbox
+xApp ->plt: 1. SDL Client Deregistration request
+plt -> plt: 2. Deregister the xApp as SDL client
+plt -> xApp: 3. SDL Client Deregistration response
+@enduml
+Figure 9.5.2-1: SDL Client Deregistration procedure
+9.5.3	Fetch Data procedure
+The Fetch Data procedure in the Near-RT RIC enables an xApp to request data for which it is authorized as the SDL client for local processing.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+end box
+xApp -> plt: 1. Fetch data request
+plt -> plt: 2. Fetch related information
+plt -> xApp: 3. Fetch data response
+@enduml
+Figure 9.5.3-1: Fetch Data procedure
+9.5.4	Subscribe/Update-Notify procedure
+The Subscribe/Update-Notify procedure in the Near-RT RIC allows the xApp to subscribe to SDL notifications for the summary of authorized data changes. The Near-RT RIC platform will notify the summary of information changes to the xApp, and the xApp may subsequently request updated data through the Fetch Data procedure.
+The notifications contain only summary of changes to the information after the subscription.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: 1. Subscribe information request
+plt -> xApp: 2. Subscribe information response
+plt -> xApp: 3. Notify information changes
+@enduml
+Figure 9.5.4-1: Subscribe/Update-Notify procedure
+9.5.5	Store Data procedure
+The Store Data procedure in the Near-RT RIC ensures that the xApp may request Near-RT RIC platform to insert data to the database.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: 1. Store data request
+plt -> plt: 2. Store related data
+plt -> xApp: 3. Store data response
+@enduml
+Figure 9.5.5-1: Store Data procedure
+9.5.6	Modify Data procedure
+The Modify Data procedure in the Near-RT RIC allows the xApp to request Near-RT RIC platform to update or delete data from database.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp ->plt: 1. Modify data request
+plt ->plt: 2. Modify related data
+plt -> xApp: 3. Modify data response
+@enduml
+Figure 9.5.6-1: Modify Data procedure
+9.5.7	Subscribe/Push procedure
+The Subscribe/Push procedure in the Near-RT RIC allows the xApp to subscribe to the Near-RT RIC platform for authorized data in the database.
+The pushes may be used to contain a given set of information, or only the changed part of the information after the subscription.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: 1. Subscribe information request
+plt -> xApp: 2. Subscribe information response
+plt -> xApp: 3. Push (data + meta-data)
+@enduml
+Figure 9.5.7-1: Subscribe/Push procedure
+9.5.7A	xApp Shared Data Fetch procedure
+The xApp Shared Data Fetch procedure enables the data consumer (Near-RT RIC platform or an xApp) to fetch specific shared data from the data producer xApp.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+box “Near-RT RIC”
+Participant consumer as “Data consumer \n(Near-RT RIC platform or xApp)”
+Participant ProducerxApp as “Data producer xApp”
+end box
+consumer -> ProducerxApp: 1. xApp Shared Data Fetch request \n(description of requested data)
+ProducerxApp -> ProducerxApp: 2. Generate requested data
+ProducerxApp -> consumer: 3. xApp Shared Data Fetch response \n(requested data)
+@enduml
+Figure 9.5.7A-1: xApp Shared Data Fetch procedure
+9.5.7B	Procedures related to xApp Shared Data Subscription and Notification
+9.5.7B.1	Procedures for xApp Shared Data Subscribe/Push
+The xApp Shared Data Subscribe/Push procedures allow the data consumer (Near-RT RIC platform or an xApp) to subscribe to and receive specific shared data from the data producer xApp.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant consumer as “Data consumer \n(Near-RT RIC platform or xApp)”
+Participant ProducerxApp as “Data producer xApp”
+End box
+consumer -> ProducerxApp: 1. xApp Shared Data Subscription request \n(description of requested data, criteria to trigger the push)
+ProducerxApp -> ProducerxApp: 2. Check authorization
+ProducerxApp -> ProducerxApp: 3. Store subscription record
+ProducerxApp -> consumer: 4. xApp Shared Data Subscription response \n(subscription ID)
+loop Data push is triggered
+ProducerxApp -> consumer: 5. xApp Shared Data Push (requested data)
+end
+@enduml
+Figure 9.5.7B.1-1: xApp Shared Data Subscribe/Push procedures
+9.5.7B.2	xApp Shared Data Subscription Delete procedure
+The xApp Shared Data Subscription Delete procedure allows the data consumer (Near-RT RIC platform or an xApp) to unsubscribe to specific shared data from the data producer xApp.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant consumer as “Data consumer \n(Near-RT RIC platform or xApp)”
+Participant ProducerxApp as “Data producer xApp”
+End box
+consumer -> ProducerxApp: 1. xApp Shared Data Subscription delete request \n(subscription ID)
+ProducerxApp -> ProducerxApp: 2. Check subscription record and authorization
+ProducerxApp -> ProducerxApp: 3. Delete the subscription record for the data consumer
+ProducerxApp -> consumer: 4. xApp Shared Data Subscription delete response
+@enduml
+Figure 9.5.7B.2-1: xApp Shared Data Subscription Delete procedure
+9.5.8	Use cases of SDL APIs
+9.5.8.1	Subscribe/Update-Notify for E2NodeInfo and E2NodeList
+The SDL Subscribe/Update-Notify procedure (clause 9.5.4) along with the SDL fetch procedure (clause 9.5.3) may be used for getting notifications and fetching E2 Node related information such as E2NodeList (clause 9.5.9.2) and E2NodeInfo (clause 9.5.9.3) changes (obtained as the result of an E2AP Global Procedure such as: E2 Setup, Reset, E2 Removal, RIC Service Update or E2 Node Configuration Update).
+As noted in clause 9.5.4, notifications will contain only the summary of changes to E2NodeInfo after the subscription. To get the complete state of E2NodeInfo, the xApp may do a fetch.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC"
+Collections "xApp" as xApp
+Participant plt as “Near-RT RIC platform”
+endbox
+Collections "E2 Node" as ran
+xApp -> plt: 1. <SDL API> Subscribe Information Request (Information type, Notify, Filter(O))
+plt -> xApp: 2. <SDL API> Subscribe Information Response
+ran <-> plt: 3. <<E2>> Global procedure
+opt Handling of E2 global procedure succeeds
+plt -> plt: 4. Update E2NodeList and/or E2NodeInfo
+plt -> plt: 5. Initiate SDL procedure
+plt -> plt: 6. Retrieve list of xApps relevant for this update
+Loop for each xApp in relevant xApps
+plt -> xApp: 7. <SDL API> Notification (Information type, Notification unit)
+xApp -> xApp: 8. Decide whether to fetch the update from SDL
+Opt xApp fetches E2NodeInfo
+xApp -> plt: 9. <SDL API> Fetch Request (Information type, Filter)
+plt -> xApp: 10. <SDL API> Fetch Response (Information type, Information Unit)
+End
+End
+End
+@enduml
+Figure 9.5.8.1-1: Subscribe/Notify procedures for E2NodeInfo and E2NodeList
+9.5.8.2	Subscribe/Push for E2NodeInfo and E2NodeList
+The SDL Subscribe/Push procedure (clause 9.5.7) may be used for getting E2 Node related information pushes such as E2NodeList (clause 9.5.9.2) and E2NodeInfo (clause 9.5.9.3) (obtained as the result of an E2 Global procedure such as E2 Setup, Reset, E2 Removal, RIC Service Update or E2 Node Configuration Update).
+As noted in clause 9.5.7, the pushes may contain only the changed to E2 Node related information after the subscription, or a complete set of E2 Node related information.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+box "Near-RT RIC"
+Collections "xApp" as xApp
+Participant plt as “Near-RT RIC platform”
+endbox
+Collections "E2 Node" as ran
+xApp -> plt: 1. <SDL API> Subscribe Information Request (Information type, Push, Filter(O))
+plt -> xApp: 2. <SDL API> Subscribe Information Response
+ran -> plt: 3. <<E2>> Global Procedure
+opt Handling of E2 global procedure succeeds
+plt -> plt: 4. Update E2NodeList and/or E2NodeInfo
+plt -> plt: 5. Initiate SDL procedure
+plt --> plt: 6. Retrieve list of xApps relevant for this update
+Loop for each xApp in relevant xApps
+plt -> xApp: 7. <SDL API> Push (Information type, Information unit)
+End
+End
+@enduml
+Figure 9.5.8.2-1: Subscribe/Push procedures for E2NodeInfo and E2NodeList
+9.5.8.3	xApp data sharing for RAN analytics information exposure
+An xApp may act as a producer of some types of RAI. Such RAI may be exposed to the Near-RT RIC platform, and further exposed via Y1 interface. In this use case, the Near-RT RIC platform uses the xApp Shared Data Subscribe/Push procedures or the xApp Shared Data Fetch procedure to collect RAI from the RAI producer xApp.
+A) using xApp Shared Data Subscribe/Push procedures
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp
+Participant plt as “Near-RT RIC platform”
+End box
+Participant Y1c as “Y1 consumer”
+Y1c -> plt: 1. <<Y1>> RAI subscription request (description of requested RAI)
+plt -> plt: 2. Near-RT RIC platform decides the proper handling
+alt Near-RT RIC platform decides to initiate xApp Shared Data Subscribe/Push procedures
+opt
+plt -> plt: 3. Query API information
+end
+plt -> xApp: 4. <SDL API> xApp Shared Data subscription request (description of requested RAI)
+rnote over plt, xApp #F0F0F0: 5. xApp configures collection of necessary data
+xApp -> plt: 6. <SDL API> xApp Shared Data subscription response
+plt -> Y1c: 7. <<Y1>> RAI subscription response
+Loop RAI report is needed
+rnote over plt, xApp #F0F0F0: 8. xApp collects necessary data and generate RAI
+xApp -> plt: 9. <SDL API> xApp Shared Data push (requested RAI)
+plt -> Y1c: 10. <<Y1>> RAI notification (requested RAI)
+end
+else Near-RT RIC platform decides to handle the request by other means
+plt -> Y1c: 11. <<Y1>> RAI subscription response
+Loop RAI report is needed
+rnote over plt, xApp #F0F0F0: 12. Near-RT RIC platform obtains RAI
+plt -> Y1c: 13. <<Y1>> RAI notification (requested RAI)
+end
+end
+@enduml
+Figure 9.5.8.3-1: xApp Shared Data Subscribe/Push procedures for RAN analytics information exposure
+B) using xApp Shared Data Fetch procedure
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp
+Participant plt as “Near-RT RIC platform”
+End box
+Participant Y1c as “Y1 consumer”
+Y1c -> plt: 1. <<Y1>> RAI query request (description of requested RAI)
+plt -> plt: 2. Near-RT RIC platform decides the proper handling
+alt Near-RT RIC platform decides to initiate xApp Shared Data Fetch procedure
+opt
+plt -> plt: 3. Query API information
+end
+plt -> xApp: 4. <SDL API> xApp Shared Data Fetch request (description of requested RAI)
+rnote over plt, xApp #F0F0F0: 5. xApp collects necessary data and generates RAI
+xApp -> plt: 6. <SDL API> xApp Shared Data fetch response (requested RAI)
+plt -> Y1c: 7. <<Y1>> RAI query response (requested RAI)
+else Near-RT RIC platform decides to handle the request by other means
+rnote over plt, xApp #F0F0F0: 8. Near-RT RIC platform obtains RAI
+plt -> Y1c: 9. <<Y1>> RAI query response (requested RAI)
+end
+@enduml
+Figure 9.5.8.3-2: xApp Shared Data Fetch procedure for RAN analytics information exposure
+9.5.9	SDL API data structures
+9.5.9.1	Overview
+The following data structures are defined:
+-	E2NodeList: List of known E2 Node ID and the associated E2 Node State
+-	E2NodeInfo: E2 Node component configuration list and RAN function list
+E2NodeList and E2NodeInfo are used to inform xApps of change to E2 Node state and information as the result of E2AP Global Procedures. The relationship between these data structures and E2AP Global Procedures is described in table 9.5.9.1-1.
+Table 9.5.9.4-2 presents the actions that xApp may perform under different E2 Node State conditions.
+NOTE 1: 	E2AP Error Indication procedure does not result in a change to SDL API data as most error cases are assumed to be handled internally within the Near-RT RIC platform. An appropriate E2 Related API (Failure, Cause) message may be used to inform xApp if required.
+NOTE 2: 	E2AP Reset procedure handling is assumed to be assisted by an appropriate platform mechanism with the Near-RT RIC first using the appropriate SDL API mechanism (see clause 9.5.8) to inform xApp that a RESET has occurred (i.e., E2 Node State = "Reset") and then a second SDL API mechanism is used to inform xApp that the E2 Node is again available (i.e. E2 Note State = "Connected"). It is assumed that the Near-RT RIC platform will delete all associated subscription records during the period between these two SDL API mechanisms and that xApp will use the information E2 Node is again available (i.e., E2 Note State = "Connected") to trigger any required E2 Subscription (Request) messages to re-establish E2 subscriptions.
+NOTE 3: 	E2AP E2 Removal procedure handling and E2 link failure handling are assumed to be assisted by an appropriate platform mechanism with the Near-RT RIC using the appropriate SDL API mechanism (see clause 9.5.8) to inform xApp that the E2 Node is not available (i.e., E2 Node State = "Disconnect").
+Table 9.5.9.1-1: SDL API handling of E2AP Global procedures
+Table 9.5.9.1-2: Expected xApp responses to E2 Node State
+9.5.9.2	E2NodeList
+The E2NodeList data structure contains a list of known E2 Nodes and the associated E2 Node State. Each record contains:
+-	E2 Node ID
+-	E2 Node State ("Connected", "Reset", "Disconnected")
+E2NodeList records may be deleted when the corresponding E2NodeInfo record has been deleted. It is recommended to maintain this record for sufficient time for all xApps to complete clean-up mechanisms.
+9.5.9.3	E2NodeInfo
+The E2NodeInfo data structure contains information on a given E2 Node. Each record contains:
+-	E2 Node ID
+-	List of declared E2 Node component configuration information
+-	List of declared RAN Functions
+E2NodeInfo records shall be deleted after corresponding E2NodeState is set to "Disconnected" and sufficient time has been allowed for all xApps to complete clean-up mechanisms.
+9.6	API Enablement Procedures
+9.6.1	API Discovery procedure
+This procedure enables the xApp(s) to discover the available Near-RT RIC APIs.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp as "xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+plt -> plt: Near-RT RIC platform service available
+plt -> plt: Store API information
+...
+xApp -> plt: 1. API discovery request
+plt -> plt: 2. Near-RT RIC platform verifies the identity of the xApp
+plt -> plt: 3. Search stored API information
+plt -> plt: 4.  Apply discovery policy \nand information filtering
+plt -> xApp: 5. API discovery response
+@enduml
+Figure 9.6.1-1: API Discovery procedure
+9.6.2	Procedures related to API Event Subscription and Notification
+In this clause, the procedures for subscription / subscription deletion and API event notification are provided. These procedures allow the xApps to receive information on API related events.
+Such events correspond to Near-RT RIC API related events like the following:
+9.6.2.1	Procedure for API Event Subscription
+The purpose of this procedure is to enable xApps to subscribe to monitor events related to the provided Near-RT RIC APIs.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp as "xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: 1. API event subscription request
+plt -> plt: 2. Check authorization for API event subscription
+plt -> plt: 3. Store event subscription
+plt -> xApp: 4. API event subscription response
+@enduml
+Figure 9.6.2.1-1: Subscription for API-related events
+9.6.2.2	Procedure for API Event Subscription Delete
+The purpose of this procedure is to enable xApps to un-subscribe from events monitoring related to the provided Near-RT RIC APIs.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Participant xApp as "xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+xApp ->plt: 1. API event subscription delete request
+plt -> plt: 2. Check authorization for API event subscription
+plt -> plt: 3. Delete the record of the API event subscription
+plt -> xApp: 4. API event subscription delete response \n(success or failure)
+@enduml
+Figure 9.6.2.2-1: Subscription Delete for API-related events
+9.6.2.3	Procedure for API Event Notification
+This procedure shows sending the event notification to the subscribed xApp, based on a trigger event captured at the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections PxApp as “Service Producer xApp”
+Participant xApp as "xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+PxApp <--> plt: API Registration procedure
+PxApp <--> plt: API Registration Update procedure
+PxApp <--> plt: API Deregistration procedure
+plt -> plt: API information update
+plt -> plt: 1. Check stored event subscription information
+plt -> plt: 2. Event notification information generation
+plt -> xApp: 3. API Event notification
+plt <-- xApp: 4. API Event notification ACK
+@enduml
+Figure 9.6.2.3-1: API Event Notification
+9.6.3	Procedures related to API Registration
+9.6.3.1	API Registration procedure
+This procedure enables the xApp to register as a service producer.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections xApp as "xApp"
+Participant PxApp as "Service Producer xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+plt -> plt: Near-RT RIC platform service available
+...
+PxApp -> plt: 1. API Registration request
+plt -> plt: 2. Near-RT RIC platform verifies \nthe identity of the xApp
+plt -> plt: 3. Near-RT RIC platform verifies \nthat xApp may act as Service Producer
+plt -> plt: 4. Store API information
+plt -> PxApp: 5. API Registration response \n(Success or Failure)
+...
+plt -> xApp: API Event Notification
+@enduml
+Figure 9.6.3.1-1: API Registration procedure
+9.6.3.2	API Registration Update procedure
+This procedure enables a previously registered xApp service producer to update API information.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections xApp as "xApp"
+Participant PxApp as "Service Producer xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+plt -> plt: Near-RT RIC platform service available
+PxApp <-> plt: API Registration procedure
+...
+PxApp -> plt: 1. API Registration Update request
+plt -> plt: 2. Near-RT RIC platform verifies \nthe identity of the xApp
+plt -> plt: 3. Search stored API information
+plt -> plt: 4. Store updated API information
+plt -> PxApp: 5. API Registration Update response \n(Success or Failure)
+...
+plt -> xApp: API Event Notification
+@enduml
+Figure 9.6.3.2-1: API Registration Update procedure
+9.6.3.3	API Deregistration procedure
+This procedure enables a previously registered xApp service producer to deregister as a service producer.
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections xApp as "xApp"
+Participant PxApp as "Service Producer xApp"
+Participant plt as “Near-RT RIC platform”
+End box
+plt -> plt: Near-RT RIC platform service available
+PxApp <-> plt: API Regisration procedure
+...
+PxApp -> plt: 1. API Deregistration request
+plt -> plt: 2. Near-RT RIC platform verifies \nthe identity of the xApp
+plt -> plt: 3. Search stored API information
+plt -> plt: 4. Remove API information
+plt -> PxApp: 5. API Deregistration response \n(Success or Failure)
+...
+plt -> xApp: API Event Notification
+@enduml
+Figure 9.6.3.3-1: API Deregistration procedure
+9.7	AI/ML API Procedures
+9.7.1	Data Pipelining service procedures
+9.7.1.1	Data Pipelining Job Setup procedure
+The Data Pipelining Job Setup procedure enables an xApp to setup a new data pipelining job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Data Pipelining Job Setup request\n [Data Pipelining Configuration(data processing instruction, etc.)]
+plt <-> plt: Validate originating xApp's Data Pipelining Job
+alt The originating xApp is NOT allowed to setup Data Pipelining Job
+plt -> xApp: Data Pipelining Job Setup RESULT [Failure, Reason]
+else The originating xApp is allowed to setup Data Pipelining Job
+plt <-> plt: Create Data Pipelining Job
+plt -> xApp: Data Pipelining Job Setup RESULT [Success, Data Pipelining Job ID]
+end alt
+@enduml
+Figure 9.7.1.1-1: Data Pipelining Job Setup procedure
+9.7.1.2	Data Pipelining Job Update procedure
+The Data Pipelining Job Update procedure enables an xApp to update a running data pipelining job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Data Pipelining Job Update request\n [Data Pipelining Job ID, Data Pipelining Job Update Details]
+plt <-> plt: Validate the originating xApp's\n Data Pipelining Job Update request
+alt The originating xApp is NOT allowed to Update Data Pipelining Job
+plt -> xApp: Data Pipelining Job Update RESULT [Failure, Reason]
+else The originating xApp is allowed to update the requested Data Pipelining Job
+plt <-> plt: Update Data Pipelining Job
+plt -> xApp: Data Pipelining Job Update RESULT [Success]
+end alt
+@enduml
+Figure 9.7.1.2-1: Data Pipelining Job Update procedure
+9.7.1.3	Data Pipelining Job Delete procedure
+The Data Pipelining Job Delete procedure enables an xApp to delete a running data pipelining job in the Near-RT RIC Platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Data Pipelining Job Delete request\n [Data Pipelining Job ID]
+plt <-> plt: Check the originating xApp's\npermission to delete the requested Data Pipelining Job
+alt The originating xApp is NOT allowed to delete the Data Pipelining Job
+plt -> xApp: Data Pipelining Job Delete RESULT [Failure, Reason]
+else The originating xApp is allowed to delete the requested Data Pipelining Job
+plt <-> plt: Delete Data Pipelining Job
+plt -> xApp: Data Pipelining Job Delete RESULT [Success]
+end alt
+@enduml
+Figure 9.7.1.3-1: Data Pipelining Job Delete procedure
+9.7.1.4	Data Pipelining Job Query procedure
+The Data Pipelining Job Query procedure enables an xApp to query the status of a running data pipelining job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: Data Pipelining Job Query request\n[Data Pipelining Job ID]
+plt <-> plt: Check the originating xApp's\npermission to query the status \nof the requested Data Pipelining Job
+alt The originating xApp is NOT allowed to query the status of the Data Pipelining Job
+plt -> xApp: Data Pipelining Job Query RESULT [Failure, Reason]
+else The originating xApp is allowed to query the status of the requested Data Pipelining Job
+plt <-> plt: Looks up the status of the Data Pipelining Job
+plt -> xApp: Data Pipelining Job Query RESULT [Success, Status]
+end alt
+@enduml
+Figure 9.7.1.4-1: Data Pipelining Job Query procedure
+9.7.1.5	Data Pipelining Request and Result Delivery procedure
+The Data Pipelining Request and Result Delivery procedure allows an xApp to request a data pipelining result from Near-RT RIC platform through providing data pipelining input data.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Autonumber
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: Data Pipelining Request [Data Pipelining Job ID, \nData Pipelining Input Data or Address of Data Pipelining Input Data]
+Alt The Data Pipelining job is configured to provide Output data or address of Output data in the response
+plt -> plt: Generate Data Pipelining Result
+plt -> xApp: Data Pipelining Response [Data Pipelining Output Data, or Address of Output Data]
+Else The Data Pipelining job is configured to provide Output data or address of Output data via the delivery procedure
+plt -> xApp: Data Pipelining Response [Accepted]
+plt -> plt: Generate Data Pipelining Result
+plt -> xApp: Data Pipelining Result Delivery [Data Pipelining Output Data, or Address of Output Data]
+end
+@enduml
+Figure 9.7.1.5-1: Data Pipelining Request and Result Delivery procedures
+9.7.2	Training service procedures
+9.7.2.1	Training Job Setup procedure
+The Training Job Setup procedure enables an xApp to setup a new training job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Training Job Setup request\n [AI/ML Model Identifier or AI/ML Model File or AI/ML Model Address, Training Configuration]
+plt <-> plt: Validate originating xApp's training Job
+alt The originating xApp is NOT allowed to setup training Job
+plt -> xApp: Training Job Setup RESULT [Failure, Reason]
+else The originating xApp is allowed to setup Training Job
+plt <-> plt: Create Training Job
+plt -> xApp: Training Job Setup RESULT [Success, Training Job ID]
+end alt
+@enduml
+Figure 9.7.2.1-1: Training Job Setup procedure
+9.7.2.2	Training Job Delete procedure
+The Training Job Delete procedure enables an xApp to delete a running training job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Training Job Delete request\n [Training Job ID]
+plt <-> plt: Check the originating xApp's\npermission to delete the requested Training Job
+alt The originating xApp is NOT allowed to delete the Training Job
+plt -> xApp: Training Job Delete RESULT [Failure, Reason]
+else The originating xApp is allowed to delete the requested Training Job
+plt <-> plt: Delete Training Job
+plt -> xApp: Training Job Delete RESULT [Success]
+end alt
+@enduml
+Figure 9.7.2.2-1: Training Job Delete procedure
+9.7.2.3	Training Job Query procedure
+The Training Job Query procedure enables an xApp to query the status of a running training job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: Training Job Query request\n[Training Job ID]
+plt <-> plt: Check the originating xApp's\npermission to query the status \nof the requested Training Job
+alt The originating xApp is NOT allowed to query the status of the Training Job
+plt -> xApp: Training Job Query RESULT [Failure, Reason]
+else The originating xApp is allowed to query the status of the requested Training Job
+plt <-> plt: Looks up the status of the Training Job
+plt -> xApp: Training Job Query RESULT [Success, Status]
+end alt
+@enduml
+Figure 9.7.2.3-1: Training Job Query procedure
+9.7.2.4	Training Request and Result Delivery procedure
+The Training Request and Result Delivery procedure allows an xApp to request training result of an AI/ML model from Near-RT RIC platform through providing AI/ML model training data.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Autonumber
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: Training Request [Training Job ID, AI/ML Model Training Data or Address of AI/ML Model Training Data]
+Alt The Training Job is configured to provide Training Result in the response
+plt -> plt: Generate Training Result
+plt -> xApp: Training Response [Trained AI/ML Model or Trained AI/ML Model Address]
+Else The Training Job is configured to provide Training Result via the delivery procedure
+plt -> xApp: Training Response [Accepted]
+plt -> plt: Generate Training Result
+plt -> xApp: Training Result Delivery [Trained AI/ML Model or Trained AI/ML Model Address]
+end
+@enduml
+Figure 9.7.2.4-1: Training Request and Result Delivery procedures
+9.7.3	Inference service procedures
+9.7.3.1	Inference Job Setup procedure
+The Inference Job Setup procedure enables an xApp to setup a new inference job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Inference Job Setup request\n [AI/ML Model Identifier or AI/ML Model File or AI/ML Model Address, Inference Configuration]
+plt <-> plt: Validate originating xApp's Inference Job
+alt The originating xApp is NOT allowed to setup Inference Job
+plt -> xApp: Inference Job Setup RESULT [Failure, Reason]
+else The originating xApp is allowed to setup Inference Job
+plt <-> plt: Create Inference Job
+plt -> xApp: Inference Job Setup RESULT [Success, Inference Job ID]
+end alt
+@enduml
+Figure 9.7.3.1-1: Inference Job Setup procedure
+9.7.3.2	Inference Job Update procedure
+The Inference Job Update procedure enables an xApp to update a running inference job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Inference Job Update request\n [Inference Job ID, Inference Job Update Details]
+plt <-> plt: Validate the originating xApp's\n Inference Job Update request
+alt The originating xApp is NOT allowed to Update Inference Job
+plt -> xApp: Inference Job Update RESULT [Failure, Reason]
+else The originating xApp is allowed to update the requested Inference Job
+plt <-> plt: Update Inference Job
+plt -> xApp: Inference Job Update RESULT [Success]
+end alt
+@enduml
+Figure 9.7.3.2-1: Inference Job Update procedure
+9.7.3.3	Inference Job Delete procedure
+The Inference Job Delete procedure enables an xApp to delete a running inference job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: 1. Inference Job Delete request\n [Inference Job ID]
+plt <-> plt: Check the originating xApp's\npermission to delete the requested Inference Job
+alt The originating xApp is NOT allowed to delete the Inference Job
+plt -> xApp: Inference Job Delete RESULT [Failure, Reason]
+else The originating xApp is allowed to delete the requested Inference Job
+plt <-> plt: Delete Inference Job
+plt -> xApp: Inference Job Delete RESULT [Success}]
+end alt
+@enduml
+Figure 9.7.3.3-1: Inference Job Delete procedure
+9.7.3.4	Inference Job Query procedure
+The Inference Job Query procedure enables an xApp to query the status of a running inference job in the Near-RT RIC platform.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+autonumber
+xApp -> plt: Inference Job Query request\n[Inference Job ID]
+plt <-> plt: Check the originating xApp's\npermission to query the status of the requested Inference Job
+alt The originating xApp is NOT allowed to query the status of the Inference Job
+plt -> xApp: Inference Job Query RESULT [Failure, Reason]
+else The originating xApp is allowed to query the status of the requested Inference Job
+plt <-> plt: Look up the status of the Inference Job
+plt -> xApp: Inference Job Query RESULT [Success, Status]
+end alt
+@enduml
+Figure 9.7.3.4-1: Inference Job Query procedure
+9.7.3.5	Inference Request and Result Delivery procedures
+The Inference Request and Result Delivery procedure allows an xApp to request an AI/ML model inference result from Near-RT RIC platform through providing model input data.
+@startuml
+skin rose
+skinparam ParticipantPadding 10
+skinparam BoxPadding 5
+skinparam lifelineStrategy solid
+Autonumber
+Box “Near-RT RIC”
+Collections “xApp” as xApp
+Participant plt as “Near-RT RIC platform”
+End box
+xApp -> plt: Inference Request [Inference Job ID, AI/ML Model Input Data or Address of AI/ML Model Input Data]
+Alt The inference job is configured to provide Output Data or Address of Output Data in the response
+plt -> plt: Generate Inference Result
+plt -> xApp: Inference Response [AI/ML Model Output Data or Address of AI/ML Model Output Data]
+Else The inference job is configured to provide Output Data or Address of Output Data via the delivery procedure
+plt -> xApp: Inference Response [Accepted]
+plt -> plt: Generate Inference Result
+plt -> xApp: Inference Result Delivery [AI/ML Model Output Data or Address of AI/ML Model Output Data]
+end
+@enduml
+Figure 9.7.3.5-1: Inference Request and Result Delivery procedures
+Annex A (informative):
+Potential conflict types among xApps for RRM optimization
+The control target of the radio resource management can be a cell, a UE or a bearer, etc. The control contents of the radio resource management can cover access control, bearer control, handover control, QoS control, resource assignment and so on. The control time span indicates the valid control duration which is expected by the control request. The conflicts of control can be illustrated as below.
+1)	Direct Conflicts: The conflicts can be observed directly by Conflict Mitigation. Some cases are described as below:
+-	Two or more xApps request different settings for the very same configuration of one or more parameters of a Control Target. Conflict mitigation processes the requests and decides on a resolution.
+-	The new request from an xApp may conflict with the running configuration resulting from a previous request of another or the same xApp.
+-	The total requested resources from different xApps may exceed the limitation of the RAN system, e.g., the sum of resources required by the two different xApps may be far beyond the resource limitation of the RAN system.
+2)	Indirect Conflicts: The conflicts cannot be observed directly, nevertheless, some dependence among the parameters and resources that the xApps target can be observed. Conflict Mitigation may anticipate the possible conflicts and take actions to mitigate them. For instance, different xApps target different configuration parameters to optimize the same metric according to the respective objective. Even though this will not result in conflicting parameter settings, it may have uncontrollable or inadvertent system impacts. One example of such indirect conflicts can occur when the changes required by one xApp create a system impact which is equivalent to a parameter change targeted by another xApp. E.g., antenna tilts and measurement offsets are different control points, but they both impact the handover boundary.
+3)	Implicit Conflicts: The conflicts cannot be observed directly, even the dependence between xApps is not obvious. For instance, different xApps may optimize different metrics and (re-)configure different parameters. Nonetheless, optimizing one metric may have implicit, unwanted, and maybe adversary side effects on one of the metrics optimized by another xApp. E.g., protecting throughput metrics for GBR users may degrade non-GBR metrics or even cell throughput.
+For mitigating these conflicts, different approaches exist:
+1)	Direct conflicts typically can be mitigated by pre-action coordination, i.e., the xApps or a Conflict Mitigation component needs to make the final determination on whether any specific change is made, or in which order the changes are applied.
+2)	Indirect conflicts can be resolved by post-action verification. Here, the actions are executed and the effects on the target metric are observed. Based on the observations, the system has to decide on potential corrections, e.g., rolling back one of the xApp actions.
+3)	Implicit conflicts are the most difficult to mitigate since these dependencies are difficult or impossible to observe and therefore hard to model in any mitigation scheme. In some cases, it may be possible to design around such conflicts by ensuring that use cases (xApps) target different parameters, thus falling back to approach 2), but preferably, a generic approach to managing such conflicts is established.
+The individual xApp goals are defined by A1 policies, but it is also important to define utility metrics that incorporate the relative importance of each of the metrics targeted by the xApps as well as the importance of the optimization (use case). A Conflict Mitigation function may also use ML approaches, e.g., Reinforcement Learning, to a-priori assess, for each proposed change, the likely probability of degrading a metric versus the potential improvement.
+Annex (informative): 
+Change History

@@ -1,0 +1,2496 @@
+O-RAN.WG3.RICARCH-v02.00
+Technical Specification 
+O-RAN Working Group 3
+Near-Real-time RAN Intelligent Controller 
+Near-RT RIC Architecture 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the 
+previous requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN 
+Adopter License Agreement to access and use Final Specifications shall no longer apply or be 
+required for these Final Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is 
+prohibited, save that you may print or download extracts of the material on this site for your 
+personal use, or copy the material on this site for the purpose of sending to individual third 
+parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of 
+the material and that you inform the third party that these conditions apply to them and that they 
+must comply with them.
+
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+ O-RAN.WG3.RICARCH-v02.00 
+Technical Specification  
+O-RAN Working Group 3 
+Near-Real-time RAN Intelligent Controller 
+Near-RT RIC Architecture 
+  
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving, 
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter 
+License Agreement contained in the Annex ZZZ of this specification. All other rights reserved.  
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+VAT ID DE321720189  
+1 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Revision History   1 
+Date Revision Author Description 
+2020.02.17 01.00.00 WG3 Arch TG Version number changed to 01.00.00 for WG3 
+approval 
+2020.11.25 01.01.00 WG3 Arch TG Version 1.1 for Board approval after 2021 copyright 
+update proposed by TSC 
+2020.03.05 02.00.05 CMCC, Nokia, 
+CICT, Lenovo, 
+AsiaInfo, Intel 
+Addition of API enablement function, and Stage-2 
+definitions for part of the Near-RT RIC APIs. 
+2020.03.06 02.00 CMCC Incremented version for WG3 vote 
+2020.03.14 02.00 CMCC, 
+Reliance Jio, 
+Intel 
+Editorial updates received before TSC vote 
+2020.03.16 02.00 CMCC, Intel Removal of UML code, and editorial updates during 
+TSC vote 
+  2 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Contents   1 
+Revision History ................................................................................................................................................. 2 2 
+Foreword............................................................................................................................................................. 5 3 
+1 Scope ........................................................................................................................................................ 5 4 
+2 References ................................................................................................................................................ 5 5 
+3 Definitions and Abbreviations ................................................................................................................. 6 6 
+3.1 Definitions ......................................................................................................................................................... 6  7 
+3.2 Abbreviations ..................................................................................................................................................... 7  8 
+4 General Principles .................................................................................................................................... 7 9 
+5 Near-RT RIC Architecture ....................................................................................................................... 8 10 
+5.1 Requirements ..................................................................................................................................................... 8  11 
+5.1.1 Platform Requirements ................................................................................................................................. 8  12 
+5.1.2 xApp Requirements ...................................................................................................................................... 8  13 
+5.1.3 Near-RT RIC API Requirements ................................................................................................................. 9  14 
+5.2 Overall Architecture Description ..................................................................................................................... 10 15 
+6 Near-RT RIC Functions Description ...................................................................................................... 10 16 
+6.1 General ............................................................................................................................................................. 10 17 
+6.2 Platform Functions ........................................................................................................................................... 11 18 
+6.2.1 Database ..................................................................................................................................................... 11 19 
+6.2.1.1 UE-NIB ................................................................................................................................................ 11 20 
+6.2.1.2 R-NIB ................................................................................................................................................... 11 21 
+6.2.2 xApp Subscription Management ................................................................................................................ 11 22 
+6.2.3 Conflict Mitigation ..................................................................................................................................... 12 23 
+6.2.4 Messaging Infrastructure ............................................................................................................................ 13 24 
+6.2.5 Security ...................................................................................................................................................... 13 25 
+6.2.6 Management Services ................................................................................................................................ 13 26 
+6.2.6.1 Life-Cycle Management of xApp ......................................................................................................... 13 27 
+6.2.6.2 FCAPS Management of Near-RT RIC ................................................................................................. 14 28 
+6.2.7 Interface Termination ................................................................................................................................. 14 29 
+6.2.7.1 E2 Termination ..................................................................................................................................... 14 30 
+6.2.7.2 A1 Termination .................................................................................................................................... 15 31 
+6.2.7.3 O1 Termination .................................................................................................................................... 15 32 
+6.2.8 API Enablement ......................................................................................................................................... 15 33 
+6.3 xApps ............................................................................................................................................................... 16 34 
+7 Near-RT RIC APIs ................................................................................................................................. 16 35 
+7.1 Overall Description .......................................................................................................................................... 16 36 
+7.2 A1 related APIs ................................................................................................................................................ 17 37 
+7.3 E2 related APIs ................................................................................................................................................ 18 38 
+7.4 Management APIs ........................................................................................................................................... 18 39 
+7.5 Void ................................................................................................................................................................. 18 40 
+7.6 SDL APIs ......................................................................................................................................................... 19 41 
+7.7 Enablement APIs ............................................................................................................................................. 19 42 
+8 External Interfaces of Near-RT RIC ...................................................................................................... 19 43 
+8.1 E2 Interface ...................................................................................................................................................... 19 44 
+8.2 A1 Interface ..................................................................................................................................................... 19 45 
+8.3 O1 Interface ..................................................................................................................................................... 20 46 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+9 Near-RT RIC API Procedures ................................................................................................................ 20 1 
+9.1 A1 related API Procedures .............................................................................................................................. 20 2 
+9.1.1 A1 Policy Setup procedure ......................................................................................................................... 20 3 
+9.1.2 A1 Policy Update procedure ...................................................................................................................... 22 4 
+9.1.3 A1 Policy Delete procedure ....................................................................................................................... 23 5 
+9.2 E2 Related API Procedures .............................................................................................................................. 24 6 
+9.2.1 Introduction ................................................................................................................................................ 24 7 
+9.2.2 RIC functional procedures ......................................................................................................................... 25 8 
+9.2.2.1 E2 Subscription API procedure ............................................................................................................ 25 9 
+9.2.2.2 E2 Subscription Delete API Procedure .................................................................................................  30 10 
+9.2.2.3 E2 Indication API Procedure ................................................................................................................ 35 11 
+9.2.2.4 E2 Control API Procedure .................................................................................................................... 36 12 
+9.2.3 E2 Guidance API related procedures ......................................................................................................... 38 13 
+9.2.3.1 E2 Guidance request/response API procedure ...................................................................................... 38 14 
+9.2.3.2 E2 Guidance modification API procedure: xApp Subscription Management initiated  ........................ 40 15 
+9.2.3.3 E2 Guidance modification API procedure: message monitoring initiated ............................................ 41 16 
+9.2.3.4 E2 Guidance modification API procedure: Conflict Mitigation initiated ............................................. 42 17 
+9.3 Management API Procedures .......................................................................................................................... 44 18 
+9.3.1 xApp Registration procedure...................................................................................................................... 44 19 
+9.3.2 xApp Deregistration procedure .................................................................................................................. 45 20 
+9.3.3 xApp Configuration procedure ................................................................................................................... 46 21 
+9.4 SDL API Procedures ........................................................................................................................................ 46 22 
+9.4.1 SDL Client Registration procedure ............................................................................................................ 46 23 
+9.4.2 SDL Client Deregistration procedure ......................................................................................................... 47 24 
+9.4.3 Fetch Data procedure .................................................................................................................................  48 25 
+9.4.4 Subscribe/Notify procedure ........................................................................................................................ 48 26 
+9.4.5 Store Data procedure .................................................................................................................................. 49 27 
+9.4.6 Modify Data procedure .............................................................................................................................. 50 28 
+9.5 API Enablement Procedures ............................................................................................................................ 51 29 
+9.5.1 Near-RT RIC API Discovery procedure .................................................................................................... 51 30 
+9.5.2 Procedures related to API Event Subscription and Notification.................................................................  52 31 
+9.5.2.1 Procedure for Event Subscription ......................................................................................................... 52 32 
+9.5.2.2 Procedure for Event Subscription Delete.............................................................................................. 53 33 
+9.5.2.3 Procedure for Event Notification .......................................................................................................... 54 34 
+Annex ZZZ: O-RAN Adopter License Agreement .......................................................................................... 56 35 
+Section 1: DEFINITIONS ................................................................................................................................................ 56 36 
+Section 2: COPYRIGHT LICENSE .................................................................................................................................  56 37 
+Section 3: FRAND LICENSE .......................................................................................................................................... 57 38 
+Section 4: TERM AND TERMINATION ........................................................................................................................ 57 39 
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 57 40 
+Section 6: INDEMNIFICATION ..................................................................................................................................... 58 41 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 58 42 
+Section 8: ASSIGNMENT ............................................................................................................................................... 58 43 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 58 44 
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 58 45 
+Section 11: GENERAL ..................................................................................................................................................... 58 46 
+  47 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Foreword 1 
+This Technical Specification has been produced by the O-RAN ALLIANCE. 2 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 3 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re -released by O-4 
+RAN with an identifying change of release date and an increase in version number as follows:  5 
+Release xx.yy.zz 6 
+where: 7 
+xx the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 8 
+etc. (the initial approved document will have xx=01). 9 
+yy the second digit is incremented when editorial only changes have been incorporated in the document.  10 
+zz the third digit included only in working versions of the document indicating incremental changes during the 11 
+editing process. 12 
+1 Scope 13 
+The present document  specifies the overall Near -RT-RIC (Near-real-time RAN Intelligent Controller) architecture and 14 
+functionalities, including interaction between hosted applications and common functions in the Near-RT RIC platform. 15 
+ 16 
+2 References 17 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 18 
+document. 19 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 20 
+non-specific. 21 
+- For a specific reference, subsequent revisions do not apply. 22 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 23 
+a GSM document), a non- specific reference implicitly refers to the latest version of that document in the same 24 
+Release as the present document. 25 
+[1] 3GPP TR 21.905: "Vocabulary for 3GPP Specifications". 26 
+[2] O- RAN-WG3.E2GAP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 General 27 
+Aspects and Principles”. 28 
+[3] O- RAN-WG3.E2AP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 29 
+Application Protocol (E2AP)”. 30 
+[4] O- RAN-WG1.OAM Architecture, “O-RAN Operations and Maintenance Architecture”. 31 
+[5] O- RAN-WG1.O1-Interface, “O-RAN Operations and Maintenance Interface Specification”. 32 
+[6] 3GPP TS 33.401: “3GPP System Architecture Evolution (SAE); Security architecture”.  33 
+[7] 3GPP TS 33.501: “Security architecture and procedures for 5G System”. 34 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+[8] O- RAN-WG2.A1.GA&P, “O-RAN Working Group 2, A1 interface: General Aspects and Principles”. 1 
+[9] O- RAN-WG2.A1AP, “O-RAN Working Group 2, A1 Interface: Application Protocol”. 2 
+[10] O- RAN-WG1.O-RAN Architecture, “O-RAN Working Group 1, O-RAN Architecture Description”. 3 
+[11] 3GPP TS 36.401: "Evolved Universal Terrestrial Radio Access Network (E-UTRAN); Architecture 4 
+Description". 5 
+[12] 3GPP TS 38.300: “NR; NR and NG-RAN Overall Description; Stage 2”. 6 
+[13] 3GPP TS 37.324: “Evolved Universal Terrestrial Radio Access (E-UTRA) and NR; Service Data Adaptation 7 
+Protocol (SDAP) specification”. 8 
+[14] 3GPP TS 38.331: “NR; Radio Resource Control (RRC); Protocol specification”. 9 
+[15] 3GPP TS 38.323: “NR; Packet Data Convergence Protocol (PDCP) specification”. 10 
+[16] 3GPP TS 38.322: “NR; Radio Link Control (RLC) protocol specification”. 11 
+[17] 3GPP TS 38.321: “NR; Medium Access Control (MAC) protocol specification”. 12 
+[18] 3GPP TS 38.201: “NR; Physical layer; General description”. 13 
+ 14 
+3 Definitions and Abbreviations 15 
+3.1 Definitions 16 
+For the purposes of the present document, the terms and definitions given in TR 21.905 [1] and the following apply.   17 
+A term defined in the present document takes precedence over the definition of the same term, if any, in TR  21.905 [1]. 18 
+Near-RT RIC : O-RAN Near-Real-Time RAN Intelligent Controller : A logical function that enables near -real-time 19 
+control and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface. 20 
+Non-RT RIC: O-RAN Non-Real-Time RAN Intelligent Controller: A logical function within SMO that drives the content 21 
+carried across the A1 interface. It is comprised of the Non-RT RIC Framework and the Non-RT RIC Applications. Please 22 
+refer to [8] for more information. 23 
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting RRC [14] and the control plane part of PDCP 24 
+protocol [15]. 25 
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of PDCP protocol [15] and 26 
+SDAP protocol [13]. 27 
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC  [16]/MAC [17]/High-PHY [18] layers based on a lower 28 
+layer functional split. 29 
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional 30 
+split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH 31 
+extraction).   32 
+O-eNB: An eNB [10] or ng-eNB [11] that supports E2 interface. 33 
+O1: An i nterface between SMO  and O -RAN managed elements, for operation and management, by which FCAPS 34 
+management, PNF (Physical Network Function) Software management, File management shall be achieved.  35 
+SMO: A Service Management and Orchestration system as described in [4]. 36 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+A1: An i nterface between Non -RT RIC and Near -RT RIC to enable policy- driven guidance of Near -RT RIC 1 
+applications/functions, and support AI/ML workflow. Please refer to [8] for more information. 2 
+E2: An interface connecting Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, or one or more O-DUs. 3 
+E2 Node: A logical node terminating E2 interface. In this version of the specif ication, O-RAN nodes terminating E2 4 
+interface are: 5 
+- for NR access: O-CU-CP, O-CU-UP, O-DU or any combination as defined in [4];  6 
+- for E-UTRA access: O-eNB. 7 
+xApp: An application designed to run on Near -RT RIC. It may consist of one or more microservices and at the point of 8 
+on-boarding it identifies which data it consumes and which data it provides. It  is independent of Near-RT RIC and may 9 
+be provided by any third party. The E2 interface enables a direct association between xApp and RAN functionalities.   10 
+O-Cloud: O-Cloud is a cloud computing platform comprising a collection of physical infrastructure nodes that meet O -11 
+RAN requirements to host the relevant O -RAN functions (such as Near-RT RIC, O-CU-CP, O-CU-UP, and O-DU), the 12 
+supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and the 13 
+appropriate management and orchestration functions. 14 
+3.2 Abbreviations 15 
+For the purposes of the present document, the following abbreviations apply.  16 
+API Application Programming Interface 17 
+FM Fault Management 18 
+LCM Life-Cycle Management 19 
+ML Machine Learning 20 
+Non-RT RIC Non-real-time RAN Intelligent Controller: 21 
+Near-RT RIC Near-real-time RAN Intelligent Controller 22 
+O-CU-CP O- RAN Central Unit – Control Plane 23 
+O-CU-UP O- RAN Central Unit – User Plane 24 
+O-DU O-RAN Distributed Unit   25 
+O-RU O-RAN Radio Unit  26 
+PM Performance Management 27 
+R-NIB  Radio-Network Information Base 28 
+SCTP  Stream Control Transmission Protocol 29 
+SMO Service Management and Orchestration 30 
+UE-NIB  UE-Network Information Base 31 
+4 General Principles 32 
+The architecture described herein follows the architecture principles specified in [2], and the following principle(s): 33 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- The Near-RT RIC architecture and internal interfaces shall be open to support 3rd party xApps.  1 
+ 2 
+5 Near-RT RIC Architecture 3 
+5.1 Requirements 4 
+The architecture described herein fulfills the Near-RT RIC requirements specified in [2] and the following requirement(s): 5 
+- Near-RT RIC shall consist of multiple xApps and a set of platform functions that are commonly used to support 6 
+the specific functions hosted by xApps. 7 
+ 8 
+5.1.1 Platform  Requirements 9 
+- Near-RT RIC shall provide a database that stores an up-to-date RAN information, history of time-varying network 10 
+state, as well as configurations  related to E2 Nodes, Cells, Bearers, Flows, UEs, etc.,  and the mapping between 11 
+them. This information shall be provided as a service to any xApp that requests it. 12 
+- Near-RT RIC shall provide ML tools that support data pipelining. 13 
+- Near-RT RIC shall provide a messaging infrastructure. 14 
+- Near-RT RIC shall provide logging, tracing and metrics collected from Near-RT RIC platform and xApps toward 15 
+SMO. 16 
+- Near-RT RIC shall provide security functions. 17 
+- Near-RT RIC shall support resolution of potential conflicts or overlaps of controls from xApps toward an E2 18 
+node.  19 
+- Near-RT RIC shall communicate with xApp(s) via Near-RT RIC APIs. 20 
+- Near-RT RIC shall register the Near-RT RIC APIs it produces.  21 
+- Near-RT RIC shall be capable of discovering the Near-RT RIC APIs it consumes.   22 
+- Near-RT RIC shall provide means to resolve compatibility clashes between xApps and the Near-RT RIC 23 
+services they access. 24 
+- Near-RT RIC shall support subscription merging from multiple xApps to avoid unnecessary network load. 25 
+ 26 
+5.1.2 xApp Requirements 27 
+- xApp may enhance the RRM capabilities of Near-RT RIC. 28 
+- xApp may be associated with zero, one or more E2SMs. 29 
+- xApp shall use Near-RT RIC APIs to make use of the Information Elements (IEs) of E2SMs that are associated 30 
+with it. 31 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- xApp that is associated with a given E2SM shall be able to interface with any E2 Node that supports that E2SM 1 
+without any intermediary xApp. 2 
+- xApp shall be able to receive event-triggered information on RAN information and time-varying network state.  3 
+- xApp shall provide collected logging, tracing and metrics information to Near-RT RIC. 4 
+- xApp shall provide a descriptor that includes the following basic information of the xApp: 5 
+- Configuration: It includes a data dictionary for configuration data, i.e., meta data such as a YANG definition or 6 
+a list of configuration parameters and their semantics. It may also include an initial configuration of xApp. 7 
+- Control: It includes the types of data that an xApp consumes and generates, in order to perform control 8 
+capabilities (e.g., xApp URL, parameters, input/output type). 9 
+- Metrics: It includes a list of metrics (e.g., metric name, type, unit and semantics) provided by the xApp. 10 
+- The xApp descriptor shall also provide the necessary data to enable management and orchestration of the xApp, 11 
+aligned with [4]. 12 
+- xApps shall communicate with Near-RT RIC platform via Near-RT RIC APIs. 13 
+- xApp shall register the Near-RT RIC APIs it produces.  14 
+- xApp shall be capable of discovering the Near-RT RIC APIs they consume. 15 
+5.1.3 Near-RT RIC API Requirements 16 
+- Near-RT RIC shall provide API s enabling the hosting of 3rd party xApps and xApps from the Near -RT RIC 17 
+platform vendor. 18 
+- Near-RT RIC APIs shall not adversely impact low -latency and high throughput operations of Near -RT RIC. 19 
+Specifically, the Near -RT RIC APIs shall support the Near-RT RIC control loop of  execution time from  10 20 
+milliseconds to 1 second. 21 
+- Near-RT RIC shall provi de APIs decoupled from specific implementation solutions, including a Shared Data 22 
+Layer (SDL) that works as an overlay for underlying databases and enables simplified data access . 23 
+- Near-RT RIC shall provide a n API repository/registry for the services provided by the Near-RT RIC platform 24 
+and/or xApps. 25 
+- Near-RT RIC shall provide means for xApps to discover the published APIs based on the xApps’ needs. 26 
+- Near-RT RIC shall provide means to restrict xApps from discovering some published APIs based on configured 27 
+policies. 28 
+- Near-RT RIC shall  provide APIs enabling all xApps to  directly use the information elements of E2SMs  with 29 
+which they are associated. 30 
+- Near-RT RIC shall provide APIs aiming to simplify the development of xApps and enable rapid innovation. 31 
+- Near-RT RIC shall provide Near -RT RIC APIs supporting xApp development in multiple programming 32 
+languages (e.g. C, C++, Python, Go). 33 
+- Near-RT RIC APIs shall support xApp subscription management based on operators’ policies. An xApp may be 34 
+restricted to interface with only a subset of E2 Nodes by such policies. Near -RT RIC shall be responsible for 35 
+routing messages between this xApp and the subset of E2 Nodes. 36 
+NOTE: Communication between xApps is FFS.  37 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+5.2 Overall Architecture Description 2 
+The overall O-RAN architecture specified in [10] describes the location and interfaces of Near-RT RIC, as well as possible 3 
+deployment options. 4 
+The RRM functional allocation between Near-RT RIC and E2 Node is described in [2]. 5 
+ 6 
+6 Near-RT RIC Functions Description 7 
+6.1 General 8 
+Near-RT RIC hosts the following functions: 9 
+- Database, which allows reading and writing of RAN/UE information 10 
+- xApp subscription management, which  merges subscriptions from different xApps and provides unified data 11 
+distribution to xApps 12 
+- Conflict mitigation, which resolves potentially overlapping or conflicting requests from multiple xApps  13 
+- Messaging infrastructure, which enables message interaction amongst Near-RT RIC internal functions 14 
+- Security, which provides the security scheme for xApps 15 
+- Management services: 16 
+- Fault management, configuration management, and performance management as a service producer to SMO ; 17 
+- Life-cycle management of xApps; 18 
+- Logging, tracing and metrics collection, which capture, monitor and collect the status of Near-RT RIC internals 19 
+and can be transferred to external system for further evaluation 20 
+- Interface Termination: 21 
+- E2 termination, which terminates E2 interface from an E2 Node; 22 
+- A1 termination, which terminates A1 interface from Non-RT RIC;  23 
+- O1 termination, which terminates O1 interface from SMO 24 
+- Functions hosted by xApps, which allow services to be executed at Near- RT RIC and outcomes to be sent to E2 25 
+Nodes via E2 interface; 26 
+- API enablement function supporting capabilities related to Near-RT RIC API operations (API repository/registry, 27 
+authentication, discovery, generic event subscription, etc.) 28 
+This is summarized in the figure below. 29 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 6.1-1: Near-RT RIC Internal Architecture 2 
+ 3 
+6.2 Platform Functions 4 
+6.2.1 Database 5 
+6.2.1.1 UE-NIB  6 
+Some xApps may generate UE related information to be stored in the UE-NIB database. 7 
+- UE-NIB maintains a list of UEs and associated data. 8 
+- UE-NIB maintains tracking and correlation of the UE identities associated with the connected E2 N odes. 9 
+6.2.1.2 R-NIB 10 
+Some xApps may generate radio access network related information to be stored in the R-NIB database. 11 
+- The R -NIB stores the configurations an d near real -time information relating to connected E2 Nodes and the 12 
+mappings between them. 13 
+6.2.2 xApp Subscription Management 14 
+- xApp subscription management manages subscriptions from xApps to E2 Nodes.  15 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- xApp subscription management enforces authorization of policies controlling xApp access to messages. 1 
+- xApp subscription management enables merging of identical subscriptions from different xApps into a single 2 
+subscription toward an E2 Node. 3 
+6.2.3 Conflict Mitigation 4 
+In the context of Near-RT RIC, Conflict Mitigation is about addressing conflicting interactions between different xApps.  5 
+An application will typically change one or more parameters with the objective of optimizing a specific metric.  Conflict 6 
+Mitigation is necessary because xApps objectives may be chosen/configured such that they result in conflicting actions.   7 
+The control target of the radio resource management can be a cell, a UE or a bearer, etc. The control contents of the radio 8 
+resource management can cover access control, bearer control, hando ver control, QoS control, resource assignment and 9 
+so on. The control time span indicates the valid control duration which is expected by the control request. The conflicts 10 
+of control can be illustrated as below. 11 
+1) Direct Conflicts: The conflicts can be observed directly by Conflict Mitigation. Some cases are described as below:  12 
+- Two or more xApps request different settings for the very same configuration of one or more parameters of a  13 
+Control Target. Conflict mitigation processes the requests and decides on a resolution. 14 
+- The new request from an xApp may conflict with the running configuration resulting from a previous request 15 
+of another or the same xApp. 16 
+- The total requested resources from different xApps may exceed the limitation of the RAN system, e.g. the sum 17 
+of resources required by the two different xApps may be far beyond the resource limitation of the RAN system.  18 
+2) Indirect Conflicts: The conflicts cannot be observed directly, nevertheless, some dependence among the parameters 19 
+and resources that the xApps target can be observed. Conflict Mitigation may anticipate the possible conflicts and 20 
+take actions to mitigate them.  For instance , different xApps target different configuration parameters to optimize 21 
+the same metric accor ding to the respective objective. Even though this will not result in conflicting parameter 22 
+settings, it may have uncontrollable or inadvertent system impacts . One example of such indirect conflicts can 23 
+occur when the changes required by one xApp create a system impact which is equivalent to a parameter change 24 
+targeted by another xApp. E.g., antenna tilts and m easurement offsets are different control points, but they both 25 
+impact the handover boundary. 26 
+3) Implicit Conflicts: The conflicts cannot be observed directly, even the dependence between xApps are not obvious. 27 
+For instance, different xApps may optimize different metrics and (re-)configure different parameters. Nonetheless, 28 
+optimizing one metric may have implicit, unwanted, and maybe adversary side effects  on one of the metrics 29 
+optimized by another xApp. E.g., protecting throughput metrics for GBR users may degrade non GBR metrics or 30 
+even cell throughput. 31 
+For mitigating these conflicts, different approaches exist: 32 
+1) Direct conflicts typically can be mitigated by pre -action coordination, i.e., the xApps or a Conflict Mitigation 33 
+component needs to make the final determination on whether any specific change is made , or in which order the 34 
+changes are applied. 35 
+2) Indirect conflicts can be resolved by post-action verification. Here, the actions are executed and the effects on the 36 
+target metric are observed. Based on the observations, the system has to decide on potential corrections, e.g., 37 
+rolling back one of the xApp actions. 38 
+3) Implicit conflicts are the most difficult to mitigate since these dependencies are difficult or impossible to observe 39 
+and therefore hard to model in any mitigation scheme. In some cases, it may be possible to design around such 40 
+conflicts by ensuring that use cases (xApps) target different parameters, thus falling back to approach 2), but 41 
+preferably, a generic approach to managing such conflicts is established. 42 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+The individual xApp goals are defined by A1 policies, but it is also important to define utility metrics that incorporate the 1 
+relative importance of each of the metrics targeted by the xApps as well as the importance of the optimization (use case). 2 
+A Conflict Mitigation function may also use ML approaches, e.g., Reinforcement Learning, to a -priori assess, for each 3 
+proposed change, the likely probability of degrading a metric versus the potential improvement.  4 
+ 5 
+6.2.4 Messaging Infrastructure 6 
+Messaging infrastructure provides low-latency message delivery service between Near-RT RIC internal endpoints.  7 
+- It supports registration/discovery/deletion of endpoints.  8 
+- Registration: Endpoints register themselves to the messaging infrastructure; 9 
+- Discovery: Endpoints are discovered by the messaging infrastructure initially and registered to the messaging 10 
+infrastructure; 11 
+- Deletion: Endpoints are deleted once they are not used anymore. 12 
+- It provides the following APIs: 13 
+- An API for sending messages to the messaging infrastructure; 14 
+- An API for receiving messages from the messaging infrastructure. 15 
+- It supports multiple messaging modes, e.g. point -to-point mode (e.g. message exchange among endpoints), 16 
+publish/subscribe mode (e.g. real-time data dispatching from E2 termination to multiple subscriber xApps). 17 
+- It provides message routing, namely according to the message routing information, messages can be di spatched 18 
+to different endpoints. 19 
+- It supports message robustness to avoid data loss during a messaging infrastructure outage/restart or to release 20 
+resources from the messaging infrastructure once a message is outdated. 21 
+ 22 
+6.2.5 Security 23 
+The security function given in this section only applies to Near-RT RIC. One of the targets is to prevent malicious xApps 24 
+from abusing radio network information (e.g. exporting to unauthorized external systems) and/or control capabilities over 25 
+RAN functions. The security requirements for the 3GPP LTE eNB is defined in [6] and for the 5G NR gNB in [7].  26 
+NOTE: The description of security functions is not included in the release. 27 
+ 28 
+6.2.6 Management Services 29 
+6.2.6.1 Life-Cycle Management of xApp 30 
+The life-cycle management of xApps provides the following functions. 31 
+- Onboarding xApps: It receives and stores xApp descriptor that contains configuration data for the xApp. 32 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- Deployment of xApps: It retrieves xApp name and other information (e.g. helm chart of the xApp) from the stored 1 
+xApp descriptor and deploys the xApp. 2 
+- Resource management (RM): It does comprehensive resource provisioning/control for xApps on Near -RT RIC 3 
+as well as monitors their latency and resource consumption characteristics to see if individual xApps meet their 4 
+latency requirements. It may trigger alarm event when they miss the critical latency requirements. 5 
+- Termination of xApps: It terminates a ru nning xApp if the xApp is no longer needed. The resource used by the 6 
+xApp will be released. 7 
+NOTE: It is assumed that the life-cycle management of xApps is performed by SMO. 8 
+ 9 
+6.2.6.2 FCAPS Management of Near-RT RIC 10 
+The FCAPS management consists of fault, configuration, accounting, performance and security management. The FCAPS 11 
+management follows O1 related management aspects defined in [4]. 12 
+To support FCAPS management services, Near-RT RIC provides the following capabilities: 13 
+- Logging: logging is to capture information needed to operate, troubleshoot and report on the performance of the 14 
+Near-RT RIC platform and its constituent components. Log records may be viewed and consumed directly by 15 
+users and systems, indexed and loaded into a data storage, and used to c ompute metrics and generate reports. 16 
+Near-RT RIC components log events according to a common logging format. Different logs can be generated 17 
+(e.g., audit log, metrics log, error log and debug log).  18 
+- Tracing: tracing mechanisms are needed to monitor the tra nsactions or a workflow. An example subscription 19 
+workflow can be broken into two traces namely, a subscription request trace followed by a response trace. 20 
+Individual traces can be analyzed to understand timing latencies as the workflow traverses a particul ar Near-RT 21 
+RIC component.  22 
+- Metrics collection: metrics for performance and fault management specific to each xApp logic and other internal 23 
+functions are collected and published for authorized  consumer (e.g., SMO). A metrics collection mechanism is 24 
+needed to collect and report metrics.  25 
+6.2.7 Interface Termination 26 
+6.2.7.1 E2 Termination 27 
+- E2 Termination terminates SCTP connection from each E2 Node. 28 
+- E2 Termination routes messages from xApps through the SCTP connection to an  E2 Node. 29 
+- E2 Termination decodes the payload of an incoming ASN.1 message enough to determine message type. 30 
+- E2 Termination handles incoming E2 messages related to E2 connectivity.  31 
+- E2 Termination receives and respond to the E2 Setup Request from an E2 Node.  32 
+- E2 Termination notifies xApps of the list of RAN functions supported by an E2 Node based on information 33 
+derived from the E2 Setup and RIC Service Update procedures [3].  34 
+- E2 Termination notifies the newly connected E2 Node of the list of accepted functions. 35 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+6.2.7.2 A1 Termination 1 
+A1 Termination provides a generic API by means of which Near-RT RIC can receive and send messages via A1 interface 2 
+[8]. These include, e.g., A1 policies and enrichment information received from Non-RT RIC, or A1 policy feedback sent 3 
+towards Non-RT RIC. 4 
+ 5 
+ 6 
+6.2.7.3 O1 Termination 7 
+An implementation of O1 T ermination at Near -RT RIC depends on the deployment options described in [4], i.e. when 8 
+Near-RT RIC is modelled as a stand-alone Managed Element.  9 
+O1 Termination communicates with SMO via O1 interface and exposes O1 -related management services [5] from Near-10 
+RT RIC.  11 
+- O1 Termination exposes provisioning management services from Near-RT RIC to O1 provisioning management 12 
+service consumer. 13 
+- O1 Termination supports managing xApps via NETCONF. 14 
+- O1 Termination supports translation of NETCONF to Near-RT RIC internal APIs. 15 
+- O1 Termination exposes FM services to report faults and events from Near-RT RIC to O1 FM service consumer. 16 
+- O1 Termination exposes PM services to report bulk and real-time PM data from Near-RT RIC to O1 PM service 17 
+consumer. 18 
+- O1 Termination exposes file management services to download ML files, software files, etc. and upload log/trace 19 
+files. 20 
+- O1 Termination exposes communication surveillance services to O1 communication surveillance service 21 
+consumer.  22 
+ 23 
+6.2.8 API Enablement 24 
+In the context of Near-RT RIC, the Near-RT RIC APIs can be categorized based on the interaction with the Near-RT RIC 25 
+platform and can be related to E2-related services, A1-related services, Management services, and Database services.  26 
+API Enablement provides support for registration, discovery and consumption of Near-RT RIC APIs within the Near-RT 27 
+RIC scope. In particular, the API enablement services include: 28 
+- Repository / Registry services for the Near-RT RIC APIs 29 
+- Services that allow discovery of the registered Near-RT RIC APIs 30 
+- Services to authenticate xApps for use of the Near-RT RIC APIs 31 
+- Services that enable generic subscription and event notification 32 
+- Means to avoid compatibility clashes between xApps and the services they access 33 
+The API enablement services can be accessed by the xApps via one or more enablement APIs.  34 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+NOTE: The provided enablement APIs may need to consider the level of trust related to the xApp (e.g. 3rd party xApp, 1 
+RIC-owned xApp, etc.). 2 
+ 3 
+6.3 xApps 4 
+An xApp consists of xApp descriptor and its image. The image is a software package, and the xApp descriptor describes 5 
+the packaging format of the image.  6 
+The xApp descriptor provides xApp management services with necessary information for the life -cycle management of 7 
+the xApp, such as deployment, deletion, upgrade etc. The xApp descriptor also provides extra parameters related to the 8 
+health management of the xApps, such as auto scaling when its load is too heavy or auto healing when it becomes 9 
+unhealthy. The xApp descriptor provides FCAPS and control parameters when the xApp is launched.  10 
+The definition of xApp descriptor includes: 11 
+- The basic information of xApp, including name, version, provider, URL of the xApp image, virtual resource 12 
+requirements (e.g. CPU), etc. This information is used to support life-cycle management of the xApp. 13 
+- The FCAPS management specifications that specify the options of configuration, performance metrics collection, 14 
+etc. for the xApp. 15 
+- The control specifications that specify the data types consumed and provided by the xApp for control capabilities 16 
+(e.g. PM data that the xApp subscribes, the message type of control messages). 17 
+ 18 
+The xApp image contains all the files needed to deploy an xApp. An xApp can have multiple versions of image s, which 19 
+are tagged by version numbers. 20 
+ 21 
+7 Near-RT RIC APIs 22 
+7.1 Overall Description 23 
+The Near-RT RIC APIs are a collection of well-defined interfaces providing Near-RT RIC platform services. These APIs 24 
+need to explicitly define the possible types of information flows and data models. The Near-RT RIC APIs are essential to 25 
+host 3rd party xApps in an inter-operable way on different Near-RT RIC platforms. 26 
+Near-RT RIC provides the following Near-RT RIC APIs for xApps as shown in Figure 7.1-1:  27 
+- A1 related APIs: APIs allowing to access A1 related functionality. 28 
+- E2 related APIs: APIs allowing to access E2 related functionality and associated xApp Subscription Management 29 
+and Conflict Mitigation functionality. 30 
+- Management APIs: APIs allowing to access management related functionality. They are u sed for services such 31 
+as O1 Termination, management services and logging, tracing, metrics collection.  32 
+- SDL APIs: APIs allowing to access Shared Data Layer related functionality. 33 
+- Enablement APIs: APIs between xApps and API enablement functionality. 34 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+xApp #n
+O1 Termination / Management Service
+E2 Termination / Conflict Mitigation / xApp Subscription 
+Management
+Framework for Transactions on APIs
+Near-RT RIC
+xApps
+E2 Related APIs
+SDL APIs
+A1 Related APIs
+Management
+ APIs
+Shared Data Layer
+xApp #2
+xApp #1
+……
+API Enablement
+Enablement 
+APIs A1 Termination
+  1 
+Figure 7.1-1: Overview of Near-RT RIC APIs  2 
+ 3 
+7.2 A1 related APIs 4 
+The xApps in Near-RT RIC provide value added services based on the policies or enrichment information or both which 5 
+are transferred through A1 interface by Non -RT RIC. A1 related APIs allow access to A1 related functionality, which 6 
+includes:  7 
+- Policy Enforcement API: used for policy enforcement request/response. 8 
+- A1 Policy Setup (Request, Success/Failure) 9 
+- A1 Policy Update (Request, Success/Failure) 10 
+- A1 Policy Delete (Request, Success/Failure) 11 
+- Enrichment Information API: used for enrichment information transfer/response. 12 
+ 13 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+7.3 E2 related APIs 1 
+The xApps in Near -RT RIC provide value added services using RIC functional mechanisms and related procedures via 2 
+E2 interface towards E2 Nodes. The E2 related APIs allow access to E2 related functionality  and the associated xApp 3 
+Subscription Management and Conflict Mitigation functionality, which includes: 4 
+- E2 Subscription (Request, Reject/Success/Failure) 5 
+- E2 Subscription Delete (Request, Reject/Success/Failure) 6 
+- E2 Indication 7 
+- E2 Control (Request, Reject/Success/Failure) 8 
+- E2 Guidance (Request, Response, Modification) 9 
+NOTE 1: Support for E2 messages related to E2 interface Support functions (E2 SETUP, RIC Service Update, etc.) is 10 
+FFS. 11 
+NOTE 2: Addition Conflict Mitigation related messages are FFS (i.e. for "analysis results"). 12 
+ 13 
+7.4 Management APIs 14 
+The Management APIs include the following APIs, including the xApp’s ML Model related APIs and the FCAPS related 15 
+APIs.  16 
+The xApp’s ML Model related APIs include: 17 
+- ML Model Deployment Request. 18 
+- ML Model Update Request. 19 
+- ML Model Uninstall Request. 20 
+The FCAPS related APIs include:  21 
+- xApp Registration API: It supports an xApp to register to the Near-RT RIC platform after the xApp is deployed. 22 
+- xApp Deregistration API: It supports an xApp to deregister from the Near-RT RIC platform before the xApp is 23 
+terminated. 24 
+- Configuration API: It transfers configurations from SMO to an xApp.  25 
+- PM API: It supports an xApp to provide PM related data to the O1 PM Consumer.  26 
+- FM API: It supports an xApp to provide faults and events information to the O1 FM Consumer.  27 
+NOTE: Trace related API is FFS. 28 
+ 29 
+7.5 Void 30 
+Void 31 
+ 32 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+7.6 SDL APIs 1 
+The SDL API provides a simple yet flexible way to store and retrieve data while hiding details such as type and location 2 
+of database, management operations of database layer such as high availability, scaling, load -balancing. The SDL API 3 
+allows access to the following Shared Data Layer functionality: 4 
+- SDL Client Registration: allows xApps to request the SDL for permissions to access the database. 5 
+- SDL Client Deregistration: allows xApps to request the SDL to deregister.  6 
+- Fetch Data: allows xApps to fetch data from the database. 7 
+- Subscribe: allows xApps to subscribe to notifications related to updates of data. 8 
+- Notify: SDL can notify xApps about  updates of information in the database. When an update occurs, t he SDL 9 
+will send notifications to those xApps that are subscribed to receive them. 10 
+- Store Data: allows xApps to store data in the database. 11 
+- Modify Data: allows xApps to modify or delete data from the database. 12 
+ 13 
+7.7 Enablement APIs 14 
+The Enablement APIs support exchange of API enablement related information between xApps and the API enablement 15 
+functionality.  16 
+The API enablement information includes: 17 
+- API Registration: enabling the API producer to register the APIs it produces. 18 
+NOTE: An investigation of services for which the API producer is the xApp is FFS. 19 
+- API Discovery: enabling discovery of the Near-RT RIC APIs by xApps. 20 
+- API-related Event Subscription: enabling subscription/un- subscription to API -related events and event 21 
+notifications. 22 
+ 23 
+8 External Interfaces of Near-RT RIC 24 
+8.1 E2 Interface  25 
+O-RAN-WG3.E2GAP [2] specifies E2 interface general aspects and principles. 26 
+O-RAN-WG3.E2AP [3] specifies E2 interface application protocols. 27 
+ 28 
+8.2 A1 Interface 29 
+O-RAN-WG2.A1.GA&P [8] specifies A1 interface general aspects and principles. 30 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+O-RAN-WG2.A1AP [9] specifies A1 interface application protocols. 1 
+8.3 O1 Interface 2 
+An implementation of O1 interface at Near-RT RIC depends on the deployment options described in [4], i.e. when Near-3 
+RT RIC is modelled as a stand-alone Managed Element.  4 
+O-RAN-WG1.O1-Interface [5] specifies O1 interface related aspects. 5 
+ 6 
+9 Near-RT RIC API Procedures 7 
+9.1 A1 related API Procedures 8 
+9.1.1 A1 Policy Setup procedure 9 
+The purpose of A1 Policy Setup procedure in Near-RT RIC is to request and activate an A1 policy enforcement toward a 10 
+suitable xApp. 11 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal The activation of a received but not activated A1 policy in Near-RT RIC. 
+Actors and Roles 
+- Non-RT RIC: originator of HTTP PUT request to activate a A1 policy. 
+- xApp : responsible for the enforcement of accommodated A1 policies. 
+- Near-RT RIC Platform 
+o A1 Termination: originator of A1 related API request to activate a A1 policy. 
+o [I nformative] xApp Repository Function: handling of A1 policy to xApp 
+accommodation. 
+Assumptions 
+- Near-RT RIC supported A1 policy types is accessible by A1 termination. 
+- Near-RT RIC nested A1 policies is accessible by A1 termination. 
+- [I nformative] xApp selection needed data is accessible by xApp Repository Function. xApp 
+selection process is performed at xApp Repository Function. 
+Pre conditions - Near-RT RIC is running normal. 
+- A1 interface is connected and activated. 
+Begins when Non-RT RIC determines to trigger the activation of one A1 policy towards the Near-RT RIC. 
+Step 1 (M) Non-RT RIC requests Near-RT RIC to set up an A1 policy. 
+Step 2 (M)  A1 Termination checks whether the received policy type is supported in Near-RT RIC or not. 
+Step 3 (M) If the received policy type is not supported in Near-RT RIC, a “400” response is directly returned 
+to Non-RT RIC. 
+Step 4 (M) If the received policy type is supported in Near-RT RIC, A1 Termination then checks whether the 
+received A1 policy is mapped to any xApp or not. 
+Step 5  
+[Informative] 
+[Note] If the received A1 policy is not mapped to any xApp, A1 Termination triggers xApp 
+selection procedure to identify a suitable xApp by sending xAPP SELECTION REQUEST to 
+xApp Repository Function. The message includes at least A1 policy received from Non-RT RIC. 
+Step 6 
+[Informative] xApp selection process is performed at xApp Repository Function. 
+Step 7 
+[Informative] If suitable xApps are identified, candidate xApps are notified to A1 Termination. 
+Step 8(M) 
+A1 Termination selects a suitable one from candidate xApps as the target of A1 related API: A1 
+POLICY SETUP REQUEST message. The message includes at least the corresponding A1 
+policy received from Non-RT RIC. 
+Step 9~10(M) If the selected xApp accomplishes setup of the A1 policy. A success is notified to A1 termination 
+in A1 related API: A1 POLICY SETUP RESULT message, and eventually to Non-RT RIC. 
+Step 11~12(M) If the selected xApp fails to set up the A1 policy. A failure is notified to A1 termination in A1 
+related API: A1 POLICY SETUP RESULT message, and eventually to Non-RT RIC. 
+Step 13~14(M)  If no suitable xApp is identified in step 6, a failure is notified to A1 termination [Informative]. A 
+“503” response is directly returned to Non-RT RIC. 
+NOTE: As the create policy and update policy procedure in A1 interface has identical HTTP PUT Request, so when a 
+HTTP PUT Request is received, A1 Termination cannot decide whether it’s asked for create or update from a first 
+glance. Only after further policy mapping check to find out the enforcement status of the received A1 policy, can the 
+purpose of the received HTTP PUT request be identified. If the received A1 policy is not mapped to any xApp, A1 
+Termination triggers A1 Policy Setup procedure as shown here. Otherwise, A1 Termination triggers A1 Policy Update 
+procedure. See 9.1.2 for details. 
+ 1 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.1.1-1 A1 Policy Setup procedure 2 
+9.1.2 A1 Policy Update procedure 3 
+The purpose of A1 Policy Update procedure in Near-RT RIC is to support modification of A1 policy from Non-RT RIC. 4 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal The update of a received and already activated A1 policy in Near-RT RIC. 
+Actors and Roles 
+- Non-RT RIC: originator of HTTP PUT request to update a A1 policy. 
+- xApp : responsible for the enforcement of accommodated A1 policies. 
+- Near-RT RIC Platform 
+o A1 Termination: originator of A1 related API request to update a A1 policy. 
+Assumptions - Near-RT RIC supported A1 policy types is accessible by A1 termination. 
+- Near-RT RIC nested A1 policies is accessible by A1 termination. 
+Pre conditions - Near-RT RIC is running normal. 
+- A1 interface is connected and activated. 
+Begins when Non-RT RIC determines to trigger the update of one A1 policy towards the Near-RT RIC. 
+Step 1 (M) Non-RT RIC requests Near-RT RIC to update an A1 policy. 
+Step 2 (M)  A1 Termination checks whether the received policy type is supported in Near-RT RIC or not. 
+Step 3 (M) If the received policy type is not supported in Near-RT RIC, a “400” response is directly returned 
+to Non-RT RIC. 
+Step 4 (M) If the received policy type is supported in Near-RT RIC, A1 Termination then checks whether the 
+received A1 policy is mapped to any xApp or not. 
+Step 5 (M) 
+[Note] If the received A1 policy is already mapped to one xApp, A1 Termination selects which as 
+the target of A1 related API: A1 POLICY UPDATE REQUEST message. The message includes 
+at least the corresponding A1 policy received from Non-RT RIC. 
+Step 6~7(M) If the target xApp accomplishes update of the A1 policy. A success is notified to A1 termination 
+in A1 related API: A1 POLICY UPDATE RESULT message, and eventually to Non-RT RIC. 
+Step 8~9(M) If the target xApp fails to update the A1 policy. A failure is notified to A1 termination in A1 related 
+API: A1 POLICY UPDATE RESULT message, and eventually to Non-RT RIC. 
+NOTE: As the create policy and update policy procedure in A1 interface has identical HTTP PUT Request, so when a 
+HTTP PUT Request is received, A1 Termination cannot decide whether it’s asked for create or update from a first 
+glance. Only after further policy mapping check to find out the enforcement status of the received A1 policy, can the 
+purpose of the received HTTP PUT request be identified. If the received A1 policy is already mapped to an xApp, A1 
+Termination triggers A1 Policy Update procedure as shown here. Otherwise, A1 Termination triggers A1 Policy Setup 
+procedure. See 9.1.1 for details. 
+ 1 
+Figure 9.1.2-1 A1 Policy Update procedure 2 
+9.1.3 A1 Policy Delete procedure 3 
+The purpose of A1 Policy Delete procedure is to support termination of A1 policy from Non-RT RIC. 4 
+Use Case Stage Evolution / Specification 
+Goal The deactivation of a received and already activated A1 policy in Near-RT RIC. 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Actors and Roles 
+- Non-RT RIC: originator of HTTP DELETE request to deactivate a A1 policy. 
+- xApp : responsible for the deactivation of nested A1 policies. 
+- Near-RT RIC Platform 
+o A1 Termination: originator of A1 related API request to delete a A1 policy. 
+Assumptions - Near-RT RIC supported A1 policy types is accessible by A1 termination. 
+- Near-RT RIC nested A1 policies is accessible by A1 termination. 
+Pre conditions - Near-RT RIC is running normal. 
+- A1 interface is connected and activated. 
+Begins when Non-RT RIC determines to trigger the deactivation of one A1 policy towards the Near-RT RIC. 
+Step 1 (M) Non-RT RIC requests Near-RT RIC to delete an A1 policy. 
+Step 2 (M)  A1 Termination checks whether the received policy type is supported in Near-RT RIC or not. 
+Step 3 (M) If the received policy type is not supported in Near-RT RIC, a “400” response is directly returned 
+to Non-RT RIC. 
+Step 4 (M) If the received policy type is supported in Near-RT RIC, A1 Termination then checks whether the 
+received A1 policy is mapped to any xApp or not. 
+Step 5 (M) 
+If the received A1 policy is already mapped to one xApp, A1 Termination selects which as the 
+target of A1 related API: A1 POLICY DELETE REQUEST message. The message includes at 
+least the corresponding A1 policy ID received from Non-RT RIC. 
+Step 6~7(M) If the target xApp accomplishes delete of the A1 policy. A success is notified to A1 termination in 
+A1 related API: A1 POLICY DELETE RESULT message, and eventually to Non-RT RIC. 
+Step 8~9(M) If the target xApp fails to delete the A1 policy. A failure is notified to A1 termination in A1 related 
+API: A1 POLICY DELETE RESULT message, and eventually to Non-RT RIC. 
+Step 10(M) If the received A1 policy is not mapped to any xApp, a “503” response is directly returned to Non-
+RT RIC. 
+ 1 
+Figure 9.1.3-1 A1 Policy Delete procedure 2 
+9.2 E2 Related API Procedures 3 
+9.2.1 Introduction 4 
+Procedures described in this section assume the Near-RT RIC Platform contains the functions listed in section 6.2. 5 
+Termination points within the Platform Functions are for information and may vary depending on implementation.  6 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+The following procedures are described in this section: 1 
+E2AP RIC Functional procedures: 2 
+- RIC Subscription using E2 Related API: E2 Subscription (request, reject, success, failure) and E2 Related 3 
+API: E2 Guidance (request, response) 4 
+- R IC Subscription Delete  using E2 Related API: E2 Subscription Delete (request, reject, success, failure) 5 
+- R IC Indication  using E2 Related API: E2 Indication 6 
+- RI C Control  using E2 Related API: E2 Control  (request, reject, success, failure) and E2 Related API: E2 7 
+Guidance (request, response) 8 
+E2 Guidance API related procedures: 9 
+- xApp initiated conflict mitigation using E2 Related API: E2 Guidance (request, response) 10 
+- x App Subscription Management initiated conflict mitigation  using E2 Related API: E2 Guidance (modification) 11 
+- C onflict mitigation related message monitoring  using E2 Related API: E2 Guidance (modification) 12 
+- C onflict mitigation initiated conflict mitigation  using E2 Related API: E2 Guidance (modification) 13 
+Other procedures related to E2AP Global support functions (E2 SETUP, RESET, etc.) and other conflict mitigation related 14 
+procedures are for future study. 15 
+9.2.2 RIC functional procedures 16 
+9.2.2.1 E2 Subscription API procedure 17 
+The purpose of the E2 Subscription API procedure in the Near-RT RIC is to ensure that only validated and non-duplicate 18 
+RIC Subscription Request messages are issued by the Near -RT RIC over the E2 interface to  the E2 Node and that 19 
+duplicated E2 Subscription Request messages from xApps are handled gracefully. 20 
+This procedure is based on the following assumptions: 21 
+- xApp may obtain guidance from Near -RT RIC Platform (i.e. Conflict Mitigation) to resolve potential co nflicts 22 
+and/or detect partial duplications prior to sending a E2 Subscription Request (see section 9.2.3.1)  23 
+- xApp has been configured with a trusted xApp ID 24 
+- E2 related API routes E2 Subscription Request messages for one or more E2 nodes from xApp towards an 25 
+appropriate Near-RT RIC platform xApp Subscription Management function instance 26 
+- xApp Subscription Management may recover from a platform database the list of all previous successful RIC 27 
+Subscriptions towards E2 Nodes listed in xApp candidate RIC Subscription request and is able to detect 28 
+duplications and recover E2 Node response messages 29 
+- xApp Subscription Management may obtain guidance from Conflict Mitigation (see section 9.2.3.2)  30 
+- xApp Subscription Management is able to generate a unique REQUEST ID for each RIC Subscription request to 31 
+each listed E2 Node 32 
+- xApp Subscription Management routes RIC Subscription Request messages to appropriate E2 termination 33 
+instance  34 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- E2 Termination systematically forwards any received RIC Subscription Response or RIC Subscription Failure to 1 
+appropriate xApp Subscription Management instance 2 
+- xApp Subscription management maintains a mapping of active Subscriptions (identified by E2 Node ID and 3 
+REQUEST ID) of validated xApps. E2 Termination uses the mapping when sending RIC INDICATION messages 4 
+to the correct xApp or xApps 5 
+  6 
+The procedure is initiated by an xApp using E2 Related API: E2 Subscription  request to send a request of a RIC 7 
+Subscription proposed for a list of E2 Nodes.  The following outcomes are considered:  8 
+- Request fails fo llowing rejection by Near -RT RIC platform and an E2 related API: E2 Subscription response 9 
+(Reject) is sent to xApp for a list of proposed E2 node targets rejected without E2 interface transaction.  10 
+Response contains Cause (i.e. xApp not authorized to request specific subscription) 11 
+- Request towards a specific E2 Node is handled successfully following acceptance by Near -RT RIC platform but 12 
+detected as duplicate and so acknowledged with an E2 related API: E2 Subscription response (Success) to xApp 13 
+for a specific E2 Node without corresponding E2 transaction 14 
+- Request towards a specific E2 Node is handled successfully following acceptance by Near-RT RIC Platform and 15 
+acceptance by E2 Node and so acknowledged with an E2 related API: E2 Subscription response (Success) to 16 
+xApp for a specific E2 Node following corresponding E2 transaction 17 
+- Request towards a specific E2 Node fails following acceptance by Near -RT RIC Platform but rejected by E2 18 
+Node and so declined using an E2 related API: E2 Subscription response (Failure) to xApp for a specific E2 Node 19 
+following corresponding E2 interface transaction.  Response contains Cause (i.e. Request contents not accepted 20 
+by E2 node) 21 
+ 22 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case 
+Stage Evolution / Specification 
+Goal E2 Subscription API procedure from xApp initiation to E2 Node and response 
+Actors and 
+Roles 
+- xApp: Originator of E2 Subscription API request 
+- Near-RT RIC Platform assumed to consist of: 
+o Database 
+o xApp Subscription Management 
+o Conflict Mitigation 
+o E2 Termination 
+- E2 Node: RIC Subscription procedure 
+Assumptions 
+- xApp Subscription Management in Near-RT RIC platform has access to platform database 
+- For E2 Subscription API procedures, xApp Subscription Management is logically placed 
+between xApp and E2 Termination 
+- Conflict Mitigation has access to sufficient information to both detect a potential conflict and take 
+a decision on an optimal mitigation solution 
+- Conflict Mitigation may initiate guidance towards other Platform Functions and/or xApp as an 
+optional addition response to Guidance Request 
+Pre-conditions 
+- E2 Node has active E2 interface to Near-RT RIC 
+- Near-RT RIC has recovered complete list of active RAN Functions on E2 Node and informed 
+initiating xApp 
+- xApp has been authorized to issue E2 Subscription API Requests  
+- xApp has been authorized to request guidance from Conflict Mitigation  
+- xApp Subscription Management has been configured to permit E2 Subscription API requests 
+from specific list of xApp  
+- E2 Termination has been configured to accept incoming RIC Subscription requests from xApp 
+Subscription Management 
+Begins when xApp determines need to propose E2 Subscription API request for a list of E2 Node ID and defines 
+message contents (target RAN Function Id, Event Trigger, Action List)  
+Step 1 (O) xApp can request optional E2 related API: E2 Guidance from Conflict Mitigation (see section 
+9.2.3.1 for details) 
+Step 2 (M) xApp sends E2 related API: E2 Subscription request with message contents (target RAN Function 
+Id, Event Trigger, Action List) for a list of E2 Nodes  
+Step 3 
+[Informative] 
+xApp Subscription Management, after optional guidance from Conflict Mitigation (see section 9.2.3.2 
+for details), accepts or rejects proposal from xApp for list of E2 nodes 
+Step 4 (M) If reject, xApp Subscription Management sends E2 related API: E2 Subscription response to xApp 
+(Reject with Cause for one or more E2 node in proposal list) 
+  
+ Loop for one or more E2 Node in list of accepted RIC Subscription proposals 
+Step 5 
+[Informative] 
+xApp Subscription Management retrieves from a platform database the list of xApp associated with 
+subscription for E2 Node target, RAN Function Id, Event Trigger, Action List.  
+Step 6  
+[Informative] 
+xApp Subscription Management counts the number of retrieved records to determine whether the 
+Subscription proposed by xApp is a new subscription or duplicate with an existing subscription 
+Step 7 
+[Informative] 
+For the case that the Subscription proposed by xApp is a new subscription (i.e. no record found for 
+E2 Node ID with Subscription matching the same contents), xApp Subscription Management assigns 
+a unique REQUEST ID. 
+Step 8 
+[Informative] 
+xApp Subscription Management sends RIC Subscription Request to E2 Termination, providing E2 
+Node ID and REQUEST ID along with message contents proposed by xApp. 
+Step 9 (M) E2 Termination selects appropriate E2 interface and sends RIC Subscription Request (REQUEST 
+ID, contents) to E2 Node 
+Step 10 (M)  If E2 Node accepts Subscription then E2 Node responds with RIC Subscription Response. 
+Step 11  
+[Informative] E2 Termination forwards received message to xApp Subscription Management.  
+Step 12  
+[Informative] 
+For each Action in subscription corresponding to an Indication message, xApp Subscription 
+Management requests E2 termination to add xApp ID to distribution list associated with E2 Node ID, 
+REQUEST ID and Action ID.   
+Step 13  
+[Informative] xApp Subscription Management creates corresponding record in the platform database. 
+Step 14 (M)  xApp Subscription Management sends E2 related API: E2 Subscription response to xApp 
+(Success, E2 Node Id) 
+  
+Step 15 (M)  If E2 Node rejects Subscription then E2 Node responds with RIC Subscription Failure (with 
+Cause). 
+Step 16  
+[Informative] E2 Termination forwards received message to xApp Subscription Management. 
+Step 17 (M) xApp Subscription Management sends E2 related API: E2 Subscription response to xApp (Failure 
+with Cause, E2 node Id) 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+  
+Step 18  
+[Informative] 
+For the case that the E2 Subscription API Request proposed by xApp is a duplicate subscription (i.e. 
+one or more records found for E2 Node ID with Subscription matching the same contents), xApp 
+Subscription Management extracts REQUEST ID from record. 
+Step 19 
+[Informative] 
+For each Action in subscription corresponding to an Indication message, xApp Subscription 
+Management requests E2 termination to add xApp ID to distribution list associated with E2 Node ID, 
+REQUEST ID and Action ID.   
+Step 20 
+[Informative] xApp Subscription Management creates corresponding record in the platform database. 
+Step 21 (M) xApp Subscription Management sends E2 Related API: E2 Subscription response to xApp 
+(Success, E2 node Id) 
+1 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.2.1-1: E2 Subscription API procedure 2 
+Platform Functions
+xApp
+xApp
+Database
+Database
+Conflict Mitigation
+Conflict Mitigation
+xApp Subscription Management
+xApp Subscription Management
+E2 Termination
+E2 Termination
+E2 Node
+E2 Node
+1: (E2 related API) E2 Guidance (Request/Response)
+2: (E2 related API) E2 Subscription (Request, List of E2 Node Id)
+3.1: Guidance (Request/Response)
+3.2: Accept/Reject decision
+alt [xApp Subscription Management function reject ]
+4: (E2 related API) E2 Subscription (Reject, Cause, List of E2 Node Id)
+[xApp Subscription Management function accept ]
+loop [For each E2 Node in list ]
+5: Fetch records (Subscription)
+6: Detect duplication
+alt [New subscription ]
+7: Assign unique REQUEST ID
+8: RIC subscription request
+9: <<E2>> RIC SUBSCRIPTION REQUEST
+alt [E2 node accepts request ]
+10: <<E2>> RIC SUBSCRIPTION RESPONSE
+11: RIC subscription response
+12: Distribution list (Add)
+13: Store record (Subscription)
+14: (E2 related API) E2 Subscription (Success , E2 node Id)
+[E2 node rejects request ]
+15: <<E2>> RIC SUBSCRIPTION FAILURE
+16: RIC subscription failure
+17: (E2 related API) E2 Subscription (Failure, Cause, E2 Node Id)
+[Duplicate subscription request detected ]
+18: Extract REQUEST ID from record
+19: Distribution list (Add)
+20: Store record (Subscription)
+21: (E2 related API) E2 Subscription (Success , E2 Node Id)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+9.2.2.2 E2 Subscription Delete API Procedure 1 
+The purpose of the E2 Subscription Delete API procedure in the Near -RT RIC is to ensure that a) only validated RIC 2 
+Subscription Delete Request messages are issued by the Near -RT RIC over the E2 interface to the E2 Node and b) that 3 
+deletion requests for duplicated Subscription Requests are handled gracefully.  4 
+This procedure is based on the following assumptions: 5 
+- E2 related API routes RIC Subscription Delete  Requests for one or more E2 nodes from xApp towards an 6 
+appropriate xApp Subscription Management instance 7 
+- xApp has been configured with a trusted xApp ID 8 
+- xApp Subscription Management may recover from the platform database the list of all previous successful RIC 9 
+Subscriptions towards E2 Nodes listed in xApp candidate RIC Subscription Delete Request and is able to detect 10 
+when and if the delete request shall result in a corresponding E2 message 11 
+- xApp Subscription Management routes RIC Subscription Delete Request messages to appropriate E2 termination 12 
+instance  13 
+- E2 Termination systematically forwards any received RIC Subscription Delete Response or RIC Subscription 14 
+Delete Failure to appropriate xApp Subscription Management instance 15 
+- xApp Subscription management mai ntains a mapping of active Subscriptions (identified by E2 Node ID and 16 
+REQUEST ID) of validated xApps.  E2 Termination uses the mapping when sending RIC INDICATION 17 
+messages to the correct xApp or xApps 18 
+  19 
+The procedure is initiated by an xApp using E2 Related API: E2 Subscription Delete request to send a request of a RIC 20 
+Subscription Delete proposed for a list of E2 Nodes.  The following outcomes are considered:  21 
+- Request fails following rejection by xApp Subscription Management and an E2 Related API: E2 Subscription 22 
+Delete response (Failure) is sent to xApp without E2 interface transaction (i.e. xApp not previously associated 23 
+with validated subscription) 24 
+- Request successful following acceptance by xApp Subscription Management but detected as duplicate and so an 25 
+E2 Related API: E2 Subscription Delete  response (Success) is sent to xApp without corresponding E2 26 
+transaction 27 
+Request successful following acceptance by xApp Subscription Management and accepted by E2 Node and so an 28 
+E2 Related API: E2 Subscription Delete  response (Success) is sent to xApp following corresponding E2 29 
+transaction 30 
+- Request fails following acceptance by xApp Subscription Management but rej ected by E2 Node and so an E2 31 
+Related API: E2 Subscription Delete  response (Failure) is sent to xApp following corresponding E2 interface 32 
+transaction (i.e. REQUEST ID is not known by E2 Node) 33 
+ 34 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal E2 Subscription Delete API procedure from xApp initiation to E2 Node and response 
+Actors and Roles 
+- xApp: Originator of E2 Subscription Delete API request 
+- Near-RT RIC Platform 
+o Database 
+o xApp Subscription Management 
+o E2 Termination 
+- E2 Node: RIC Subscription Delete procedure 
+Assumptions 
+- xApp Subscription Management in Near-RT RIC has access to platform database 
+- For E2 Subscription Delete API procedures, xApp Subscription Management is logically 
+placed between xApp and E2 Termination 
+ 
+Pre conditions 
+- E2 Node has active E2 interface to Near-RT RIC 
+- Near-RT RIC has recovered complete list of active RAN Functions on E2 Node and 
+informed initiating xApp 
+- xApp Subscription Management has been configured to permit RIC Subscription Delete 
+requests from xApp 
+- E2 Termination has been configured to accept incoming RIC subscription delete requests 
+from xApp Subscription Management 
+ Begins when xApp determines need to request E2 Subscription Delete API for a list of (E2 Node ID / 
+REQUEST ID) pairs 
+Step 1 (M) xApp sends E2 related API: E2 Subscription Delete request for a list of E2 Nodes.   
+Step 2 
+[Informative] xApp Subscription Management accepts or rejects proposal from xApp 
+Step 3 (M) If reject, xApp Subscription Management sends E2 related API: E2 Subscription Delete 
+response to xApp (Reject with Cause for one or more E2 node in proposal list) 
+  
+ Loop for one or more E2 Node in list of accepted RIC Subscription Delete proposals 
+Step 4 
+[Informative] 
+xApp Subscription Management retrieves list of xApp associated with subscription for E2 Node 
+and Request ID. 
+Step 5 
+[Informative] 
+xApp subscription Management confirms that xApp proposing Subscription Delete has an active 
+subscription 
+Step 6 (M) xApp Subscription Management sends E2 related API: E2 Subscription Delete response to 
+xApp (Reject with Cause for E2 node) 
+  
+Step 7 
+[Informative] 
+xApp Subscription Management counts the number of retrieved records to determine whether or 
+not xApp proposing Subscription Delete is the only associated xApp 
+Step 8 
+[Informative] 
+For the case that xApp proposing Subscription Delete is the only xApp associated with the 
+subscription (i.e. a given REQUEST ID) xApp Subscription Management sends RIC Subscription 
+Delete Request to E2 Termination, providing E2 Node ID and REQUEST ID 
+Step 9 (M) E2 Termination selects appropriate E2 interface and sends RIC Subscription Delete Request 
+(REQUEST ID) to E2 Node 
+  
+Step 10 (M) If E2 Node accepts Subscription Delete then E2 Node responds with RIC Subscription Delete 
+Response 
+Step 11 
+[Informative] E2 Termination forwards received message to xApp Subscription Management. 
+Step 12 
+[Informative] 
+xApp Subscription Management requests E2 termination to delete distribution list(s) associated 
+with E2 Node ID and REQUEST ID.  
+Step 13 
+[Informative] xApp Subscription Management deletes corresponding record in the platform database. 
+Step 14 (M) xApp Subscription Management sends RIC API: E2 related E2 Subscription Delete response 
+to xApp (Success) 
+  
+Step 15 (M) If E2 Node rejects Subscription Delete then E2 Node responses with RIC Subscription Delete 
+Failure (with Cause): 
+Step 16 
+[Informative] E2 Termination forwards received message to xApp Subscription Management. 
+Step 17 (M) xApp Subscription Management sends E2 related API: E2 Subscription Delete response to 
+xApp (Failure with Cause) 
+  
+Step 18 
+[Informative] 
+For the case that xApp proposing Subscription Delete is one of a number of xApp associated 
+with the subscription (i.e. a given REQUEST ID) xApp Subscription Management requests E2 
+termination to remove xApp from distribution list(s) associated with E2 Node ID and REQUEST 
+ID. 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Step 19 
+[Informative] xApp Subscription Management deletes corresponding record in the platform database. 
+Step 20 (M) xApp Subscription Management sends E2 related API: E2 Subscription Delete response to 
+xApp (Success) 
+ 1 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+ 2 
+Platform functions
+xApp
+xApp
+Database
+Database
+xApp Subscription Management
+xApp Subscription Management
+E2 Termination
+E2 Termination
+E2 Node
+E2 Node
+1: (E2 related API) E2 Subscription Delete (Request, List of E2 Node Id)
+2: Accept/Reject decision
+alt [xApp Subscription Management function reject ]
+3: (E2 related API) E2 Subscription Delete (Reject, Cause, List of E2 Node Id)
+[xApp Subscription Management function accept ]
+loop [For each E2 Node in E2 Node List ]
+4: Fetch records (Subscription)
+5: Confirm that xApp had previously subscribed
+(i.e. record found for xApp ID)
+6: (E2 related API) E2 Subscription Delete (Reject, Cause, E2 Node Id)
+7: Count valid records
+alt [Single xApp record ]
+8: RIC subscription delete request
+9: <<E2>> RIC SUBSCRIPTION DELETE REQUEST
+alt [E2 node accepts delete request ]
+10: <<E2>> RIC SUBSCRIPTION DELETE RESPONSE
+11: RIC subscription delete response
+12: Distribution list (Delete)
+13: Delete record
+14: (E2 related API) E2 Subscription Delete (Success , E2 node Id)
+[E2 node rejects delete request ]
+15: <<E2>> RIC SUBSCRIPTION DELETE FAILURE
+16: RIC subscription delete failure
+17: (E2 related API) E2 Subscription Delete (Failure, E2 Node Id)
+[Multiple xApp records ]
+18: Distribution list (Remove)
+19: Delete record
+20: (E2 related API) E2 Subscription Delete (Success , E2 node Id)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Figure 9.2.2-1: E2 Subscription Delete API procedure 1 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+9.2.2.3 E2 Indication API Procedure 1 
+The purpose of the E2 Indication API procedure in the Near-RT RIC is to ensure delivery of RIC INDICATION messages 2 
+to one or more validated xApps. 3 
+This procedure is based on the following assumptions: 4 
+- E2 Termination maintains a list of validated xApps associated with an E2 node ID and REQUEST ID  5 
+- E2 related API ensures delivery of RIC Indication messages from E2 termination to all validated xApp  6 
+- Messaging infrastructure may support distribution of messages to multiple destinations  7 
+ 8 
+Use Case Stage Evolution / Specification 
+Goal E2 Indication API procedure from E2 Node initiation to xApp reception 
+Actors and Roles 
+- xApp: Originator of RIC subscription request 
+- Near-RT RIC Platform 
+o Database 
+o xApp Subscription Management 
+o E2 Termination 
+- E2 Node: Originator of RIC Indication procedure 
+Assumptions - For RIC Indication procedures, E2 Termination uses E2 related API to directly send 
+received messages to one or more xApp 
+Pre conditions 
+- E2 Node has active E2 interface to Near-RT RIC 
+- Near-RT RIC has recovered complete list of active RAN Functions on E2 Node and 
+informed initiating xApp 
+- E2 Termination has distribution list associating Indication messages with xApps 
+Begins when 
+E2 Node creates RIC Indication Message (REQUEST ID, RAN Function Id, Action ID, 
+Sequence number, Indication Type, Indication Header, Indication Message, optional Call 
+Process ID) 
+Step 1 (M) E2 Node sends RIC Indication message to E2 termination 
+Step 2  
+[Informative] 
+If not available, E2 Termination fetches distribution list from platform database for E2 node Id, 
+REQUEST ID, RAN Function Id, Action ID 
+Step 3 (M) 
+E2 Termination forwards Indication message to associated xApps using either: 
+a) If messaging infrastructure in Near-RT RIC supports distribution of messages to list of 
+destinations, E2 Termination sends E2 related API: E2 Indication to list of xApps 
+b) If messaging infrastructure in Near-RT RIC only supports distribution of messages to single 
+destinations, E2 Termination sends E2 related API: E2 Indication to each xApp in list 
+ 9 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.2.3-1: E2 Indication API procedure 2 
+9.2.2.4 E2 Control API Procedure 3 
+The purpose of the E2 Control API procedure in the Near -RT RIC is to ensure that only authorized xApp may initiate 4 
+RIC Control Request messages issued by the Near-RT RIC over the E2 interface to the E2 Node. 5 
+This procedure is based on the following assumptions: 6 
+- xApp may obtain guidance from Conflict Mitigation to resolve potential conflicts prior to sending a E2 Control 7 
+API Request (see section 9.2.3.1) 8 
+- xApp has been configured with a trusted xApp ID 9 
+- E2 related API may be configured to route E2 Control API Request message s for a E2 node from xApp either 10 
+towards Conflict Mitigation for acceptance (see section 9.2.3.4) or directly towards an appropriate E2 Termination 11 
+instance 12 
+- E2 related API ensures that only authorized xApp may send E2 Control API Request messages to appropriate E2 13 
+Termination instance 14 
+- E2 related API ensures that E2 Termination systematically forwards any received RIC Control Response or RIC 15 
+Control Failure to appropriate xApp 16 
+ 17 
+The procedure is initiated by an xApp using E2 Related API: E2 Control request to send a request of a RIC Control for 18 
+an E2 Node. The following outcomes are considered: 19 
+- Request successful following acceptance by Near -RT RIC platform and accepted by E2 Node and so an E2 20 
+Related API: E2 Control  response (Success with outcome) is sent to xApp following corresponding E2 21 
+transaction 22 
+- Request fails following acceptance by Near -RT RIC platform but rejected by E2 Node and so an E2 Related 23 
+API: E2 Control response (Failure with cause) is sent to xApp following corresponding E2 interface transaction 24 
+(i.e. Request contents is not compliant) 25 
+- Request rejected by Near-RT Platform and so an E2 Related API: E2 Control response (Reject) is sent to xApp 26 
+(i.e. rejected by Conflict Mitigation) 27 
+Platform functions
+xApp
+xApp
+Database
+Database
+E2 Termination
+E2 Termination
+E2 Node
+E2 Node
+<<E2>> 1: RIC INDICATION
+2: Fetch distribution list
+alt [Messaging system supports message distribution ]
+3a: (E2 related API) E2 indication (xApp ID list)
+[Messaging system supports individual messages only ]
+loop [For all xApp in distribution list ]
+3b: (E2 related API) E2 indication (xApp ID)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Use Case Stage Evolution / Specification 
+Goal E2 Control API procedure from xApp initiation to E2 Node and response 
+Actors and Roles 
+- xApp: Originator of E2 Control API request 
+- Near-RT RIC Platform 
+o E2 Termination 
+- E2 Node: RIC Control procedure 
+Assumptions 
+- For E2 Control API procedures, xApp may directly send messages to E2 Termination 
+- Conflict Mitigation has access to sufficient information to both detect a potential conflict and 
+take a decision on an optimal mitigation solution 
+Pre-conditions 
+- E2 Node has active E2 interface to Near-RT RIC 
+- Near-RT RIC has recovered complete list of active RAN Functions on E2 Node and 
+informed initiating xApp 
+- xApp has been authorized to send RIC Control requests for a specific scope (E2 Node list, 
+RAN Function, etc.) 
+- xApp has been authorized to request guidance from Conflict Mitigation 
+- E2 Termination and E2 related API has been configured to accept incoming E2 Control API 
+requests from authorized xApp and forward either to Conflict Mitigation or directly to E2 
+Termination 
+ Beg ins when xApp determines need to propose RIC Control procedure for a E2 Node and defines message 
+contents (REQUEST ID, RAN Function Id, Call process ID, Control Header, Control message)  
+Step 1 (O) xApp may request E2 related API: E2 Guidance from Conflict Mitigation (see section 9.2.3.1 for 
+details) 
+Step 2 
+[Informative] xApp assigns a unique REQUEST ID  
+Step 3 (O) 
+xApp sends E2 related API: E2 Control request with message contents (REQUEST ID, RAN 
+Function Id, Call process ID, Control Header, Control message) for a E2 Node.  
+Message may be routed either 
+a) Directly to E2 Termination 
+b) Or message may be routed to Conflict Mitigation (see section 9.2.3.4 for details) 
+Step 4 
+[Informative] If message was routed to Conflict Mitigation, Conflict Mitigation processes request 
+Step 5  
+[Informative] 
+If message was routed to Conflict Mitigation and Conflict Mitigation accepts proposed RIC 
+Control message, then message is forwarded to appropriate E2 Termination instance 
+Step 6 (O) 
+If message was routed to Conflict Mitigation and Conflict Mitigation rejects proposed RIC Control 
+message, then RIC API: E2 related E2 Control response (Reject with Cause) message sent to 
+xApp. 
+  
+Step 7 (M) E2 Termination receives incoming proposed RIC Control message, selects appropriate E2 
+interface and sends RIC Control Request (REQUEST ID, contents) to E2 Node. 
+  
+Step 8 (M) If E2 Node accepts RIC Control Request, then E2 Node responds with RIC Control Response 
+Step 9 (M) E2 Termination sends E2 Related API: E2 Control response (Success with Outcome) to xApp, 
+routing either a) directly or b) via Conflict Mitigation.   
+Step 10 (O) If response is routed via Conflict Mitigation, then E2 Related API: E2 Control response 
+(Success with Outcome) is sent to xApp 
+  
+Step 11 (M) If E2 Node rejects RIC Control Request, then E2 Node responds with RIC Control Failure (with 
+Cause) 
+Step 12 (M) E2 Termination sends E2 Related API: E2 Control response (Failure with Cause) to xApp, 
+routing either a) directly or b) via Conflict Mitigation 
+Step 13 (O) If response is routed via Conflict Mitigation, then E2 Related API: E2 Control response (Failure 
+with Cause) is sent to xApp 
+ 2 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.2.4-1 E2 Control API Procedure 2 
+ 3 
+9.2.3 E2 Guidance API related procedures 4 
+9.2.3.1 E2 Guidance request/response API procedure 5 
+The purpose of the xApp initiated E2 Guidance request/response API procedure in the Near-RT RIC is to allow authorized 6 
+xApp to obtain guidance from the Conflict Mitigation platform function prior to initiating an action.   7 
+Guidance from Conflict Mitigation may include: 8 
+- Indication on whether or not the xApp proposed E2 Related API message or series of messages may result in a 9 
+conflict with E2 related API messages from other xApps 10 
+- Recommendations on how the proposed E2 Related message or series of messages should be modified to avoid 11 
+conflict 12 
+- Modification of previous guidance to other xApps and/or other platform functions 13 
+ 14 
+This procedure is based on the following assumptions: 15 
+- xApp may use E2 Related API to obtain guidance from Conflict Mitigation to resolve potential conflicts prior to 16 
+initiating a RIC function procedure 17 
+Platform Functions
+xApp
+xApp
+Conflict Mitigation
+Conflict Mitigation
+E2 Termination
+E2 Termination
+E2 Node
+E2 Node
+1: (E2 related API) Guidance (Request/Response)
+2: Assign unique REQUEST ID
+alt [E2 Related API configured to pass request directly to E 2 termination ]
+3a: (E2 related API) E2 Control (Request)
+[E2 Related API configured to pass request via Conflict Mitigation ]
+3b: (E2 related API) E2 Control (Request)
+4: Conflict mitigation processing
+alt [Conflict Mitigation accepts proposed message ]
+5: RIC control request
+[Conflict mitigation rejects proposed message ]
+6: (E2 related API) E2 Control (Reject)
+7: <<E2>> RIC CONTROL REQUEST
+alt [E2 node accepts request ]
+8: <<E2>> RIC CONTROL ACKNOWLEDGE
+alt [E2 Related API configured to pass response directly to requesting xApp ]
+9a: (E2 related API) E2 Control (Success )
+[E2 Related API configured to pass response via Conflict Mitigation ]
+9b: RIC control acknowledge
+10: (E2 related API) E2 Control (Success )
+[E2 node rejects request ]
+11: <<E2>> RIC CONTROL FAILURE
+alt [E2 Related API configured to pass response directly to requesting xApp ]
+12a: (E2 related API) E2 Control (Failure)
+[E2 Related API configured to pass response via Conflict Mitigation ]
+12b: RIC control failure
+13: (E2 related API) E2 Control (Failure)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- xApp may use Conflict Mitigation response in a subsequent procedure (i.e. for a RIC Functional Procedure)  1 
+ 2 
+This procedure is initiated by an xApp using E2 Related API: E2 Guidance  request. The following outcomes are 3 
+considered: 4 
+- Near-RT RIC Platform provides guidance to requesting xApp using E2 Related API: E2 Guidance  response 5 
+- Near-RT RIC Platform provides modified guidance to another xApp and/or other platform function using E2 6 
+Related API: E2 Guidance response 7 
+ 8 
+Use Case Stage Evolution / Specification 
+Goal xApp initiation of Conflict Mitigation guidance 
+Actors and Roles 
+- xApp: Originator of Conflict Mitigation guidance request 
+- Near-RT RIC Platform 
+o Database 
+o Conflict Mitigation 
+Assumptions 
+- Conflict Mitigation has access to sufficient information to both detect a potential conflict and 
+take a decision on an optimal mitigation solution 
+- Conflict Mitigation may initiate guidance towards other Platform Functions and/or xApp as 
+an optional addition response to Guidance Request 
+Pre-conditions - xApp has been authorized to request guidance from Conflict Mitigation  
+- xApp has been assigned xApp ID 
+Begins when xApp determines need to request guidance from Conflict Mitigation 
+Step 1 (M) xApp sends E2 Related API E2 Guidance Request to Conflict Mitigation 
+Step 2  
+[Informative] Conflict Mitigation may recover related information from platform database 
+Step 3 
+[Informative] Conflict Mitigation processes request 
+Step 4 
+[Informative] Conflict Mitigation may signal conflict and/or provide guidance to another platform function 
+Step 5 (O) Conflict Mitigation may signal conflict and/or provide guidance to another xApp using E2 
+Related API E2 Guidance (modification) 
+Step 6 (M) Conflict Mitigation sends E2 Related API E2 Guidance response to xApp 
+Ends with xApp continues processing using Conflict Mitigation guidance response 
+ 9 
+ 10 
+Figure 9.2.3.1-1: xApp initiated E2 guidance request/response procedure 11 
+Platform Functions
+Other xApp
+Other xApp
+xApp
+xApp
+Database
+Database
+Conflict Mitigation
+Conflict Mitigation
+1: (E2 related API) E2 Guidance (Request)
+2: Fetch related information
+3: Conflict mitigation processing
+4: Guidance (Modification)
+5: (E2 related API) E2 Guidance (Modification)
+6: (E2 related API) E2 Guidance (Response)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+9.2.3.2 E2 Guidance modification API procedure: xApp Subscription Management initiated 1 
+The purpose of the Near -RT RIC Platform internal xApp Subscription Management initiated E2 Guidance modification 2 
+procedure is to allow Conflict Mitigation to signal a potential modification of E2 Guidance as the result of an xApp 3 
+Subscription Management request to obtain guidance from the Conflict Mitigation platform function prior to handling an 4 
+action. 5 
+This procedure is based on the following assumptions: 6 
+- xApp Subscription Management may request guidance from Conflict Mit igation to resolve potential conflicts 7 
+prior to initiating a RIC function procedure 8 
+- Conflict Mitigation may need to subsequentially modify previous provided Guidance to an xApp  9 
+ 10 
+The following outcomes are considered: 11 
+- Conflict Mitigation provides guidance to xApp Subscription Management 12 
+- Conflict Mitigation provides modified guidance to another Near-RT RIC platform function 13 
+- Conflict Mitigation provides modified guidance to an xApp using E2 Related API: E2 Guidance  modification 14 
+ 15 
+Use Case Stage Evolution / Specification 
+Goal xApp Subscription Management initiation of Conflict Mitigation guidance resulting in potential 
+E2 Related API: E2 Guidance modification sent to an xApp 
+Actors and Roles 
+- Near-RT RIC Platform 
+o Database 
+o Conflict Mitigation 
+o xApp Subscription Management 
+Assumptions 
+- Conflict Mitigation has access to sufficient information to both detect a potential conflict 
+and take a decision on an optimal mitigation solution 
+- Conflict Mitigation may initiate guidance towards other Platform Functions and/or xApp as 
+an optional addition response to Guidance Request 
+Pre-conditions - xApp Subscription Management has been configured to request guidance from Conflict 
+Mitigation  
+Begins when xApp Subscription Management receives incoming request 
+Step 1  
+[Informative] xApp Subscription Management requests guidance from Conflict Mitigation 
+Step 2 
+[Informative] Conflict Mitigation may recover related information from platform database 
+Step 3 
+[Informative] Conflict Mitigation processes request 
+Step 4 
+[Informative] Conflict Mitigation may signal conflict and/or provide guidance to another platform function 
+Step 5 (O) Conflict Mitigation may signal conflict and/or provide guidance to another xApp using E2 
+Related API: E2 Guidance (modification) 
+Step 6  
+[Informative] Conflict Mitigation responds to xApp Subscription Management 
+Step 7 
+[Informative] 
+xApp Subscription Management may consider Conflict Mitigation response to determine 
+response to incoming request 
+End with xApp Subscription Management sends response to incoming request 
+ 16 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.2.3.2-1: E2 Guidance modification API procedure: xApp Subscription Management initiated  2 
+ 3 
+9.2.3.3 E2 Guidance modification API procedure: message monitoring initiated 4 
+The purpose of the Conflict mitigation related message monitoring procedure in the Near-RT RIC is to allow the Conflict 5 
+Mitigation platform function to monitor ongoing transactions involving other Platform Functions.  6 
+This procedure is based on the following assumptions: 7 
+- Other Platform functions (i.e. E2 termination, xApp Subscription Management) may be configured to forward 8 
+messages related to xApp transactions to Conflict Mitigation 9 
+- Conflict Mitigation may use information obtained when formulating responses in a subsequent procedure and/or 10 
+modify previous Guidance to another Near-RT RIC platform function 11 
+- Conflict Mitigation may use information to provide modified guidance to an xApp using E2 Related API: E2 12 
+Guidance modification 13 
+ 14 
+Platform Functions
+Other xApp
+Other xApp
+xApp
+xApp
+Database
+Database
+xApp Subscription Management
+xApp Subscription Management
+Conflict Mitigation
+Conflict Mitigation
+Message (Request)
+1: Guidance (Request)
+2: Fetch related information
+3: Conflict mitigation processing
+4: Guidance (Modification)
+5: (E2 Related API) E2 Guidance (Modification)
+6: Guidance (Response)
+7: Use guidance response as part of decision process
+alt [Message accepted ]
+Message (Request)
+[Message rejected ]
+Message (Reject)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal Platform function forward xApp related messages to Conflict Mitigation resulting in 
+potential E2 Related API: E2 Guidance modification sent to an xApp 
+Actors and Roles 
+- Near-RT RIC Platform 
+o Conflict Mitigation 
+o Other Platform Function 
+ xApp Subscription Management 
+ E2 Termination 
+ Etc. 
+Assumptions - Conflict Mitigation is capable of exploiting collected xApp related messages 
+Pre-conditions - Other Platform Functions have been configured to copy and forward selected xApp 
+related message to Conflict Mitigation  
+Step 1  
+[Informative] Message received by other Platform Function 
+Step 2 
+[Informative] Other Platform Function handles incoming message and sends outgoing message 
+Step 3  
+[Informative] 
+Other Platform Function applies message filter and determines that message is to be 
+copied and sent to Conflict Mitigation.  If filter conditions match then forwards copy of 
+incoming message to Conflict mitigation 
+Step 4 
+[Informative] Conflict Mitigation processes forwarded message 
+Step 5 
+[Informative] 
+Conflict Mitigation may signal conflict and/or provide updated guidance to another 
+platform function 
+Step 6 (O) Conflict Mitigation may signal conflict and/or provide updated guidance to another xApp 
+using E2 Related API: E2 Guidance (modification) 
+ 1 
+ 2 
+Figure 9.2.3.3-1: E2 Guidance modification API procedure: message monitoring initiated  3 
+ 4 
+9.2.3.4 E2 Guidance modification API procedure: Conflict Mitigation initiated 5 
+The purpose of the Conflict Mitigation initiated conflict mitigation procedure in the Near -RT RIC is to allow Conflict 6 
+Mitigation to directly intervene during the handling an action. 7 
+This procedure is based on the following assumptions: 8 
+- Messages from xApp or other platform functions may be redirected towards Conflict Mitigation to resolve 9 
+potential conflicts prior to initiating a RIC function procedure 10 
+- xApp would not be aware of the redirection if conflict mitigation accepts the proposed message  11 
+ 12 
+The following outcomes are considered: 13 
+Platform Functions
+Other xApp
+Other xApp
+Conflict Mitigation
+Conflict Mitigation
+Other Platform Function (i.e. E2 termination)
+Other Platform Function (i.e. E2 termination)
+1: Message
+2.1: Process incoming message
+2.2: Message
+3.1: Apply filter
+3.2: Forward message
+4: Process forwarded message
+5: Guidance (Modification)
+6: (E2 Related API) E2 Guidance (Modification)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+- Conflict Mitigation accepts proposed message and forwards to other platform function  1 
+- Conflict Mitigation rejects proposed message and sends a rejection message to the i nitiating xApp or other 2 
+platform function providing both cause for rejection and optionally guidance 3 
+ 4 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal Conflict Mitigation initiation of Conflict Mitigation guidance resulting in 
+potential E2 Related API: E2 Guidance modification sent to an xApp  
+Actors and Roles 
+- xApp or other platform function 
+- Near-RT RIC Platform 
+o Database 
+o Conflict Mitigation 
+ 
+Assumptions 
+- Messages from xApp or other platform function may be redirected to 
+Conflict Mitigation 
+- Conflict Mitigation has access to sufficient information to both detect a 
+potential conflict and take a decision on an optimal mitigation solution 
+- Conflict Mitigation may initiate guidance towards other Platform 
+Functions and/or xApp as an optional addition response to Guidance 
+Request 
+ 
+Pre-conditions - Message infrastructure has been configured to redirect specified 
+messages to Conflict Mitigation   
+Begins when xApp or other platform function sends message to platform function RIC functional 
+procedures 
+Step 1 
+[Informative] Message infrastructure redirects message from xApp to Conflict Mitigation  
+Step 2 
+[Informative] Conflict Mitigation may recover related information from SDL  
+Step 3  
+[Informative] Conflict Mitigation processes request  
+Step 4 
+[Informative] 
+If accepted, Conflict Mitigation may forward to E2 termination for delivery  
+  
+Step 5 
+[Informative] 
+If rejected, Conflict Mitigation may send a rejection message to xApp 
+including indication of cause and optionally guidance information  
+Step 6 (O) Conflict Mitigation may signal conflict and/or provide guidance to another 
+platform function or xApp  
+Step 7 (O) Conflict Mitigation may signal conflict and/or provide updated guidance to 
+another xApp using E2 Related API: E2 Guidance (modification)  
+Ends with xApp receives eventual response from E2 Node  
+ 5 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.2.3.4-1: E2 Guidance modification API procedure: Conflict Mitigation initiated  2 
+ 3 
+9.3 Management API Procedures 4 
+9.3.1 xApp Registration procedure 5 
+This procedure registers the xApp application to the Near-RT RIC platform so that it can be managed by the SMO via the 6 
+Near-RT RIC platform. When the xApp is deployed, it will register itself as a managed application to the Near -RT RIC 7 
+platform by passing the relevant info through the API. Relevant info may include the xApp name, vendor, software 8 
+version, YANG schemas for configuration management, f aults raised, metrics generated, ports for messaging, supported 9 
+commands (e.g. health check, aliveness probe) and other information needed by the Near -RT RIC platform and/or the 10 
+SMO for managing the xApp.    11 
+In response to an xApp Registration, Near-RT RIC platform performs the following: 12 
+- Authenticates the xApp 13 
+- Validates that this xApp can run on this Near-RT RIC platform; e.g. RIC has the capacity 14 
+- Assigns an ID to the xApp 15 
+- Creates an xApp Managed Object Instance (MOI) in the Near -RT RIC Config DB and populates it with the 16 
+relevant information passed from the xApp 17 
+- Sends a Notify MOI Creation to SMO if subscribed 18 
+Platform Functions
+Other xApp
+Other xApp
+Database
+Database
+Conflict Mitigation
+Conflict Mitigation
+1: Message (Request)
+2: Fetch related information
+3: Conflict mitigation processing
+alt [Conflict mitigation accepts message ]
+4: Message (Request)
+[Conflict Mitigation rejects message ]
+5: Message (Reject, Cause)
+6: Guidance
+7: (E2 related) E2 Guidance (Modification)
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case 
+Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To register the newly deployed xApp to the Near-RT RIC platform.  
+Actors and 
+Roles 
+- xApp: originator of the xApp registration procedure. 
+- Management Service in Near-RT RIC platform: handle 
+registration related message from/to xApp and O1 
+termination and may do initial validation of xApp. 
+ 
+Assumptions The API channel is established successfully between xApp and 
+Management Service in the Near-RT RIC platform.  
+Pre conditions The xApp is deployed onto the Near-RT RIC platform.  
+Begins when An xApp is deployed and ready for registration.  
+Step 1(M) 
+xApp send xApp registration request to the Management Service 
+Component in the Near -RT RIC platform.  passing relevant 
+information needed to manage the xApp. 
+ 
+Step 2(M) 
+Near-RT RIC platform processes the application registration, 
+which includes (not an exhaustive list): 
+- Performing authentication and validity checks 
+- If the checks pass, assigning an xApp ID for the xApp 
+- Creating an xApp Managed Object Instance in the Near -RT 
+RIC Config DB in compliance with the YANG schemas 
+Populating xApp MOI with the xApp ID and the initial xApp 
+configuration. 
+ 
+Step 3(M) 
+The Management Service send the registration response to the 
+xApp. If the response indicates the registration fails, it will send 
+the registration response with failure results and failure cause. 
+ 
+Step 4(O) 
+If SMO has subscribed to CM Notifications from the Near-RT RIC, 
+O1 Terminations formats and sends a Notify MOI Creation to 
+SMO to notify SMO that a MOI has been created for a new xApp. 
+ 
+ 1 
+ 2 
+ 3 
+Figure 9.3.1-1:  xAp p  Registration procedure 4 
+9.3.2 xApp Deregistration procedure 5 
+This procedure deregisters the xApp from the Near-RT RIC platform.  6 
+The message flow is FFS. 7 
+ 8 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+9.3.3 xApp Configuration procedure 1 
+This procedure configures an xApp when a configuration request is received from the SMO over the O1. SMO sends the 2 
+configuration request via a NETCONF command over the O1 to O1 Termination in the Near -RT RIC platform. O1 3 
+Termination validates and saves the  configuration persistently in the Config DB and responds to the SMO. If the 4 
+configuration is for an xApp, Management Services notifies the xApp of the new configuration via the Configuration API. 5 
+xApp takes the new configuration into use. 6 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To configure a registered xApp.  
+Actors and Roles 
+- xApp: the object of xApp configuration procedure 
+- Near-RT RIC platform:  
+Management Service: handle the configuration related message from/to 
+xApp and O1 termination. 
+O1 Termination: receive and send message from/to Management 
+Service and SMO. 
+ 
+Assumptions - The API channel is established successfully between xApp and 
+Management Service in the Near-RT RIC platform,  
+Pre conditions - The xApp is installed successfully on the Near -RT RIC platform and 
+registered to the SMO.  
+Begins when O1 Termination receives the configuration message from SMO to indicate 
+that there’s configuration for the xApp.  
+Step 1(M) 
+[informative] Near-RT RIC determines that the configuration is for an xApp.  
+Step 2(M) The Management Service identify the reconfiguration info related to the xApp 
+and send the xApp configuration message to the xApp via the API.  
+Step 3(M) 
+The xApp takes the new configuration int o use and  response the 
+Management Service with the xApp configuration response message to 
+indicate the configuration result (success or failure). 
+ 
+ 7 
+ 8 
+ 9 
+Figure 9.2.3-1:  xA pp Configuration procedure 10 
+ 11 
+ 12 
+9.4 SDL API Procedures 13 
+9.4.1 SDL Client Registration procedure 14 
+The SDL Client Registration procedure in the Near-RT RIC enables an xApp to register with the SDL for permission to 15 
+access the database. 16 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal xApp requests the SDL as a client for the permission to access database. 
+Actors and Roles - xApp: Originator of SDL Client Registration request 
+- SDL: Response to the request of xApp 
+Pre-conditions - SDL API services have been registered and authorized by API enablement. 
+Begins when xApp determines to register with SDL to access the database in the Near-RT-RIC platform. 
+Step 1 (M) xApp sends SDL Client Registration request to SDL to obtain permission to access the 
+database. 
+Step 2 
+[Informative] 
+SDL arranges with the database the permission for the xApp to access the database (internal 
+implementation).  
+Step 3 (M) SDL sends the response of successful or failed registration to the xApp. 
+ 1 
+ 2 
+ 3 
+Figure 9.4.1-1: SDL Client Registration procedure 4 
+9.4.2 SDL Client Deregistration procedure 5 
+The SDL Client Deregistration  procedure in the Near -RT RIC enables an xApp to request the SDL to release the 6 
+registration. 7 
+Use Case Stage Evolution / Specification 
+Goal xApp requests the SDL to release the registration. 
+Actors and Roles - xApp: Originator of SDL Client Deregistration request 
+- SDL: Response to the request of xApp 
+Pre-conditions - SDL API services have been registered with API enablement. 
+- xApp has successfully registered as a client to the SDL before. 
+Begins when xApp determines to release the registration with SDL.. 
+Step 1 (M) xApp sends Client Deregistration request to SDL to release the connection with database. 
+Step 2 
+[Informative] SDL deregisters from database (internal implementation). 
+Step 3 (M) SDL sends the response of successful or failed deregistration to the xApp. 
+ 8 
+ 9 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.4.2-1: SDL Client Deregistration procedure 2 
+9.4.3 Fetch Data procedure 3 
+The Fetch Data procedure in the Near-RT RIC enables an xApp to request data for which it is authorized from the SDL 4 
+for local processing. 5 
+Use Case Stage Evolution / Specification 
+Goal xApp fetches data from the SDL. 
+Actors and Roles - xApp: Originator of Fetch Data request 
+- SDL: Response to the request of xApp 
+Pre-conditions 
+- SDL API services have been registered with API enablement. 
+- xApp has successfully registered as a client to the SDL before. 
+- xApp has been authorized to read the data in the database. 
+Begins when xApp determines to fetch relevant data from the SDL in the Near-RT-RIC platform. 
+Step 1 (M) xApp requests to SDL to fetch data from database. 
+Step 2 
+[Informative] SDL fetches xApp required information from database (internal implementation). 
+Step 3 (M) SDL sends the requested data or the failure response to specific xApp. 
+ 6 
+ 7 
+ 8 
+Figure 9.4.3-1: Fetch Data procedure 9 
+9.4.4 Subscribe/Notify procedure 10 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+The Subscribe/Notify procedure in the Near-RT RIC allows the xApp to subscribe to SDL for the authorized data changes 1 
+in the database. The SDL will notify the information changes to the xApp, and the xApp can subsequently request updated 2 
+data through the Fetch Data procedure. 3 
+Use Case Stage Evolution / Specification 
+Goal XApp subscribes with the SDL for data changes and receives related notifications. 
+Actors and Roles - xApp: Originator of Subscribe request 
+- SDL: Response to the request of xApp, and notify the subscribed information to xApp. 
+Pre-conditions - SDL API services have been registered by API enablement. 
+- xApp has successfully registered as a client to the SDL before. 
+Begins when xApp determines to subscribe for notifications related to information changes in the SDL in the 
+Near-RT-RIC platform. 
+Step 1 (M) xApp sends the request to SDL to subscribe for notifications related to information changes. 
+Step 2 (M) SDL responds to the xApp subscription. 
+Step 3 
+[Informative] SDL subscribes related information from database (internal implementation). 
+Step 4 (M) SDL sends the notification for the subscribed information changes to the xApp. The xApp can 
+further send a request to SDL to fetch the updated information. 
+ 4 
+ 5 
+ 6 
+Figure 9.4.4-1:  Subscribe/Notify procedure 7 
+ 8 
+9.4.5 Store Data procedure 9 
+The Store Data procedure in the Near-RT RIC ensures that the xApp can request SDL to insert data to the database. 10 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification 
+Goal XApp requests to store data in the SDL. 
+Actors and Roles - xApp: Originator of Store Data request 
+- SDL: Response to the request of xApp 
+Pre-conditions 
+- SDL API services have been registered by API enablement. 
+- xApp has successfully registered as a client to the SDL before. 
+- xApp has been authorized to write the data in the database. 
+Begins when xApp determines to store relevant data to the database in the Near-RT-RIC platform. 
+Step 1 (M) xApp sends a request to SDL to store related information and try to insert data to database. 
+Step 2 
+[Informative] SDL stores xApp requested information in database (internal implementation). 
+Step 3 (M) SDL responds to the xApp, including success and failure operation. 
+ 1 
+ 2 
+ 3 
+Figure 9.4.5-1: Store Data procedure 4 
+9.4.6 Modify Data procedure 5 
+The Modify Data procedure in the Near-RT RIC allows the xApp to request SDL to update or delete data from database. 6 
+Use Case Stage Evolution / Specification 
+Goal XApp intends to modify or delete data stored by the SDL. 
+Actors and Roles - xApp: Originator of Modify Data request 
+- SDL: Response to the request of xApp 
+Pre-conditions 
+- SDL API services have been registered by API enablement. 
+- xApp has successfully registered as a client to the SDL before. 
+- xApp has been authorized to write the data in the database. 
+Begins when xApp determines to modify relevant data stored by the database in the Near-RT-RIC platform. 
+Step 1 (M) xApp sends a request to SDL to modify related information, including update and delete data in 
+database. 
+Step 2 
+[Informative] SDL modifies or deletes xApp requested information in database (internal implementation). 
+Step 3 (M) SDL responds to the xApp, including success and failure operation. 
+ 7 
+ 8 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.4.6-1: Modify Data procedure 2 
+ 3 
+9.5 API Enablement Procedures  4 
+9.5.1 Near-RT RIC API Discovery procedure 5 
+This procedure enables the xApp(s) to discover the Near-RT RIC APIs which are offered by the Near-RT RIC platform.  6 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To allow the xApp to discover which APIs are provided by the Near -RT RIC 
+platform and how to access them.   
+Actors and Roles 
+- xApp: Requester of the available Near-RT RIC APIs in RIC platform and 
+potential Near-RT RIC API consumer. 
+- API enablement: providing the Near -RT RIC API information to the 
+xApps. 
+ 
+Assumptions For initiating the discovery, the xApp has registered to RIC platform and is 
+aware of the Enablement API info.   
+Pre conditions 
+- The xApp is deployed to RIC platform. 
+- The Enablement API info has been provided to the xApp (as pre-
+configuration by SMO or by other means. 
+ 
+Begins when xApps wants to discover the APIs which are provided by the RIC platform 
+(via API enablement).  
+Step 1 (M) 
+xApp sends a Near-RT RIC API discovery request to the API enablement. It 
+includes the xApp identity and includes query information. Query information 
+may include criteria for discovering matching APIs (e.g. API type, Serving 
+Area Information, interfaces, protocols) 
+ 
+Step 2 
+[Informative] 
+API enablementverifies the identity of the xApp. API enablement retrieves 
+the stored Near-RT RIC API(s) information, as per the query information in 
+the discovery request. Also, the API enablement applies the discovery policy 
+and performs filtering of the retrieved near-RT RIC APIs information.  
+ 
+Step 3 (M) 
+The API enablement function sends a near-RT RIC API discovery response 
+to the xApp with the information about the APIs for which the xApp has the 
+required authorization. 
+ 
+ 7 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+ 1 
+Figure 9.4.1-1: Near-RT RIC API Discovery procedure  2 
+ 3 
+9.5.2 Procedures related to API Event Subscription and Notification 4 
+In this section, the procedures for subscription / subscription deletion and API event notification are provided. These 5 
+procedures allow the xApps to receive information on events.  6 
+Such events correspond to near-RT RIC API related events like the following: 7 
+Events Events Description 
+Availability of near-RT RIC APIs Availability events of near-RT RIC APIs (e.g. 
+active, inactive) 
+Near-RT RIC API updated Events related to change in near-RT RIC API 
+information 
+ 8 
+9.5.2.1 Procedure for Event Subscription 9 
+The purpose of this procedure is to enable xApps to subscribe to monitor events related to the provided near -RT RIC 10 
+APIs. 11 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To allow the xApp to subscribe to receive Near -RT RIC API related event 
+notifications.   
+Actors and Roles 
+- xApp: Requester to subscribe to API enablement to monitor events 
+related to the near-RT RIC APIs 
+- API enablement: Providing the subscription to Near-RT RIC API events  
+ 
+Assumptions 
+- For initiating the subscription, the xApp has registered to RIC platform 
+and is aware of the Enablement API info. Also, xApp has discovered the 
+provided Near-RT RIC APIs. 
+ 
+Pre-conditions 
+- The xApp is registered to RIC platform. 
+- The Enablement API information has been provided to the xApp (as pre-
+configuration by SMO. 
+- The xApp has discovered the registered near-RT RIC APIs (9.5.1) 
+ 
+Begins when xApp has discovered the near-RT RIC APIs as provided by the RIC platform 
+and wants to subscribe for event notifications.   
+Step 1 (M) 
+xApp sends an event subscription request to the API enablement in order to 
+receive notification of events. This request i ncludes the subscribing xApp 
+identifier as well as the event criteria. 
+- Event criteria may include event type information, e.g. API failure event, 
+new API available event, API unavailable event, API version change 
+event, API location change event, etc. 
+ 
+Step 2  
+[Informative] 
+The API enablement checks whether the xApp is authorized to monitor the 
+requested event(s)  
+Step 3 (M) The API enablement stores the approved subscription information.  
+Step 4 (M) 
+The API enablement sends an API event subscription response to the xApp. 
+This response indicates the success or failure of the event subscription 
+operation. 
+ 
+ 1 
+ 2 
+Figure 9.4.2.1-1: Subscription for API-related events  3 
+ 4 
+9.5.2.2 Procedure for Event Subscription Delete 5 
+The purpose of this procedure is to enable xApps to un-subscribe from events monitoring related to the provided near-RT 6 
+RIC APIs. 7 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To allow the xApp to un -subscribe from Near -RT RIC API related event 
+notifications.   
+Actors and Roles 
+- xApp: Requester to un -subscribe to API enablement from monitoring 
+events related to the near-RT RIC APIs 
+- API enablement: Removing the subscription of xApp to Near -RT RIC 
+API events  
+ 
+Assumptions 
+For initiating the subscription delete, the xApp has registered to RIC platform 
+and is aware of the Enablement API info. Also, xApp has subscribed to 
+events. 
+ 
+Pre-conditions The xApp has subscribed to near-RT RIC API related events (9.5.2.1)   
+Begins when xApp wants to un-subscribe for near-RT RIC API related events.   
+Step 1 (M) 
+xApp sends an event subscription delete request to the API enablement with 
+the information of the subscribed event and includes the xApp identifier and 
+the event subscription identifier 
+ 
+ 
+Step 2  
+[Informative] 
+The API enablement, u pon receiving the event subscription delete request 
+from the xApp, checks for the event subscription corresponding to the xApp 
+and further checks if the subscribing entity is authorized to un-subscribe.  
+ 
+Step 3 (M) API enablement deletes the subscription information for the xApp.  
+Step 3 (M) 
+The API enablement sends an API event un -subscription response to the 
+xApp. This response indicates the success or failure of the event un-
+subscription operation. 
+ 
+ 1 
+ 2 
+Figure 9.5.2.2-1: Subscription Delete for API-related events 3 
+ 4 
+9.5.2.3 Procedure for Event Notification 5 
+This procedure shows sending the event notification to the subscribed xApp, based on a trigger event captured at the API 6 
+enablement.  7 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+To notify the xApp on events related to the Near -RT RIC APIs, based on 
+subscription.  
+ 
+ 
+Actors and Roles 
+- xApp: Receiving event notifications based on subscription 
+- API enablement: Generating/ triggering event notifications and sending 
+them to the subscribed xApps 
+ 
+Assumptions For receiving a notification, the xApp has registered to RIC platform and has 
+subscribed to events.  
+Pre-conditions The xApp has subscribed to near-RT RIC API related events (9.5.2.1)   
+Begins when A trigger event criterion is met at the API Enablement. Such criterion has 
+been configured during subscription of the xApp.  
+Step 1 (M) 
+API enablement generates an event related to APIs, which is to be consumed 
+by the subscribed xApp(s). For the generated event, the API enablement 
+retrieves the list of corresponding event subscriptions. 
+ 
+Step 2 (M) The API enablement sends event notifications to all the subscribing xApp (s) 
+that have subscribed for the event matching the criteria.  
+Step 3 (O) 
+The xApp may send an event notification acknowledgement to API 
+enablement. It depends on the capabilities of the transport used for 
+notifications whether or not such acknowledgement can be sent. 
+ 
+ 1 
+ 2 
+Figure 9.5.2.3-1: API Event Notification 3 
+
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Annex ZZZ: O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity 4 
+that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under c ommon control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 11 
+software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not 15 
+add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such 20 
+Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a 21 
+third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not 22 
+included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not 23 
+commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date 24 
+any Final Specification was published by the O -RAN Alliance or the date the patent claim first came into existence, 25 
+whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation 26 
+without infringing that claim. For the avoidance of doubt in exceptiona l cases where a Final Specification can only be 27 
+implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered 28 
+Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing 32 
+Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O -RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non -sublicensable, worldwide copyright license to obtain, use and modify O -RAN 36 
+Specifications, but not to further distribute such O -RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an O-RAN 38 
+Specification. 39 
+2.2 Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in a separate written 40 
+agreement with O-RAN Alliance. 41 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Section 3: FRAND LICENSE 1 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 2 
+Patent License Agreement to each Adopter under Fair Reasonable And Non - Discriminatory (FRAND) terms and 3 
+conditions with or without compensation (royalties) a nonexclusive, non- transferable, irrevoca ble (but subject to 4 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 5 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such  6 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that 7 
+is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant 8 
+to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 9 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 10 
+customers of such licensed Compliant Implementations. 11 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 13 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 14 
+its Affiliates for its license of Necessary Claims to its licensees. 15 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement 16 
+to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non-17 
+Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a none xclusive, non -18 
+transferable, irrevocable (but subject to Defensive Suspension), non- sublicensable, worldwide patent license under their 19 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant 20 
+Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a 21 
+Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, 22 
+Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as 23 
+set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the 24 
+Members’, Contributors’, Academic C ontributors’, Adopters’ and their Affiliates’ distributors and the use by the 25 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant 26 
+Implementations. 27 
+Section 4: TERM AND TERMINATION 28 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 30 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) 31 
+days after being given notice specifying the breach. 32 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 33 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the 34 
+date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the version 35 
+that was current as of the date of termination. 36 
+Section 5: CONFIDENTIALITY 37 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 38 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. 39 
+Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not ap ply to any 41 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) 42 
+publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by 43 
+O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on 44 
+such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 45 
+governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O -RAN 46 
+Alliance, and cooperates with O -RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to 47 
+have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval. 48 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Section 6: INDEMNIFICATION 1 
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or Academic 2 
+Contributors, and their employees, and  agents and their respective successors, heirs and assigns (the “Indemnitees”), 3 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed 4 
+upon any of the Indemnitees in connection with any cl aims, suits, investigations, actions, demands or judgments arising 5 
+out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with 6 
+O-RAN Specifications. 7 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 8 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 9 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY 10 
+OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 11 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON- PERFORMANCE UNDER THIS AGREEMENT, 12 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 13 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 14 
+SPECIFICATIONS ARE PROVID ED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 15 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIANCE AND THE 16 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 17 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 18 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY WARRANTY OR 19 
+CONDITION FOR O-RAN SPECIFICATIONS. 20 
+Section 8: ASSIGNMENT 21 
+Adopter may not assign the Agreement or any of its rights or obligations under thi s Agreement or make any grants or 22 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 23 
+written consent of the O -RAN Alliance, which consent may be withheld in O -RAN Alliance’s sole discreti on. O-RAN 24 
+Alliance may freely assign this Agreement. 25 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 26 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 27 
+Contributors and Academic Contributors) are entit led to rights as a third -party beneficiary under this Agreement, 28 
+including as licensees under Section 3. 29 
+Section 10: BINDING ON AFFILIATES 30 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity ’s or 31 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 32 
+and are also entitled to the benefits of the rights of Adopter hereunder. 33 
+Section 11: GENERAL 34 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  35 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 36 
+supersedes and replaces any prior or contemporaneous agreements  between the parties, whether written or oral, relating 37 
+to the subject matter of this Agreement.  38 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulation s 39 
+with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and 40 
+antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any 41 
+communication that would violate the antitrust laws. 42 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 43 
+or O -RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 44 
+
+                                   
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. All Rights Reserved. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.  
+     O-RAN.WG3.RICARCH-v02.00 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 1 
+Contributors or Academic Contributors. 2 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null,  void 3 
+or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from 4 
+the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full 5 
+force and effect. 6 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 7 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be 8 
+construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or 9 
+rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 10 
+force and effect.  11 

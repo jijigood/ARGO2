@@ -1,0 +1,1267 @@
+ 
+                              O-RAN.WG6.O2DMS-INTERFACE-K8S-
+PROFILE-v02.00 
+Technical Specification  
+ 
+ 
+O-RAN Working Group 6 
+O2dms Interface Specification: Kubernetes Native API Profile 
+for Containerized NFs 
+  
+  
+ 
+1 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+The copying or incorporation into any other work of part or all of the material available in this specification in any form w ithout the prior 
+written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification 
+for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O -RAN ALLIANCE as the source of the material and that you inform the third party that these conditions 
+apply to them and that they must comply with them. 
+ 
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238, VAT ID DE321720189 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+Contents 1 
+Contents .............................................................................................................................................................. 2 2 
+Chapter 1. Introduction ............................................................................................................................... 3 3 
+1.1 Scope ................................................................................................................................................................. 3 4 
+1.2 References.......................................................................................................................................................... 3 5 
+1.3 Definitions and Abbreviations ........................................................................................................................... 3 6 
+1.3.1 Definitions .................................................................................................................................................... 3 7 
+1.3.2 Abbreviations ............................................................................................................................................... 3 8 
+Chapter 2. O2dms Service Overview ......................................................................................................... 5 9 
+2.1 Overview ........................................................................................................................................................... 5 10 
+2.2 Supported Use Cases ......................................................................................................................................... 5 11 
+Chapter 3. O2dms Service Definitions ....................................................................................................... 6 12 
+3.1 General ............................................................................................................................................................... 6 13 
+3.1.1 The O2dms Services Supported ................................................................................................................... 6 14 
+3.1.2 O2dms capabilities to support instantiation use case ................................................................................... 6 15 
+3.1.3 O2dms capabilities to support termination use case ..................................................................................... 9 16 
+Chapter 4. O2dms Service Definitions for Kubernetes ............................................................................ 13 17 
+4.1 General ............................................................................................................................................................. 13 18 
+4.2 Referenced Cloud-Native APIs and Data Model Solutions ............................................................................. 13 19 
+4.2.1 Kubernetes API overview .......................................................................................................................... 13 20 
+4.3 Referenced K8s resource objects ..................................................................................................................... 14 21 
+4.3.1 Kubernetes Native Namespace Scoped Resource Objects ......................................................................... 15 22 
+4.3.2 Kubernetes Native Cluster Scoped Resource Objects ................................................................................ 28 23 
+ 24 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+Chapter 1. Introduction 1 
+1.1 Scope 2 
+This Technical Specification has been produced by the O-RAN.org. 3 
+The contents of the present document are subject to continuing work within O -RAN WG6 and may change following 4 
+formal O-RAN approval. Should the O -RAN.org modify the contents of the present document, it will be re -released by 5 
+O-RAN Alliance with an identifying change of release date and an increase in version number as follows: 6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e., technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document. 11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+This document defines O -RAN O -Cloud DMS interface functions an d protocols for the O -RAN O2 interface. The 14 
+document studies the functions conveyed over the interface, including management functions, procedures, operations, 15 
+and corresponding solutions, and identifies existing standards and industry work that can serve as a basis for O -RAN 16 
+work. 17 
+1.2 References 18 
+The following documents contain provisions which, through reference in this text, constitute provisions of this 19 
+specification (see also https://www.o-ran.org/specifications). 20 
+[1] 3GPP TR 21.905, Vocabulary for 3GPP Specifications 21 
+[2] O-RAN WG6, Orchestration Use Case and Requirements for O-RAN Virtualized RAN 22 
+[3] O-RAN WG6, Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN 23 
+[4] O-RAN WG6, O-RAN O2 General Aspects and Principles Specification 24 
+[5] Kubernetes® API, online https://kubernetes.io/docs/reference/kubernetes-api/  25 
+[6] Kubernetes® API Conventions, online https://git.k8s.io/community/contributors/devel/sig-architecture/api-26 
+conventions.md 27 
+NOTE: Kubernetes® and K8s® are registered trademarks of the Linux Foundation, in the United States and 28 
+other countries. O-RAN is not affiliated with, endorsed, or sponsored by the Linux Foundation. 29 
+1.3 Definitions and Abbreviations 30 
+1.3.1 Definitions 31 
+ 32 
+1.3.2 Abbreviations 33 
+For the purposes of the present document, the abbreviations given in 3GPP TR  21.905 [1] and the following apply. An 34 
+abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 35 
+3GPP TR 21.905 [1]. 36 
+DMS Deployment Management Services 37 
+API Application Programming Interface 38 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ SMO Service Management and Orchestration 39 
+NFO Network Function Orchestration 40 
+[1] 41 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+Chapter 2. O2dms Service Overview 42 
+2.1 Overview 43 
+This document deals with the containerized workload lifecycle management services offered over the O2dms interface 44 
+using the O2dms profile for Kubernetes. The relationship with O2ims services is also described whenever applicable 45 
+(e.g., provisioning of Kubernetes labels in the O-Cloud Kubernetes cluster by SMO to be able to match them against the 46 
+O-RAN CNF deployment requirements).  47 
+This profile exposes the full set of capabilities of Kubernetes native “API Server” function to the SMO and enables the 48 
+reuse of Kubernetes native API procedures and data mod el (Kubernetes resource manifest s). As depicted in  Figure 2.1-49 
+1, the O2dms profile for Kubernetes exposes one O2dms interface instance per one Kubernetes cluster to the SMO and 50 
+the interface is terminated by the API Server component of Kubernetes native co ntrol plane. The address  and access 51 
+credentials required for communication with the Kubernetes  API Server component are assumed to be available to the 52 
+SMO (for example via O2-IMS, from the Kubernetes cluster instantiation time). 53 
+ 54 
+Figure 2.1-1 55 
+2.2 Supported Use Cases 56 
+The list of orchestration use-cases captured in [2] needs to be supported using O2dms capabilities for containerized 57 
+workloads (NFs and other workloads). This version of the O2dms profile for Kubernetes supports the following use 58 
+cases aligned with [2] based on Kubernetes native APIs and resource objects.  59 
+• Instantiation of containerized workloads on Kubernetes cluster: This O2dms capability enables the SMO to 60 
+instantiate a containerized workload on a target Kubernetes cluster using the Kubernetes native  resource 61 
+manifests (Deployments, StatefulSets, ConfigMaps, etc.). The complete set of Kubernetes native resource 62 
+objects may be used for workload instantiation including network, compute, storage, and configuration related 63 
+objects. 64 
+• Termination of containerized workloads on Kubernetes cluster: This O2dms capability enables the SMO to 65 
+terminate a containerized workload on a target Kubernetes cluster by deleting all the Kubernetes native 66 
+resource manifests related to that workload from the target Kubernetes c luster. 67 
+Note: Support for other workload LCM use cases is FFS. 68 
+
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+Chapter 3. O2dms Service Definitions 69 
+3.1 General 70 
+This section provides details of the O2dms interface capabilities for containerized workload management exposed to the 71 
+SMO using the O2dms Kubernetes profile. The O2dms Kubernetes profile exposes a REST based interface to the SMO 72 
+from the API Server function of Kubernetes native control plane. The protocol stack used by O2dms Kubernetes  profile 73 
+for secure communication between the SMO and the target Kubernetes c luster is depicted in Figure 3.1-1. This protocol 74 
+stack enables a secure transfer of the Kubernetes native API objects from the SMO to the target Kubernetes cluster.  75 
+ 76 
+Figure 3.1-1: Illustration of the protocol stack used by O2dms Kubernetes profile 77 
+3.1.1 The O2dms Services Supported 78 
+In this specification, the Kubernetes native APIs provide all the required capabilities to the SMO for containerized 79 
+workload lifecycle management in a Kubernetes cluster. The Kubernetes native APIs are exposed by the API Server 80 
+function of the Kubernetes native control plane and is the common denominator for the SMO to manage containerized 81 
+workloads on Kubernetes based O-Clouds.  82 
+The Kubernetes API Sever exposes a REST based interface, offering CRUD (Create, Read, Update, Delete) operations 83 
+using Kubernetes native resource manifests. Aligned with this REST interface, the ORAN WG6 use cases captured in  84 
+[1] for lifecycle management of containerized workload are realized by using the API Server’s supported operations 85 
+(CRUD) and data model (Kubernetes native resource manifests). 86 
+3.1.2 O2dms capabilities to support instantiation use case 87 
+The instantiation use case requires the SMO to start the execution of a containerized workload on a Kubernetes cluster 88 
+that meets the execution requirements of that workload. In this O2dms profile, the instantiation use case is realized by 89 
+secured transfer of the Kubernetes native resource objects from the SMO to the API Server function in the target 90 
+Kubernetes cluster. A containerized network function usually consists of several Kubernetes resource object manifests 91 
+for different types of resources and a secured transfer of all these manifests is required for successful compeletion of the 92 
+instantiation use case.  93 
+Figure 3.1.2-1 exemplifies the instantiation flow in O2dms Kubernetes profile aligned with the NF instantiation use 94 
+case in [1]. 95 
+@startuml 96 
+Autonumber 97 
+skinparam sequenceArrowThickness 1 98 
+skinparam ParticipantPadding 5 99 
+skinparam BoxPadding 10 100 
+participant User 101 
+Box "SMO" #gold 102 
+   Participant NFO as NFO 103 
+end box 104 
+Box "Kubernetes® based O-Cloud" #lightseagreen 105 
+   participant apiserver as "K8s® API Server" 106 
+
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+    participant worker as "K8s® worker" 107 
+End box 108 
+Note over NFO, apiserver 109 
+  PRECONDITIONS: 110 
+  SMO is active and running normally  111 
+  K8s® cluster is active and running normally 112 
+  SMO and K8s® API Server connectivity is established 113 
+End Note 114 
+== Use case: Instantiate containerized workload on K8s® cluster == 115 
+User -> NFO : Instantiate CNF (Id) 116 
+Note over NFO 117 
+  SMO gets the deployment artifacts for  118 
+  containerized workload (e.g., ASD, Helm Charts) 119 
+  from a repository 120 
+end Note 121 
+Note over NFO 122 
+  If unspecified, the SMO performs homing to select 123 
+  a suitable K8s® cluster and adds information in  124 
+  the inventory for the workload being deployed 125 
+end Note 126 
+Note over NFO 127 
+  SMO generates parameterized K8s® manifests 128 
+  for the containerized workload 129 
+end Note 130 
+loop Until all K8S resource manifests are sent to K8s® cluster 131 
+NFO -> apiserver : **[O2dms]** <<HTTP POST>> Create K8s® resource object 132 
+apiserver -> apiserver: Create K8s® resource 133 
+apiserver -> NFO : **[O2dms]** <<HTTP 201>> CREATED 134 
+end 135 
+Note over apiserver 136 
+  K8s® API Server notifies the worker 137 
+  node(s) to start workload execution 138 
+end note 139 
+Note over worker 140 
+    K8s® worker fetches the container 141 
+    images and starts their execution 142 
+end note 143 
+note over NFO 144 
+  SMO acquires the workload instantiation status 145 
+  via O2dms 146 
+end note 147 
+NFO --> User : Outcome notification 148 
+== End Instantiate containerized workload on K8s® Cluster == 149 
+@enduml 150 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+ 151 
+Figure 3.1.2-1: Instantiation 152 
+ 153 
+ 154 
+ 155 
+ 156 
+ 157 
+ 158 
+ 159 
+ 160 
+
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Table 3.1.2-1: Instantiation Use Case 161 
+Use Case Stage Evolution/Specification 
+Use Case  Instantiation of containerized workload on a selected Kubernetes cluster 
+Goal The goal of this use case is to instantiate a containerized workload on a Kubernetes cluster 
+that has the required resources to host the workload 
+Actors and roles - SMO: The SMO initiates the instantiation process  
+- Kubernetes API Server: O2dms termination point in Kubernetes cluster 
+Preconditions - SMO is active and running normally 
+- Selected Kubernetes cluster is running normally  
+- Kubernetes API server is accessible via O2dms interface 
+Begins when The SMO decides to instantiate a containerized workload on a Kubernetes cluster 
+Step 1 (M) A request to instantiate a new containerized workload is received by the SMO with an 
+identifier for that workload. 
+- Note: The identifier provided is used by the SMO to get related artifacts for that 
+workload. Examples of such artifacts includes workload descriptors (e.g., ASD and 
+HelmCharts). 
+- Note: If the cluster is not user selected, the SMO performs homing by matching the 
+requirements of the containerized workload with the resources available on the 
+Kubernetes cluster. The SMO adds information about the workload being deployed 
+in the SMO inventory. 
+- Note: The SMO generates parameterized Kubernetes native resource manifests 
+from the workload artifacts using SMO internal workload deployment toolchain 
+(e.g., Helm Client). 
+Step 2 (M) The SMO sends the Kubernetes native resource manifests to the API Server function in the 
+chosen Kubernetes cluster using O2dms interface by making an HTTP POST call to the 
+respective resource URL with the Kubernetes resource manifest as payload. 
+Step 3 (M) The API Server function authenticates the request and validates the resource manifest s and 
+creates the respective resource objects in Kubernetes cluster 
+- Note: The creation of a Kubernetes resource object results in an internal 
+notification to the worker nodes that the deployed containerized workload needs to 
+be instantiated 
+- Note: A worker node responsible for the workload execution fetches the container 
+images from the image registery specified in the resource manifests files and starts 
+it execution by provisioning the required number of resources. 
+Step 4 (M) The API Server responds to the SMO by acknowledging the creation of the requested 
+resource objects in the Kubernetes cluster. 
+- Note: There may be a delay between the Success response from the API Server to 
+the SMO and the actual execution of the containerized workload on the Kubernetes 
+cluster due to several reasons including, for example, the time it takes to pull the 
+container images from the registry, the allocation of the resources to the container 
+and the initialization of the application inside the containers. The successful 
+workload instantiation notification over O2dms may not represent an active 
+workload state at the service level. Depending on the workload type (e.g., NF, 
+xAPP, rAPP), the SMO may be required, after the O2dms success notification, to 
+configure the deployed workload (e.g., via O1 interface) to make it available at the 
+service level. 
+Step 5 (O) The SMO notifies the user about the outcome of workload instantiation request  
+Ends when This use case ends when the containerized workload is up and running in the chosen 
+Kubernetes cluster. 
+ 162 
+3.1.3 O2dms capabilities to support termination use case  163 
+The termination use case requires the SMO to stop the execution of a containerized workload on a Kubernetes cluster 164 
+and release all resources that are being used by that workload. In this O2dms profile, the termination use case is realized 165 
+by deleting the Kubernetes native resource objects from the Kubernetes cluster that is running the workload. Figure 166 
+3.1.3-1 exemplifies the termination use case flow in O2dms Kubernetes profile aligned with the NF termination use 167 
+case in [1]. 168 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ @startuml 169 
+Autonumber 170 
+skinparam sequenceArrowThickness 1 171 
+skinparam ParticipantPadding 5 172 
+skinparam BoxPadding 10 173 
+participant User 174 
+Box "SMO" #gold 175 
+   Participant NFO as NFO 176 
+end box 177 
+Box "Kubernetes® based O-Cloud" #lightseagreen 178 
+   participant apiserver as "K8s® API Server" 179 
+   participant worker as "K8s® worker" 180 
+End box 181 
+Note over NFO, apiserver 182 
+  PRECONDITIONS: 183 
+  SMO is active and running normally  184 
+  K8s® cluster is active and running normally 185 
+  SMO and K8s® API Server connectivity is established 186 
+End Note 187 
+== Use Case: Terminate containerized workload on K8s® cluster == 188 
+User -> NFO : Terminate CNF (ID) 189 
+Note over NFO  190 
+  The SMO determines the K8s® cluster 191 
+  running the containerized workload 192 
+  The SMO determines the K8s® resources 193 
+  installed in the cluster for that workload 194 
+end note 195 
+loop Until all K8s® resources are deleted from the cluster 196 
+NFO -> apiserver : **[O2dms]** <<HTTP DELETE>> Delete K8s® resource object 197 
+apiserver -> apiserver: Delete K8s® resource 198 
+apiserver -> NFO : **[O2dms]** <<HTTP 200>> OK 199 
+end 200 
+Note over apiserver 201 
+  K8s® API Server notifies the worker 202 
+  node(s) to terminate workload execution 203 
+end note 204 
+Note over worker 205 
+    K8s® worker stops the container  206 
+    process and releases the resources 207 
+end note 208 
+note over NFO 209 
+  SMO acquires the workload termination status 210 
+  via O2dms 211 
+end note 212 
+NFO --> User : Outcome notification 213 
+== End Terminate containerized workload on K8s® cluster == 214 
+@enduml 215 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+ 216 
+Figure 3.1.3-1: Termination 217 
+ 218 
+ 219 
+ 220 
+ 221 
+ 222 
+ 223 
+ 224 
+ 225 
+ 226 
+ 227 
+ 228 
+ 229 
+
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Table 3.1.3-1: Termination Use Case 230 
+Use Case Stage Evolution/Specification 
+Use Case Termination of containerized workload on a selected Kubernetes cluster 
+Goal The goal of this use case is to terminate a containerized workload on a Kubernetes cluster that is 
+hosting it and release all resources used by that workload 
+Actors and roles - SMO: The SMO initiates the deletion process  
+- Kubernetes API Server: O2dms termination point in Kubernetes cluster 
+Preconditions - SMO is active and running normally 
+- Selected Kubernetes cluster is running normally  
+- Kubernetes API server is accessible via O2dms interface 
+Begins when The SMO decides to terminate a containerized workload on a Kubernetes cluster 
+Step 1 (M) A request to terminate a new containerized workload is received by the SMO with an identifier 
+for that workload. 
+- Note: The SMO may use the provided workload identifier for determining the 
+Kubernetes cluster running that workload or may have this information available to it a 
+priori (e.g., from inventory) 
+- Note: The SMO determines all the Kubernetes resources manifests that collectively 
+represent the containerized workload in the target Kubernetes cluster 
+Step 2 (M) The SMO requests the deletion of all Kubernetes resource objects representing the 
+containerized workload from the API Server function in the target Kubernetes cl uster by 
+sending HTTP DELETE request(s) to the respective resource URL.  
+Step 3 (M) The API Server function authenticates the request and deletes the requested resource objects 
+from the Kubernetes cluster 
+- Note: The deletion of a Kubernetes resource object results in an internal notification to 
+the worker nodes to release any resources held by that workload. 
+- Note: The Kubernetes worker nodes stop the execution of workloads automatically for 
+which the resource objects no longer exist in the Kubernetes cluster and release the 
+resources. 
+Step 4 (M) The API Server responds to the SMO by informing it about the resource objects that have been 
+deleted from Kubernetes cluster. 
+- Note: There may be a delay between the Success response from the API Server to the 
+SMO and the actual termination of workload and release of resources in the 
+Kubernetes cluster. The SMO may query the status of the terminated workload via 
+O2dms before notifying the SMO user of operation outcome. 
+Step 5 (O) The SMO notifies the user about the outcome of workload termination request  
+Ends when This use case ends when a containerized workload running in the chosen Kubernetes cluster is 
+terminated and all resources used by that workload are released. 
+ 231 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+Chapter 4. O2dms Service Definitions for Kubernetes 232 
+4.1 General  233 
+The O2dms profile for Kubernetes is based on the usage of Kubernetes native APIs and data model as O2dms interface. 234 
+Kubernetes offers a native REST based, secured interface with a large set of cluster-scoped and namespace-scoped 235 
+resource objects as data model. This chapter provides the details of these K8s native APIs and data model.  236 
+4.2 Referenced Cloud-Native APIs and Data Model Solutions 237 
+4.2.1 Kubernetes API overview 238 
+At high-level, the Kubernetes API [4] structure has a grouping of the managed K8s resource objects which represent 239 
+K8s resource categories. The generic concepts are introduced regarding the data model  of the managed K8s resource 240 
+objects in Kubernetes. 241 
+4.2.1.1 API Structure 242 
+The Kubernetes API [4] managed objects represent a concrete instance of a K8s resource type on the Kubernetes 243 
+cluster. Kubernetes leverages standard RESTful terminology to describe the API concepts:  244 
+• A K8s resource is a single instance of a K8s resource type (Note: Throughout this document, to distinguish a 245 
+"resource" in context of Kubernetes from the "resources" used in a different O -RAN context, this will now be 246 
+called a "K8s resource") 247 
+• A K8s resource type is the name used in the URL 248 
+• All K8s resource types have a representation in JSON (their object schema) which is called a kind  249 
+• A list of instances of a K8s resource type is known as a collection 250 
+All K8s resource types are either scoped by the Kubernetes cluster (e.g., /apis/GROUP/VERSION/*) or to a namespace 251 
+(e.g., /apis/GROUP/VERSION/namespaces/NAMESPACE/*). 252 
+4.2.1.1.1 API Verbs 253 
+API verbs GET, CREATE, UPDATE, PATCH, DELETE and PROXY support single K8s resources only. These verbs 254 
+with single K8s resource support have no support for submitting multiple K8s resources together in an ordered or 255 
+unordered list or transaction. API verbs LIST and WATCH support getting multiple K8s resources, and 256 
+DELETECOLLECTION supports deleting multiple K8s resources. 257 
+4.2.1.1.2 K8s resource Objects 258 
+The Kubernetes API [4] supports read and write operations on the K8s resource objects via a Kubernetes API endpoint. 259 
+Kubernetes differentiates the following categories of K8s resource objects managed via their APIs: 260 
+• Workloads: objects used to manage and run OS containers on the Kubernetes cluster. 261 
+• Discovery & Loadbalancing: objects used to inter-connect the workloads into externally accessible, load-262 
+balanced services. 263 
+• Configuration & Storage: objects used to inject initialization data into the containerized applications, and to 264 
+persist data that is external to the OS containers. 265 
+• Cluster: objects define how the Kubernetes cluster itself is configured. 266 
+• Metadata: objects used to configure the behavior of other K8s resources within the Kubernetes cluster. 267 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Note: There are some Kubernetes resource objects (e.g., ClusterRoles, CustomResourceDefinitions, StorageClasses 268 
+etc.) which the SMO may manage separately from the containerized workload resource management. These are FFS. 269 
+4.2.1.2 Data model concepts 270 
+The K8s resource objects are modelled with individual object schemas. All K8s resource objects typically have 3 271 
+components: 272 
+• K8s resource ObjectMeta: The metadata about the K8s resource object, such as its name, type, api version, 273 
+annotations, and labels. This schema, which is common to all K8s resource types, contains fields that maybe 274 
+updated both by the SMO and the Kuberneters cluster’s internal control plane. 275 
+• K8s resourceSpec: It is defined by the SMO and describes the desired state of system concerning the K8s 276 
+resource object. Specified when creating or modifying a K8s resource object is requested. 277 
+• K8s resourceStatus: Provided by the Kubernetes cluster’s internal control plane and represents the current 278 
+state of the system concerning the K8s resource object. 279 
+4.2.1.3 O2dms Procedures 280 
+The following are the list of Kubernetes procedures supported by the O2 dms: 281 
+• CREATE: The CREATE procedure enables the SMO to instantiate a workload on the target Kubernetes 282 
+cluster. This procedure requires a namespace and a specified K8s resource type. 283 
+• READ: 284 
+o GET: The GET procedure enables the SMO to retrieve and read a specified workload from a target 285 
+Kubernetes cluster. This procedure requires a namespace, a specified K8s resource type, and the name 286 
+of the K8s resource. 287 
+o LIST: The LIST procedure enables the SMO to list or watch a specified workload type from a target 288 
+Kubernetes cluster. This procedure requires a namespace and a specified K8s resource type. 289 
+• UPDATE: 290 
+o PATCH: The PATCH procedure enables the SMO to partially update a workload in a Kubernetes 291 
+cluster. This procedure requires a namespace, a specified K8s resource type, and the name of the K8s 292 
+resource. 293 
+o REPLACE: The REPLACE procedure enables the SMO to replace a workload in a target Kubernetes 294 
+cluster. This procedure requires a namespace, a specified K8s resource type, the name of the K8s 295 
+resource. 296 
+• DELETE: The DELETE procedure enables the SMO to terminate a workload (s) in a target Kubernetes 297 
+cluster. This procedure requires a namespace, a specified K8s resource type, and the name of the K8s resource. 298 
+4.3 Referenced K8s resource objects 299 
+The Kubernetes APIs and resource objects are fully specified by the open -source Kubernetes project and this document 300 
+adopts those definitions, APIs, and resource objects [5]. For the purposes of this document, the terms and definitions for 301 
+Kubernetes API resource objects given in [5] would apply. This section provides details of relevant K8s APIs and 302 
+resource objects along with recommended use and constraints, if any. 303 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 
+4.3.1 Kubernetes Native Namespace Scoped Resource Objects 304 
+4.3.1.1 Kubernetes native workload resources 305 
+4.3.1.1.1 Pod 306 
+A Pod is the smallest and most basic deployable unit of functionality in a K8s cluster. A Pod resource represents a 307 
+single instance of one or multiple containers that are scheduled and run on a single worker node in a K8s cluster. The 308 
+containers in a Pod are managed as a single unit and share the Pod’s networking and storage resources. 309 
+Table 4.3.1.1.1-1 provides details of the standard K8s Pod resource specification.  310 
+Table 4.3.1.1.1-1: Pod resource specification [5]  311 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the Pod resource.  
+kind string Represents the REST resource for Pod resource. The K8s API Server 
+may infer this from the endpoint the client submits the request to. The 
+value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Pod resource [6]. 
+spec PodSpec Specifies the desired behavior of the Pod resource. 
+status PodStatus Represents the most recent observed status of the Pod resource. 
+ 312 
+Table 4.3.1.1.1-2 provides relevant K8s Pod resource URIs and supported HTTP methods using O2dms inter face. For 313 
+the SMO to lifecycle manage a K8s Pod resource in a chosen K8s cluster using O2dms K8s profile, it shall use the 314 
+URIs, and HTTP methods listed in Table 4.3.1.1.1-2 with K8s standard query and body parameters for Pod resource 315 
+included in the HTTP request [5]. 316 
+Table 4.3.1.1.1-2: Pod resource URIs and HTTP methods supported using O2dms K8s profile 317 
+Relevant Pod Resource URIs Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/pods • POST: Create a Pod resource in the specified 
+namespace 
+• GET: List or watch Pod resources in the namespace 
+• DELETE: Delete all Pods resources from the 
+namespace 
+/api/v1/namespaces/{namespace}/pods/{name} • PUT: Replace the Pod resource in the namespace 
+• PATCH: Partial update the Pod resource in the 
+namespace 
+• DELETE: Delete the Pod resource from the namespace 
+• GET: Get status of the Pod resource in the namespace 
+/api/v1/namespaces/{namespace}/pods/{name}/eviction • POST: Terminate the running Pod instance 
+ 318 
+NOTE: A Pod resource should not be created directly via O2dms because a Pod resource created directly is not 319 
+managed by K8s control plane and it cannot repair or replace itself. A Pod resources should be created 320 
+through K8s controller resources instead (e.g., Deployment, Job, Statefulset).  321 
+4.3.1.1.2 Deployment 322 
+A K8s deployment resource is used for running one or multiple identical stateless Pods in a K8s cluster. A Deployment 323 
+resource ensures that the desired number of replicas of a Pod are running at any given time by replacing any failed or 324 
+unresponsive Pod instances. The Deployment resource object contains the Pod resource template which specifies the 325 
+details of the Pods to be created and instantiated on K8s worker node/s. Deployment resource is generally used for 326 
+running stateless applications in K8s clusters since it does not provide a unique identity to the Pods it manages.  327 
+Table 4.3.1.1.2-1 provides details of the standard K8s Deployment resource specification.  328 
+Table 4.3.1.1.2-1: Deployment resource specification [5]  329 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the Deployment resource.  
+kind string Represents the REST resource for Deployment resource. The K8s 
+API Server may infer this from the endpoint the client submits the 
+request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Deployment resource [6]. 
+spec DeploymentSpec Specifies the desired behavior of the Deployment resource. 
+status DeploymentStatus Represents the most recent observed status of the Deployment 
+resource. 
+ 330 
+Table 4.3.1.1.2-2 provides relevant K8s Deployment resource URIs and supported HTTP methods using O2dms 331 
+interface. For the SMO to lifecycle manage a K8s Deployment resource in a chosen K8s cluster using O2dms K8s 332 
+profile, it shall use the URIs, and HTTP methods listed in Table 4.3.1.1.2-2 with K8s standard query and body 333 
+parameters for Deployment resource included in the HTTP request [5]. 334 
+Table 4.3.1.1.2-2: Deployment resource URIs and HTTP methods supported using O2dms K8s profile  335 
+Relevant Deployment Resource URIs Supported HTTP Methods  
+/apis/apps/v1/namespaces/{namespace}/deployments • POST: Create a Deployment resource in the specified 
+namesapce 
+• GET: List or watch Deployment resources in the 
+namespace 
+• DELETE: Delete all Deployment resources from the 
+namespace 
+/apis/apps/v1/namespaces/{namespace}/deployments/ 
+{name} 
+• PUT: Replace the Deployment resource in the 
+namespace 
+• PATCH: Partial update the Deployment resource in the 
+namespace 
+• DELETE: Delete the Deployment resource from the 
+namespace 
+• GET: Read the Deployment resource in the namespace 
+ 336 
+NOTE: The creation of a Deployment resource in a K8s cluster also results in the creation of the K8s ReplicaSet 337 
+resource in the same cluster. The ReplicaSet resource ensures that the number of Pods running in the 338 
+cluster are equal to the number requested in the Deployment resource. A Deployment resource should be 339 
+used instead of creating the ReplicaSet resource directly. The K8s Deployment resource fully substitutes 340 
+the ReplicaSet functions and should be used in most cases. 341 
+4.3.1.1.3 StatefulSet 342 
+A K8s statefulset resource is used for running one or multiple stateful Pods that maintain unique and persistent 343 
+identities and hostnames during their lifetime. The Pods belonging to a StatefulSet resource are created from the same 344 
+Pod spec but maintain their individual identities across any rescheduling events caused by Pod failures. In addition, 345 
+statefulsets provide an ordered and graceful deployment and scaling of Pods in K8s clusters. By default, the Pod 346 
+deployment for statefulsets is done in sequential order and termination in reverse order but this behavior can be 347 
+overridden.  For state persistency, StatefulSet resources are generally paired with persistent storage volumes and this 348 
+paired relationship is maintained across Pod rescheduling events. 349 
+Table 4.3.1.1.3-1 provides details of the standard K8s StatefulSet resource specification.  350 
+Table 4.3.1.1.3-1: StatefulSet resource specification [5]  351 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the StatefulSet resource.  
+kind string Represents the REST resource for StatefulSet resource. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the StatefulSet resource [6]. 
+spec StatefulSetSpec Specifies the desired identities of the Pods in the StatefulSet 
+resource. 
+status StatefulSetStatus Represents the most recent observed status of the Pods in the 
+StatefulSet. 
+ 352 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Table 4.3.1.1.3-2 provides relevant K8s StatefulSet resource URIs and supported HTTP methods using O2dms 353 
+interface. For the SMO to lifecycle manage a K8s StatefulSet resource in a chosen K8s cluster using O2dms K8s 354 
+profile, it shall use the URIs, and HTTP methods listed in Table 4.3.1.1.3-2 with K8s standard query and body 355 
+parameters for StatefulSet resource included in the HTTP request [5]. 356 
+Table 4.3.1.1.3-2: StatefulSet resource URIs and HTTP methods supported using O2dms K8s profile  357 
+Relevant StatefulSet Resource URIs Supported HTTP Methods  
+/apis/apps/v1/namespaces/{namespace}/statefulsets • POST: Create a StatefulSet resource in the specified 
+namespace 
+• GET: List or watch all StatefulSet resources in the 
+namespace 
+• DELETE: Delete all StatefulSet resources from the 
+namespace 
+/apis/apps/v1/namespaces/{namespace}/statefulsets/ 
+{name} 
+• PUT: Replace the StatefulSet resource in the namespace 
+• PATCH: Partial update the StatefulSet resource in the 
+namespace 
+• DELETE: Delete the StatefulSet resource from the 
+namespace 
+• GET: Read the StatefulSet resource in the namespace 
+ 358 
+4.3.1.1.4 DaemonSet 359 
+A K8s DaemonSet resource is used for running a Pod instance on all or a subset of the worker nodes in a K8s cluster. If 360 
+the cluster scales up or down i.e., worker nodes are added ore removed from the cluster, the daemo nset Pods are scaled 361 
+accordingly to ensure that one Pod per worker node requirement is met. 362 
+Table 4.3.1.1.4-1 provides details of the standard K8s DaemonSet resource specification. 363 
+Table 4.3.1.1.4-1: DaemonSet resource specification [5]  364 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the DaemonSet resource.  
+kind string Represents the REST resource for DaemonSet resource. The K8s 
+API Server may infer this from the endpoint the client submits the 
+request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the DaemonSet resource [6]. 
+spec DaemonSetSpec Specifies the desired behavior of the DaemonSet resource. 
+status DaemonSetStatus Represents the most recent observed status of the DaemonSet 
+resource. 
+ 365 
+Table 4.3.1.1.4-2 provides relevant K8s DaemonSet resource URIs and supported HTTP methods using O2dms 366 
+interface. For the SMO to lifecycle manage a K8s DeamonSet resource in a K8s cluster using O2dms K8s profile, it 367 
+shall use the URIs, and HTTP methods listed in Table 4.3.1.1.4-2 with K8s standard query and body parameters for 368 
+DeamonSet resource included in the HTTP request [5]. 369 
+Table 4.3.1.1.4-2: DaemonSet resource URIs and HTTP methods supported using O2dms K8s profile 370 
+Relevant DaemonSet Resource URIs Supported HTTP Methods  
+/apis/apps/v1/namespaces/{namespace}/daemonsets • POST: Create a DaemonSet resource in specified 
+namespace 
+• GET: List or watch all DaemonSet resources in the 
+namespace 
+• DELETE: Delete all DaemonSet resources from the 
+namespace 
+/apis/apps/v1/namespaces/{namespace}/daemonsets/ 
+{name} 
+• PUT: Replace the DaemonSet resource in the 
+namespace 
+• PATCH: Partial update the DaemonSet resource in the 
+namespace 
+• DELETE: Delete the DaemonSet resource from the 
+namespace 
+• GET: Read the DaemonSet resource in the namespace 
+ 371 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 4.3.1.1.5 Job 372 
+A K8s Job resource is used for running workloads in K8s clusters that run to completion and are terminated after 373 
+completion. A Job resource can create one or more Pods and execute them until a specified number of Jobs are 374 
+successfully terminated. A Job resource tracks successful completions of Pod executions and upon reaching the desired 375 
+number of completions, the Job is considered complete. 376 
+Table 4.3.1.1.5-1 provides details of the standard K8s Job resource specification.  377 
+Table 4.3.1.1.5-1: Job resource specification [5]  378 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the Job resource.  
+kind string Represents the REST resource for Job resource. The K8s API Server 
+may infer this from the endpoint the client submits the request to. The 
+value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Job resource [6]. 
+spec JobSpec Specifies the desired behavior of the Job resource. 
+status JobStatus Represents the most recent observed status of the Job resource. 
+ 379 
+Table 4.3.1.1.5-2 provides relevant K8s Job resource URIs and supported HTTP methods using O2dms interface. For 380 
+the SMO to lifecycle manage a Job resource in a chosen K8s cluster using O2dms K8s profile, it shall use the URIs, and 381 
+HTTP methods listed in Table 4.3.1.1.5-2 with K8s standard query and body parameters for Job resource included in 382 
+the HTTP request [5]. 383 
+Table 4.3.1.1.5-2: Job resource URIs and HTTP methods supported using O2dms K8s profile  384 
+Relevant Job Resource URIs Supported HTTP Methods  
+/apis/batch/v1/namespaces/{namespace}/jobs • POST: Create a Job resource in specified namespace 
+• GET: List or watch all Job resources in the namespace 
+• DELETE: Delete all Job resources from the namespace 
+/apis/batch/v1/namespaces/{namespace}/Jobs/ 
+{name} 
+• PUT: Replace the Job resource in the namespace 
+• PATCH: Partial update the Job resource in the namespace 
+• DELETE: Delete the Job resource from the namespace 
+• GET: Read the Job resource in the namespace 
+ 385 
+4.3.1.1.6 CronJob 386 
+A K8s CronJob resource is used for running K8s Jobs on a pre-defined time schedule provided in Linux/Unix Cron 387 
+format. The time schedule of the CronJob resource follows the timezone set for the K8s native kube -controller-manager 388 
+function. 389 
+Table 4.3.1.1.6-1 provides details of the standard K8s CronJob resource specification.   390 
+Table 4.3.1.1.6-1: CronJob resource specification [5]  391 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the CronJob resource.  
+kind string Represents the REST resource for CronJob resource. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the CronJob resource [6]. 
+spec CronJobSpec Specifies the desired behavior of the CronJob resource. 
+status CronJobStatus Represents the most recent observed status of the CronJob resource. 
+ 392 
+Table 4.3.1.1.6-2 provides relevant K8s CronJob resource URIs and supported HTTP methods using O2dms interface. 393 
+For the SMO to lifecycle manage a CronJob resource in a chosen K8s cluster using O2dms K8s profile, it shall use the 394 
+URIs, and HTTP methods listed in Table 4.3.1.1.6-2 with K8s standard query and body parameters for CronJob 395 
+resource included in the HTTP request [5]. 396 
+Table 4.3.1.1.6-2: CronJob resource URIs and HTTP methods supported using O2dms K8s profile 397 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Relevant CronJob Resource URIs Supported HTTP Methods  
+/apis/batch/v1/namespaces/{namespace}/cronjobs • POST: Create a CronJob resource in specified namespace 
+• GET: List or watch all CronJob resources in the namespace 
+• DELETE: Delete all CronJob resources from the namespace 
+/apis/batch/v1/namespaces/{namespace}/cronjobs/ 
+{name} 
+• PUT: Replace the CronJob resource in the namespace 
+• PATCH: Partial update the CronJob resource in the 
+namespace 
+• DELETE: Delete the CronJob resource from the namespace 
+• GET: Read the CronJob resource in the namespace 
+ 398 
+4.3.1.2 Kubernetes native discovery and load balancing resources 399 
+4.3.1.2.1 Service 400 
+A K8s Service resource is used for exposing a containerized workload/application running in a K8s cluster to internal 401 
+and external clients. The Service resource also abstracts the ephemeral nature of Pods and containers by creating a 402 
+constant point of entry to the group of Pods that provide the same functionality. Each Service gets an IP address and 403 
+port number that does not change during the lifetime of the Service resource in the K8s cluster. In addition, the Service 404 
+resource provides load-balancing across all Pod instances that provide the same functionality. Kubern etes supports five 405 
+types of Service resources identified as ClusterIP, NodePort, LoadBalancer, ExternalName and Headless Service with 406 
+ClusterIP being the default Service type. 407 
+Table 4.3.1.2.1-1 provides details of the standard K8s Service resource specification.   408 
+Table 4.3.1.2.1-1: K8s Service resource specification [5] 409 
+Resource Field Resource Field 
+Type  
+Resource Field Description 
+apiVersion string Defines the versioned schema of the Service resource.  
+kind string Represents the REST resource for Service resource. The K8s API Server 
+may infer this from the endpoint the client submits the request to. The 
+value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Service resource [6] 
+spec ServiceSpec Specifies the desired behavior and type of the Service resource 
+status ServiceStatus Read only. Represents the most recent observed status of the Service 
+resource 
+  410 
+Table 4.3.1.2.1-2 provides relevant K8s Service resource URIs and supported HTTP methods using O2dms interface. 411 
+For the SMO to lifecycle manage a Service resource in a chosen K8s cluster using O2dms K8s profile, it shall use the 412 
+URIs, and HTTP methods listed in Table 4.3.1.2.1-2 with K8s standard query and body parameters for Service resource 413 
+included in the HTTP request [5]. 414 
+Table 4.3.1.2.1-2: K8s Service resource URIs and HTTP methods supported using O2dms K8s profile  415 
+Relevant Service Resource URIs Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/services • POST: Create a Service resource in the specified 
+namespace 
+• GET: List or watch all Service resources in the namespace 
+• DELETE: Delete all Service resources from the namespace 
+/api/v1/namespaces/{namespace}/services/{name} • PUT: Replace the Service resource in the namespace 
+• PATCH: Partial update the Service resource in the 
+namespace 
+• DELETE: Delete the Service resource from the namespace 
+• GET: Read the Service resource in the namespace 
+ 416 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ 4.3.1.2.2 Ingress 417 
+A K8s Ingress resource is used for defining HTTP(s) routing rules that control external access to applications running 418 
+inside the K8s cluster. A K8s Ingress resource can be associated with one or more K8s Service resources (each of which 419 
+can expose a different set of Pods) and offers load-balancing and SSL termination features. The Ingress resource can 420 
+assign a specific externally reachable URL to each Service resource associated with it.  421 
+Table 4.3.1.2.2-1 provides details of the standard K8s Ingress resource specification.   422 
+Table 4.3.1.2.2-1: K8s Ingress resource specification [5] 423 
+Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the Ingress resource.  
+kind string Represents the REST resource for Ingress resource. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Ingress resource [6] 
+spec IngressSpec Specifies the desired behavior of the Ingress resource 
+status IngressStatus Represents the most recent observed status of the Ingress resource 
+  424 
+Table 4.3.1.2.2-2 provides relevant K8s Ingress resource URIs and supported HTTP methods using O2dms interface. 425 
+For the SMO to lifecycle manage an Ingress resource in a chosen K8s cluster using O2dms K8s profile, it shall use the 426 
+URIs, and HTTP methods listed in Table 4.3.1.2.2-2 with K8s standard query and body parameters for Ingress resource 427 
+included in the HTTP request [5]. 428 
+Table 4.3.1.2.2-2: K8s Ingress resource URIs and HTTP methods supported using O2dms K8s profile 429 
+Relevant Ingress Resource URIs Supported HTTP Methods  
+/apis/networking.k8s.io/v1/namespaces/{namespace}/ 
+ingresses 
+• POST: Create an Ingress resource in the specified 
+namespace 
+• GET: List or watch all Ingress resources in the 
+namespace 
+• DELETE: Delete all Ingress resources from the 
+namespace 
+/apis/networking.k8s.io/v1/namespaces/{namespace}/ 
+ingresses/{name} 
+• PUT: Replace the Ingress resource in the namespace 
+• PATCH: Partial update the Ingress resource in the 
+namespace 
+• DELETE: Delete the Ingress resource from the 
+namespace 
+• GET: Read the specified Ingress resource in the 
+namespace 
+ 430 
+NOTE:  For an Ingress resource to work, an Ingress controller (i.e., an additional controller to the default K8s 431 
+controllers) shall be running inside the K8s cluster. K8s does not offer a default ingress controller and 432 
+leaves the choice of ingress controller to the cluster administrator. In the ORAN context, the K8s cluster 433 
+may have a default ingress controller installed at the time of cluster creation, or the SMO may decide to 434 
+extend the K8s cluster with any specific ingress controller after cluster creation usin g O2dms interface.  435 
+4.3.1.2.3 NetworkPolicy 436 
+A K8s NetworkPolicy resource is used to control traffic flow to/from a K8s workloads at the IP address or port level 437 
+using ingress and egress rules. These rules may apply to other K8s Pods, Namespaces, or generic IP blocks  to restrict or 438 
+allow traffic from these entities. Selectors and IP blocks (CIDR ranges) are used to enforce the NetworkPolicy 439 
+constraints specified in the NetworkPolicy resource specification.  440 
+Table 4.3.1.2.3-1 provides details of the standard K8s NetworkPolicy resource specification. 441 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Table 4.3.1.2.3-1: NetworkPolicy resource specification [5] 442 
+Resource Field Resource Field Type  Resource Field Description 
+apiVerison string Defines the versioned schema of the NetworkPolicy resource.  
+kind string Represents the REST resource for NetworkPolicy. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the NetworkPolicy resource [6] 
+spec NetworkPolicySpec Specifies the desired behavior of the NetworkPolicy resource and the 
+ingress and/or egress traffic rules to be enforced in the cluster. 
+status NetworkPolicyStatus Describes the current state of the NetworkPolicy 
+ 443 
+Table 4.3.1.2.3-2 provides relevant K8s NetworkPolicy resource URIs and supported HTTP methods using O2dms 444 
+interface. For the SMO to lifecycle manage a K8s NetworkPolicy resource in a K8s cluster using O2dms K8s profile, it 445 
+shall use the URIs, and HTTP methods listed in Table 4.3.1.2.3-2 with K8s standard query and body parameters for 446 
+NetworkPolicy resource included in the HTTP request [5]. 447 
+Table 4.3.1.2.3-2: NetworkPolicy resource URIs and HTTP methods supported using O2dms K8s profile 448 
+Relevant NetworkPolicy Resource URIs Supported HTTP Methods  
+/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicy • POST: Create a new NetworkPolicy 
+resource in the specified namespace 
+• GET: List or watch all NetworkPolicy 
+resources in the namespace 
+• DELETE: Delete all NetworkPolicy 
+resources from the namespace 
+/apis/networking.k8s.io/v1/namespaces/{namespace}/networkpolicy/ 
+{name} 
+• PUT: Replace the NetworkPolicy resource 
+in the namespace 
+• PATCH: Partial update the NetworkPolicy 
+resource in the namespace 
+• DELETE: Delete the NetworkPolicy 
+resource from the namespace 
+• GET: Read the NetworkPolicy resource in 
+the namespace 
+ 449 
+NOTE:  The functionality of the NetworkPolicy resource depends on the presence of a compatible K8s network 450 
+plugin that supports K8s network policies. Without a supporting network plugin, the NetworkPolicy 451 
+resource creation will have no impact on the ingress and egress traffic to/from a K8s workload.  452 
+4.3.1.3 Kubernetes native storage and workload configuration resources 453 
+4.3.1.3.1 ConfigMap 454 
+A K8s ConfigMap resource is used for storing non-confidential data in the form of key-value pairs that can be read as 455 
+runtime configurations by Pods in a K8s cluster. ConfigMap resource can be used to store configuration files, 456 
+environment variables or command line arguments for workloads to use at runtime. A ConfigMap resource decouples 457 
+the workload containers from environment specific configuration data thereby making the K8s Pods easily portable 458 
+across the worker nodes in a K8s cluster. The data stored in a ConfigMap cannot exceed 1 MiB.  459 
+Table 4.3.1.3.1-1 provides details of the standard K8s ConfigMap resource specification.   460 
+Table 4.3.1.3.1-1: K8s ConfigMap resource specification [5] 461 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the ConfigMap resource.  
+kind string Represents the REST resource for ConfigMap resource. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the ConfigMap resource [6] 
+data object Contains the configuration data in key-value pairs. Keys shall be 
+alphanumeric characters and ‘- ‘, ‘_’ or ‘.’ Values shall be UTF-8 byte 
+sequence. Keys in the data field shall not overlap with keys in 
+binaryData field to pass validation checks at ConfigMap creation time. 
+binaryData object Contains binary data in key-value pairs. Keys shall be alphanumeric 
+characters and ‘-‘, ‘_’, or ‘.’ Values can contain byte sequences that 
+are not in UTF-8 range. Keys in the binaryData field shall not overlap 
+with keys in the data field to pass validation checks at ConfigMap 
+creation time. 
+immutable boolean When true, the data stored in the ConfigMap cannot be updated. 
+When false, the data can be modified at any time. 
+  462 
+Table 4.3.1.3.1-2 provides relevant K8s ConfigMap resource URIs and supported HTTP methods using O2dms 463 
+interface. For the SMO to lifecycle manage an ConfigMap resource in a chosen K8s cluster using O2dms K8s profile, it 464 
+shall use the URIs, and HTTP methods listed in Table 4.3.1.3.1-2 with K8s standard query and body parameters for 465 
+ConfigMap resource included in the HTTP request [5]. 466 
+Table 4.3.1.3.1-2: K8s ConfigMap resource URIs and HTTP methods supported using O2dms K8s profile 467 
+Relevant ConfigMap Resource URIs Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/configmaps • POST: Create a ConfigMap resource in the specified 
+namespace 
+• GET: List or watch all ConfigMap resources in the 
+namespace 
+• DELETE: Delete all ConfigMap resources from the 
+namespace 
+/api/v1/namespaces/{namespace}/configmaps/{name} • PUT: Replace the ConfigMap resource in the namespace 
+• PATCH: Partial update the ConfigMap resource in the 
+namespace 
+• DELETE: Delete the ConfigMap resource from the 
+namespace 
+• GET: Read the specified ConfigMap resource in the 
+namespace 
+ 468 
+4.3.1.3.2 Secret 469 
+A K8s Secret resource is used for storing sensitive or confidential data in key value pairs format. Secrets are like 470 
+ConfigMaps but specifically intended to be used for storing confidential data such as passwords, OAuth tokens, SSH 471 
+keys etc. By default, data stored in Secrets is not encrypted in a K8s cluster. 472 
+Table 4.3.1.3.2-1 provides details of the standard K8s Secret resource specification.   473 
+Table 4.3.1.3.2-1: K8s Secret resource specification [5] 474 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the Secret resource.  
+kind string Represents the REST resource for Secret resource. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the Secret resource [6] 
+data object Contains the secret data in key-value pairs. Keys shall be 
+alphanumeric characters and ‘- ‘, ‘_’ or ‘.’ Values are serialized form of 
+the secret data specified as based64 encoded string.  
+stringData object Contains non-binary secret data in string form. 
+immutable boolean When true, the data stored in the ConfigMap cannot be updated. 
+When false, the data can be modified at any time. 
+type String A non-constrained string value. Used to facilitate programmatic 
+handling of secret data. Defaults to Opaque (arbitrary user-defined 
+data) 
+ 475 
+Table 4.3.1.3.2-2 provides relevant K8s Secret resource URIs and supported HTTP methods using O2dms interface. For 476 
+the SMO to lifecycle manage a Secret resource in a chosen K8s cluster using O2dms K8s profile, it shall use the URIs, 477 
+and HTTP methods listed in Table 4.3.1.3.2-2 with K8s standard query and body parameters for Secret resource 478 
+included in the HTTP request [5]. 479 
+Table 4.3.1.3.2-2: K8s Secret resource URIs and HTTP methods supported using O2dms K8s profile 480 
+Relevant Secret Resource URIs Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/secrets • POST: Create a Secret resource in the specified 
+namespace 
+• GET: List or watch all Secret resources in the namespace 
+• DELETE: Delete all Secret resources from the namespace 
+/api/v1/namespace/{namespace/secrets/{name} • PUT: Replace the Secret resource in the namespace 
+• PATCH: Partial update the Secret resource in the 
+namespace 
+• DELETE: Delete the Secret resource from the namespace 
+• GET: Read the specified Secret resource in the 
+namespace 
+ 481 
+4.3.1.3.3 PersistentVolumeClaim 482 
+The K8s PersistentVolumeClaim resource is used for requesting and claiming a K8s PersistentVolume resource. The 483 
+PersistentVolume may pre-exist in the K8s cluster or created dynamically in response to the creation of 484 
+PersistentVolumeClaim resource. A PersistentVolumeClaim provides a way to request a persistent storage for Pods 485 
+without knowing the underlying storage technology. Pods can use PersistentVolumeClaims as volumes and mount them 486 
+as part of the Pod specification. 487 
+Table 4.3.1.3.3-1 provides details of the standard K8s PersistentVolumeClaim resource specification.   488 
+Table 4.3.1.3.3-1: K8s PersistentVolumeClaim resource specification [5] 489 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the PersistentVolumeClaim 
+resource.  
+kind string Represents the REST resource for PersistentVolumeClaim 
+resource. The K8s API Server may infer this from the endpoint 
+the client submits the request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the PersistentVolumeClaim resource [6] 
+spec PersistentVolumeClaimSpec Specifies the desired characteristics of the persistent volume 
+requested for the Pod. 
+status PersistentVolumeClaimStatus Read only. Represents the most recent observed status of the 
+PersistentVolumeClaim resource. 
+  490 
+Table 4.3.1.3.3-2 provides relevant K8s PersistentVolumeClaim resource URIs and supported HTTP methods using 491 
+O2dms interface. For the SMO to lifecycle manage a PersistentVolumeClaim resource in a chosen K8s cluster using 492 
+O2dms K8s profile, it shall use the URIs, and HTTP methods listed in Table 4.3.1.3.3-2 with K8s standard query and 493 
+body parameters for PersistentVolumeClaim resource included in the HTTP request [5]. 494 
+Table 4.3.1.3.3-2: K8s PersistentVolumeClaim resource URIs and HTTP methods supported using O2dms K8s 495 
+profile 496 
+Relevant PersistentVolumeClaim 
+Resource URIs 
+Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/ 
+persistentvolumeclaims 
+• POST: Create a PersistentVolumeClaim resource in the specified 
+namespace 
+• GET: List or watch all PersistentVolumeClaim resources in the 
+namespace 
+• DELETE: Delete all PersistentVolumeClaim resources from the 
+namespace 
+/api/v1/namespaces/{namespace}/ 
+persistentvolumeclaims/{name} 
+• PUT: Replace the PersistentVolumeClaim resource in the namespace 
+• PATCH: Partial update the PersistentVolumeClaim resource in the 
+namespace 
+• DELETE: Delete the PersistentVolumeClaim resource from the 
+namespace 
+• GET: Read the PersistentVolumeClaim resource in the namespace 
+ 497 
+4.3.1.4 Kubernetes native metadata and cluster configuration resources 498 
+4.3.1.4.1 LimitRange 499 
+A K8s LimitRange resource is used to set constraints on the resource utilization of Pods and containers in a namespace. 500 
+By default, a container can use as much compute resources as it needs in the nam espace and that can lead to resource 501 
+contention problems among Pods and containers that share the namespace and may belong to different priority classes. 502 
+A LimitRange resource an enforce defaults or min-max values for different resources in the namespace (e.g., CPU, 503 
+memory, storage) at Pod or container level.   504 
+Table 4.3.1.4.1-1 provides details of the standard K8s LimitRange resource specification.   505 
+Table 4.3.1.4.1-1: K8s LimitRange resource specification [5] 506 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the LimitRange resource.  
+kind string Represents the REST resource for LimitRange resource. The K8s 
+API Server may infer this from the endpoint the client submits the 
+request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the LimitRange resource [6] 
+spec LimitRangeSpec Specifies the limits that will be enforced on resources in a 
+namespace. 
+  507 
+Table 4.3.1.4.1-2 provides relevant K8s LimitRange resource URIs and supported HTTP methods usi ng O2dms 508 
+interface. For the SMO to lifecycle manage a LimitRange resource in a chosen K8s cluster using O2dms K8s profile, it 509 
+shall use the URIs, and HTTP methods listed in Table 4.3.1.4.1-2 with K8s standard query and body parameters for 510 
+LimitRange resource included in the HTTP request [5]. 511 
+Table 4.3.1.4.1-2: K8s LimitRange resource URIs and HTTP methods supported using O2dms K8s profile  512 
+Relevant LimitRange Resource URIs Supported HTTP Methods  
+/api/v1/namespaces/{namespace}/limitranges • POST: Create a LimitRange resource in the specified namespace 
+• GET: List or watch all LimitRange resources in the namespace 
+• DELETE: Delete all LimitRange resources from the namespace 
+/api/v1/namespaces/{namespace}/limitranges/ 
+{name} 
+• PUT: Replace the LimitRange resource in the namespace 
+• PATCH: Partial update the LimitRange resource in the 
+namespace 
+• DELETE: Delete the LimitRange resource from the namespace 
+• GET: Read the LimitRange resource in the namespace 
+ 513 
+4.3.1.4.2 ResourceQuota 514 
+A K8s ResourceQuota resource is used to set limits on the total/aggregate resource consumption in a namespace. A 515 
+ResourceQuota object can specify limits for other K8s resource objects (by resource type) and compute resources (e.g., 516 
+memory, CPU, storage). A single K8s namespace can have multiple ResourceQuota resources with unique names for 517 
+limiting different types of namespace scoped resources. The ResourceQuota specified limi ts are enforced at K8s 518 
+resource creation time and have no impact on exsting Pods and resources in the namespace.  519 
+Table 4.3.1.4.2-1 provides details of the standard K8s ResourceQuota resource specification. 520 
+Table 4.3.1.4.2-1: ResourceQuota resource specification [5] 521 
+Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the ResourceQuota resource.  
+kind string Represents the REST resource for ResourceQuota. The K8s API 
+Server may infer this from the endpoint the client submits the request 
+to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the ResourceQuota resource [6] 
+spec ResourceQuotaSpec Specifies the desired quota of K8s resource objects and/or compute 
+resources imposed on the namespace 
+status ResourceQuotaStatus Defines the actual enforced quota and its current usage 
+ 522 
+Table 4.3.1.4.2-2 provides relevant K8s ResourceQuota resource URIs and supported HTTP methods using O2dms 523 
+interface. For the SMO to lifecycle manage a K8s ResourceQuota resource in a K8s cluster using O2dms K8s profile, it 524 
+shall use the URIs, and HTTP methods listed in Table 4.3.1.4.2-2 with K8s standard query and body parameters for 525 
+ResourceQuota resource included in the HTTP request [5]. 526 
+Table 4.3.1.4.2-2: ResourceQuota resource URIs and HTTP methods supported using O2dms K8s profile  527 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 26 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Relevant ResourceQuota Resource URIs Supported HTTP Methods  
+/apis/apps/v1/namespaces/{namespace}/resourcequotas • POST: Create a new ResourceQuota resource in the 
+specified namespace 
+• GET: List or watch all ResourceQuota resources in 
+the namespace 
+• DELETE: Delete all ResourceQuota resources from 
+the namespace 
+/apis/apps/v1/namespaces/{namespace}/resourcequotas/ 
+{name} 
+• PUT: Replace the ResourceQuota resource in the 
+namespace 
+• PATCH: Partial update the ResourceQuota resource 
+in the namespace 
+• DELETE: Delete the ResourceQuota resource from 
+the namespace 
+• GET: Read the ResourceQuota resource in the 
+namespace 
+ 528 
+4.3.1.4.3 HorizontalPodAutoscaler 529 
+A K8s HorizontalPodAutoscaler resource is used to automatically scale up or down, the number of Pod instances 530 
+belonging to a workload resource that supports horizontal scaling (e.g., Deployments and StatefulSets). The scale-up 531 
+and scale-down levels are controlled by defined minimum and maximum values in the HorizontalPodAutoscaler 532 
+resource. The HorizontalPodAutoscaler resource works by changing the “s cale” property of a workload resource e.g., 533 
+Deployment, based on observed metrics such as CPU and Memory utilization.  534 
+NOTE: For the K8s cluster to horizontally scale a workload based on the metrics specified in the K8s 535 
+HorizontalPodAutoscaler resource, it should have a metrics collection service running in the cluster. 536 
+Table 4.3.1.4.3-1 provides details of the standard K8s HorizontalPodAutoscaler resource specification.  537 
+Table 4.3.1.4.3-1: HorizontalPodAutoscaler resource specification [5]  538 
+Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the HorizontalPodAutoscaler 
+resource.  
+kind string Represents the REST resource for HorizontalPodAutoscaler 
+resource. The K8s API Server may infer this from the endpoint 
+the client submits the request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the HorizontalPodAutoscaler resource 
+[6]. 
+spec HorizontalPodAutoscalerSpec Specifies the min-max replica count and behavior of the 
+HorizontalPodAutoscaler resource. 
+status HorizontalPodAutoscalerStatus Represents the most recent observed status of the 
+HorizontalPodAutoscaler resource. 
+ 539 
+Table 4.3.1.4.3-2 provides relevant K8s HorizontalPodAutoscaler resource URIs and supported HTTP methods using 540 
+O2dms interface. For the SMO to lifecycle manage a K8s HorizontalPodAutoscaler resource in a chosen K8s cluster 541 
+using O2dms K8s profile, it shall use the URIs, and HTTP methods listed in Table 4.3.1.4.3-2 with K8s standard query 542 
+and body parameters for HorizontalPodAutoscaler resource included in the HTT P request [5]. 543 
+Table 4.3.1.4.3-2: HorizontalPodAutoscaler resource URIs and HTTP methods supported using O2dms K8s 544 
+profile 545 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 27 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Relevant HorizontalPodAutoscaler Resource 
+URIs 
+Supported HTTP Methods  
+/apis/autoscaling/v2/namespaces/{namespace}/ 
+horizontalpodautoscalers 
+• POST: Create a HorizontalPodAutoscaler resource in the 
+specified namespace 
+• GET: List or watch HorizontalPodAutoscaler resources in the 
+namespace 
+• DELETE: Delete all HorizontalPodAutoscaler resources from 
+the namespace 
+/apis/autoscaling/v2/namespaces/{namespace}/ 
+Horizontalpodautoscalers/{name} 
+• PUT: Replace the HorizontalPodAutoscaler resource in the 
+namespace 
+• PATCH: Partial update the HorizontalPodAutoscaler 
+resource in the namespace 
+• DELETE: Delete the HorizontalPodAutoscaler resource from 
+the namespace 
+• GET: Read the HorizontalPodAutoscaler resource in the 
+namespace 
+ 546 
+4.3.1.4.4 PodDisruptionBudget 547 
+A K8s PodDisruptionBudget resource is used to ensure that a specific number of Pod instances belonging to a workload 548 
+resource (e.g., Deployments, StatefulSets) are available in the cluster in a healthy running state in the event of planned 549 
+or unplanned Pod disruptions. A K8s PodDisruptionBudget resource ensures that the application or service offered by 550 
+the Pods remains available in the event of concurrent disruptions due to Pod termination events. The number of healthy 551 
+Pod instances required during disruption events can be specified as a minimum-available or maximum-unavialable 552 
+number.  553 
+Table 4.3.1.4.4-1 provides details of the standard K8s PodDisruptionBudget resource specification.  554 
+Table 4.3.1.4.4-1: PodDisruptionBudget resource specification [5]  555 
+Resource Field Resource Field Type  Resource Field Description 
+apiVersion string Defines the versioned schema of the PodDisruptionBudget 
+resource.  
+kind string Represents the REST resource for PodDisruptionBudget resource. 
+The K8s API Server may infer this from the endpoint the client 
+submits the request to. The value cannot be updated. 
+metadata ObjectMeta Standard metadata of the PodDisruptionBudget resource [6]. 
+spec PodDisruptionBudgetSpec Specifies the desired behavior of PodDisruptionBudge resource. 
+status PodDisruptionBudgetStatus Represents the most recent observed status of the 
+PodDisruptionBudget resource. 
+ 556 
+Table 4.3.1.4.4-2 provides relevant K8s PodDisruptionBudget resource URIs and supported HTTP methods using 557 
+O2dms interface. For the SMO to lifecycle manage a K8s PodDisruptio nBudget resource in a chosen K8s cluster using 558 
+O2dms K8s profile, it shall use the URIs, and HTTP methods listed in Table 4.3.1.4.4-2 with K8s standard query and 559 
+body parameters for PodDisruptionBudget resource included in the HTTP request [5]. 560 
+Table 4.3.1.4.4-2: PodDisruptionBudget resource URIs and HTTP methods supported using O2dms K8s profile  561 
+
+                                                                                                       
+________________________________________________________________________________________________
+© 2022 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 28 
+ 
+O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE-v02.00 
+ Relevant PodDisruptionBudget Resource URIs Supported HTTP Methods  
+/apis/policy/v1/namespaces/{namespace}/ 
+poddisruptionbudgets 
+• POST: Create a PodDisruptionBudget resource in the 
+specified namespace 
+• GET: List or watch PodDisruptionBudget resources in the 
+namespace 
+• DELETE: Delete all PodDisruptionBudget resources from the 
+namespace 
+/apis/policy/v1/namespaces/{namespace}/ 
+poddisruptionbudgets/{name} 
+• PUT: Replace the PodDisruptionBudget resource in the 
+namespace 
+• PATCH: Partial update the PodDisruptionBudget resource in 
+the namespace 
+• DELETE: Delete the PodDisruptionBudget resource from the 
+namespace 
+• GET: Read the PodDisruptionBudget resource in the 
+namespace 
+ 562 
+4.3.2 Kubernetes Native Cluster Scoped Resource Objects 563 
+This is FFS. 564 

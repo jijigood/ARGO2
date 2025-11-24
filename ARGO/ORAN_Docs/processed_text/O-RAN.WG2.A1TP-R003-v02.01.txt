@@ -1,0 +1,239 @@
+ 
+                                 O-RAN.WG2.A1TP-R003-v02.01 
+Technical Specification  
+ 
+O-RAN Working Group 2 (Non-RT RIC and A1 interface WG) 
+ 
+A1 interface: Transport Protocol 
+ 
+ 
+  
+Copyright © 2023 by the O-RAN ALLIANCE e.V. 
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior 
+written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification 
+for your personal use, or copy the material of this specification for the purpose of sending to i ndividual third parties for their information 
+provided that you acknowledge O -RAN ALLIANCE as the source of the material and that you inform the third party that these conditions 
+apply to them and that they must comply with them. 
+ 
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany 
+ 
+
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2 
+O-RAN.WG2.A1TP-R003-v02.01 
+Contents 
+Foreword............................................................................................................................................................. 3 
+Modal verbs terminology ................................................................................................................................... 3 
+1 Scope ........................................................................................................................................................ 4 
+2 References ................................................................................................................................................ 4 
+2.1 Normative references ......................................................................................................................................... 4 
+2.2 Informative references ....................................................................................................................................... 5 
+3 Definition of terms, symbols and abbreviations ....................................................................................... 5 
+3.1 Terms ................................................................................................................................................................. 5 
+3.2 Symbols ............................................................................................................................................................. 5 
+3.3 Abbreviations ..................................................................................................................................................... 5 
+4 A1 interface protocol stack ...................................................................................................................... 6 
+4.1 General ............................................................................................................................................................... 6 
+4.2 Reference model ................................................................................................................................................ 6 
+4.3 Functions and protocol stack ............................................................................................................................. 6 
+5 Network layer ........................................................................................................................................... 7 
+6 Transport layer ......................................................................................................................................... 7 
+7 Security .................................................................................................................................................... 7 
+8 Application ............................................................................................................................................... 8 
+9 Data interchange ....................................................................................................................................... 8 
+History ................................................................................................................................................................ 9 
+ 
+  
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3 
+O-RAN.WG2.A1TP-R003-v02.01 
+Foreword 
+This Technical Specification (TS) has been produced by O-RAN Alliance Working Group 2 (Non-RT RIC and 
+A1 interface WG). It is part of a TS-family covering the A1 interface as identified below:  
+- "A1 interface: General Aspects and Principles";  
+- "A1 interface: Use Cases and Requirements";  
+- "A1 interface: Transport Protocol";  
+- "A1 interface: Application Protocol";  
+- "A1 interface: Type Definitions"; and 
+- "A1 interface: Test Specification". 
+Modal verbs terminology 
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", 
+"can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal 
+forms for the expression of provisions). 
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation. 
+ 
+  
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4 
+O-RAN.WG2.A1TP-R003-v02.01 
+1 Scope 
+The contents of the present document are subject to continuing work within O-RAN and may change 
+following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, 
+it will be re-released by O-RAN with an identifying change of version date and an increase in version 
+number as follows: 
+version xx.yy.zz 
+where: 
+xx: the first digit-group is incremented for all changes of substance, i.e. technical enhancements, 
+corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with 
+leading zero if needed. 
+yy: the second digit-group is incremented when editorial only changes have been incorporated in the 
+document. Always 2 digits with leading zero if needed. 
+zz: the third digit-group included only in working versions of the document indicating incremental 
+changes during the editing process. External versions never include the third digit-group.  Always 
+2 digits with leading zero if needed. 
+The present document specifies the transport protocol stack for the A1 interface.  
+2 References 
+2.1 Normative references 
+References are either specific (identified by date of publication and/or edition number or version number) 
+or non-specific. For specific references, only the cited version applies. For non-specific references, the latest 
+version of the referenced document (including any amendments) applies. 
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O-RAN 
+cannot guarantee their long-term validity. 
+The following referenced documents are necessary for the application of the present document. 
+[1] O-RAN TS: "A1 interface: General Aspects and Principles" ("A1GAP") 
+[2] O-RAN TS: "A1 interface: Application Protocol" ("A1AP") 
+[3] O-RAN TS: "A1 interface: Type Definitions" ("A1TD") 
+[4] IETF RFC 793: "Transmission Control Protocol" 
+[5] IETF RFC 5246: "The Transport Layer Security (TLS) Protocol Version 1.2" 
+[6] IETF RFC 8446: "The Transport Layer Security (TLS) Protocol Version 1.3" 
+[7] IETF RFC 2818: "HTTP over TLS" 
+[8] IETF RFC 7230: "Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing" 
+[9] IETF RFC 7321: "Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content” 
+[10] IETF RFC 7540: "Hypertext Transfer Protocol Version 2 (HTTP/2)"  
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5 
+O-RAN.WG2.A1TP-R003-v02.01 
+[11] IETF RFC 8259: "The JavaScript Object Notation (JSON) Data Interchange Format" 
+[12] IETF RFC 8200 (2017-07): "Internet Protocol, Version 6 (IPv6) Specification" 
+[13] IETF RFC 791 (1981-09): "Internet Protocol" 
+[14] IETF RFC 6749 (2012-10): "The OAuth 2.0 Authorization Framework" 
+[15] IETF RFC 7519 (2015-05): "JSON Web Token (JWT)" 
+[16] O-RAN TS: "O-RAN Security Requirements Specifications" 
+[17] O-RAN TS: "O-RAN Security Protocols Specifications" 
+2.2 Informative references 
+References are either specific (identified by date of publication and/or edition number or version number) 
+or non-specific. For specific references, only the cited version applies. For non-specific references, the latest 
+version of the referenced document (including any amendments) applies. 
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O-RAN 
+cannot guarantee their long-term validity. 
+The following referenced documents are not necessary for the application of the present document, but 
+they assist the user with regard to a particular subject area. 
+Not applicable. 
+3 Definition of terms, symbols and abbreviations 
+3.1 Terms 
+For the purposes of the present document, the terms given in A1GAP [1] apply. 
+3.2 Symbols 
+Void. 
+3.3 Abbreviations 
+For the purposes of the present document, the abbreviations given in A1GAP [1] and the following apply: 
+IETF Internet Engineering Task Force 
+JWT JSON Web Tokens 
+RFC Request For Comments 
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6 
+O-RAN.WG2.A1TP-R003-v02.01 
+4 A1 interface protocol stack 
+4.1 General 
+The architecture for the A1 interface is specified in A1GAP [1]. The protocol stack for the A1 interface 
+supports application protocol and data models as specified in A1AP [2] and A1TD [3]. 
+4.2 Reference model 
+The A1 interface is defined between the Non-RT RIC and the Near-RT RIC functions. The A1 architecture and 
+principles are described in A1GAP [1]. Figure 4.2-1 illustrates the reference model for the A1 interface. 
+ 
+Non-RT RIC
+Near-RT RIC
+A1 interface
+ 
+Figure 4.2-1: A1 interface reference model 
+4.3 Functions and protocol stack 
+The following layers of the protocol stack for the A1 interface are described in the following clauses: 
+- TCP as specified in IETF RFC 793 [4] provides the communication service at the transport layer; 
+- TLS as specified in IETF RFC 5246 [5] and IETF RFC 8446 [6] is used to provide secure HTTP 
+connections as specified in IETF RFC 2818 [7] and IETF RFC 7230 [8]; 
+- HTTP as specified in IETF RFC 7321 [9] and IETF RFC 7540 [10] is used as application-level 
+protocol; 
+- The data interchange layer constitutes the transport of documents in the JSON format as 
+specified in IETF RFC 8259 [11]. 
+Figure 4.3-1 illustrates the protocol stack of the A1 interface. 
+ 
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7 
+O-RAN.WG2.A1TP-R003-v02.01 
+JSON
+HTTP
+TCP
+IP
+Data link layer
+Physical layer
+Data Interchange
+Application
+Transport
+Network
+Data link
+Physical
+TLSSecurity
+ 
+Figure 4.3-1: A1 protocol stack 
+5 Network layer 
+A1 may be transported over IPv6 as specified in IETF RFC 8200 [12] and/or IPv4 as specified in IETF RFC 791 
+[13]. 
+6 Transport layer 
+TCP as specified in IETF RFC 793 [4] shall be used as transport protocol. An HTTP connection is mapped to a 
+TCP connection. 
+Both Non-RT RIC and Near-RT RIC can act as HTTP client and HTTP server. As a result, Non-RT RIC and Near-
+RT RIC can establish a TCP connection for each direction. 
+7 Security 
+TLS v1.2 as specified in IETF RFC 5246 [5], TLS v1.3 as specified in IETF RFC 8446 [6], and OAuth2.0 as 
+specified in IETF RFC 6749 [14] with JWT as specified in IETF RFC 7519 [15] shall be supported. 
+TLS shall be supported and used for the security protection at the transport and application layers, as 
+specified in O-RAN Security Requirements Specifications [16] and O-RAN Security Protocols Specifications 
+[17]. 
+mTLS shall be supported and used for mutual authentication, as specified in O-RAN Security Requirements 
+Specifications [16] and O-RAN Security Protocols Specifications [17]. 
+OAuth 2.0 shall be supported and used for authorization at the application layer, as specified in O-RAN 
+Security Requirements Specifications [16] and O-RAN Security Protocols Specifications [17]. 
+JWT shall be supported for authorization as specified in O-RAN Security Requirements Specifications [16] 
+and O-RAN Security Protocols Specifications [17]. 
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8 
+O-RAN.WG2.A1TP-R003-v02.01 
+8 Application 
+As application layer, HTTP/1.1 as specified in IETF RFC 7231 [9] shall be supported, and HTTP/2 as specified 
+in IETF RFC 7540 [10] should be supported. 
+HTTP over TLS as specified in IETF RFC 2818 [7] and updated in IETF RFC 7230 [8] shall be supported. 
+HTTP details such as standard headers, custom headers, error codes, methods, URIs etc are specified in 
+A1AP [2]. 
+The default TCP port numbers should be used for HTTP operation. 
+9 Data interchange 
+As a data interchange format, JSON as specified in IETF RFC 8259 [11] shall be supported. The objects 
+transported in HTTP messages, and the data types in JSON format, are specified in A1TD [3].  
+
+ 
+________________________________________________________________________________________________ 
+© 2023 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9 
+O-RAN.WG2.A1TP-R003-v02.01 
+History 
+Date Revision Description 
+2022.11.17 02.01 Aligning to O-RAN drafting rules 
+2022.07.30 02.00 Adapting to ODR template and referring to O-RAN security specifications for mTLS and 
+OAuth2.0 
+2021.03.13 01.01 Editorial corrections to apply latest template and update references. Clarification of HTTP 
+port number. 
+2019.09.30 01.00 First version 
+ 
+ 
+ 

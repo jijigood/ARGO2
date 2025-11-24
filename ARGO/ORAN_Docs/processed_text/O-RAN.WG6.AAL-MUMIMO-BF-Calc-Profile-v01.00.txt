@@ -1,0 +1,381 @@
+O-RAN.WG6.AAL MUMIMO BF Calc Profile v01.00
+Technical Specification 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+AAL Profile - MUMIMO Precoder/BeamFormer Calculation 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the 
+third party that these conditions apply to them and that they must comply with them.
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the copyright statement on the cover page of this specification.
+
+O-RAN.WG6.AAL MUMIMO BF Calc Profile v01.00
+Technical Specification 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+AAL Profile - MUMIMO Precoder/BeamFormer Calculation 
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving, 
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License 
+Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+ Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+ Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.    1 
+
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Revision History 1 
+Date Revision Author Description 
+2022.02.28 1.00.00.00 Meta AAL Profile specification to offload “MU-MIMO 
+precoder/beamformer weights calculation” compute to 
+Hardware Accelerator (HWA) in a look-aside manner. 
+    
+  2 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Contents 1 
+Revision History ........................................................................................................................................... 2 2 
+Chapter 1 Introductory Material .................................................................................................................... 4 3 
+ Scope 4 4 
+ References.............................................................................................................................................................. 4 5 
+ Definitions and Abbreviations.................................................................................................................................  4 6 
+ Definitions........................................................................................................................................................... 4 7 
+ Abbreviations ...................................................................................................................................................... 4 8 
+Chapter 2 Overview ...................................................................................................................................... 6 9 
+ General .................................................................................................................................................................. 6 10 
+ Document Structure ................................................................................................................................................ 6 11 
+Chapter 3 AALI Configuration and Management .......................................................................................... 7 12 
+Chapter 4 AAL Profile Specification ............................................................................................................. 7 13 
+Annex ZZZ : O-RAN Adopter License Agreement ....................................................................................... 8 14 
+Section 1: DEFINITIONS ............................................................................................................................................ 8 15 
+Section 2: COPYRIGHT LICENSE .............................................................................................................................. 8 16 
+Section 3: FRAND LICENSE....................................................................................................................................... 8 17 
+Section 4: TERM AND TERMINATION ..................................................................................................................... 9 18 
+Section 5: CONFIDENTIALITY .................................................................................................................................. 9 19 
+Section 6: INDEMNIFICATION .................................................................................................................................. 9 20 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ................................................................................. 10 21 
+Section 8: ASSIGNMENT ......................................................................................................................................... 10 22 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS ................................................................................................ 10 23 
+Section 10: BINDING ON AFFILIATES ................................................................................................................... 10 24 
+Section 11: GENERAL .............................................................................................................................................. 10 25 
+ 26 
+ 27 
+28 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Chapter 1 Introductory Material 1 
+ Scope 2 
+This Technical Specification has been produced by the O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 4 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-5 
+RAN with an identifying change of release date and an increase in version number as follows: 6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document. 11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+The present document focuses on the Common API related to common aspects of accelerator abstraction from a 14 
+admistration and application perspective.  15 
+ References 16 
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”. 17 
+[2] Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN, 2019. 18 
+[3] O-RAN WG6 Acceleration Abstraction Layer General Aspects and Principles  19 
+[4] 3GPP TR 38.300: "NR; NR and NG-RAN Overall Description" 20 
+[5] 3GPP TS 38.211: "NR; Physical channels and modulation". 21 
+[6] 3GPP TS 38.212: "NR; Multiplexing and channel coding". 22 
+[7] O-RAN WG6 Acceleration Abstraction Layer General Aspects and Principles  23 
+[8] O-RAN Acceleration Abstraction Layer High-PHY Profiles 24 
+ 25 
+ 26 
+ 27 
+ Definitions and Abbreviations 28 
+ Definitions 29 
+For the purposes of the present document, the terms and definitions given in [7] apply.  30 
+ Abbreviations 31 
+For the purposes of the present document, the following abbreviations apply.  32 
+AAL Acceleration Abstraction Layer 33 
+AALI Acceleration Abstraction Layer interface 34 
+AAL-LPU  Acceleration Abstraction Layer Logical Processing Unit  35 
+BF                       Beam Forming  36 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+CNF Containerized Network Function 1 
+HWA                   Hardware Accelator  2 
+NF Network Function 3 
+O-CU O-RAN Centralized Unit 4 
+O-DU O-RAN Distributed Unit 5 
+O-RU O-RAN Radio Unit 6 
+OS Operating System  7 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Chapter 2 Overview 1 
+ General 2 
+The AAL General Aspects and Principles is described in [7] including a high-level architecture of the AAL and 3 
+definition of the AAL profiles. This document details the AAL specification consisting of the description of the 4 
+interface, information models, and requirements to implement an AALI for 5 
+AAL_MUMIMO_PRECODER_WEIGHTS_CAL profile [7] 6 
+ 7 
+The purpose of the AAL_MUMIMO_PRECODER_WEIGHTS_CAL profile is to support look-aside acceleration of 8 
+beamforming (precoding) weight calculation by the Application. This profile compliments the High-PHY profiles 9 
+specified in [8]. 10 
+ Document Structure 11 
+This present document is structured as follows: Chapter 2 presents the overview and main purpose of this specification. 12 
+Chapter 3 present s the high level AALI configuration and management principles for the AAL_MU 13 
+MIMO_PRECODER_WEIGHTS_CAL profile. Chapter 4 presents the Profile Overview for the  profile, sample 14 
+capabilities, inputs, and outputs as well as HWA parameters for the profile. 15 
+  16 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Chapter 3 AALI Configuration and Management  1 
+The AALI configuration and management APIs are the APIs that an Application (O-DU) executes to configure and 2 
+manage the AAL-LPU(s) that have been allocated to the Application by the O-Cloud. The high-level Configuration and 3 
+Management Principles are presented in [7].  4 
+Chapter 4 AAL Profile Specification 5 
+The AAL_MU MIMO_PRECODER_WEIGHTS_CALC is used to support look-aside acceleration of beamforming 6 
+(precoding) weight calculation by the Application. The Application provides HWA (aka AF in [8]) with all the 7 
+information required to calculate precoding weights, as shown in Table 4-1. HWA computes MU-MIMO precoding 8 
+weights according to an implementation-specific method, one exemplary method being block diagonalization. 9 
+HWA returns to the Application a handle* (optional) to the precoding weights for the layers of the selected UEs 10 
+together with precoding weights themselves. The precoding weights can be used by the Application to compute SINR 11 
+per UE and per layer to assist with MCS selection.  12 
+ 13 
+Application sends the precoding weights (optional) or handle (optional) to AF [8] via AAL_DOWNLINK_High-PHY 14 
+Profile [8]. 15 
+ 16 
+*Handle represents an index to “Beamforming (precoding) weights per PRG for the layers of the selected UEs” 17 
+uniquely. This is an optional parameter. It is introduced to enable following example implementation option:  18 
+After precoding weights calculation, HWA stores the precoding weights locally together with the associated handle. 19 
+HWA returns to Application the handle to the precoding weights as well as the precoding weights for the layers of the 20 
+selected UEs. This provides option to Application to send just the handle to AF [8] in AAL_DOWNLINK_High-PHY 21 
+Profile [8]. In this case, AF can use the handle to retrieve precoding weights stored locally.  22 
+Note - This is applicable only for the sencario in which same HWA is used for “high Phy function” and “precoding 23 
+weights calculation function”.  24 
+ 25 
+Table 4-1 AAL Profile Parameters for Weight Calculation 26 
+Parameters Summary HWA Role 
+Application  HWA 
+UEs Ordered list of UEs selected for 
+scheduling 
+ 
+Number of layers, per UE Number of layers scheduled per UE  
+Channel Estimation Abstraction A representation of SRS-based 
+channel observations, as documented 
+in [8] (e.g. SVD, raw channel). Sent 
+for each PRG and for each UE 
+scheduled in the PRG. 
+Compute beamforming weights for the 
+selected UEs and layers, e.g. based on 
+block diagonalization based precoding. 
+HWA  Application 
+Beamforming (precoding) weights  Beamforming (precoding) weights 
+per PRG for the layers of the selected 
+UEs. 
+Compute precoding weights for the 
+selected UEs and layers, e.g. based on 
+the representation of SRS-based 
+channel observations 
+Handle 
+ 
+(OPTIONAL) 
+Index to Beamforming (precoding) 
+weights per PRG for the layers of the 
+selected UEs. 
+ 
+ 27 
+ 28 
+ 29 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Annex ZZZ : O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, method or operation (whether implemented in hardware, software 11 
+or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 24 
+generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 27 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 28 
+claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an ORAN 38 
+Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40 
+agreement with O-RAN Alliance. 41 
+Section 3: FRAND LICENSE 42 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 43 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 44 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 45 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 46 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 1 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 2 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 3 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 4 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 5 
+customers of such licensed Compliant Implementations. 6 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 7 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 8 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 9 
+its Affiliates for its license of Necessary Claims to its licensees. 10 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 11 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 12 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 13 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 14 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 15 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 16 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 17 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 18 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 19 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 20 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 21 
+licensed Compliant Implementations. 22 
+Section 4: TERM AND TERMINATION 23 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 24 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 25 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 26 
+(30) days after being given notice specifying the breach. 27 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 28 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 29 
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 30 
+version that was current as of the date of termination. 31 
+Section 5: CONFIDENTIALITY 32 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN 33 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 34 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 35 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 36 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 37 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 38 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 39 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 40 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 41 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 42 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN 43 
+Alliance’s prior written approval. 44 
+Section 6: INDEMNIFICATION 45 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 46 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 47 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 48 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 49 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 50 
+products that comply with O-RAN Specifications. 51 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 1 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 2 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 3 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 4 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 5 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 6 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O-RAN 7 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 8 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 9 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 10 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 11 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 12 
+CONDITION FOR O-RAN SPECIFICATIONS. 13 
+Section 8: ASSIGNMENT 14 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 15 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 16 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 17 
+Alliance may freely assign this Agreement. 18 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 19 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 20 
+Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, 21 
+including as licensees under Section 3. 22 
+Section 10: BINDING ON AFFILIATES 23 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 24 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 25 
+and are also entitled to the benefits of the rights of Adopter hereunder. 26 
+Section 11: GENERAL 27 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  28 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 29 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 30 
+to the subject matter of this Agreement.  31 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 32 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 33 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 34 
+prohibits any communication that would violate the antitrust laws. 35 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 36 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 37 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, 38 
+Contributors or Academic Contributors. 39 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 40 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 41 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 42 
+full force and effect. 43 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 44 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 45 
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 46 
+
+ 
+ 
+                    O-RAN.WG6.AAL MUMIMO BF Cal Profle v0.01.01.00 TS 
+ 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 1 
+force and effect. 2 

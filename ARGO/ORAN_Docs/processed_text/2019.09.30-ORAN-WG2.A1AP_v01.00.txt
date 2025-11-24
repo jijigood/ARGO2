@@ -1,0 +1,1964 @@
+ORAN-WG2.A1.AP-v01.00 
+Technical Specification 
+O-RAN Working Group 2
+A1 interface: Application Protocol 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform 
+the third party that these conditions apply to them and that they must comply with them.
+
+ 
+ 
+                                  
+ORAN-WG2.A1.AP-v01.00 
+Technical Specification  
+ 
+O-RAN Working Group 2  
+A1 interface: Application Protocol  
+ 
+ 
+ 
+  
+ 
+Prepared by the O-RAN Alliance e.V. Copyright © 2019 by the O-RAN Alliance e.V. By using, accessing or downloading any part of this O-RAN 
+specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to 
+the terms of the O-RAN Adopter License Agreement contained in Annex Z of this specification. All other rights reserved. 
+                  1 
+ 
+ 
+ 
+ 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                2 
+Revision History  1 
+Date Revision Author Description 
+2019.09.24 00.01.01 Patric Lind 
+(Ericsson) 
+First version for approval by WG2 
+2019.09.30 01.00 Patric Lind 
+(Ericsson) 
+Spec renamed to 01.00 for publication 
+  2 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                3 
+Contents  1 
+Revision History ................................................................................................................................................. 2 2 
+Chapter 1 Introduction ........................................................................................................................................ 4 3 
+1.1 Scope 4 4 
+1.2 References .................................................................................................................................................................... 4 5 
+1.3 Definitions and Abbreviations ...................................................................................................................................... 5 6 
+1.3.1 Definitions ................................................................................................................................................................. 5 7 
+1.3.2 Abbreviations ............................................................................................................................................................. 6 8 
+Chapter 2 A1 application protocol ...................................................................................................................... 7 9 
+Chapter 3 A1 Services ........................................................................................................................................ 7 10 
+3.1 Introduction........................................................................................................................................................ 7 11 
+3.2 Policy Management Service .............................................................................................................................. 8 12 
+3.2.1 Service Description ...................................................................................................................................... 8 13 
+3.2.2 Service Operations ....................................................................................................................................... 9 14 
+3.3 ML Model Management Service ..................................................................................................................... 16 15 
+3.4 Enrichment Information Service ...................................................................................................................... 16 16 
+Chapter 4 API Defintions ................................................................................................................................. 16 17 
+4.1 Introduction...................................................................................................................................................... 16 18 
+4.2 A1-P (policy management) .............................................................................................................................. 16 19 
+4.2.1 Introduction ................................................................................................................................................ 16 20 
+4.2.2 Usage of HTTP .......................................................................................................................................... 17 21 
+4.2.3 Resources ................................................................................................................................................... 17 22 
+4.2.4 Custom Operations without associated resources ...................................................................................... 20 23 
+4.2.5 Notifications ............................................................................................................................................... 20 24 
+4.2.6 Data Model ................................................................................................................................................. 20 25 
+4.2.7 Error Handling ........................................................................................................................................... 29 26 
+Annex A: OpenAPI specification ..................................................................................................................... 30 27 
+A.1 General ............................................................................................................................................................. 30 28 
+Annex B: JSON objects .................................................................................................................................... 31 29 
+B.1 JSON schema and instances............................................................................................................................. 31 30 
+B.1.1 JSON schema for A1 policy ....................................................................................................................... 31 31 
+B.1.2 Policy object instance ................................................................................................................................. 32 32 
+B.1.3 Multi-policy object instance ....................................................................................................................... 32 33 
+B.2 Single policy operations ................................................................................................................................... 33 34 
+B.2.1 Create policy .............................................................................................................................................. 33 35 
+B.2.2 Query policy ............................................................................................................................................... 34 36 
+B.2.3 Delete policy .............................................................................................................................................. 34 37 
+B.2.4 Update policy ............................................................................................................................................. 34 38 
+B.3 Multi-policy operations .................................................................................................................................... 36 39 
+B.3.1 Create multiple policies .............................................................................................................................. 36 40 
+B.3.2 Query multiple policies .............................................................................................................................. 37 41 
+B.3.3 Delete multiple policies .............................................................................................................................. 38 42 
+B.3.4 Update multiple policies ............................................................................................................................. 39 43 
+Annex Z ............................................................................................................................................................ 43 44 
+ 45 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                4 
+Chapter 1 Introduction 1 
+1.1 Scope 2 
+This Technical Specification has been produced by O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O-RAN WG2 and may change following 4 
+formal O-RAN approval. In the event that O -RAN Alliance decides to  modify the contents of the present document, it 5 
+will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version number as 6 
+follows: 7 
+Release x.y.z 8 
+where: 9 
+x the first digit  is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 10 
+etc. (the initial approved document will have x=01). 11 
+y the second digit is incremented when editorial only changes have been incorporated in the document . 12 
+z the third digit included only in working versions of the document indicating incremental changes during the 13 
+editing process. 14 
+The present document is part of a TS-family covering the O-RAN WG2: A1 interface as identified below: “General 15 
+Aspects and Principles”. “Transport Protocol”. “Application Protocol”. 16 
+1.2 References 17 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 18 
+document. 19 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 20 
+non-specific. 21 
+- For a specific reference, subsequent revisions do not apply. 22 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 23 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in the same 24 
+Release as the present document. 25 
+[1] 3GPP TR 21.905: “3rd Generation Partnership Project; Technical Specification Group Services 26 
+and System Aspects; Vocabulary for 3GPP Specifications”  27 
+[2]  O-RAN WG2: “Non-RT RIC and A1 interface (Use Case Requirements)” 28 
+[3] O-RAN WG2: “A1 interface: General Aspects and Principles” 29 
+[4] O-RAN WG2: “A1 interface: Transport Protocol” 30 
+[5] 3GPP TS 23.501: “3rd Generation Partnership Project; Technical Specification Group Services 31 
+and System Aspects; System Architecture for the 5G System; Stage 2” 32 
+[6] 3GPP TS 29.501: “3rd Generation Partnership Project; Technical Specification Group Core 33 
+Network and Terminals; 5G System; Principles and Guidelines for Services Definition; Stage 3” 34 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                5 
+[7] 3GPP TS 29.cde: “3rd Generation Partnership Project; Technical Specification Group Core 1 
+Network and Terminals; 5G System; <template> Services Stage 3” 2 
+[8]  3GPP TS 32.158: “3rd Generation Partnership Project; Technical Specification Group 3 
+Management and orchestration; Design rules for REpresentational State Transfer (REST) Solution 4 
+Sets (SS) 5 
+[9] 3GPP TS 32.866: “3rd Generation Partnership Project; Technical Specification Group Services 6 
+and System Aspects; Telecommunication management; Study on a REST(REpresentational State 7 
+Transfer)-ful HTTP-based Solution Set (SS) 8 
+[10]    IETF RFC8259: “The JavaScript Object Notation (JSON) Data Interchange Format” 9 
+[11]    IETF RFC6902: “JavaScript Object Notation (JSON) Patch” 10 
+[12] 3GPP TS 38.463: “3rd Generation Partnership Project; Technical Specification Group Radio 11 
+Access Network;  NG-RAN; E1 application protocol (E1AP)” 12 
+[13] 3GPP TS 38.473: “3rd Generation Partnership Project; Technical Specification Group Radio 13 
+Access Network;  NG-RAN; F1 application protocol (F1AP)” 14 
+[14] 3GPP TS 23.401: “3rd Generation Partnership Project; Technical Specification Group Radio 15 
+Access Network; UTRAN overall description”  16 
+[15] 3GPP TS 23.003: “3rd Generation Partnership Project; Technical Specification Group Core 17 
+Network and Terminals; Numbering, addressing and identification” 18 
+[16] ITU-T P.1203.3: “SERIES P: TELEPHONE TRANSMISSION QUALITY, TELEPHONE 19 
+INSTALLATIONS, LOCAL LINE NETWORKS; Models and tools for quality assessment of 20 
+streamed media; Parametric bitstream-based quality assessment of progressive download and 21 
+adaptive audiovisual streaming services over reliable transport – Quality integration module” 22 
+[17] 3GPP TS 38.300: “3rd Generation Partnership Project; Technical Specification Group Radio 23 
+Access Network; NR; NR and NG-RAN Overall Description; Stage 2” 24 
+[18] IETF RFC 3986: “Uniform Resource Identifier (URI): Generic Syntax” 25 
+[19]    IETF RFC7807: “Problem Details for HTTP APIs” 26 
+[20] 3GPP TS 29.500: “3rd Generation Partnership Project; Technical Specification Group Core etwork 27 
+and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 3” 28 
+[21] 3GPP TS 21.900: “3rd Generation Partnership Project; Technical Specification Group Core 29 
+Network and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 30 
+3” 31 
+1.3 Definitions and Abbreviations 32 
+1.3.1 Definitions 33 
+A1 policy Declarative policy that is identified by its PolicyID and contains a scope identifier and one or more 34 
+policy statements. 35 
+PolicyID Identifier of an A1 policy that is used in policy operations and included in policy objects. 36 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                6 
+Scope identifier Identifier of what the statements in the policy applies to (UE, group of UEs, slice, QoS flow , 1 
+network resource or combinations thereof). 2 
+Policy statement Expression of a directive in an A1 policy that is related to policy objectives and/or policy 3 
+resources and are to be applied to/for the entities identified by the scope identifier. 4 
+Policy object Representation of an A1 policy in JSON format used as payload in HTTP based policy procedures.  5 
+1.3.2 Abbreviations 6 
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1], O-RAN [2,3] and the 7 
+following apply. An abbreviation defined in the present document takes precedence over the definition of the same 8 
+abbreviation, if any, in 3GPP TR 21.905 [1].  9 
+Id    Identifier 10 
+JSON   JavaScript Object Notation 11 
+KPI   Key Performance Indicator 12 
+KQI   Key Quality Indicator 13 
+ML   Machine Learning 14 
+QoS   Quality of Service 15 
+QoE   Quality of Experience 16 
+REST   REpresentational State Transfer 17 
+RAN   Radio Access Netework 18 
+RT    Real Time 19 
+RIC   RAN Intelligent Controller 20 
+RRM   Radio Resouirce Management 21 
+S-NSSAI  Single Network Slice Selection Assistance Information  22 
+SMO   Service Management and Orchestration 23 
+SPID   Subscriber Profile IDentity 24 
+UE    User Equipment 25 
+UEId   UE Identity 26 
+URI   Uniform Resource Identifier 27 
+ 28 
+  29 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                7 
+Chapter 2 A1 application protocol 1 
+This document contains a REST method realization of the interface architecture and policy procedures defined in [3]. It 2 
+is based on HTTP transport as defined in [4]. 3 
+This definition of the A1 Application Protocol (A1AP) is based on the 3GPP service framework for network functions 4 
+[5]. It corresponds to a REST-based Solution Set and is based on the structure in the 3GPP specification 29.501 [6] and 5 
+the related template [7]. The design patterns for HTTP procedures are based on [8] and the design patterns for JSON 6 
+objects are based on [9]. 7 
+Chapter 3 A1 Services 8 
+3.1 Introduction 9 
+The A1AP contains APIs for the services defined in [3]: 10 
+A1-P – Policy Management Service 11 
+A1-ML – ML Model Management Service 12 
+A1-EI – Enrichment Information Service 13 
+The A1AP is based on signaling between an A1 service consumer and an A1 service producer residing in the non-RT 14 
+RIC or in the near-RT RIC. 15 
+A1-P 
+Consumer
+non-RT RIC
+A1-ML 
+Consumer
+A1-EI 
+Producer
+A1-P 
+Producer
+A1-ML  
+Producer
+A1-EI  
+Consumer
+near-RT RIC
+A1-P A1-ML A1-EI
+ 16 
+Figure 3.1-1 Service framework for the A1 services. 17 
+The interactions between Service Consumer and Service Producer is based on the service framework used for 3GPP 18 
+Network Functions [5] section 7.1.2 where requests are sent from the Consumer and responses and notifications are sent 19 
+from the from the Producer. It is the Producer that handles the resources on which the Consumer performs operations. 20 
+The terms consumer and producer does, thus, not refer to the direction of the data transfer over the A1 interface.  21 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                8 
+3.2 Policy Management Service 1 
+Definitions of A1 policy, policy statements, policy procedures and A1 policy life cycle aspects are found in [3]. This 2 
+document defines a REST based solution set for how to realize A1 policies and perform operations on them over the A1 3 
+interface [4]. 4 
+3.2.1 Service Description 5 
+3.2.1.1 Functional elements 6 
+The A1AP is based on signaling between the A1P Consumer residing in the non -RT RIC and the A1P Producer residing 7 
+in the near-RT RIC. Both the A1P Consumer and the A1P Producer contains a HTTP Client and a HTTP Server.  8 
+HTTP Client
+A1-P Consumer
+HTTP Server
+HTTP Server HTTP Client
+A1-P Producer
+Create policy
+Query policy
+Update policy
+Delete policy
+Query policy types
+Policy feedback
+  policynotifications
+  policies
+ 
+ 9 
+Figure 3.2-1 HTTP roles in service framework. 10 
+The A1AP realizes the A1 policy procedures defined in [3] using HTTP [4] operations where a policy is represented as 11 
+a JSON object [10], [11]. 12 
+3.2.1.2 Policy representation 13 
+The following principles are used for A1 policies when JSON is used as resource representation format: 14 
+- A policy corresponds to a resource (in the REST sense); 15 
+- A policy is represented as a JSON object referred to as a policy object; 16 
+- A policy object contains a scope identifier and at least one policy statement (e.g. one or more policy objective 17 
+statements and/or one or more policy resource statements); 18 
+- A policy is identified by a PolicyId that is included in the policy object , and in the URI when operation is for a 19 
+single policy; 20 
+- The PolicyId is assigned by the A1-P Consumer when the policy is created; 21 
+- The A1-P Producer cannot modify or delete a policy; 22 
+- A (multi-)policy object can contain representations of several A1 policies (to enable policy operation for 23 
+multiple policies); 24 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                9 
+- Policy feedback for a specifc policy is implicitly subscribed to when the policy is created  (i.e. no explicit 1 
+subscribe operation is needed); 2 
+- A policy object does not contain any information related to which internal function in the near -RIC that is to 3 
+evaluate the policy, instead the near-RT RIC mediates the policy to the appropriate internal function. 4 
+3.2.1.3 Representation objects 5 
+The following JSON objects are used within the service operations of the A1-P service: 6 
+PolicyObject 7 
+ The policy object is the JSON representation of a complete A1 policy. 8 
+PolicyUpdateObject 9 
+The policy update object is the JSON representation of a partial update to an A1 policy. 10 
+PolicyNotifyObject 11 
+The policy notification object is the JSON representation of the content in an A1 policy feedback message.  12 
+PolicyErrorObject 13 
+The policy error object is the JSON representation of the content in a response message with other HTTP error 14 
+response codes (4xx). 15 
+NOTE: These JSON objects can represent a single policy or multiple policies. 16 
+PolicyListObject 17 
+The policy list object is the JSON representation of the collection of policies  18 
+3.2.1.4 Resource identifiers 19 
+The main URI for A1 policies is: 20 
+ …/A1/policies 21 
+A single policy can be operated upon by adding the value of the policy identifier to the URI: 22 
+ …/A1/policies/{PolicyID_value} 23 
+The main URI for policy notification is: 24 
+ …/A1/policynotifications 25 
+3.2.2 Service Operations 26 
+The following table describes the mapping between the A1 policy procedures and the HTTP methods used to realise 27 
+them. 28 
+A1 policy procedure Single policy method Multiple policies method 
+Create policy PUT PATCH (‘add’ policy) 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                10 
+Query policy GET GET (sequence of *) 
+Update policy - complete PUT PATCH (‘replace’ policy) 
+Update policy - partial PATCH (‘add’, ‘replace’, 
+‘remove’ statement) 
+PATCH (‘add’, ‘replace’, 
+‘remove’ statement) 
+Delete policy DELETE PATCH (‘remove’ policy) 
+Notify policy POST POST 
+NOTE*):  There is no suitable PATCH operation defined for query of multiple policies, hence sequence of 1 
+GET operations need to be used if a specified set of policies is to be queried. For operations based on HTTP 2 
+PATCH, the payload is defined by JSON PATCH as defined in IETF RFC 6902 [11] and includes 3 
+add/replace/remove operations. 4 
+Table 3.2-1 A1 procedures to HTTP methods mapping. 5 
+3.2.2.1 Introduction 6 
+The following sections describe the policy operations. For details on the policy objects (in JSON format) transferred in 7 
+the HTTP message bodies, see Annex B. 8 
+The policy scope in a policy object contains a scope identifier that can be e.g. a UEId, a GroupId or a CellId. The A1-P 9 
+Consumer needs to map PolicyIDs to scope identifiers in order to manage e.g. all policies applicable to a specific 10 
+individual UEId. If there are several polices related to a single scope identifier, then several poli cy requests need to be 11 
+made to manage that specific individual, either in a sequence of single policy operations or in a single operation with a 12 
+multi-policy object. 13 
+3.2.2.2 Create policy 14 
+3.2.2.2.1 General 15 
+An A1 policy is created using a HTTP PUT request containing a policy object in the payload. The format of the policy 16 
+object is checked, and the request is either accepted or rejected. If accepted, the policy is to be enforced. 17 
+3.2.2.2.2 Create single policy 18 
+The operation to create a single policy is based on HTTP PUT and a PolicyID created by the the A1-P Consumer.  19 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PUT   policies/"PolicyID_value"(PolicyObject)
+2. 201 Created (PolicyObject)
+ 20 
+Figure 3.2.2.2-1 Create single policy procedure. 21 
+The procedure is as follows: 22 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                11 
+1) The A1-P Consumer generates the PolicyID and sends a HTTP PUT request to the A1-P Producer. The target 1 
+URI identifies the resource (PolicyID) under which the new policy shall be created. The message body carries 2 
+a complete policy object. 3 
+2) The A1-P Producer returns the HTTP PUT response. On success, “201” is returned. The location header is 4 
+present and carries the URI of the new policy and the message body the complete policy object. On failure, the 5 
+appropriate error code is returned and the message body may provide a policy error object. 6 
+3.2.2.2.3 Create multiple policies 7 
+The operation to create multiple policies is based on HTTP PATCH and the content of the (multi-)policy object 8 
+represents multiple policies with a JSON PATCH 'add' operation for each policy. 9 
+ 10 
+Figure 3.2.2.2-2 Create multiple policies procedure. 11 
+As the location header in the response cannot contain the resulting URI for all created policies, the URI for operating on 12 
+each created policy is based on the target URI and the PolicyID (in the same way as after creating a single policy). 13 
+3.2.2.3 Query policy 14 
+3.2.2.3.1 General 15 
+A1-P Consumer can use the query policy procedure to read a single policy or to check which policies that exist. 16 
+3.2.2.3.2 Query single policy 17 
+The operation to query a single policy is based on HTTP GET. The policy to be read is identified with a URI that 18 
+includes the PolicyId while the message body is empty and the response returns the complete policy object. 19 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policies/"PolicyID_value"
+2. 200 OK (PolicyObject)
+ 20 
+Figure 3.2.2.3-1 Query single policy procedure. 21 
+The procedure is as follows: 22 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PATCH   policies(PolicyObject)
+2. 201 Created (PolicyObject)
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                12 
+1) The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the policy to 1 
+be read based on the PolicyId under the parent resource “/policies”. The message body is empty. 2 
+2) The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body 3 
+carries a complete policy object representing the read policy. On failure, the appropriate error code is returned 4 
+and the message response body may contain additional error information. 5 
+3.2.2.3.3 Query multiple policies 6 
+The operation to query multiple policies is a sequence of operations to query a single policy. 7 
+NOTE: to query all policies applicable to e.g. a dynamically defined group of UEs, a slice or a cell, the A1 -P 8 
+Consumer need to map the scope identifier to the applicable PolicyID(s) and make a sequence of requests. 9 
+3.2.2.3.4 Query all policies 10 
+The operation to query all policies is based on HTTP GET. The collection of policies to be read is identified within the 11 
+URI while the message body is empty and the response returns a policy list object representing all policies in the 12 
+collection and their enforcement status. 13 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. GET   policies
+2. 200 OK (PolicyListObject)
+ 14 
+Figure 3.2.2.3-2 Query all policies procedure. 15 
+3.2.2.4 Update policy 16 
+3.2.2.4.1 General 17 
+A1-P Consumer can use the update policy procedure to either complete replace one or more policies, or to partially 18 
+update one or more polices. 19 
+3.2.2.4.2 Update single policy (complete) 20 
+The operation to completely update a single policy is based on HTTP PUT. The policy to be updated is identified with a 21 
+URI that includes the PolicyId and the message body contains the complete policy object for the updated policy. 22 
+ 23 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                13 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PUT   policies/"PolicyID_value"(PolicyObject)
+2. 200 OK (PolicyObject) or 204 No Content
+ 1 
+Figure 3.2.2.4-1 Update completely single policy procedure. 2 
+The procedure is as follows: 3 
+1) The A1-P Consumer sends a HTTP PUT request to the A1-P Producer. The target URI identifies the policy to 4 
+be updated based on the PolicyId under the parent resource “/Policies”. The message body contains a complete 5 
+policy object. 6 
+2) The A1-P Producer returns the HTTP PUT response. On success, “200 OK” or “204 No Content” is returned. 7 
+The message body carries a complete policy object representing the updated policy. On failure, the appropriate 8 
+error code is returned and the message response body may contain additional error information.   9 
+NOTE: In case the policy does not exist, the PUT request is handled as a create policy request. 10 
+3.2.2.4.3 Update multiple policies (complete) 11 
+The operation to completely update multiple policies is based on HTTP PATCH and the content of the (multi -)policy 12 
+object represents multiple policies with a JSON PATCH 'replace' operation for each policy.  13 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PATCH   policies(PolicyObject)
+2. 200 OK (PolicyObject) or 204 No Content
+ 14 
+Figure 3.2.2.4-2 Update completely multiple policies procedure. 15 
+3.2.2.4.4 Update single policy (partial) 16 
+The operation to partially update a single policy is based on HTTP PATCH. The policy to be updated is identified with 17 
+a URI that includes the PolicyId and the message body contains the policy update object for the updated policy with a 18 
+JSON PATCH 'add', 'replace' or 'remove' operation for each statement to be updated. 19 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                14 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PATCH   policies/"PolicyID_value"(PolicyUpdateObject)
+2. 200 OK (PolicyObject) or 204 No Content
+ 1 
+Figure 3.2.2.4-3 Update partially single policy procedure. 2 
+3.2.2.4.5 Update multiple policies (partial) 3 
+The operation to partially update multiple policies is the same as the operation to partially update a single policy with 4 
+the only difference being the content of the policy update object which here represents multiple updated policies. 5 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PATCH   policies(PolicyUpdateObject)
+2. 200 OK (PolicyObject) or 204 No Content
+ 6 
+Figure 3.2.2.4-4 Update partially multiple policies procedure. 7 
+3.2.2.5 Delete policy 8 
+3.2.2.5.1 General 9 
+A1-P Consumer can use the delete policy procedure to delete a single policy or to delete multiple policies.  10 
+3.2.2.5.2 Delete single policy 11 
+The operation to delete a single policy is based on HTTP DELETE. The policy to be deleted is identified with a URI 12 
+that includes the PolicyId. Neither request nor response contain any policy object in the message body.  13 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. DELETE   policies/"PolicyID_value"
+2. 204 No Content
+ 14 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                15 
+Figure 3.2.2.5-1 Delete single policy procedure. 1 
+The procedure is as follows: 2 
+1) The A1-P Consumer sends a HTTP DELETE request to the A1-P Producer. The target URI identifies the 3 
+policy to be deleted based on the PolicyId under the parent resource “/Policies”. The message body is empty. 4 
+2) The A1-P Producer returns the HTTP DELETE response. On success, “204 No Content” is returned. The 5 
+message body is empty. On failure, the appropriate error code is returned and the message response body may 6 
+contain additional error information.  7 
+3.2.2.5.3 Delete multiple policies 8 
+The operation to delete multiple policies is based on HTTP PATCH and the content of the (multi-)policy object 9 
+represents multiple policies with a JSON PATCH 'remove' operation for each policy.  10 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. PATCH   policies(PolicyObject)
+2. 204 No Content
+Delete policies
+ 11 
+Figure 3.2.2.5-2 Delete multiple policies procedure. 12 
+3.2.2.6 Policy feedback 13 
+3.2.2.6.1 General 14 
+Policy feedback is an operation that requires the A1-P Producer to have a reduced feature HTTP Client for sending 15 
+HTTP POST requests and receiving HTTP POST responses. Correspondingly, the A1-P Consumer is required to have a 16 
+reduced feature HTTP Server for receiving HTTP POST requests and sending HTTP POST responses.  17 
+The A1-P Producer uses the policy feedback operation to notify the A1 -P Consumer about: 18 
+- Changes in the policy enforcement status for an A1 policy; 19 
+All notifications are sent to the URI for notification handling and the PolicyNotifyObject contains the information about 20 
+changes and causes. 21 
+3.2.2.6.2 Policy status update 22 
+The operation to provide policy feedback is based on HTTP POST. The URI contains the target resource for policy 23 
+notification handling. The notification content is represented in a policy notification object that is included in the 24 
+message body and can contain one or several notifications. 25 
+The procedure is used to notify about an enforcement status change of a policy between ‘enforced’ and ‘not enforced’.  26 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                16 
+A1-P Consumer
+ A1-P Producer
+A1-P Consumer
+ A1-P Producer
+1. POST   policynotifications(PolicyNotifyObject)
+2. 204 No content
+ 1 
+Figure 3.2.2.6-1 Policy enforcement feedback procedure. 2 
+The procedure is as follows: 3 
+1) The A1-P Producer sends a HTTP POST request to the A1-P Consumer. The target URI identifies the sink for 4 
+policy notifications. The message body contains a policy notification object. 5 
+2) The A1-P Consumer returns the HTTP POST response with “204 No Content”. The message body is empty. 6 
+On failure, the appropriate error code is returned. 7 
+3.3 ML Model Management Service 8 
+No explicit ML Model service operations are defined in this version of the specification. 9 
+3.4 Enrichment Information Service 10 
+No explicit Enrichment Information service operations are defined in this version of the specification. 11 
+Chapter 4 API Defintions 12 
+4.1 Introduction 13 
+4.2 A1-P (policy management) 14 
+This section contains the defintion of the REST based API for the Policy Management Service referrd to as A1-P. 15 
+4.2.1 Introduction 16 
+The A1-P service shall use the A1-P API. 17 
+The request URI used in HTTP request from the A1-P consumer towards the A1-P producer shall have the structure 18 
+defined in subclause 4.4.1 of 3GPP TS 29.501 [6], i.e.: 19 
+{apiRoot}/<apiName>/{apiVersion}/<apiSpecificResourceUriPart> 20 
+"apiRoot" shall be a concatenation of the following parts: 21 
+- scheme ("https")  22 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                17 
+NOTE: In this release of the specification, https scheme URIs are mandated. 1 
+- the fixed string "://" 2 
+- authority (host and optional port) as defined in IETF RFC 3986 [9]. 3 
+"apiName" shall be “A1-P”. 4 
+"apiVersion" shall be “v1”. 5 
+"apiSpecificResourceUriPart" shall be as be defined in subclause 4.2.3. 6 
+4.2.2 Usage of HTTP 7 
+4.2.2.1 General 8 
+The A1 Transport, HTTP protocol and security requirements, is described in [4]. 9 
+4.2.2.2 HTTP standard headers 10 
+Note: the encodings and applicable MIME media type for the related Content-Type header are not specified in the 11 
+current version. 12 
+4.2.2.3 HTTP custom headers 13 
+No HTTP custom headers are introduced in this version of the specification.  14 
+4.2.3 Resources  15 
+4.2.3.1 Overview 16 
+The resource URI structure for the A1-P API is illustrated in figure 4.2.3-1. 17 
+{apiRoot}/A1-P/v1
+/policies
+/policynotifications
+/{policy_id_value}
+ 18 
+Figure 4.2.3-1: Resource URI structure of the A1-P API 19 
+Table 4.2.3-1 provides an overview of the resources and applicable HTTP methods. 20 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                18 
+Table 4.2.3-1: Resources and methods overview 1 
+Resource name Resource URI HTTP method or 
+custom operation Description 
+policy_id …/policies PUT Create policy, Update policy 
+POST N/A 
+GET Query policy 
+PATCH Create policy, Update policy, Delete policy 
+DELETE Delete policy  
+…/policynotifications POST Notify policy 
+4.2.3.2 Resource: <policy_id> 2 
+The name of resources in the A1-P API is the PolicyId assigned by the A1-P Consumer when the policy is created. 3 
+4.2.3.2.1 Description 4 
+A resource represents an A1 policy. 5 
+4.2.3.2.2 Resource Definition 6 
+The Resource URI and the supported resource variables are as defined in previous sections. 7 
+4.2.3.2.3 Resource Standard Methods 8 
+The following subclauses specifies the standard methods supported by the resource. 9 
+Note: URI query parameters are not specified in the current version. 10 
+4.2.3.2.3.1 HTTP PUT 11 
+This method shall support the request data structures specified in table 4.2.3.3-1 and the response data structures and 12 
+response codes specified in table 4.2.3.3-2. 13 
+Table 4.2.3.2.3.1-1: Data structures supported by the HTTP PUT Request Body on this resource  14 
+Data type P Cardinality Description 
+PolicyObject "M" "1" Create policy 
+PolicyUpdateObject "M" "1" Update policy 
+Table 4.2.3.2.3.1-2: Data structures supported by the HTTP PUT Response Body on this resource 15 
+Data type P Cardinality Response 
+codes 
+Description 
+PolicyObject "C"  "0..1" 201 Created 
+204 No content 
+Confirmation of created policy 
+ 
+PolicyErrorObject "O" "0..1" 4xx Detailed problem description 
+NOTE: Presence condition "C" means PolicyObject shall be included in case response code is 201 Created but not 16 
+included in case response code is 204 No content. 17 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                19 
+4.2.3.2.3.2 HTTP GET 1 
+Table 4.2.3.2.3.2-1: Data structures supported by the HTTP GET Request Body on this resource  2 
+Data type P Cardinality Description 
+N/A  "0" There is no object in the message body of a GET request 
+Table 4.2.3.2.3.1-2: Data structures supported by the HTTP GET Response Body on this resource 3 
+Data type P Cardinality Response 
+codes 
+Description 
+PolicyObject "C" "1" 200 OK Requested policy object 
+ 
+PolicyListObject "C" "1" 200 OK Requested policy list object 
+ 
+PolicyErrorObject "O" "0..1" 4xx Detailed problem description 
+NOTE: Presence condition "C" means PolicyObject shall be included in case URI in request is 4 
+‘…/policies/{PolicyID_value}’ while PolicyListObject shall be included in case URI is ‘…/policies’.  5 
+4.2.3.2.3.3 HTTP PATCH 6 
+Table 4.2.3.2.3.3-1: Data structures supported by the HTTP PATCH Request Body on this resource  7 
+Data type P Cardinality Description 
+PolicyObject "M" "1" Create policy, Update policy (complete), Delete policy 
+PolicyUpdateObject "M" "1" Update policy (partial) 
+Table 4.2.3.2.3.3-2: Data structures supported by the HTTP PATCH Response Body on this resource 8 
+Data type P Cardinality Response 
+codes 
+Description 
+PolicyObject "C"  "0..1" 201 Created 
+204 No content 
+Confirmation of created or updated policies 
+ 
+PolicyErrorObject "O" "0..1" 4xx Detailed problem description 
+NOTE: Presence condition "C" means PolicyObject shall be included in case response code is 201 Created but not 9 
+included in case response code is 204 No content. 10 
+4.2.3.2.3.4 HTTP DELETE 11 
+Table 4.2.3.2.3.4-1: Data structures supported by the HTTP DELETE Request Body on this resource  12 
+Data type P Cardinality Description 
+N/A  "0" There is no object in the message body of a DELETE request 
+Table 4.2.3.2.3.4-2: Data structures supported by the HTTP DELETE Response Body on this resource 13 
+Data type P Cardinality Response 
+codes 
+Description 
+N/A  "0" 204 No content Confirmation of succesful deletion 
+ 
+PolicyErrorObject "O" "0..1" 4xx Detailed problem description 
+  14 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                20 
+4.2.3.2.3.5 HTTP POST 1 
+Table 4.2.3.2.3.5-1: Data structures supported by the HTTP POST Request Body on this resource  2 
+Data type P Cardinality Description 
+PolicyNotifyObject "M"  "1" Notify policy 
+Table 4.2.3.2.3.5-2: Data structures supported by the HTTP POST Response Body on this resource 3 
+Data type P Cardinality Response codes Description 
+N/A  "0" 204 No content Confirmation of received notification 
+PolicyErrorObject "O" "0..1" 4xx Detailed problem description 
+ 4 
+4.2.3.2.4 Resource Custom Operations 5 
+No custom operations are defined. 6 
+4.2.4 Custom Operations without associated resources  7 
+No custom operations are defined. 8 
+4.2.5 Notifications 9 
+Notifications are defined by the policy feedback procedure. 10 
+4.2.6 Data Model 11 
+This subclause specifies the application data model supported by the A1-P API. The data model is based on policy 12 
+statements that include attributes and are combined with a scope identifer into policy objects. 13 
+For policy objectives, policy statements for the following characteristics are defined: 14 
+- QoS targets; 15 
+- QoE targets. 16 
+For policy resources, policy statements for the following characteristics are defined: 17 
+-  Traffic steering optimization. 18 
+4.2.6.1 Scope identifier (Structured data type) 19 
+A1 polices are in [3] defined as containing a scope identifier and one or more policy statements where policy statements 20 
+contain policy objectives and/or policy resources. This section defines the structured data type and attributes to be used 21 
+as scope identifier. 22 
+The scope identifier contains the following attributes: 23 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                21 
+Table 4.2.6.1-1: Definition of statement type scope 1 
+Attribute 
+Name 
+Data Type P Cardinality Description Applicability 
+ue_id String "C" "0..1" UE identifier based on RAN UE Id 
+[12]&[13] 
+identifies a single UE 
+group_id String "C" "0..1" identifer of a pre-defined group of UEs, 
+SPID [14] 
+identifies a group of UEs 
+slice_id String "C" "0..1" network slice identifier, NSSAI [15] identifies a slice 
+qos_id String "C" "0..1" QoS identifier, 5QI [5] identifies a QoS Flow 
+cell_id String "C" "0..1" network resource identifier related to cells 
+[15] 
+identifies a cell 
+Note: Presence condition "C" means that least one attribute shall be included when the scope is defined. The allowed 2 
+combinations of attributes depend on the policy statement that is combined with the scope identifier, see section 4.2.6.4. 3 
+4.2.6.2 Policy statements (Structured data types) 4 
+A1 polices are in [3] defined as containing a scope identifier and one or more policy statements where policy statements 5 
+contain policy objectives and/or policy resources. This section defines the structured data types and attributes to be used 6 
+for policy statements. 7 
+4.2.6.2.1 Introduction 8 
+Table 4.2.6.2.1-1 specifies the data types defined for policy objectives in the A1-P interface protocol. The possible 9 
+combinations of these are defined in section 4.2.6.4. 10 
+Table 4.2.6.2.1-1: policy statements (Data Types) for policy objectives 11 
+Data type Section defined Description Applicability 
+qos_target 4.2.6.2.2 Attributes related to QoS  
+qoe_target 4.2.6.2.3 Attributes related to QoE  
+ 12 
+Table 4.2.6.2.2-2 specifies the data types defined for policy resources in the A1-P interface protocol. The usage of these 13 
+are defined in section 4.2.6.4. 14 
+Table 4.2.6.2.1-2: policy statements (Data Types) for policy resources 15 
+Data type Section 
+defined 
+Description Applicability 
+traffic_steering_preference 4.2.6.2.4 Attributes used to schedule traffic on 
+available cells in a different way than 
+what would be through default behavior 
+ 
+  16 
+4.2.6.2.2 QoS target 17 
+The qos_target statement contains the following attributes: 18 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                22 
+Table 4.2.6.2.2-1: Definition of statement type qos_target 1 
+Attribute name Data type P Cardinality Description Applicability 
+gfbr Number "C" "0..1" Guaranteed Flow Bit Rate, 
+see [5] 
+ 
+mfbr Number "C" "0..1" Maximum Flow Bit Rate, 
+see [5] 
+ 
+priority_level Number "C" "0..1" Priority Level, see [5]  
+pdb Number "C" "0..1" Packet Delay Budget, see 
+[5] 
+ 
+Note: Presence condition "C" means that least one attribute shall be included when this statement is used. 2 
+4.2.6.2.3 QoE target 3 
+The qoe_target statement contains the following attributes: 4 
+Table 4.2.6.2.3-1: Definition of statement type qoe 5 
+Attribute name Data type P Cardinality Description Applicability 
+qoe_score number "C" "0..1" mean opinion score value 
+between 1 and 5, 
+it can be either e.g. video MOS 
+as specified in [16] or a 
+customized MOS 
+ 
+initial_buffering number "C" "0..1" refers to the time in seconds 
+between the initiation of video 
+playback by the user and the 
+actual start of the playback as 
+specified in [16] 
+ 
+reBuffFreq number "C" "0..1" it can be calculated by taking the 
+number of stalling events 
+(excluding the initial buffering) 
+and dividing by the length of 
+media as specified in [16] or by a 
+customized time window 
+ 
+stallRatio number "C" "0..1" ratio of the sum of duration of the 
+stalling events to the total media 
+length as specified in [16] or by a 
+customized time window.  
+ 
+Note 1: Presence condition "C" means that least one attribute shall be included when this statement is used.  6 
+Note 2: In this version of the specification, the QoE target is applicable to video streaming services . 7 
+Application server will measure the QoE related attributes (e.g. MOS, initial buffering, reBuffFreq, stallRatio) for a 8 
+specific service based on application info. However, it’s too late for network to optimize the radio resource when the 9 
+application server find the QoE is too bad. Near-RT RIC could predict the QoE related attributes based on the network 10 
+side info (e.g. QoS parameters, radio conditions, Packet measure report etc.) e.g. by performing model inference for a 11 
+specific ML model received from non-RT RIC. The predict value is approximately the QoE related attribute which will 12 
+be measured at application server later, but it’s estimated at Near-RT RIC in real time. So Near-RT RIC could decide to 13 
+optimize the radio resource based on the predict value and the QoE target contained in the A1 policy.  14 
+4.2.6.2.4 Traffic steering preference 15 
+The traffic_steering_preference statement contains the following attributes: 16 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                23 
+Table 4.2.6.2.4-1: Definition of statement type traffic_steering_preference 1 
+Attribute name Data type P Cardinality Description Applicability 
+cell_id_list Array “M” "1..N" list of CellIDs, see section 
+4.2.6.1 
+ 
+preference preference_type “M” "1" the preference of cell usage 
+[shall/prefer/avoid/forbid]. 
+ 
+primary true/false “O” "0..1" indicates applicability to the 
+selection of primary cell  
+ 
+ Note: Presence condition "M" means that the attribute shall be included when this statement is used while "O" means 2 
+that it is optional to include. 3 
+When the value of the preference attribute is set to 'prefer' or 'avoid', the cell_id_list contains cells in descending order  4 
+of importance for how they should be preferred or avoided, e.g. the first entry is most preferred or most avoided.  When 5 
+the preference value is set to 'shall' or 'forbid', the cell_id_list contains cells that are of equal importance.  6 
+When the value of the primary attribute is set to 'true', and the value of the preference attribute is set to 'shall', then o nly 7 
+a cell in the cell_id_list is to be used as primary cell. When the value of the primary attribute is set to 'true', and the 8 
+value of the preference attribute is set to 'prefer', then a cell in the cell_id_list may be used as primary cell. When the 9 
+value of the primary attribute is set to 'true', and the preference value is set to 'avoid' or 'forbid', then no cell in the 10 
+cell_id_list is to be used as primary cell.  11 
+When the value of the primary attribute is set to 'false', and the value of the preference attribute is set to 'shal l', then only 12 
+one or more cells in the cell_id_list are to be used as secondary cell. When the value of the primary attribute is set to 13 
+'false', and the value of the preference attribute is set to 'prefer', then one or more cells in the cell_id_list may be  used as 14 
+secondary cell. When the value of the primary attribute is set to 'false', and the preference value is set to 'avoid' or 15 
+'forbid', then no cell in the cell_id_list is to be used as secondary cell.  16 
+When the primary attribute is not included, the statement shall be handled in the same way as when the primary 17 
+attribute is set to 'false'. 18 
+4.2.6.2.5 Enforcement update 19 
+Policy feedback provides a notification containing the status and reason for a change in enforcement status.  20 
+The enforcement_update statement contains the following attributes: 21 
+Table 4.2.6.2.5-1: Definition of statement type enforcement_update 22 
+Attribute name Data type P Cardinality Description Applicability 
+enforce_status enforcement_status_type "M" "1" indicating if policy is being 
+enforced or not 
+In all notifications 
+enforce_reason enforcement_reason_type "C" "0..1" Indicating the reason why a 
+policy is no longer being 
+enforced 
+ 
+Note: Presence condition "M" means that the data type shall be included in a policy notification object. Presence 23 
+condition "C" means that the enforce_reason shall be included when enforce_status value indicates status is changed to 24 
+no longer enforced. 25 
+4.2.6.2.6 Problem details 26 
+In case a policy request is not accepted, additional information can be provided in the response in addition to the normal 27 
+HTTP status code. 28 
+The problem_details statement contains the following attributes: 29 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                24 
+Table 4.2.6.2.6-1: Definition of statement type problem_details 1 
+Attribute name Data type P Cardinality Description Applicability 
+type string “O” "0..1" a URI reference according 
+to IETF RFC 3986 [18] that 
+identifies the problem type 
+ 
+title string “O” "0..1" human-readable summary 
+of the problem type 
+ 
+status number “O” "0..1" the HTTP status code  
+detail string “O” "0..1" human-readable explanation   
+instance string “O” "0..1" URI reference that 
+identifies the specific 
+occurrence of the problem 
+ 
+policy_error_code policy_error_type “M” "1" machine-readable policy 
+error cause  
+ 
+invalid_params array “O” "0..N" description of invalid 
+parameters causing a 
+request to be rejected 
+parameters defined as 
+attributes in this 
+specification that had invalid 
+values in the policy request 
+NOTE: attribute names are as defined in IETF RFC 7807 [19] except for the cause attributes that is here renamed to 2 
+policy_error_code. 3 
+4.2.6.3 Attributes (Simple data types and enumerations) 4 
+This subsection defines attributes to be used for scope information and attributes that are not defined as part of the 5 
+statements in the previous sections.  6 
+4.2.6.3.1 Introduction 7 
+This subclause defines simple data types and enumerations that can be referenced from data structures defined i n the 8 
+previous subclauses. 9 
+4.2.6.3.2 Simple data types  10 
+A policy object contains a PolicyID attribute in addition to the scope identifier and the policy statement(s). 11 
+Table 4.2.6.3.2-1: Common attribute for policy objects 12 
+Type Name Type Definition Description Applicability 
+policy_id String policy identifier assigned by the A1-P Consumer 
+when a policy is created 
+used in URI and included in 
+policy objects 
+ 13 
+4.2.6.3.3 Enumerations 14 
+4.2.6.3.3.1 Supported_type 15 
+The enumeration supported_type represents the support of a feature (e.g. a REST resource). It shall comply with the 16 
+provisions defined in table 4.2.6.3.3.1-1. 17 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                25 
+Table 4.2.6.3.3.1-1: Enumeration support_type 1 
+Enumeration value Description Applicability 
+added equals that support for a specific feature has been added  
+removed equals that support for a specific feature has been removed  
+supported equals that support for a specific feature is supported  
+not_supported equals that support for a specific feature is not supported  
+ 2 
+4.2.6.3.3.2 Preference_type 3 
+The enumeration preference_type represents the preference of a specific network resource (e.g. cell usage). It shall 4 
+comply with the provisions defined in table 4.2.6.3.3.2-1. 5 
+Table 4.2.6.3.3.2-1: Enumeration preference_type 6 
+Enumeration value Description Applicability 
+Shall equals to select the 
+resource 
+select the cell regardless if connection retainability might be at 
+risk 
+Prefer equals to favor the selection 
+of the resource 
+favor the selection of the cell even if it is not with the best radio 
+quality if the connection retainability is not at risk. 
+Avoid equals to avoid selecting 
+the resource 
+avoid selecting the cell unless the connection retainability is at 
+risk 
+Forbid equals to not select the 
+resource 
+not select the cell under any conditions 
+ 7 
+4.2.6.3.3.4 Enforcement_status_type 8 
+The enumeration enforcement_status_type represents if a policy is enforced or not. It shall comply with the provisions 9 
+defined in table 4.2.6.3.3.4-1. 10 
+Table 4.2.6.3.3.4-1: Enumeration enforcement_status_type 11 
+Enumeration value Description Applicability 
+Yes equals that the policy is enforced  
+No equals that the policy is NOT enforced  
+ 12 
+4.2.6.3.3.5 Enforcement_reason_type 13 
+The enumeration enforcement_reason_type represents the reason why notification is sent (e.g. why enforcement status 14 
+has changed). It shall comply with the provisions defined in table 4.2.6.3.3.5-1. 15 
+Table 4.2.6.3.3.5-1: Enumeration enforcement_reason_type 16 
+Enumeration value Description Applicability 
+100 Policy object syntax error One or more fields in policy 
+object cannot be interpreted 
+200 Scope identifier is invalid Scope identifier is no longer 
+valid 
+300 Policy statement not applicable for the associated scope Policy statement(s) can no 
+longer be enforced for the 
+scope identifier 
+800 Default Generic default reason 
+ 17 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                26 
+4.2.6.3.3.6 Policy_error_type 1 
+The enumeration policy_error_type represents error information that can be provided in addition to the HTTP response 2 
+error code. It shall comply with the provisions defined in table 4.2.6.3.3.6-1. 3 
+The policy_error_type corresponds to the "cause" attribute defined in 3GPP specification 29.501 [6]. 4 
+Table 4.2.6.3.3.6-1: Enumeration policy_error_type 5 
+Enumeration value Description Applicability 
+CONF_POLICY_ID Policy instance with requested ID already exists In case a create policy request 
+could not be accepted due to 
+existing policy instance with same 
+policy id 
+BAD_REQ_MISSING_PARAM Bad request due to missing attributes in policy 
+object header (e.g. missing policy ID or scope ID) 
+In case a create policy request 
+could not be accepted due to 
+malformed syntax (missing policy 
+ID or scope ID) 
+ 6 
+4.2.6.4 Policy representations objects 7 
+This section contains the formal representation definitions of the policy representation object types defined in 3.2.1.4. 8 
+4.2.6.4.1 PolicyObject 9 
+4.2.6.4.1.1 General 10 
+A policy object is based on IETF RFC 8259 [10] (JSON) and it always contains one or more sets of: 11 
+- one policy identifier (PolicyID); 12 
+- one scope identifier; 13 
+and 14 
+- one or more policy statements. 15 
+The scope identifier can be either: 16 
+- an identifier for a single UE (ue_id); 17 
+- an identifier for a group of UEs (group_id); 18 
+- an identifier for a slice (slice_id); 19 
+- an identifier for QoS (qos_id); 20 
+- an identifier for a cell (cell_id). 21 
+Table 4.2.6.4.1.1-1: General definition of policy object 22 
+Attribute 
+name 
+Data type P Cardinality Description Applicability 
+policy_id string "M" "1" See section 4.2.6.3 policy identifier 
+ scope "M" "1" See section 4.2.6.1 scope identifier 
+ statement "M" "1..N" See section 4.2.6.2 policy statements 
+Note: Presence condition "M" means that the data type shall be included in a policy object. Allowed combinations are 23 
+listed in table 4.2.6.4.1.2-1. 24 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                27 
+4.2.6.4.1.2 Allowed combinations 1 
+A policy statement can be applied together with scope identifers containing different combinations of identifiers. Not all 2 
+combinations are relevant. The following table indicates combinations that are allowed.  3 
+Table 4.2.6.4.1.2-1: Allowed combinations of scope identifiers and policy statements 4 
+Scope identifier 
+Policy statement 
+ue_id group_id slice_id qos_id cell_id 
+qos_target 1 0..1 0 1 0..1 
+qos_target 1 0 0..1 1 0..1 
+qos_target 0 1 0 1 0..1 
+qos_target 0 0 1 1 0..1 
+qos_target 0 0 0 1 0..1 
+traffic_steering_preference 1 0 0..1 0..1 0..1 
+traffic_steering_preference 0 0 1 0..1 0..1 
+qoe_target 1 0 1 0..1 0..1 
+qoe_target 1 0 0 1 0..1 
+qoe_target 0 0 1 0..1 0..1 
+qoe_target 0 0 0 1 0..1 
+Note: on each row is listed a combination of identifiers that is allowed for the indicated statement. Notation is the same 5 
+as for caridinality: "0" means the identifier shall not occur, "0..1" means the identifier may occur and "1" means the 6 
+identifier shall occur. Only at most one occurance of an identifier is allowed in the present version.  7 
+4.2.6.4.2 PolicyUpdateObject 8 
+4.2.6.4.2.1 General 9 
+A policy update object is used when a policy is to be partially updated. (If po licy is to be completely updated, a normal 10 
+policy object is used.) 11 
+A policy update object is based on JIETF RFC 6902 [11] (JSON PATCH) and it always contains one ore more sets of: 12 
+- one patch operator (add, replace, remove) 13 
+- one path identifier (to the statements part of the policy); 14 
+- a name and value pair for the policy statement to be updated. 15 
+4.2.6.4.2.2 Policy update object 16 
+Table 4.2.6.4.2.2-1: Content in policy update object 17 
+Attribute name Data type P Cardinality Description Applicability 
+op  "M" "1" See [11] JSON PATCH operation 
+path string "M" "1" See [11] and *) part in statement to operate 
+on 
+ statement "M" "1" See [11] and section 4.2.6.2 statement to be updated 
+NOTE *): the path is either to the ‘statements’ part of a single policy or includes the value of the policy identifier in 18 
+case of a multi policy object (‘policyid_value/statements’). 19 
+4.2.6.4.3 PolicyListObject 20 
+4.2.6.4.3.1 General 21 
+A policy list object is based on IETF RFC 8259 [10] (JSON) and always contains one or more sets of: 22 
+- one policy identifier (PolicyID); 23 
+and 24 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                28 
+- one enforcement status statement (value either ‘enforced’ or ‘not enforced’). 1 
+4.2.6.4.3.2 Policy list object 2 
+When used in a HTTP GET response to …/policies, the content of the list object is as defined in table 4.2.6.4.3-1. 3 
+Table 4.2.6.4.3.2-1: Content in policy list object for policies 4 
+Attribute 
+name 
+Data type P Cardinality Description Applicability 
+policy_id String "M" "1..N" See section 4.2.6.3  
+enforce_status enforcement_status_type "M" "1..N" See section 4.2.6.2 statement indicating 
+reason for not 
+enforcing policy 
+ 5 
+4.2.6.4.4 PolicyNotifyObject 6 
+4.2.6.4.4.1 General 7 
+A policy notification object is based on IETF RFC 8259 [10] (JSON) and always contains one or more sets of: 8 
+- one policy identifier (PolicyID); 9 
+and 10 
+- one enforcement update statement. 11 
+4.2.6.4.4.2 Policy notification object 12 
+Table 4.2.6.4.4.2-1: Content in policy notification object for enforcement status change 13 
+Attribute name Data type P Cardinality Description Applicability 
+policy_id string "M" "1..N" See section 4.2.6.3 in all notifications 
+enforce_update enforcement_update_type "M" "1..N" See section 4.2.6.2 statement indicating 
+reason for not 
+enforcing policy 
+4.2.6.4.5 PolicyErrorObject 14 
+4.2.6.4.5.1 General 15 
+A policy error object is used when details related to an error needs to be provided in addition to the normal HTTP status 16 
+codes. 17 
+A policy error object is based on IETF RFC 7807 [19] (Problem details for HTTP APIs), and additional attributes 18 
+defined in 3GPP specification 29.501 [6], and it always contains one ore more sets of: 19 
+- one policy identifier (PolicyID); 20 
+and 21 
+- one problem details statement. 22 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                29 
+4.2.6.4.5.2 Policy error object 1 
+Table 4.2.6.4.5.2-1: Content in policy error object 2 
+Attribute name Data type P Cardinality Description Applicability 
+policy_id string "M" "1..N" See section 4.2.6.3 in all error responses 
+problem_details problem_details_type "M" "1..N" See section 4.2.6.2 statement containing 
+detailed problem description 
+ 3 
+4.2.6.5 Binary data 4 
+Binary data is not applicable in this version of the specification. 5 
+4.2.7 Error Handling 6 
+4.2.7.1 General 7 
+HTTP error handling shall be supported as specified in subclause 5.2.4 of 3GPP TS 29.500 [20] and according to the 8 
+principles in 3GPP TS 29.501 [6]. 9 
+4.2.7.2 Protocol Errors 10 
+No protocol errors are described in this version of the specification. 11 
+4.2.7.3 Application Errors 12 
+The application errors defined for the A1-P service are listed in Table 4.2.7.3-1. 13 
+ 14 
+Table 4.2.7.3-1: Application errors 15 
+Application Error HTTP status code Description 
+Bad Request 400 Object in payload not properly formulated or not related to the 
+method 
+Not Found 404 No resource found at the URI 
+Method Not Allowed 405 Method not allowed for the URI 
+  16 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                30 
+Annex A: OpenAPI specification 1 
+The OpenAPI specification will be included in a later version of this specification. 2 
+A.1 General  3 
+This Annex specifies the formal definition of the <Service Name> API(s). It consists of OpenAPI 3.0.0 specifications in 4 
+YAML format. 5 
+Informative copies of the OpenAPI specification files contained in this 3GPP Technical Specification are available on 6 
+the public 3GPP file server in the following locations (see clause 5B of the 3GPP TS 21.900 [21] for further 7 
+information): 8 
+- https://www.3gpp.org/ftp/Specs/archive/OpenAPI/<Release>/, and 9 
+- https://www.3gpp.org/ftp/Specs/<Plenary>/<Release>/OpenAPI/. 10 
+  11 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                31 
+Annex B: JSON objects 1 
+B.1 JSON schema and instances 2 
+B.1.1 JSON schema for A1 policy 3 
+B1.1.1.1 JSON object 4 
+An O-RAN A1 policy contains PolicyID, scope identifier and policy statement.  5 
+{ 6 
+  "title": "policies", 7 
+  "description": "O-RAN A1 policy", 8 
+  "type": "object", 9 
+  "properties": { 10 
+    "policy_id": {"type": "string"}, 11 
+   "scope": { 12 
+  … 13 
+   }, 14 
+   "statement": { 15 
+  … 16 
+   }, 17 
+    … 18 
+   "statement": { 19 
+  … 20 
+   } 21 
+  } 22 
+} 23 
+B1.1.1.2 Scope Identifier 24 
+A Scope Identifier contains one or more identifier attributes. 25 
+    "scope": { 26 
+      "ue_id": {"type": "string"}, 27 
+      "group_id": {"type": "string"}, 28 
+      "slice_id": {"type": "string"}, 29 
+      "group_id": {"type": "string"}, 30 
+      "qos_id": {"type": "string"}, 31 
+      "cell_id": {"type": "string"} 32 
+    } 33 
+B1.1.1.3 Policy Statements 34 
+A Policy Statement contains one or more attributes. 35 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                32 
+B1.1.1.3.1 QoS target 1 
+    "statement": { 2 
+      "gfbr": {"type": "string"}, 3 
+      "mfbr": {"type": "string"}, 4 
+      "priority_level": {"type": "string"}, 5 
+      "pdb": {"type": "string"} 6 
+    } 7 
+B1.1.1.3.2 QoE target 8 
+    "statement": { 9 
+      "qoe_score": {"type": "number"}, 10 
+      " initial_buffering": {"type": "number"}, 11 
+      " reBuffFreq": {"type": "number"}, 12 
+      " stallRatio": {"type": "number"} 13 
+    } 14 
+B1.1.1.3.3 Traffic Steering Preference 15 
+    "statement": { 16 
+      "cell_id": {"type": "string"}, 17 
+      "preference": {"type": "preference_type"}, 18 
+      "primary": true/false 19 
+    } 20 
+B.1.2 Policy object instance 21 
+  { 22 
+    "policy_id": "policyvalue#a", 23 
+   "scope": { 24 
+  … 25 
+   }, 26 
+   "statement": { 27 
+  … 28 
+   } 29 
+  }   30 
+B.1.3 Multi-policy object instance 31 
+A multi-policy object contains multiple policies. 32 
+[ 33 
+  { 34 
+    "policy_id": "policyvalue#a", 35 
+   "scope": { 36 
+  … 37 
+   }, 38 
+   "statement": { 39 
+  … 40 
+   } 41 
+  }, 42 
+  …   43 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                33 
+  { 1 
+    "policy_id": "policyvalue#b", 2 
+   "scope": { 3 
+  … 4 
+   }, 5 
+   "statement": { 6 
+  … 7 
+   } 8 
+  } 9 
+]   10 
+B.2 Single policy operations 11 
+B.2.1 Create policy 12 
+B.2.1.1 Request 13 
+PUT …/policies/policyvalue#a HTTP 1.1 14 
+Content-Type: application/json 15 
+{ 16 
+  "policy_id": "policyvalue#a", 17 
+ "scope": { 18 
+  … 19 
+   }, 20 
+   "statement": { 21 
+  … 22 
+   } 23 
+} 24 
+B.2.1.2 Response 25 
+HTTP 1.1 201 Created 26 
+Location: …/policies/policyvalue#a 27 
+Content-Type: application/json 28 
+{ 29 
+  "policy_id": "policyvalue#a", 30 
+ "scope": { 31 
+  … 32 
+   }, 33 
+   "statement": { 34 
+  … 35 
+   } 36 
+} 37 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                34 
+B.2.2 Query policy 1 
+B.2.2.1 Request 2 
+GET …/policies/policyvalue#a HTTP 1.1 3 
+Content-Type: application/json 4 
+B.2.2.2 Response 5 
+HTTP 1.1 200 OK 6 
+Content-Type: application/json 7 
+{ 8 
+  "policy_id": "policyvalue#a", 9 
+  "scope_id": "scopevalue#1", 10 
+ "scope": { 11 
+  … 12 
+   }, 13 
+   "statement": { 14 
+  … 15 
+   } 16 
+} 17 
+B.2.3 Delete policy 18 
+B.2.3.1 Request 19 
+DELETE …/policies/policyvalue#a HTTP 1.1 20 
+Content-Type: application/json 21 
+B.2.3.2 Response 22 
+HTTP 1.1 204 No content 23 
+B.2.4 Update policy 24 
+B.2.4.1 Complete 25 
+B.2.4.1.1 Request 26 
+PUT …/policies/policyvalue#a HTTP 1.1 27 
+Content-Type: application/json 28 
+{ 29 
+  "policy_id": "policyvalue#a", 30 
+  "scope_id": "scopevalue#1", 31 
+ "scope": { 32 
+  … 33 
+   }, 34 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                35 
+   "statement": { 1 
+  … 2 
+   } 3 
+  } 4 
+} 5 
+B.2.4.1.2 Response 6 
+HTTP 1.1 200 OK 7 
+Content-Type: application/json 8 
+{ 9 
+  "policy_id": "policyvalue#a", 10 
+  "scope_id": "scopevalue#1", 11 
+ "scope": { 12 
+  … 13 
+   }, 14 
+   "statement": { 15 
+  … 16 
+   } 17 
+} 18 
+B.2.4.2 Partial 19 
+B.2.4.2.1 Request 20 
+PATCH …/policies/policyvalue#a HTTP 1.1 21 
+Content-Type: application/json-patch+json 22 
+[ 23 
+  { 24 
+    "op": "replace", 25 
+    "path": "/statements" 26 
+    "value": { 27 
+   … 28 
+    } 29 
+  }, 30 
+  { 31 
+    "op": "add", 32 
+    "path": "/statements" 33 
+    "value": { 34 
+   … 35 
+    } 36 
+  }, 37 
+  … 38 
+  { 39 
+    "op": "remove", 40 
+    "path": "/statements" 41 
+    "value": { 42 
+   … 43 
+    } 44 
+  } 45 
+] 46 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                36 
+B.2.4.2.2 Response 1 
+HTTP 1.1 200 OK 2 
+Content-Type: application/json 3 
+{ 4 
+  "policy_id": "policyvalue#a", 5 
+  "scope_id": "scopevalue#1", 6 
+ "scope": { 7 
+  … 8 
+   }, 9 
+   "statement": { 10 
+  … 11 
+   } 12 
+} 13 
+B.3 Multi-policy operations 14 
+B.3.1 Create multiple policies 15 
+B.3.1.1 Request 16 
+PATCH …/policies HTTP 1.1 17 
+Content-Type: application/json-patch+json 18 
+[ 19 
+  { 20 
+    "op": "add", 21 
+    "path": "/policyvalue#a ",  22 
+    "value": { 23 
+      "policy_id": "policyvalue#a", 24 
+      "scope_id": "scopevalue#1", 25 
+     "scope": { 26 
+      … 27 
+     }, 28 
+     "statement": { 29 
+      … 30 
+     } 31 
+ } 32 
+  }, 33 
+  … 34 
+  { 35 
+    "op": "add", 36 
+    "path": "/policyvalue#b ",  37 
+    "value": { 38 
+      "policy_id": "policyvalue#b", 39 
+      "scope_id": "scopevalue#2", 40 
+     "scope": { 41 
+  … 42 
+     }, 43 
+     "statement": { 44 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                37 
+  … 1 
+     } 2 
+ } 3 
+  } 4 
+] 5 
+B.3.1.2 Response 6 
+HTTP 1.1 200 OK 7 
+Content-Type: application/json 8 
+[ 9 
+  { 10 
+    "policy_id": "policyvalue#a", 11 
+    "scope_id": "scopevalue#1", 12 
+ "scope": { 13 
+  … 14 
+   }, 15 
+   "statement": { 16 
+  … 17 
+   } 18 
+  }, 19 
+  … 20 
+  { 21 
+    "policy_id": "policyvalue#b", 22 
+    "scope_id": "scopevalue#2", 23 
+ "scope": { 24 
+  … 25 
+   }, 26 
+   "statement": { 27 
+  … 28 
+   } 29 
+  } 30 
+] 31 
+B.3.2 Query multiple policies 32 
+B.3.2.1 Request 33 
+GET …/policies HTTP 1.1 34 
+Content-Type: application/json 35 
+B.3.2.2 Response 36 
+HTTP 1.1 200 OK 37 
+Content-Type: application/json 38 
+[ 39 
+  { 40 
+    "policy_id": "policyvalue#a", 41 
+    "scope_id": "scopevalue#1", 42 
+ "scope": { 43 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                38 
+  … 1 
+   }, 2 
+   "statement": { 3 
+  … 4 
+   } 5 
+  }, 6 
+  … 7 
+  { 8 
+    "policy_id": "policyvalue#b", 9 
+    "scope_id": "scopevalue#2", 10 
+ "scope": { 11 
+  … 12 
+   }, 13 
+   "statement": { 14 
+  … 15 
+   } 16 
+  } 17 
+] 18 
+B.3.3 Delete multiple policies 19 
+B.3.3.1 Request 20 
+PATCH …/policies HTTP 1.1 21 
+Content-Type: application/json-patch+json 22 
+[ 23 
+  { 24 
+    "op": "remove", 25 
+    "path": "/policyvalue#a ",  26 
+    "value": { 27 
+      "policy_id": "policyvalue#a", 28 
+      "scope_id": "scopevalue#1", 29 
+   "scope": { 30 
+  … 31 
+     }, 32 
+      "statement": { 33 
+  … 34 
+     } 35 
+ } 36 
+  }, 37 
+  … 38 
+  { 39 
+    "op": "remove", 40 
+    "path": "/policyvalue#b ",  41 
+    "value": { 42 
+      "policy_id": "policyvalue#b", 43 
+      "scope_id": "scopevalue#2", 44 
+   "scope": { 45 
+  … 46 
+     }, 47 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                39 
+     "statement": { 1 
+  … 2 
+     } 3 
+ } 4 
+  } 5 
+] 6 
+B.3.3.2 Response 7 
+HTTP 1.1 200 OK 8 
+Content-Type: application/json 9 
+[ 10 
+  { 11 
+    "op": "remove", 12 
+    "path": "/policyvalue#a ",  13 
+    "value": { 14 
+      "policy_id": "policyvalue#a", 15 
+      "scope_id": "scopevalue#1", 16 
+   "scope": { 17 
+  … 18 
+     }, 19 
+     "statement": { 20 
+  … 21 
+     } 22 
+ } 23 
+  }, 24 
+  … 25 
+  { 26 
+    "op": "remove", 27 
+    "path": "/policyvalue#b ",  28 
+    "value": { 29 
+      "policy_id": "policyvalue#b", 30 
+      "scope_id": "scopevalue#2", 31 
+   "scope": { 32 
+  … 33 
+     }, 34 
+     "statement": { 35 
+  … 36 
+     } 37 
+ } 38 
+  } 39 
+] 40 
+B.3.4 Update multiple policies 41 
+B.3.4.1 Complete 42 
+B.3.4.1.1 Request 43 
+PATCH …/policies/policyvalue#a HTTP 1.1 44 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                40 
+Content-Type: application/json-patch+json 1 
+[ 2 
+  { 3 
+    "op": "replace", 4 
+    "path": "/policyvalue#a ",  5 
+    "value": { 6 
+      "policy_id": "policyvalue#a", 7 
+      "scope_id": "scopevalue#1", 8 
+   "scope": { 9 
+  … 10 
+     }, 11 
+     "statement": { 12 
+  … 13 
+     } 14 
+ } 15 
+  }, 16 
+  … 17 
+  { 18 
+    "op": "replace", 19 
+    "path": "/policyvalue#b ",  20 
+    "value": { 21 
+      "policy_id": "policyvalue#b", 22 
+      "scope_id": "scopevalue#2", 23 
+   "scope": { 24 
+  … 25 
+     }, 26 
+     "statement": { 27 
+  … 28 
+     } 29 
+ } 30 
+  } 31 
+] 32 
+B.3.4.1.2 Response 33 
+HTTP 1.1 200 OK 34 
+Content-Type: application/json 35 
+[ 36 
+  { 37 
+    "policy_id": "policyvalue#a", 38 
+    "scope_id": "scopevalue#1", 39 
+ "scope": { 40 
+  … 41 
+   }, 42 
+   "statement": { 43 
+  … 44 
+   } 45 
+  }, 46 
+  … 47 
+  { 48 
+    "policy_id": "policyvalue#b", 49 
+    "scope_id": "scopevalue#2", 50 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                41 
+ "scope": { 1 
+  … 2 
+   }, 3 
+   "statement": { 4 
+  … 5 
+   } 6 
+  } 7 
+] 8 
+B.3.4.2 Partial 9 
+B.3.4.2.1 Request 10 
+PATCH …/policies/policyvalue#a HTTP 1.1 11 
+Content-Type: application/json-patch+json 12 
+[ 13 
+  { 14 
+    "op": "replace", 15 
+    "path": "policyidvalue#a/statements" 16 
+    "value": { 17 
+   … 18 
+    } 19 
+  }, 20 
+  … 21 
+  { 22 
+    "op": "replace", 23 
+    "path": "policyidvalue#b/statements" 24 
+    "value": { 25 
+   … 26 
+    } 27 
+  } 28 
+] 29 
+B.3.4.2.2 Response 30 
+HTTP 1.1 200 OK 31 
+Content-Type: application/json 32 
+[ 33 
+  { 34 
+    "policy_id": "policyvalue#a", 35 
+    "scope_id": "scopevalue#1", 36 
+ "scope": { 37 
+  … 38 
+   }, 39 
+   "statement": { 40 
+  … 41 
+   } 42 
+  }, 43 
+  … 44 
+  { 45 
+    "policy_id": "policyvalue#b", 46 
+    "scope_id": "scopevalue#2", 47 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                42 
+ "scope": { 1 
+  … 2 
+   }, 3 
+   "statement": { 4 
+  … 5 
+   } 6 
+  } 7 
+]  8 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                43 
+Annex Z 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER AGREES TO 2 
+THE TERMS OF THIS AGREEMENT.   3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and 4 
+the entity that downloads, uses or otherwise accesses any O -RAN Specification, including its Affiliates (the 5 
+“Adopter”). 6 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7 
+ 8 
+SECTION 1:  DEFINITIONS 9 
+ 10 
+1.1  “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common 11 
+control with another entity, so long as such control exists.  For the purpose of this Section, “Control” means 12 
+beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 13 
+1.2  “Compliant Portion” means only those specific portions of products (hardware, software or 14 
+combinations thereof) that implement any O-RAN Specification. 15 
+1.3   “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contr ibutors, 16 
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 17 
+1.4  “Minor Update” means an update or revision to an O -RAN Specification published by O-RAN Alliance 18 
+that does not add any significant new features or  functionality and remains interoperable with the prior 19 
+version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates. 20 
+1.5  “Necessary Claims” means those claims of all present and future patents and patent applications, other 21 
+than design patents and design registrations, throughout the world, which (i) are owned or otherwise 22 
+licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or 23 
+Academic Contributorship; (ii) such Member, Contr ibutor or Academic Contributor has the right to grant a 24 
+license without the payment of consideration to a third party; and (iii) are necessarily infringed by 25 
+implementation of a Final Specification (without considering any Contributions not included in the  Final 26 
+Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) 27 
+grounds, taking into account normal technical practice and the state of the art generally available at the date 28 
+any Final Specification w as published by the O -RAN Alliance or the date the patent claim first came into 29 
+existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate an 30 
+implementation which complies with a Final Specification without infringing that claim. For the avoidance of 31 
+doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of 32 
+which infringe patent claims, all such patent claims shall be considered Necessary Claims. 33 
+1.6  “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 34 
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in 35 
+their license a term allowing the licensor to suspend the l icense against a licensee who brings a patent 36 
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their 37 
+Affiliates. 38 
+ 39 
+SECTION 2: COPYRIGHT LICENSE 40 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                44 
+ 1 
+2.1  Subject to the terms and conditions of this Agreement,  O-RAN Alliance hereby grants to Adopter a 2 
+nonexclusive, nontransferable, irrevocable, non -sublicensable, worldwide copyright license to obtain, use 3 
+and modify O-RAN Specifications, but not to further distribute such O -RAN Specification in any modified or 4 
+unmodified way, solely in furtherance of implementations of an O-RAN Specification. 5 
+2.2  Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in a 6 
+separate written agreement with O-RAN Alliance. 7 
+ 8 
+SECTION 3: FRAND LICENSE 9 
+ 10 
+3.1  Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on 11 
+a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non -Discriminatory 12 
+(FRAND) terms and conditions with or without c ompensation (royalties) a nonexclusive, non -transferable, 13 
+irrevocable (but subject to Defensive Suspension), non -sublicensable,  worldwide license under their 14 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distri bute 15 
+Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a 16 
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to 17 
+any Adopter if that Adopter is  not making a reciprocal grant to Members, Contributors and Academic 18 
+Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the 19 
+distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant 20 
+Portions. 21 
+3.2  Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 22 
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to 23 
+Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or 24 
+Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 25 
+3.3  Adopter, on behalf of itself and its Affiliates,  shall be prepared to grant based on a separate Patent 26 
+License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates 27 
+under FRAND terms and conditions with or without compensation (royalties) a nonexclusive, non -28 
+transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable,  worldwide license under 29 
+their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 30 
+Compliant Portions; provided, however, that such license will not extend: (a) to any part or function of a 31 
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to 32 
+any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a 33 
+reciprocal grant to Adopter, as set forth in Section 3.1.  For the avoidance of doubt, the foregoing license 34 
+includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their 35 
+Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and 36 
+their Affiliates’ customers of such licensed Compliant Portions. 37 
+ 38 
+SECTION 4:  TERM AND TERMINATION 39 
+ 40 
+4.1  This Agreement shall remain in force, unless early terminated according to this Section 4. 41 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                45 
+4.2  O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this 1 
+Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such 2 
+breach within thirty (30) days after being given notice specifying the breach. 3 
+4.3  Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement.  Under surviving 4 
+Section 3, after termination of this Agreement, Adopter will continue to grant l icenses (a) to entities who 5 
+become Adopters after the date of termination; and (b) for future versions of O-RAN Specifications that are 6 
+backwards compatible with the version that was current as of the date of termination. 7 
+ 8 
+SECTION 5: CONFIDENTIALITY 9 
+ 10 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 11 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than 12 
+reasonable care.  Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to 13 
+an obligation of confidentiality at least as restrictive as those contained in this Section.  The foregoing 14 
+obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation 15 
+on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully 16 
+received without a duty of confidentiality; (4) disclosed by O -RAN Alliance or a Member, Contributor or 17 
+Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently 18 
+developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, 19 
+or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and 20 
+cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have 21 
+the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN Alliance’s prior written 22 
+approval.  23 
+ 24 
+SECTION 6:  INDEMNIFICATION 25 
+ 26 
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or 27 
+Academic Contributors, and their employees, and agents and their respective successors, heirs and assi gns 28 
+(the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and 29 
+expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, 30 
+investigations, actions, demands or judgme nts arising out of Adopter’s use of the licensed O -RAN 31 
+Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications. 32 
+ 33 
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY 34 
+ 35 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREA CH OF SECTION 3, AND ADOPTER’S 36 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD 37 
+PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING 38 
+FROM ITS PERFORMANCE OR NON -PERFORMANCE U NDER THIS AGREEMENT, IN EACH CASE WHETHER 39 
+UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE 40 
+NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 41 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                46 
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEV ER, 1 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O -RAN ALLIANCE AND THE MEMBERS, 2 
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF 3 
+MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR 4 
+PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS. 5 
+ 6 
+SECTION 8:  ASSIGNMENT 7 
+ 8 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any 9 
+grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first 10 
+received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s 11 
+sole discretion.  O-RAN Alliance may freely assign this Agreement. 12 
+ 13 
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS 14 
+ 15 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future 16 
+Members, Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under 17 
+this Agreement, including as licensees under Section 3. 18 
+ 19 
+SECTION 10:  BINDING ON AFFILIATES 20 
+ 21 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 22 
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable 23 
+to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 24 
+ 25 
+SECTION 11:  GENERAL 26 
+ 27 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.   28 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and 29 
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether 30 
+written or oral, relating to the subject matter of this Agreement. 31 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 32 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without 33 
+limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter 34 
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 35 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created 36 
+between Adopter, or O -RAN Alliance or its Members, Contributors or Academic Contributors.  Except as 37 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2019 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License 
+Agreement in Annex Z.  
+                47 
+expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, 1 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. 2 
+In the event that any provision of this Agreement conflicts with governing law or i f any provision is held to 3 
+be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will 4 
+be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of 5 
+this Agreement will remain in full force and effect. 6 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of 7 
+any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or  8 
+otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or 9 
+third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other 10 
+instance; rather the same shall be and remain in full force and effect. 11 

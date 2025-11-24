@@ -1,0 +1,755 @@
+O-RAN.WG3.RICARCH-v01.00
+Technical Specification  
+O-RAN Working Group 3 
+Near-Real-time RAN Intelligent Controller 
+Near-RT RIC Architecture 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the 
+third party that these conditions apply to them and that they must comply with them.
+
+                      O-RAN.WG3.RICARCH-v01.00 
+Technical Specification  
+ 
+ 
+O-RAN Working Group 3 
+Near-Real-time RAN Intelligent Controller 
+Near-RT RIC Architecture 
+ 
+ 
+  
+Prepared by the O-RAN Alliance e.V. Copyright © 2020 by the O-RAN Alliance e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving, distributing, displaying or preparing 
+derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in the Annex ZZZ of this specification. All other 
+rights reserved. 
+document shall be handled under appropriate O-RAN IPR rules. 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.    1 
+ 
+ 
+ 
+ 
+
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+2 
+O-RAN.WG3.RICARCH-v01.00 
+Revision History   1 
+ 2 
+Date Revision Author Description 
+2020.02.17 01.00.00 WG3 Arch TG Version number changed to 01.00.00 for WG3 approval 
+2020.02.24 01.00.00 CMCC Editorial corrections collected during WG3 approval process 
+ 3 
+ 4 
+  5 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+3 
+O-RAN.WG3.RICARCH-v01.00 
+Contents   1 
+Revision History ................................................................................................................................................. 2 2 
+Foreword............................................................................................................................................................. 4 3 
+1 Scope ........................................................................................................................................................ 4 4 
+2 References ................................................................................................................................................ 4 5 
+3 Definitions and Abbreviations ................................................................................................................. 5 6 
+3.1 Definitions ......................................................................................................................................................... 5 7 
+3.2 Abbreviations ..................................................................................................................................................... 6 8 
+4 General Principles .................................................................................................................................... 6 9 
+5 Near-RT RIC Architecture ....................................................................................................................... 6 10 
+5.1 Requirements ..................................................................................................................................................... 6 11 
+5.1.1 Framework Requirements ............................................................................................................................ 6 12 
+5.1.2 xApp Requirements ...................................................................................................................................... 7 13 
+5.1.3 Open API Requirements ............................................................................................................................... 7 14 
+5.2 Overall Architecture Description ....................................................................................................................... 7 15 
+6 Near-RT RIC Functions Description ........................................................................................................ 7 16 
+6.1 General ............................................................................................................................................................... 7 17 
+6.2 Framework Functions ........................................................................................................................................ 9 18 
+6.2.1 Database ....................................................................................................................................................... 9 19 
+6.2.2 xApp Subscription Management .................................................................................................................. 9 20 
+6.2.3 Conflict Mitigation ....................................................................................................................................... 9 21 
+6.2.4 Messaging Infrastructure ............................................................................................................................ 10 22 
+6.2.5 Security ...................................................................................................................................................... 10 23 
+6.2.6 Management Services ................................................................................................................................ 11 24 
+6.2.7 Interface Termination .................................................................................................................................  11 25 
+6.3 xApps ............................................................................................................................................................... 12 26 
+7 Open APIs for xApp ............................................................................................................................... 13 27 
+7.1 Overall Description of API .............................................................................................................................. 13 28 
+7.2 A1 related APIs ................................................................................................................................................ 13 29 
+7.3 E2 related APIs ................................................................................................................................................ 14 30 
+7.4 Management APIs ........................................................................................................................................... 14 31 
+7.5 Control APIs .................................................................................................................................................... 14 32 
+7.6 SDL APIs ......................................................................................................................................................... 14 33 
+8 External Interfaces of Near-RT RIC ...................................................................................................... 15 34 
+8.1 E2 Interface ...................................................................................................................................................... 15 35 
+8.2 A1 Interface ..................................................................................................................................................... 15 36 
+8.3 O1 Interface ..................................................................................................................................................... 15 37 
+Annex ZZZ: O-RAN Adopter License Agreement .......................................................................................... 16 38 
+Section 1: DEFINITIONS ................................................................................................................................................ 16 39 
+Section 2: COPYRIGHT LICENSE .................................................................................................................................  16 40 
+Section 3: FRAND LICENSE .......................................................................................................................................... 17 41 
+Section 4: TERM AND TERMINATION ........................................................................................................................ 17 42 
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 17 43 
+Section 6: INDEMNIFICATION ..................................................................................................................................... 18 44 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 18 45 
+Section 8: ASSIGNMENT ............................................................................................................................................... 18 46 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 18 47 
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 18 48 
+Section 11: GENERAL ..................................................................................................................................................... 18 49 
+ 50 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+4 
+O-RAN.WG3.RICARCH-v01.00 
+Foreword 1 
+This Technical Specification has been produced by the O-RAN Alliance. 2 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 3 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re -released by O-4 
+RAN with an identifying change of release date and an increase in version number as follows:  5 
+Release x.y.z 6 
+where: 7 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 8 
+etc. (the initial approved document will have x=01). 9 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  10 
+z the third digit included only in working versions of the document indicating incremental changes during the 11 
+editing process. 12 
+ 13 
+1 Scope 14 
+The present document specifies the overall architecture of the N ear-RT-RIC (RAN Intelligent Controller) and function 15 
+descriptions, including the interaction between hosted applications and common functions in the Near-RT RIC. 16 
+ 17 
+2 References 18 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 19 
+document. 20 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 21 
+non-specific. 22 
+- For a specific reference, subsequent revisions do not apply. 23 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 24 
+a GSM document), a non- specific reference implicitly refers to the latest version o f that document in the same 25 
+Release as the present document. 26 
+[1]  3GPP TR 21.905: "Vocabulary for 3GPP Specifications". 27 
+[2] O-RAN-WG3.E2GAP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, 28 
+E2 General Aspects and Principles”. 29 
+[3]  O-RAN-WG3.E2AP, “O-RAN Working Group 3, Near-Real-time RAN Intelligent Controller, E2 30 
+Application Protocol (E2AP)”. 31 
+[4]  O-RAN-WG1.OAM Architecture, “O-RAN Operations and Maintenance Architecture”. 32 
+[5]  O-RAN-WG1.O1-Interface, “O-RAN Operations and Maintenance Interface Specification”. 33 
+[6] 3GPP TS 33.401: “3GPP System Architecture Evolution (SAE); Security architecture ”. 34 
+[7] 3GPP TS 33.501: “Security architecture and procedures for 5G System”. 35 
+[8]  O-RAN-WG2.A1.GA&P, “O-RAN Working Group 2, A1 interface: General Aspects and 36 
+Principles”. 37 
+[9]  O-RAN-WG2.A1AP, “O-RAN Working Group 2, A1 Interface: Application Protocol”. 38 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+5 
+O-RAN.WG3.RICARCH-v01.00 
+[10] O-RAN-WG1.O-RAN Architecture, “O-RAN Working Group 1, O-RAN Architecture 1 
+Description”. 2 
+[11] 3GPP TS 36.401: "Evolved Universal Terrestrial Radio Access Network (E-UTRAN); 3 
+Architecture Description". 4 
+[12]  3GPP TS 38.300: “NR; NR and NG-RAN Overall Description; Stage 2”. 5 
+3 Definitions and Abbreviations 6 
+3.1 Definitions 7 
+For the purposes of the present document, the terms and definitions given in TR 21.905 [1] and the following apply.   8 
+A term defined in the present document takes precedence over the definition of the same ter m, if any, in TR 21.905 [1]. 9 
+Near-RT RIC (O-RAN near-real-time RAN Intelligent Controller): a logical function that enables near-real-time control 10 
+and optimization of RAN elements and resources via fine- grained (e.g. UE basis, Cell  basis) data collection and actions 11 
+over E2 interface. 12 
+non-RT RIC(O-RAN non-real-time RAN Intelligent Controller): a logical function that enables non- real-time control 13 
+and optimization of RAN elements and resources, AI/ML workflow including model training and updates, and policy -14 
+based guidance of applications/features in Near-RT RIC. 15 
+O-CU: O-RAN Central Unit: a logical node hosting RRC, SDAP and PDCP protocols. 16 
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting the RRC and the control plane part of the PDCP 17 
+protocol. 18 
+O-CU-UP: O-RAN Central Unit –  User Plane: a logical node hosting the user plane part of the PDCP protocol and the 19 
+SDAP protocol. 20 
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC/MAC/High- PHY layers based on a lower layer functional 21 
+split. 22 
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional 23 
+split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH 24 
+extraction).   25 
+O-eNB (O-RAN eNB): an eNB [10] or ng-eNB [11] that supports E2 interface. 26 
+O1: Interface between orchestration & management entities (Orchestration/NMS) and O -RAN managed elements, for 27 
+operation and management, by which FCAPS management, Software management, File management and other similar 28 
+functions shall be achieved.  29 
+SMO: Service Management and Orchestration system. 30 
+A1: Interface between non -RT RIC and N ear-RT RIC to enable policy- driven guidance of Near -RT RIC 31 
+applications/functions, and support AI/ML workflow.  32 
+E2: Interface connecting the Near-RT RIC and one or more O-CU-CPs, one or more O-CU-UPs, and one or more O-DUs. 33 
+E2 Node : a logical node terminating E2 interface. In this version of the specification, ORAN nodes terminating E2 34 
+interface are: 35 
+- for NR access: O-CU-CP, O-CU-UP, O-DU or any combination as defined in [4];  36 
+- for E-UTRA access: O-eNB. 37 
+xApp: An application designed to run on the Near -RT RIC. Such an application is likely to consist of one or more 38 
+microservices and at the point of on -boarding will identify which data it consumes and which da ta it provides. The 39 
+application is independent of the Near-RT RIC and may be provided by any third party. The E2 enables a direct association 40 
+between the xApp and the RAN functionality.   41 
+O-Cloud: O-Cloud is a cloud computing platform comprising a collection of physical infrastructure nodes that meet O-42 
+RAN requirements to host the relevant O -RAN functions (such as Near -RT RIC, O-CU-CP, O-CU-UP, and O-DU), the 43 
+supporting software components (such as Operating System, Virtual Machine Monitor, Container Runtime, etc.) and the 44 
+appropriate management and orchestration functions. 45 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+6 
+O-RAN.WG3.RICARCH-v01.00 
+3.2 Abbreviations 1 
+For the purposes of the present document, the following abbreviations apply.  2 
+API    Application Programming Interface 3 
+FM                       Fault Management 4 
+LCM                    Life-Cycle Management 5 
+ML                       Machine Learning 6 
+non-RT RIC  non-real-time RAN Intelligent Controller: 7 
+Near-RT RIC  near-real-time RAN Intelligent Controller 8 
+O-CU    O-RAN Central Unit 9 
+O-CU-CP   O-RAN Central Unit – Control Plane 10 
+O-CU-UP   O-RAN Central Unit – User Plane 11 
+O-DU    O-RAN Distributed Unit   12 
+O-RU    O-RAN Radio Unit  13 
+PM                       Performance Management 14 
+SMO    Service Management and Orchestration 15 
+4 General Principles 16 
+The Near -RT RIC architecture shall follow the g eneral architecture principles specified in [ 2], and the following 17 
+principle(s): 18 
+- The Near-RT RIC architecture and internal interfaces shall be open to support 3rd party xApps.  19 
+ 20 
+5 Near-RT RIC Architecture 21 
+5.1 Requirements 22 
+The Near -RT RIC architecture shall follow the Near -RT RIC requirements specified in [ 2], and the following 23 
+requirements: 24 
+- The Near-RT RIC shall consist of multiple xApps and a set of framework functions that are commonly used to 25 
+support the specific functions hosted by xApps. 26 
+- The Near-RT RIC shall provide an open framework to allow on-boarding and Life Cycle Management (LCM) of 27 
+xApps to support Near-RT RIC related use cases. 28 
+ 29 
+5.1.1 Framework Requirements 30 
+- The Near-RT RIC shall provide a database function that stores the configurations relating to E2 nodes , Cells, 31 
+Bearers, Flows, UEs and the mappings between them. 32 
+- The Near-RT RIC shall provide ML tools that support data pipelining. 33 
+- The Near-RT RIC shall provide a messaging infrastructure. 34 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+7 
+O-RAN.WG3.RICARCH-v01.00 
+- The Near-RT RIC shall provide logging, tracing and metrics collection from Near-RT RIC framework and xApps 1 
+to SMO. 2 
+- The Near-RT RIC shall provide security functions. 3 
+- The Near-RT RIC shall support conflict resolution to resolve the potential conflicts or overlaps which may be 4 
+caused by the requests from xApps. 5 
+5.1.2 xApp Requirements 6 
+- xApps may enhance the RRM capabilities of Near-RT RIC. 7 
+- xApps shall provide logging, tracing and metrics collection to the Near-RT RIC. 8 
+- xApps shall provide a descriptor that will include basic information (configuration, metrics and control) about the 9 
+xApp. 10 
+- xApp descriptor components shall include the following: 11 
+- Configuration: The xApp configuration specification shall include a data dictionary for the configuration data, 12 
+i.e., meta data such as a yang definition or a list of configuration parameters and their semantics. Additionally it 13 
+may include an initial configuration of xApps. 14 
+- Control: xApp controls specification shall include the types of data it consumes and provides that enable control 15 
+capabilities (e.g. xApp URL, parameters, input/output type). 16 
+- Metrics: The xApp  metrics specification shall include a list of metrics (e.g., metric name, type, unit and 17 
+semantics) provided by the xApp. 18 
+- The xApp d escriptor shall also provide the necessary data to enable their management and orchestration. The 19 
+specific requirements for these descriptors shall be aligned with [4]. 20 
+5.1.3 Open API Requirements 21 
+- Near-RT RIC shall provide an open API enabling the hosting of 3rd party xApps and xApps from the Near -RT 22 
+RIC platform vendor. 23 
+- Near-RT RIC shall provide an open API decoupled from specific implementation solutions, including a Shared 24 
+Data Layer (SDL) that works as an overlay for underlying databases and enables simplified data access . 25 
+Note: Communication between xApps is for further study.  26 
+ 27 
+5.2 Overall Architecture Description 28 
+The overall architecture of O -RAN described in [ 10] specifies the location and interfaces of Near -RT RIC, as well as 29 
+possible deployment options. 30 
+The RRM functional allocation between the Near-RT RIC and the E2 node is described in [2]. 31 
+ 32 
+6 Near-RT RIC Functions Description 33 
+6.1 General 34 
+The Near-RT RIC hosts the following functions: 35 
+- Database, which allows reading and writing of RAN/UE information; 36 
+- xApp subscription management, which  merges subscriptions from different xApps and provides unifi ed data 37 
+distribution to xApps; 38 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+8 
+O-RAN.WG3.RICARCH-v01.00 
+- Conflict mitigation, which resolves potentially overlapping or conflicting requests from multiple xApps;  1 
+- Messaging infrastructure, which enables message interaction amongst Near-RT RIC internal functions;  2 
+- Security, which provides the security scheme for the xApps; 3 
+- Management services; 4 
+- Fault management, configuration management, and performance management as a service producer to SMO;  5 
+- Life-cycle management of xApps; 6 
+- Logging, tracing and metrics collection, which capture, monitor and collect the status of Near-RT RIC internals 7 
+and can be transferred to external system for further evaluation;  8 
+- Interface Termination  9 
+- E2 termination, which terminates the E2 interface from an E2 Node; 10 
+- A1 termination, which terminates the A1 interface from the non-RT RIC;  11 
+- O1 termination, which terminates the O1 interface from SMO; 12 
+- Functions hosted by xApps , which allow services to be executed at the Near -RT RIC and the outcomes sent to 13 
+the E2 Nodes via E2 interface. 14 
+This is summarized in the figure below.  15 
+ 16 
+ 17 
+Figure 6.1-1 Near-RT RIC Internal Architecture 18 
+ 19 
+
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+9 
+O-RAN.WG3.RICARCH-v01.00 
+6.2 Framework Functions 1 
+6.2.1 Database 2 
+6.2.1.1 UE-NIB  3 
+xApps may provide UE related information to be stored in the UE-NIB (UE-Network Information Base) database. 4 
+- UE-NIB maintains a list of UEs and associated data. 5 
+- UE-NIB maintains tracking and correlation of the UE identities associated with the connected E2 nodes. 6 
+6.2.1.2 R-NIB 7 
+xApps may provide radio access network related information to be stored in the R-NIB (Radio-Network Information 8 
+Base) database 9 
+- The R -NIB stores the configurations and near real -time information relating to connected E2 Nodes and the 10 
+mappings between them. 11 
+6.2.2 xApp Subscription Management 12 
+- xApp subscription management manages subscriptions from the xApps to the E2 Nodes. 13 
+- xApp subscription management enforces authorization of policies controlling xApp access to messages. 14 
+- xApp subscription management enable s merging of identical subscriptions from different xApps into a single 15 
+subscription to the E2 Node. 16 
+6.2.3 Conflict Mitigation 17 
+In the context of the N ear-RT RIC, Conflict Mitigation is about addressing conflicting interactions between different 18 
+xApps.  An application will typically change one or more parameters with the objective of optimizing a specific metric.  19 
+Conflict Mitigation is necessary because xApps objectives may be chosen/configured such that they result in conflicting 20 
+actions.   21 
+The control target of the  radio resource management  can be c ell, UE or bear er, etc. The control contents of the radio 22 
+resource management can cover the access control, the bearer control, the handover control, the QoS control, the resource 23 
+assignment and so on. The control time span indicates the valid control duration which is expected by the control request. 24 
+The conflicts of control can be illustrated as below. 25 
+1) Direct Conflicts: The conflicts can be observed directly by Conflict Mitigation. Some cases are described as below:  26 
+- Two or more xApps request different settings for the very same configuration of one or more parameters of a  27 
+Control Target. Conflict mitigation processes the requests and decides on a resolution. 28 
+- The new request from an xApp may conflict with the running configuration re sulting from a previous request 29 
+of another or the same xApp. 30 
+- The total requested resources from different xApps may exceed the limitation of the RAN system, e.g. the sum 31 
+of resources required by the two different xApps may be far beyond the resource limitation of the RAN system.  32 
+2) Indirect Conflicts: The conflicts cannot be observed directly, nevertheless, some dependence among the parameters 33 
+and resources that the xApps target can be observed. Conflict Mitigation may anticipate the possible conflicts and 34 
+take actions to mitigate them.  For instance, different xApps target different configuration parameters to optimize 35 
+the same metric according to the respective objective. Even though this will not result in conflicting parameter 36 
+settings, it may have uncontrollable or inadvertent system impacts . One example of such indirect conflicts can 37 
+occur when the changes required by one xApp create a system impact which is equivalent to a parameter change 38 
+targeted by another xApp. E.g., antenna tilts and Measurement offsets are different control points, but they both 39 
+impact the handover boundary. 40 
+3) Implicit Conflicts: The conflicts cannot be observed directly, even the dependence between xApps are not obvious. 41 
+For instance, d ifferent xApps  may optimizing different metrics by (re -)configuring different parameters. 42 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+10 
+O-RAN.WG3.RICARCH-v01.00 
+Nonetheless, optimizing one metric may have implicit, unwanted, and maybe adversary side effects on one of the 1 
+metrics optimized by another xApp. E.g., p rotecting throughput metrics for GBR users may degrade non GBR 2 
+metrics or even Cell Throughput. 3 
+For mitigating these conflicts, different approaches exist: 4 
+1) Direct conflicts typically can be mitigated by pre -action coordination, i.e., the xApps or a Conflict Mitigation 5 
+component needs to make the final determination on whether any specific change is made or in which order the 6 
+changes are applied. 7 
+2) Indirect conflicts can be resolved by post-action verification. Here, the actions are executed and the effects on the 8 
+target metric are observed. Based on the observations, the system has to decide on potential corrections, e.g., 9 
+rolling back one of the xApp actions. 10 
+3) Implicit conflicts are the most difficult to mitigate since these dependencies are difficult or impossible to observe 11 
+and therefore hard to model in any mitigation scheme. In some cases, it may be possible to design around such 12 
+conflicts by ensuring that Use Cases (xApps) target different parameters, thus falling back to approach 2), but 13 
+preferably, a generic approach to managing such conflicts is established. 14 
+The individual xApp goals are defined by A1 policies, but it is also important to define utility metrics that incorporate the 15 
+relative importance of each of the metrics targeted by the xApps as well as the importance of the optimization (use case). 16 
+A Conflict Mitigation function may also use ML approaches, e.g., Reinforcement Learning, to a -priori assess, for each 17 
+proposed change, the likely probability of degrading a metric versus the potential improvement.  18 
+ 19 
+6.2.4 Messaging Infrastructure 20 
+Messaging infrastructure provides low-latency message delivery service between Near-RT RIC internal endpoints.  21 
+- It supports registration/discovery/deletion of endpoints.  22 
+- Registration: Endpoints register themselves to the messaging infrastructure; 23 
+- Discovery: Endpoints are discovered by the messaging infrastructure initially and registered to the messaging 24 
+infrastructure; 25 
+- Deletion: Endpoints are deleted once they are not used anymore. 26 
+- It provides the following kinds of APIs: 27 
+- An API for sending messages to the messaging infrastructure; 28 
+- An API for receiving messages from the messaging infrastructure. 29 
+- It support s multiple messaging modes, e.g. point -to-point mode (e.g. message exchange among endpoints), 30 
+publish/subscribe mode (e.g. real-time data dispatching from E2 termination to multiple subscriber xApps). 31 
+- It provides message routing, namely according to the mes sage routing information, messages can be dispatched 32 
+to different endpoints. 33 
+- It supports message robustness to avoid data loss during a  messaging infrastructure outage/restart or to release 34 
+resources from the messaging infrastructure once a message is outdated. 35 
+ 36 
+6.2.5 Security 37 
+The security function given in this section only applies to the Near-RT RIC.  One target of security function is to prevent 38 
+malicious xApps from abusing radio network information (e.g. exporting to unauthorized external systems) and/or control 39 
+capabilities over RAN functions. The security requirements for the 3GPP LTE eNB is defined in [ 6] and for the 5G NR 40 
+gNB in [7].  41 
+Note: The description of security functions is not be included in the first release. 42 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+11 
+O-RAN.WG3.RICARCH-v01.00 
+ 1 
+6.2.6 Management Services 2 
+6.2.6.1 Life-Cycle Management of xApp 3 
+The life-cycle management of xApps provides the following functions. 4 
+- Onboarding xApps: It receives and stores xApp descriptor that contains configuration data for the xApp. 5 
+- Deployment of xApps: It  retrieves xApp name and other information (e.g. helm chart of the xA pp) from stored 6 
+xApp descriptor and deploys the xApp. 7 
+- Resource management (RM): It does comprehensive res ource provisioning/control for xApps on Near -RT RIC 8 
+as well as monitors their latency and resource consumption characteristics to see if individual xApps meet their 9 
+latency requirements. It may trigger the alarm event when they miss the critical latency requirements. 10 
+- Termination of xApps: It terminates a running xApp if the xApp is no longer needed. The resource used by the 11 
+xApp will be released. 12 
+Note: LCM of the Near-RT RIC as a NF (Network Function) will be done by SMO via O-Cloud. However, it is not 13 
+clear yet whether LCM of xApps will be done by SMO or Near-RT RIC. This section is present under the assumption 14 
+that LCM of xApps is performed by Near-RT RIC. 15 
+6.2.6.2 FCAPS Management of Near-RT RIC 16 
+The FCAPS management consists of fault, configuration, accounting, performance and security management. The FCAPS 17 
+management follows O1 related management aspects defined in [4]. 18 
+To support FCAPS management services, Near -RT RIC provides the following capabili ties in the current version of 19 
+specification: 20 
+- Logging: logging is to capture information needed to operate, troubleshoot and report on the performance of the 21 
+Near-RT RIC platform and its constituent components. Log records may be viewed and consumed directly by 22 
+users and systems, indexed and loaded into a data storage, and used to compute metrics and generate reports. 23 
+Near-RT RIC components log events according to a common logging format. Different logs can be generated 24 
+(e.g., audit log, metrics log, error log and debug log).  25 
+- Tracing: tracing mechanisms are needed to monitor the transactions or a workflow. An example subscription 26 
+workflow can be broken into two traces namely, a subscription request trace followed by a response trace. 27 
+Individual traces can be analy zed to understand timing latencies as the workflo w traverses a particular Near -RT 28 
+RIC component.  29 
+- Metrics collection: metrics for performance and fault management specific to each xApp logic and other internal 30 
+functions are collected and published for authorized  consumer (e.g., SMO). A metrics collection mechanism is 31 
+needed to collect and report metrics.  32 
+6.2.7 Interface Termination 33 
+6.2.7.1 E2 Termination 34 
+- E2 Termination terminates the SCTP connection from each E2 Node. 35 
+- E2 Termination routes messages from the xApps through the SCTP connection to the E2 Node. 36 
+- E2 Termination decodes the payload of an incoming ASN.1 message enough to determine message type. 37 
+- E2 Termination handles incoming E2 messages related to E2 connectivity.  38 
+- E2 Termination receives and respond to the E2 Setup Request from the E2 Node.  39 
+- E2 Termination notif ies xApps of the list of RAN functions supported by a n E2 Node based on information 40 
+derived from E2 Setup and RIC Service Update procedures [3].  41 
+- E2 Termination notifies the newly connected E2 Node of the list of accepted functions. 42 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+12 
+O-RAN.WG3.RICARCH-v01.00 
+6.2.7.2 A1 termination 1 
+A1 termination provides a generic API for the Near-RT RIC by means of which it can receive and send messages via A1 2 
+interface [8]. These include, e.g.,  A1 policies and e nrichment information received from the non -RT RIC, or A1 policy 3 
+feedback sent towards the non-RT RIC. 4 
+ 5 
+ 6 
+6.2.7.3 O1 termination 7 
+O1 termination communicates with SMO via O1 interface and exposes O1- related management services [5] from Near-8 
+RT RIC.  9 
+- O1 termination exposes provisioning management services from Near -RT RIC to O1 provisioning management 10 
+service consumer. 11 
+- O1 termination supports managing xApps via NETCONF. 12 
+- O1 termination supports translation of NETCONF to Near-RT RIC internal APIs. 13 
+- O1 termination exposes FM services to report faults and events from Near-RT RIC to O1 FM service consumer. 14 
+- O1 termination exposes PM services to report bulk and real -time PM data from Near-RT RIC to O1 PM service 15 
+consumer. 16 
+- O1 termination exposes file management services to download ML files, software files, etc. and upload log/trace 17 
+files. 18 
+- O1 termination exposes communication surveillance services to O1 communication surveillance service 19 
+consumer.  20 
+6.3 xApps 21 
+xApps consist of xApp descriptor and xApp image. xApp descriptor describes the packaging format of xApp image. xApp 22 
+image is the software package.  23 
+The xApp descriptor provides xApp management services with necessary information for the LCM of xApps, such as 24 
+deployment, deletion, upgrade etc. The xApp descriptor also provides extra parameters related to the health management 25 
+of the xApps, such as auto scaling when the load of xApp is too heavy and auto healing when xApp becomes unhealthy. 26 
+The xApp descriptor provides FCAPS and control parameters to xApps whe n xApp is launched.  27 
+The definition of xApp descriptor includes: 28 
+- The basic information of xApp, including name, version, provider, URL of xApp image, virtual resource 29 
+requirements (e.g. CPU), etc. This information is used to support LCM of xApps.  30 
+- The FCAPS management specifications that specify the options of configuration, performance metrics collection, 31 
+etc. for the xApp. 32 
+- The control specifications that specify the data types consumed and provided by the xApp for control capabilities 33 
+(e.g. PM data that the xApp subscribes, the message type of control messages). 34 
+ 35 
+The xApp image contains all the files needed to deploy a n xApp. An xApp can have multiple versions of xApp image, 36 
+which are tagged by the xApp image version number. 37 
+ 38 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+13 
+O-RAN.WG3.RICARCH-v01.00 
+7 Open APIs for xApp 1 
+7.1 Overall Description of API 2 
+Near-RT RIC provides the following open APIs for xApps as showed in Figure 7.1-1:  3 
+- A1 related APIs: the APIs between xApps and A1 Termination. 4 
+- E2 related APIs: the APIs between xApps and E2 Termination. 5 
+- Management APIs: the APIs between xApps and management related functions, such as O1 termination, 6 
+management services and logging, tracing, metrics collection.  7 
+- Control APIs: the APIs between xApps and the functions which are responsible for control , such as conflict 8 
+mitigation, xApp subscription management, etc. 9 
+- SDL APIs: the APIs between xApps and Shared Data Layer. 10 
+xApp #n
+…… 
+xApp #2
+E2 Termination A1 Termination
+O1 Termination / Management  Service /
+Logging, Tracing, Metrics
+Conflict Mitigation / Subscription Management 
+Framework for Transactions on APIs
+Near-RT RIC
+xApps
+E2 Related APIs
+Co nt rol  AP Is
+SDL APIs
+A1 Related APIs
+Management 
+APIs
+Shared Data Layer
+xApp #1
+ 11 
+Figure 7.1-1 Overview of Open APIs  12 
+ 13 
+7.2 A1 related APIs 14 
+The xApps in Near-RT RIC provide value added services based on the policies or enrichment information or both which 15 
+are transferred through A1 interface by non-RT RIC. A1 related APIs enable the exchange of information between xApps 16 
+and A1 termination, which includes:  17 
+- Policy Enforcement API: used for policy enforcement request/response. 18 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+14 
+O-RAN.WG3.RICARCH-v01.00 
+- Enrichment Information API: used for enrichment information transfer/response . 1 
+ 2 
+7.3 E2 related APIs 3 
+E2 related APIs enable the exchange of information between xApps and E2 termination.  4 
+ 5 
+7.4 Management APIs 6 
+Management APIs support the following APIs, including xApp life-cycle management related APIs, PM and FM related 7 
+APIs.  8 
+xApp life-cycle management related APIs include the following functions: 9 
+- ML Model Deployment Request. 10 
+- ML Model Update Request. 11 
+- ML Model Uninstall Request. 12 
+FCAPS related APIs include the following functions:  13 
+- Configuration API: The xApp is configured by SMO via O1 interface. The API transfers the configurations from 14 
+SMO to xApp.  15 
+- PM API: xApps provide PM related data to O1 PM Consumer via PM API.  16 
+- FM API xApps provide faults and events information to O1 FM Consumer via FM API.  17 
+ 18 
+7.5 Control APIs 19 
+The APIs provide the exchange of control related information between xApps and the functions which are responsible for 20 
+control such as conflict mitigation, xApp subscription management. For example, t he analysis results, decisio ns or 21 
+requests from xApps can be transferred via the API for conflict mitigation, xApp subscription management or other 22 
+necessary functions. 23 
+ 24 
+7.6 SDL APIs 25 
+SDL APIs provide a simple yet flexible way to store and retrieve data while hiding details such as type and location of 26 
+database, management operations of database layer such as high availability, scaling, load -balancing. SDL APIs allow 27 
+multiple xApps to access the data independently of each other. 28 
+- Register API: xApps can register at SDL for the permissions to access the database.  29 
+- Deregister API: xApps can request to delete the API which has been registered in SDL.  30 
+- Modify API: It allows to modify or delete data from the database. 31 
+- Fetch API: It allows the xApps to fetch data from the database. 32 
+- Store API: It allows the xApps to store data in the database. 33 
+- Notification API: The database can notify the xApps the update information on the database via the notifi cation 34 
+API. The database will ignore  the notification to the xApp when update occurs if the notification API is not 35 
+registered by the xApp. 36 
+ 37 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+15 
+O-RAN.WG3.RICARCH-v01.00 
+8 External Interfaces of Near-RT RIC 1 
+8.1 E2 Interface  2 
+O-RAN-WG3.E2GAP [2] specifies E2 interface general aspects and principles. 3 
+O-RAN-WG3.E2AP [3] specifies E2 interface application protocols. 4 
+ 5 
+8.2 A1 Interface 6 
+O-RAN-WG2.A1.GA&P [8] specifies A1 interface general aspects and principles. 7 
+O-RAN-WG2.A1AP [9] specifies A1 interface application protocols. 8 
+8.3 O1 Interface 9 
+O-RAN-WG1.O1-Interface [5] specifies O1 interface related aspects. 10 
+ 11 
+  12 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+16 
+O-RAN.WG3.RICARCH-v01.00 
+Annex ZZZ: O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implem ented in hardware, 11 
+software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 24 
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 27 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent 28 
+claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an O-RAN 38 
+Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40 
+agreement with O-RAN Alliance. 41 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+17 
+O-RAN.WG3.RICARCH-v01.00 
+Section 3: FRAND LICENSE 1 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 2 
+Patent License Agreement to each Adopter under Fair Reasonable And Non - Discriminatory (FRAND) terms and 3 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 4 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 5 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 6 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 7 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 8 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 9 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 10 
+customers of such licensed Compliant Implementations. 11 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 13 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 14 
+its Affiliates for its license of Necessary Claims to its licensees. 15 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 16 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair 17 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 18 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 19 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 20 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 21 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 22 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not ma king a reciprocal 23 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 24 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 25 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 26 
+licensed Compliant Implementations. 27 
+Section 4: TERM AND TERMINATION 28 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 30 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 31 
+(30) days after being given notice specifying the breach. 32 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 33 
+after termination of this Agreement, Adopter will continue to grant licenses (a ) to entities who become Adopters after 34 
+the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the 35 
+version that was current as of the date of termination. 36 
+Section 5: CONFIDENTIALITY 37 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 38 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 39 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 41 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 42 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 43 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 44 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 45 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 46 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 47 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+18 
+O-RAN.WG3.RICARCH-v01.00 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 1 
+Alliance’s prior written approval. 2 
+Section 6: INDEMNIFICATION 3 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 4 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnit ees”), 5 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 6 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 7 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 8 
+products that comply with O-RAN Specifications. 9 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 10 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 11 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 12 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 13 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 14 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 15 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 16 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 17 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 18 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 19 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 20 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 21 
+CONDITION FOR O-RAN SPECIFICATIONS. 22 
+Section 8: ASSIGNMENT 23 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 24 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 25 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 26 
+Alliance may freely assign this Agreement. 27 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 28 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 29 
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 30 
+including as licensees under Section 3. 31 
+Section 10: BINDING ON AFFILIATES 32 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 33 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 34 
+and are also entitled to the benefits of the rights of Adopter hereunder. 35 
+Section 11: GENERAL 36 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  37 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 38 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 39 
+to the subject matter of this Agreement.  40 
+
+ 
+Copyright © 2020 by the O-RAN Alliance e.V. Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.     
+19 
+O-RAN.WG3.RICARCH-v01.00 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 1 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 2 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 3 
+prohibits any communication that would violate the antitrust laws. 4 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 5 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 6 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 7 
+Contributors or Academic Contributors. 8 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 9 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 10 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 11 
+full force and effect. 12 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 13 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 14 
+be construed as a waiver or relinquishment to any extent of the other partie s’ or third party beneficiary’s right to assert 15 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 16 
+force and effect.  17 

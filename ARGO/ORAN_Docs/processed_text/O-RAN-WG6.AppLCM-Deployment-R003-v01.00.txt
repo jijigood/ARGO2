@@ -1,0 +1,359 @@
+O-RAN.WG6.AppLCM-Deployment-R003-v01.00
+Technical Report
+O-RAN Working Group 6
+Application Life Cycle Management (LCM)
+for Deployment
+Technical Recommendation
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+1
+List of figures
+Figure 4.1-1: <here is the preferred format for figure title>	7
+List of tables
+Table 4.1-1: <here is the preferred format for table title>	7
+Foreword
+This Technical Report (TR) has been produced by O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+Executive summary
+This is a Technical Recommendation from the WG6 Cloudification & Orchestration working group that documents the deployment flow use case, application package, package artifacts, and life cycle management.
+The content of this TR itself is not normative. However, it will recommend possible requirements that are recommended to be incorporated into the Orchestration Use Case and Requirements document. Furthermore, the various sections of this document such as use case flows, application package, and package artifacts related to provisioning will be ported into their appropriate normative documents.
+Because of the scope and nature of this document, there are a number of major sections in this document that will be tracked separately as they become mature.
+Introduction
+Orchestration is the process of onboarding packages that have applications so that application artifacts can be made available during LCM. This is a Technical Recommendation from the WG6 Cloudification & Orchestration working group that documents the deployment flow use case, application package and life cycle management. The Deployment flow in this document shows detailed flows of what happens to accomplish deployment of applications.
+The content of this TR itself it not normative.But, it will recommend possible requirements that are recommended to be incorporated into the Orchestration Use Case and Requirements document. The Deployment flow Use case is recommended to be integrated into the Orchestration Use Case document.
+Because of the scope and nature of this document, there are a number of major sections in this document that will be tracked separately as they become mature. The document contains content for K8s aware and ETSI NFV aware solutions.
+The recommendation section of this document provides recommendations of where the content should be incorporated into what normative specifications.
+1	Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+The present document specifies a Technical Recommendation from the WG6 Cloudification & Orchestration working group that documents the deployment flow use case, application package and life cycle management.
+This document covers the orchestration & cloudification aspects for the Application Package model. The model is developed in the OAM Specification [1].
+1.1 Revision History per Topic
+2	References
+2.1	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+O-RAN.WG10.OAM-Architecture: “O-RAN Operations and Maintenance Architecture”.
+Kubernetes label key-value-nomenclature https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+Kubernetes node features https://kubernetes-sigs.github.io/node-feature-discovery/v0.9/get-started/features.html#table-of-contents
+O-RAN WG10 App Package Specification
+O-RAN Cloudification & Orchestration Use Case and Requirements
+ETSI GS NFV-SOL 004 (V4.3.1): "Network Functions Virtualisation (NFV) Release 4; Protocols and Data Models; VNF Package and PNFD Archive specification".
+ETSI GS NFV-IFA 011 (V4.3.1): "Network Functions Virtualisation (NFV) Release 4; Management and Orchestration; VNF Descriptor and Packaging Specification".
+O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE (V03.00): "O-RAN Working Group 6: O2dms Interface Specification: Profile based on ETSI NFV Protocol and Data Models".
+O-RAN WG6 O2DMS INTERFACE K8S PROFILE (v02.00): “O-RAN Working Group 6 O2dms Interface Specification: Kubernetes Native API Profile for Containerized NFs”.
+O-RAN WG6 O2IMS INTERFACE (v03.00):” O-RAN Working Group 6 O2ims Interface Specification”.
+3	Definition of terms, symbols, and abbreviations
+3.1	Terms
+For the purposes of the present document, the following terms apply:
+DeploymentDescriptor: a template validated by the Solution Provider describing the deployment options for the application that includes one or more DeploymentItems.
+DeploymentItem: a template that describes the requirements for the deployment of a component of the application on the O-Cloud.
+3.2	Symbols
+Void
+3.3	Abbreviations & Acronyms
+For the purposes of the present document, the abbreviations apply:
+4	Background
+4.1 	Introduction
+This section describes the Common Application Life Cycle Management of applications that are developed by a Solution Provider and delivered to a Service Provider or Network Operator for deployment in an O-Cloud. Once the Solution Provider delivers the NF deployment, it is validated in a test environment prior to giving to operations to deploy.  The description of the delivery of the NF deployments to the Service Provider as part of LCM is detailed in the OAM architecture document. The framework for Lifecycle Management is defined in the OAM Architecture document [1]. The O-RAN Cloudification & Orchestration aspects described here complements the concepts in the OAM Architecture specification. The following diagram in Figure 1 - Common Application Life Cycle Management for ASD is an example that applies to the ASD solution for didactic purposes.
+Figure 1 - Common Application Life Cycle Management for ASD
+The above diagram depicts some of the key steps in basic application package orchestration:
+Step 1, DELIVER: a solution provider (vendor) delivers an application package (app package) which may include a variety of artifacts. These artifacts may include application descriptors, model descriptors, informational artifacts, cloud native artifacts, metadata, and dictionaries.
+Step 2, ONBOARDING: Onboarding involves the ingestion, verification, and unpacking of the package and storage into a catalog. The SMO performs these onboarding activities and may usea cloud-native onboarding tools for that purpose. During this process, an AI/ML model can be trained.
+Security Package Validation – During onboarding, the security validation of the package or package artifact(s) is performed. See the OAM Architecture document [1] clause 4.1.3, and clause 4.1.4.
+Step 3, CERTIFICATION PROCESS: After onboarding, the package undergoes a certification process from the catalog in the SMO. Afterwards, it is published to an artifact repository (aka the run-time library). Certification of the package may include the following: security validation of artifacts, metadata verification, artifact verification against indicated metadata locations. See the OAM Architecture document [1].
+Note: The package cannot be certified until training is finished. If the AI/ML training cannot complete, the package is not certified.
+Note: The package cannot be certified until security validation of the package is completed.
+Note: For some operators, the package may go through part of the certification process before onboarding (Step 1 and Step 2).
+Step 4, DEPLOY: In deployment, The deployment tool is given a reference to the image repository entry from which the image can be pulled. Inventory is updated.
+4.2	App Package
+4.2.1	App Package Concepts
+The package concepts are motivated from the ETSI GS NFV-SOL 004 [2] standards which describe the directory structure and required files for a package.
+The Application Package contains:
+Manifest file – The manifest file describes the location and types of files in the package.
+Metadata – The metadata contains reference information related to the package itself. It is information about the information in the package, hence it is called metadata.
+Other artifacts – The package can also contain other artifacts as well such as informational artifacts.
+Note: The OAM Architecture specification [1] does not cover details about the application package.
+4.2.2 	App Package Security
+An important aspect of managing an application package as it relates to O-RAN Cloudification & Orchestration are the security aspects.
+There are standards which relate to package security. These include ETSI GS NFV-IFA011 [3] (stage 2) and ETSI GS NFV-SOL 004 [2] Clause 5.1 (stage 3) which describes two options for package security:
+Option 1 Per Artifact: The VNF package shall contain a Digest (a.k.a. hash) for each of the components of the VNF package. The table of hashes is included in the manifest file, which is signed with the VNF provider private key. In addition, the VNF provider shall include a signing certificate that includes the VNF provider public key, following a pre-defined naming convention and located either at the root of the archive or in a predefined location (e.g., directory). The certificate may also be included in the signature container if the signature format allows that. For example, the CMS format allows to include the certificate in the same container as the signature.
+Option 2 Per CSAR Package: The complete CSAR file shall be digitally signed with the VNF provider private key. The VNF provider delivers one zip file consisting of the CSAR file, a signature file and a certificate file that includes the VNF provider public key. Only one signature of the CSAR file shall be present. The certificate may also be included in the signature container if the signature format allows that. The manifest shall be signed in both option 1 and option 2. Only one signature of the manifest shall be present.
+Figure 2 - Package Security Approaches
+4.2.3 	App Package DeploymentDescriptor
+This section describes the Application Package (App Package) as it relates to O-RAN Cloudification & Orchestration. The OAM Architecture document (see reference [1]) details the Application Package model which details the high-level composition of the Application Package (AppPackage). This is shown in figure 2. The part of that model that is pertinent to O-RAN cloudification & orchestration that is within scope of the [Work Item Technical Report] is demarcated with a blue box in figure 2.
+This section also describes the Application Service Descriptor (ASD) and the VNF Descriptor (VNFD) in the application package. These two things serve the same function in their respective profiles, and these terms are used interchangeably through the rest of the document. The ASD is a simplified deployment descriptor compared to the VNFD for CNFs, xApps and rApps to leverage enhancements in orchestrators.
+Figure 3 - Deployment Descriptor Model
+In figure 2, the part of the model highlighted with the blue box, shows that the DeploymentDescriptor is contained within an AppPackage. The DeploymentDescriptor has a composition relationship to Deployment Item(s). The Deployment Item(s) has a composition (containment) relationship to one cloud native descriptor files. The DeploymentItem has an association relationship with the ExecutableImage(s) which has a cardinality of zero to many.
+In figure 2, the part of the model highlighted with the blue box, ties back to the application package model management descriptor which is described in more detail in this TR. Note: future versions of this document will further describe this part of the model (in the blue box).
+This TR suggests that the DeploymentDescriptor and DeploymentItem(s) be contained within one artifact in the package as an Application Service Descriptor (ASD) or VNF Descriptor (VNFD). The DeploymentItem is part of the ASD. However, it is possible that the DeploymentDescriptor and DeploymentItem(s) could be in separate artifact.
+There will be metadata pertaining to the cloud native descriptor file. The metadata will include the checksum/hash, and type of file (helm, K8s manifest, SOL doc). From a workflow perspective, it uses the metadata to determine the appropriate action to take. The ASD allows the SMO to determine the resource requirements based on variables of the cloud native descriptor file. The deployment requirements can be derived for the executable image from the deployment item and the cloud native descriptor file.
+The OAM architecture document and Information Model specification in reference [1] in the Lifecycle Management section describes the full model and the components show in more detail.
+4.2.4 	CloudNativeDescriptorFile and ExecutableImage
+5 	Use Cases
+5.1	Deployment Flow for ASD And Cloud Native Artifacts Use Case
+5.1.1	Introduction
+This describes a use case and flow to deploy an application (such as a NF deployment) into the O-Cloud. The deployment uses a deployment tool that is appropriate for the artifactType in the DeploymentItem.
+This use case is for an application deployment on a K8s Cluster with an ASD.
+NOTE 2:	The use case flow illustrates interactions among entities within the SMO and between the SMO and the O-Cloud.
+5.1.2	UML Sequence Diagram
+@startuml
+Autonumber
+skinparam sequenceArrowThickness 2
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+Box "Personnel" #lightblue
+Actor Operator as "Cloud Operator"
+End box
+Box "Service Management & Orchestration\nFramework" #gold
+Participant ORC as "Orchestrator"
+Collections DPT as "Deployment Tools"
+end box
+Box "O-Cloud Platform"#lightseagreen
+participant DMS as "DMS"
+End box
+Note over DPT, ORC
+NOTE: Steps detailing SMO internal interactions is for
+illustrative purposes, and its specification is out of the
+scope of the present document. See also note 1 in clause 5.1.1.
+End Note
+Note over Operator, DMS
+<B>PRECONDITIONS:</B>
+App Package for NF Deployment is onboarded and cataloged
+SMO has connectivity to O-Cloud
+O-Cloud has registered all its DMSs from different sites with the SMO
+End Note
+== Deployment Flow Use Case ==
+Note over Operator, DPT
+<B>TRIGGER CONDITION:</B>
+(1) Operator Initiates Deployment
+End Note
+Operator -> ORC : Deployment\nlifeCycle Parameters
+Note left
+Deployment
+requirements
+End Note
+ORC -> ORC : Extract xNF Constraints\nfrom deployment descriptor (e.g., ASD)
+Alt Collect Input & Parameterizations (Optional)
+Note over ORC, DPT
+Collects resource requirements for that NF deployment, to be
+used for homing decision
+End Note
+ORC -> DPT : Cloud Artifacts & lifeCycle Parameters
+DPT -> ORC : K8s Manifest file result from\nprocessing the CloudNativeDescriptor Files\nand then collecting the resource\nrequirements from them
+ORC -> ORC : Update resource requirements
+End
+ORC -> ORC : Calculate resource requirements
+Alt Homing Operation (Cluster ID not provided)
+ORC -> ORC : Homing Decision selects one target\n K8s cluster matching \nxNF deployment resource requirements\n and constraints
+Note left
+Homing Operation
+End Note
+Else Homing Operation (Cluster ID already provided)
+ORC -> ORC : Check inventory that Cluster ID \nhas free resources for placement.\nCheck cluster fulfils\n constraints from DeploymentDescriptor.
+Else Homing Operation Cluster ID provided but it does not have free resources
+ORC -> ORC : No Free Resources or constraints not fulfiled
+Note over ORC
+Cluster does not have free resources
+Use Case Ends
+End Note
+End
+Opt Cluster has a special configuration needed (Optional)
+Note over ORC, DPT
+The cluster has a special configuration required, possibly an inter-cluster network
+End Note
+ORC -> ORC : A special cluster configuration need has been identified
+ORC -> ORC : Goes to FOCOM/IMS to configure the cluster
+End
+ORC -> ORC : Cluster ID and parameterized cloud artifacts
+ORC -> DPT : Cluster ID, lifeCycle Parameters, Cloud Artifacts
+DPT -> DMS : Deployment
+== End Deployment Flow Use Case ==
+@enduml
+Figure 4 – Deployment Flow for ASD and Cloud Native Artifacts Use Case
+5.1.3	Sequence Table
+5.1.4 Recommended Requirements for Deployment Flow for ASD and Cloud Native Artifacts Use Cases
+ORCHESTRATION REQUIREMENTS RELATED TO O2 (Recommended section for the Orchestration & Cloudification Use Case document)
+POTENTIAL NEW REQUIREMENTS:
+5.2 Deployment flow for VNFD use case
+5.2.1	Introduction
+Clause 5.2 describes a use case and flow to deploy an application, such as an NF Deployment into the O-Cloud, using the ETSI NFV defined Virtualised Network Function (VNF) Descriptor (VNFD) specified in ETSI GS NFV-IFA 011 [3].
+NOTE 1:	It is assumed in the use case flow that the SMO interacts with an O-Cloud DMS based on the O2-D demarcation #1 documented in the O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [4]. The use case flow could be revisited, or new ones be derived, in future versions of the present document based on further updates performed to the referenced document.
+NOTE 2:	The use case flow illustrates interactions among entities within the SMO and between the SMO and the O-Cloud. Clause 2.3.2 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [4] provides the mapping and correspondence of management functions and functional blocks between the O-RAN and ETSI NFV architectural frameworks.
+5.2.2	UML sequence diagram
+Figure 5.2.2-1 illustrates the use case flow for the instantiation of an NF Deployment based on VNFD.
+@startuml
+Autonumber
+skinparam sequenceArrowThickness 1
+skinparam ParticipantPadding 5
+skinparam BoxPadding 10
+Box "Personnel" #lightblue
+Actor operator as "Cloud operator"
+End box
+Box "SMO" #gold
+Participant nfo as "NFO"
+Participant focom as "FOCOM"
+Participant repository as "Package repository"
+end box
+Box "O-Cloud" #lightseagreen
+participant dms as "DMS"
+End box
+note over nfo, repository
+NOTE: This step about SMO internal interactions is for illustrative purposes, and its specification is out of
+the scope of the present document. See also note 2 in clause 5.2.1.
+end note
+note over operator, dms
+Precondition:
+The Cloud operator has required privileges to instantiate the NF
+The App Package for NF Deployment is onboarded and cataloged in the Package repository, and it is valid as per VNF Package specification
+SMO has connectivity to the O-Cloud
+O-Cloud has registered its DMS with the SMO
+end note
+note over operator, nfo
+Trigger:
+The opeator requests the instantiation
+of the NF Deployment
+end note
+operator -> nfo: Request NF Deployment instantiation
+group NF Deployment instantiation processing
+nfo <-> repository: Get VNFD of the NF Deployment from Application Package
+note right: See note at\n the top of UML.nfo -> nfo: Check NF Deployment\n requirements from VNFD
+end
+group NFO coordination with FOCOM to check O-Cloud availability
+nfo <-> focom: Check O-Cloud inventory, capacity\n and resources availability of O-Cloud
+note right: See note at\n the top of UML.
+end
+nfo -> nfo: NF Deployment homing processing and decision
+alt Successful homing
+nfo -> nfo: Update inventory in the\n SMO about the homing\n decision and
+else No successful homing
+nfo -> operator: Unsuccessful NF Deployment instantiation
+note over operator, nfo
+Use case ends
+end note
+end
+nfo -> dms: Request NF Deployment instantiation
+opt Fetching of VNFD and other content
+dms <-> repository: Request necessary Application Package content
+end
+note over dms
+O-Cloud DMS uses the VNFD
+for the NF Deployment instantiation
+end note
+ref over nfo, dms
+NF Deployment intantiation procedure
+(refer to clause 2.4.2.1 of O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE)
+end ref
+alt Successful instantiation
+dms -> nfo: Inform about succesful instantiation
+nfo -> nfo: Update necessary runtime\n and inventory information
+else No successful instantiation
+dms -> nfo: Inform about unsuccesful instantiation
+nfo -> nfo: Release granted/reserved\n resources and update of\n necessary inventory information
+end
+nfo -> operator: Inform result of NF Deployment instantiation
+note over operator, dms
+Postcondition:
+The NF Deployment is instantiated on the O-Cloud
+end note
+@enduml
+Figure 5 5.2.2-1: Flow of NF Deployment instantiation with VNFD
+5.2.3	Sequence table
+5.3.2	Potential New Requirements for Deployment flow for VNFD Use Case
+Table 5.2.4-1 lists potential requirements related to VNFD support application deployment.
+Table 5.2.4-1: Potential requirements related to VNFD for application deployment
+6 	Information Requirements for K8s-Aware Solution
+6.1 	DeploymentDescriptor with Application Service Descriptor
+Application Service Descriptor (ASD) describes application metadata for the orchestrator to be used as input for deployment of an application workload that is described by the ASD.
+6.1.1 Conventions
+The attributes of the ASD information elements are described in the tables provided in section 6.1. Each table has 5 columns, with the following significance:
+The "Attribute" column provides the attribute name.
+The "Qualifier" column indicates whether the support of the attribute is mandatory, optional or conditional from the SMO perspective.
+The "Cardinality" column contains the minimum and maximum cardinality of this information element (e.g., 1, 0 … N, 1 … N). A cardinality range starting with 0 indicates that the attribute need not always be included and 1 indicates that the attribute needs to be always included.
+The "Type" column provides information on the type of the attribute values. It can be the name of an Information Element. If a cell in the "Type" is marked as "Not specified", which indicates that the specification of the type is left to the data model.
+The "Description" provides a brief explanatory description, additional constraints, and examples.
+The ASD is a complementary descriptor to the cloud-native deployment artifacts hence it contains design-time information provided by the application vendor that is not described/available in the cloud native artifacts. Such complementary information in the ASD can include specific infrastructure capabilities requirements for the deployment of the application software workload, constraints on the Kernel type needed, additional networking requirements needed beyond primary connectivity described in the cloud native artifacts, any special CNI (Container Network Interfaces), etc.
+ASD can support an application workload deployment on OS container infrastructures, and it is applicable to O-RAN NFs, xApps, and rApps.
+The following figure illustrates the representation of O-RAN OAM Application Packaging Model [WG10. Common Package] and shows how the Application Service Descriptor is positioned within the Application Package Model.
+Figure 6 DeploymentDescriptor with ASD representation
+6.1.2 Application Service Descriptor
+For the O-RAN NFs the Application Service Descriptor (ASD) is a main top level descriptor template which consists of the attributes described in Table 6.2-1 below.
+Table 6.2-1 ASD Information Model
+6.1.3 Deployment Item (DeploymentItems) Information Element
+The CloudNativeDescriptorFile defined in [WG10. Common Package] is realized by the deploymentItems IE which has the DeploymentItems structure described in Table 6.3-1 below.
+DeploymentItems IE describes the type of cloud native artifact, its order of deployment in case multiple cloud native artifacts are employed with the same ASD, and the list of parameters that can be parameterized in this cloud native deployment artifact at deployment time
+Table 6.3-1 DeploymentItems IE
+6.1.4 External connection point (asdExtCpd) Information Element
+ExtCpd describes application exposing endpoints to enable orchestrators to string together or optimally place linked applications.
+Table 6.4 ExtCpd IE
+Note 1: Applies only for ExtCpd representing secondary network interfaces in a POD.
+Note 2: Several ExtCpd may refer to same additional network interface requirements.
+6.1.5 NetworkInterfaceRealizationRequirements Information Element
+NetworkInterfaceRealizationRequirements IE describes details related to secondary networks that attach the OS containers to the logical or physical networks.
+Table 6.5 NetworkInterfaceRealizationRequirements IE
+6.1.6 ExtCpdParamMappings Information Element
+ExtCpdParamMappings IE describes required information on what parameters to be provided to the deployment tools for the ExtCpd instance.
+Table 6.6 ExtCpdParamMappings IE
+Note 1: When the ExtCpd represent a networkRedundant/mated pair of sriov interfaces, there are references to 2 or 3 related NADs needed to be passed, while for other interface types only one NAD reference is needed to be passed.
+Note 2: The format of the Content strings is specific for each different orchestration templating technology used (Helm, Teraform, etc.). Currently only a format for use with Helm charts is suggested: "<helmchartname>:[<subchartname>.] 0 ... N[<parentparamname>.] 0 … N<paramname>”. Whether the optional parts of the format are present depends on how the parameter is declared in the helm chart. An example is: "chartName:subChart1.subChart2.subChart3.Parent1.Parent2.Parent3.parameter".
+Note 3:  A direct attached (passthrough) network interface, such as an sriov interface, attaches to a network via only one of the two switch planes in the infrastructure.
+When using a direct attached network interface one therefore commonly in a pod uses a mated pair of sriov network attachments, where each interface attaches same network but via different switchplane.
+The application uses the mated pair of network interfaces as a single logical “swith-path-redundant” network interface – and this is represented by a single ExtCpd. 
+Also, there is a case where a third “bond” attachment interface is used in the pod, bonding the two direct interfaces so that the application does not need to handle the redundancy issues – application just uses the bond interface.
+In this case all three attachments are together making up a logical “switch-path-redundant” network interface represented by a single ExtCpd. When three NADs are used in the ExtCpd the NAD implementing the bond attachment interface is provided through the parameter indicated in the third place in the nadNames attribute.
+6.1.7 EnhancedClusterCapabilities Information Element
+EnhancedClusterCapabilities IE describes information which is used to aid placement of the application service on a suitable cluster.
+Table 6.7 EnhancedClusterCapabilities IE
+6.1.8 	Metadata
+NOTE: Content is expected in future versions of the present document.
+6.1.9 	Security
+NOTE: Content is expected in future versions of the present document.
+6.1.10 	Resource Requirements
+NOTE: Content is expected in future versions of the present document.
+6.1.11	DeploymentItems
+NOTE: Content is expected in future versions of the present document.
+6.1.12	Other
+NOTE: Content is expected in future versions of the present document.
+6.2 	DeploymentItem
+6.2.1	Deployment Sequencing
+NOTE: Content is expected in future versions of the present document.
+6.2.2 	Lifecycle Requirements
+NOTE: Content is expected in future versions of the present document.
+7 	Information Requirements for ETSI-based Solution
+7.1 	DeploymentDescriptor
+NOTE: Content is expected in future versions of the present document.
+7.2 	DeploymentItems
+NOTE: Content is expected in future versions of the present document.
+8 	Formatting Recommendations
+8.1 	CSAR
+NOTE: Content is expected in future versions of the present document.
+8.2	SOL004
+NOTE: Content is expected in future versions of the present document.
+9 Recommendations
+9.1 Introduction
+This TR is structured in a modular fashion organized by major topics and the following sections provide relevant recommendations by topic.
+9.2 Recommendation for Deploy flow use case & requirements
+The deployment flow use case for ASD is recommended to be incorporated into the Cloudification & Orchestration Use Case and Requirements document.
+9.3 Recommendation for DeploymentDescriptor based on ASD
+This is described in Clause 6.1 and Clause 6.2
+The team producing this TR has considered four options for where that content might be placed:
+O2 DMS Interface Spec (new) WG6 Stage 2 –
+The O2 DMS Interface Specification would be a sister document in WG6 to the existing O2 IMS Interface Specification. It would be a new document which would also be the home for other O2 DMS topics, such as O2 DMS fault and O2 DMS performance management. So, it could be created for DeploymentDescription as well as the other O2 DMS topic areas.
+WG10 App Pkg Spec [out of place wrong WG]
+Another possibility is to put into the WG10 App Package Specification; however, it is not proper working group.
+O2 DMS LCM - O2 DeploymentDesc for ASD (new WG6 document)
+A new separate dedicated for ASD modelling could be an option.
+O2 DMS K8s Profile [this is a Stage 2 material being put into Stage 3 document]
+Incorporating the material into the Stage 3 O2 DMS K8s Profile document. The problem with that is that it is stage 2 material going into a stage 3 document.
+9.4 Recommendation for DeploymentDescriptor based on VNF
+Recommendation for Deployment Flow for VNFD Use Case
+Revision History
+History
+History of the Document

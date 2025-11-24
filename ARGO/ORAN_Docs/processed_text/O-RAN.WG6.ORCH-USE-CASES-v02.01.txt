@@ -1,0 +1,3565 @@
+O-RAN.WG6.ORCH-USE-CASES-v02.01
+Technical Specification 
+Orchestration Use Cases and Requirements 
+ for O-RAN Virtualized RAN 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the 
+previous requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN 
+Adopter License Agreement to access and use Final Specifications shall no longer apply or be 
+required for these Final Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is 
+prohibited, save that you may print or download extracts of the material on this site for your 
+personal use, or copy the material on this site for the purpose of sending to individual third parties 
+for their information provided that you acknowledge O-RAN ALLIANCE as the source of the 
+material and that you inform the third party that these conditions apply to them and that they must 
+comply with them.
+
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ. 
+ 
+                              O-RAN.WG6.ORCH-USE-CASES-v02.01 
+Technical Specification  
+ 
+ 
+Orchestration Use Cases and Requirements  
+ for O-RAN Virtualized RAN 
+   
+  
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving,       
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter 
+License Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+VAT ID DE321720189  
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        2 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+T able of C ontents  1 
+ 2 
+Table of Contents ............................................................................................................................................... 2 3 
+Table of Figures .................................................................................................................................................. 3 4 
+1. Scope ........................................................................................................................................................ 4 5 
+1.1 References.......................................................................................................................................................... 4  6 
+1.2 Definitions and Abbreviations ........................................................................................................................... 5  7 
+1.2.1 Definitions .................................................................................................................................................... 5  8 
+1.2.2 Abbreviations ............................................................................................................................................... 5  9 
+2 Objectives ................................................................................................................................................. 5 10 
+2.1 Context and Relationship to other WG6 and O-RAN Work .............................................................................. 5  11 
+2.2 Objectives of this Document .............................................................................................................................. 6  12 
+2.3 Relationship to O-RAN OAM Architecture ...................................................................................................... 6  13 
+2.4 Functional Description of O-RAN Cloud Infrastructure.................................................................................... 7  14 
+3 Orchestration Use Cases ........................................................................................................................... 7 15 
+3.1 O-Cloud Basic Use Cases .................................................................................................................................. 8  16 
+3.1.1 O-Cloud Pre-Deployment Processing Use Case .......................................................................................... 8  17 
+3.1.2 O-Cloud Platform Software Installation Use Case ..................................................................................... 10 18 
+3.1.3 O-Cloud Registration and Initialization Use Case ..................................................................................... 12 19 
+3.1.4 O-Cloud Inventory Update Use Case (DMS Example) .............................................................................. 14 20 
+3.1.5 Hardware Infrastructure Scaling of O-Cloud Post Deployment ................................................................. 16 21 
+3.1.6 O-Cloud Platform Software Upgrade Use Case ......................................................................................... 17 22 
+3.2 Network Function Basic Use Cases ................................................................................................................. 19 23 
+3.2.1 Instantiate Network Function on O-Cloud ................................................................................................. 19 24 
+3.2.2 Scale Out of NF .......................................................................................................................................... 23 25 
+3.2.3 Scale In of NF ............................................................................................................................................ 25 26 
+3.2.4 Software Upgrade of NF ............................................................................................................................ 27 27 
+3.2.5 Terminate Network Function on O-Cloud ................................................................................................. 30 28 
+3.2.5.3 UML sequence diagram ............................................................................................................................... 30 29 
+3.3 Near-RT RIC/xAPP Use Cases ........................................................................................................................ 32 30 
+3.3.1 Configure O-Cloud for Near-RT RIC ........................................................................................................ 32 31 
+3.3.2 Deploy xAPP in Near-RT RIC ................................................................................................................... 33 32 
+3.4 Multi-vendor network provisioning in a mixed PNF/VNF environment ......................................................... 37 33 
+3.5 Reconfiguration of O-RAN Virtual Network Function(s) ............................................................................... 37 34 
+3.5.1 High Level Description .............................................................................................................................. 37 35 
+3.5.2 Sequence Description ................................................................................................................................. 38 36 
+3
+.5.3 UML sequence diagram ............................................................................................................................. 39 37 
+3.6 Recovery Use Cases......................................................................................................................................... 40 38 
+3.6.1 Introduction ................................................................................................................................................ 40 39 
+3.6.2 Network Function Deployment Level Reset Use Case .............................................................................. 41 40 
+3.6.3 O-Cloud Node Level Reset Use Case ........................................................................................................ 43 41 
+3.7 Fault Use Cases ................................................................................................................................................ 45 42 
+3.7.1 Alarm Subscription Use Case..................................................................................................................... 45 43 
+3.7.2 Alarm Notification Use Case ..................................................................................................................... 48 44 
+3.7.3 Alarm Query Use Case ............................................................................................................................... 51 45 
+4 Orchestration Requirements ................................................................................................................... 54 46 
+4.1 General Requirements ...................................................................................................................................... 54 47 
+4.2 Orchestration Requirements Relating to O1 .................................................................................................... 56 48 
+4.3 Orchestration Requirements Relating to O2 .................................................................................................... 56 49 
+Annex A: Terminology Used in O-Cloud Requirements ................................................................................. 58 50 
+Annex ZZZ:  O-RAN Adopter License Agreement ......................................................................................... 59 51 
+ 52 
+  53 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        3 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+T able of F igures  54 
+Figure 2-1:  Relationship of this Document to Scenario Documents and O-RAN Management Documents ..................... 6 55 
+Figure 2-2:  O-RAN Architecture and Management Interfaces .......................................................................................... 7  56 
+Figure 3-1: O-Cloud Pre-Deployment Processing ............................................................................................................ 10 57 
+Figure 3-2: Platform Software Installation ....................................................................................................................... 12 58 
+Figure 3-3: O-Cloud Deployment Processing ................................................................................................................... 14 59 
+Figure 3-4: O-Cloud Inventory Update ............................................................................................................................. 15 60 
+Figure 3-5: Hardware Infrastructure Scaling .................................................................................................................... 17 61 
+Figure 3-6: O-Cloud Platform Software Upgrade............................................................................................................. 19 62 
+Figure 3-7: Instantiate Network Function ......................................................................................................................... 23 63 
+Figure 3-8: Scale Out of Network Function...................................................................................................................... 25 64 
+Figure 3-9: Scale In of Network Function ........................................................................................................................ 27 65 
+Figure 3-10: SW Upgrade of Network Function .............................................................................................................. 29 66 
+Figure 3-11: Terminate Network Function ....................................................................................................................... 32 67 
+Figure 3-12: Configure O-Cloud for Near-RT RIC .......................................................................................................... 33 68 
+Figure 3-13: Deploy xAPP ............................................................................................................................................... 37 69 
+Figure 3-14: Reconfiguration............................................................................................................................................ 40 70 
+Figure 3-15: Remote System Reset of legacy xNB by OSS ............................................................................................. 40 71 
+Figure 3-16: NF Deployment level recovery .................................................................................................................... 42 72 
+Figure 3-17: O-Cloud Node level recovery ...................................................................................................................... 45 73 
+Figure 3-18: Alarm Subscription ...................................................................................................................................... 48 74 
+Figure 3-1 9: Alarm Notification  ....................................................................................................................................... 51 75 
+Figure 3-20: Alarm Query ................................................................................................................................................ 54 76 
+ 77 
+78 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        4 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+1. Scope  79 
+This Technical Specification has been produced by the O-RAN ALLIANCE. 80 
+The contents of the present document are subject to continuing work within O-RAN and may change following formal 81 
+O-RAN approval. Should O-RAN modify the contents of the present document, it will be re-released by O-RAN with 82 
+an identifying change of release date and an increase in version number as follows: 83 
+Version x.y.z 84 
+where: 85 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 86 
+etc. (the initial approved document will have x=01). 87 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  88 
+z the third digit included only in working versions of the document indicating incremental changes during the 89 
+editing process. 90 
+1.1 References 91 
+The following documents contain provisions which, through reference in this text, constitute provisions of this 92 
+specification. 93 
+References are either specific (identified by date of publication, edition number, version number, etc.) or non-specific. 94 
+- For a specific reference, subsequent revisions do not apply. 95 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 96 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 16.  97 
+[1] 3GPP TR 21.905: "Vocabulary for 3GPP Specifications". 98 
+[2] ETSI GS NFV 003 V1.4.1, “Terminology for Main Concepts in NFV”  99 
+[3] O-RAN-WG1-O-RAN Architecture Description - v04.00.00, “O-RAN Architecture Description” 100 
+[4] O-RAN White Paper: “O-RAN: Towards an Open and Smart RAN”, October 2018. 101 
+[5] O-RAN.WG1.OAM-Architecture-v05.00: “O-RAN Operations and Maintenance Architecture”.  102 
+[6] O-RAN.WG1.O1-Interface.0-v05.00: “O-RAN Operations and Maintenance Interface Specification”.  103 
+[7] O-RAN-WG6.CAD-v02.02: “Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN”. 104 
+[8]    O-RAN-WG2. Use Case Requirements v01.00, “Use Case and Requirements Specification v01.00”  105 
+[9]    O-RAN-WG6.O2-GA&P-v01.01: “O2 General Aspects and Principles v.01.00” 106 
+[10]    O-RAN.WG3.RICARCH-v01.00: “Near-RT RIC Architecture v.01” 107 
+[11]    O-RAN-WG6.AAL-GAnP-v00.01: “O-RAN O-Cloud Acceleration Abstraction Layer” 108 
+[12]    ETSI GS NFV-SOL 015 V1.2.1 (2020-12): “Specification of Patterns and Conventions for RESTful NFV-109 
+MANO APIs” 110 
+[13]    ETSI 3GPP TS 29.501 V16.5.0 (2020-09): “Principles and Guidelines for Services Definition; Stage 3” 111 
+ 112  
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        5 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+1.2 Definitions and Abbreviations 113 
+1.2.1 Definitions 114 
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following 115 
+apply. A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP 116 
+TR 21.905 [1].  117 
+Managed Function  Term used in O-RAN OAM to refer to a distinct logical function that is managed.  Examples 118 
+include Near-RT RIC, O-CU-CP, O-CU-UP, O-DU, and O-RU.     119 
+From the OAM Framework document:  3GPP TS 28.622 states that a Managed Function 120 
+(MF) can represent a telecommunication function either realized by software running on 121 
+dedicated hardware or realized by software running on NFVI. Each managed function 122 
+instance communicates with a manager (directly or indirectly) over one or more management 123 
+interfaces exposed via its containing managed element instance. 124 
+Managed Element  Term used in O-RAN OAM to refer to a distinct physical or virtual element that is managed.  125 
+The ME will expose its contained MFs and their information models to the SMO through its 126 
+management interfaces. 127 
+From the OAM Framework document:  3GPP TS 28.622 states that a Managed Element 128 
+(ME) communicates with a manager (directly or indirectly) over one or more management 129 
+interfaces for the purpose of being monitored and/or controlled. Managed elements may or 130 
+may not additionally perform element management functionality. 131 
+1.2.2 Abbreviations 132 
+For the purposes of this document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply.  133 
+An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, 134 
+in 3GPP TR 21.905 [1]. 135 
+3GPP Third Generation Partnership Project 136 
+5G Fifth-Generation Mobile Communications 137 
+CNF Containerized Network Function 138 
+DMS O- Cloud Deployment Management Services 139 
+FOCOM Federated O-Cloud Orchestration & Management 140 
+IM Information Model  141 
+IMS O-Cloud Infrastructure Management Services 142 
+LCM Life Cycle Management 143 
+NF Network Function 144 
+NFO Network Function Orchestration 145 
+NFVI Network Function Virtualization Infrastructure 146 
+O-CU O- RAN Central Unit as defined by O-RAN ALLIANCE 147 
+O-CU-CP O- CU Control Plane 148 
+O-DU-UP O- CU User Plane 149 
+O-DU O- RAN Distributed Unit (uses Lower-level Split) 150 
+O-RU O- R AN Radio Unit 151 
+PNF Physical Network Function 152 
+RAN Radio Access Network 153 
+SMO Service Management and Orchestration Framework 154 
+VIM Virtual Infrastructure Manager 155 
+VNF Virtual Network Function 156 
+WG Working Group 157 
+ 158 
+2 Objectives 159 
+2.1 Context and Relationship to other WG6 and O-RAN Work 160 
+This document introduces different use cases for O-RAN orchestration of virtualized RAN and the interfaces used for 161 
+management and orchestration, in particular the O1 interface between the service management and orchestration 162 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        6 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ framework and the RAN managed functions and the O2 interface between the service management and orchestration 163 
+framework and the O-Cloud Infrastructure Management Services/Deployment Management Services that controls 164 
+resource assignment for Virtualized Network Functions.   165 
+This document relies on WG1 architecture documents for the overall architecture.  WG6 focuses on end-to-end 166 
+orchestration in O-RAN and virtualization/cloudification of O-RAN functions. 167 
+The following documents are used as input on high level O-RAN OAM architecture and functions: 168 
+• WG1 O-RAN architecture [3] 169 
+• WG10 OAM architecture [5]  170 
+• WG10 OAM interface specification (O1) [6] 171 
+In addition, the WG6 CADS specification [7] is referenced for input on cloud architecture and terminology, and the 172 
+WG6 O2 General Aspects and Principles [9] is referenced for details of the O2 interface and its usage 173 
+The details of implementing orchestration interfaces and models are covered in follow on documents, such as are shown 174 
+in purple in Figure 2-1. 175 
+NOTE: Work on AAL[11] may lead to additional use cases in future. 176 
+ 177 
+Figure 2-1:  Relationship of this Document to Scenario Documents and O-RAN Management Documents 178 
+This document also draws on work from other O-RAN working groups such as WG2 for Non-RT RIC details and WG3 179 
+for Near-RT RIC and xAPP details, as well as sources from other industry bodies.   180 
+ 181 
+2.2 Objectives of this Document 182 
+The O-RAN ALLIANCE seeks to improve RAN flexibility and deployment velocity, while at the same time reducing 183 
+the capital and operating costs through the adoption of cloud-based architectures.  184 
+A key principle is the decoupling of RAN hardware and software for all compone nts including O-CU, O-DU, and O-185 
+RU, and the deployment of software components on commodity server architectures supplemented with programmable 186 
+accelerators where necessary. 187 
+Given that the RAN environment will consist of a range of different components that  can be realized by either PNFs or 188 
+VNFs/CNFs it is critical to understand the coordination of RAN components done by the Service Management and 189 
+Orchestration Framework to deploy and operate RAN services in an O-RAN architecture. 190 
+This document defines end-to-end use cases in clause 3 and specifies OAM-related general and interface requirements 191 
+in clause 4 to support the O-RAN architecture.  192 
+2.3 Relationship to O-RAN OAM Architecture 193 
+This document follows the high level O-RAN OAM Architecture defined in O-RAN WG1.  The high level OAM 194 
+Architecture is given below in Figure 2-2 as taken from [3] but focusing on OAM interfaces O1 and O2 only. 195 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        7 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 196 
+Figure 2-2:  O-RAN Architecture and Management Interfaces 197 
+The Use Cases in this document describe the use of the O1 and O2 interfaces for orchestration within an O -RAN. 198 
+2.4 Functional Description of O-RAN Cloud Infrastructure  199 
+This document uses terminology for O-Cloud components taken from the Cloud Architecture and Deployment 200 
+Scenarios for O-RAN virtualized RAN Specification [7], and O2 General Aspects and Principles [9], including the O-201 
+Cloud Node, IMS and DMS. 202 
+3  Orchestration Use Cases 203 
+These Use Cases focus on the private cloud case where the cloud is managed by the operator.  Applic ability to the 204 
+public cloud case is for further study. 205 
+The present document provides Use Cases related to Network Function, O-Cloud, SMO and Near-RT RIC.  At a high 206 
+level, the use cases cover similar functionality/scope applicable to O-Cloud and O-Cloud-based Network Functions, 207 
+such as: 208 
+• Instantiation and deployment of O-Cloud and Network Functions 209 
+• Updating of O-Cloud and Network Functions 210 
+• Scaling of O-Cloud and Network Functions 211 
+ 212 
+Instantiation and deployment of O-Cloud in the O-RAN is triggered by the “Service Request” from SMO and a 213 
+sequential process involving the use cases described in clauses 3.1.1, 3.1.2, 3.1.3. The instantiation of Network Function 214 
+is described in clause 3.2.1. 215 
+ 216 
+Updating of O-Cloud and Network Function can be performed independently and be triggered by the SMO as described 217 
+in clauses 3.1.6 and 3.2.4, respectively. 218 
+ 219 
+Scaling of Network Function is triggered by the SMO as described in clause 3.2.2 (for the scaling out) and clause 3.2.3 220 
+(for the scaling in). Scaling of O-Cloud is described in clause 3.1.5. 221 
+ 222 
+The roles and actors described in Table 3-1 are used in the use case descriptions. 223 
+ 224 
+Table 3-1: Description of actors and roles used in the use cases. 225 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        8 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Actor/Role Description 
+RAN Planner Operator planning area deployment of RAN. 
+Cloud Planner Operator planning O-Cloud instance.  
+Cloud Installation 
+Project Manager Operator designing each O-Cloud instance. 
+O-Cloud Vendor Provider of the O-Cloud software. 
+Network Function 
+Install Project 
+Manager 
+Operator designing each Network Function instance. 
+Network operator Operator operating operator’s network. 
+Cloud Installer Operator installing O-Cloud Node 
+Cloud Maintainer Operator that operates and manages O-Cloud Nodes 
+SMO See [3].  SMO is further divided into FOCOM, NFO and OAM Functions. 
+IMS See [9] 
+DMS See [9] 
+O-Cloud Node(s) See [7]   
+Near-RT RIC See [3] 
+xAPP See [10] 
+Network Function 
+(Application) Network Function that is instantiated and managed. 
+Network 
+Controller Entity responsible for managing, controlling and setting up network connectivity. 
+ 226 
+Note: The UML Sequence Diagrams in the use cases follow the template defined in the OAM Architecture [5] 227 
+Appendix B.  An arrow with dashed lines is used to indicate a synchronous return message. 228 
+ 229 
+3.1 O-Cloud Basic Use Cases 230 
+Cloud Platforms must be identified for the SMO to take advantage of them. In traditional data center clouds these have 231 
+been manually or externally added to the SMO for homing of NF deployments  since the numbers are typically low from 232 
+hundreds of cloud regions to even several thousand. However, in the case of edge clouds the number of deployments 233 
+scale into the 10K to 100K range, in which case this process needs to more closely resemble the way RAN elements are 234 
+“discovered”. Even in this latter case, the rationale for edge clouds is for specific performance requirements, therefore 235 
+not all edge clouds are equivalent. This Use Case describes how the SMO discovers and manages a cloud 236 
+implementation that meets the O-RAN specifications as described in the Cloud Architecture and Deployment Scenarios 237 
+for O-RAN virtualized RAN [7]. Such a cloud instance is generally referred to as an O-Cloud which is comprised of O-238 
+Cloud Nodes (Compute, Storage, and Network), dedicated resources for the O-Cloud. 239 
+This group of Use Cases includes the following: 240 
+- Pre-processing where before the O-Cloud is activated the SMO is configured with the identity of the O-Cloud so 241 
+that registration can be done 242 
+- Basic platform software installation by the SMO and IMS  243 
+- O-Cloud deployment processing where the O-Cloud registers with SMO and has its identity and software version 244 
+checked 245 
+- Capabilities Exchange where the SMO either queries for O-Cloud capabilities or is notified autonomously that 246 
+there has been a change in O-Cloud capabilities 247 
+- O-Cloud hardware upgrade where a new O-Cloud Node is added  248 
+- O-Cloud software upgrade where new platform software is added to the O-Cloud  249 
+ 250 
+The end result of the group of use cases is an active O-Cloud registered with SMO and ready for the deployment of 251 
+Network Functions. 252 
+NOTE: Where Personnel are shown as part of the Use Case, the roles and terminology used are given for 253 
+purposes of illustration only. 254 
+3.1.1 O-Cloud Pre-Deployment Processing Use Case 255 
+3.1.1.1 High Level Description 256 
+This Use Case describes the SMO being configured to add an O-Cloud into its inventory prior to the O-Cloud itself 257 
+being activated and attempting to register with the SMO.   258 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        9 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ The Use Case assumes that this will be part of a sequence of “Service Requests” to the SMO, one for the deployment of 259 
+the O-Cloud and one for the Network Function(s) that will run on that O-Cloud instance.  In the latter request, 260 
+information is assumed to be present on the NF Service Requests to identify the O -Cloud instance, as described in a 261 
+later Use Case. 262 
+NOTE: I n some cases, there could potentially be a single “Service Request” to SMO containing information 263 
+about both the O-Cloud and Network Function(s) that will run on that O-Cloud instance, but this is not 264 
+covered in the Use Case. 265 
+3.1.1.2 Sequence Description 266 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal SMO is aware of the O-Cloud Id used to associate its inventory record with the 
+registration event that will be eventually received from the O-Cloud instance.  
+Actors and Roles 
+RAN Planner: 
+Cloud Planner: 
+Cloud Installation Project Manager: 
+SMO: FOCOM 
+Network Operator 
+ 
+Assumptions   
+Pre conditions 
+1) SMO is available 
+2) The Cloud Blueprint is available to the Cloud Installation Project 
+Manager, which has been created based on the requirements from the 
+RAN Buildout Plan of Record. 
+ 
+ 
+Begins when  
+Decision to deploy an O -Cloud to support RAN growth/coverage has been 
+made. 
+      Note: If the network connectivity does not exist in between the network 
+gateway(s) of O -Cloud and the SMO, then the network operator sets up such 
+connectivity. This step may take place before, in parallel or after step 1. 
+ 
+Step 1 (M) 
+Cloud Installation Project Manager issues a “service request” to the SMO to 
+update its Inventory, i.e., indicate that a new O-Cloud is to be inventoried.. The 
+Cloud Installation Project Manager also registers to the SMO the basic software 
+for the O-Cloud. 
+ 
+Step 2 (M) 
+SMO generates O-Cloud ID, and creates an inventory record with the O-Cloud 
+ID. The O-Cloud ID represents a globally unique identifier for identifying the new 
+O-Cloud instance by the SMO and for handling the registration process. 
+ 
+Step 3 (M) 
+SMO confirms update to Cloud Installation Project Manager  
+ 
+Ends when SMO has updated inventory with the O-Cloud ID of the O-Cloud  
+Exceptions None identified  
+Post Conditions 
+SMO holds basic software for the O -Cloud available for download and  has 
+created an inventory record with the O-Cloud ID for this O-Cloud, and is ready 
+for interaction with O-Cloud  
+Network connectivity exists between the network gateway(s) of O-Cloud and 
+SMO. 
+ 
+Traceability REQ-ORC-GEN1; REQ-ORC-GEN2  
+ 267 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        10 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.1.3 UML sequence diagram 268 
+ 269 
+Figure 3-1: O-Cloud Pre-Deployment Processing 270 
+3.1.2 O-Cloud Platform Software Installation Use Case 271 
+3.1.2.1 High Level Description 272 
+The Use Case describes the deployment of the O-Cloud and installation of O-Cloud Platform Software on an O-Cloud 273 
+Node.  The Cloud Installer begins the installation by installing the hardware for the O-Cloud Nodes and notifying SMO 274 
+to begin Cloud Build.  SMO then loads O-Cloud Platform Software on a first O-Cloud Node in the O-Cloud, which then 275 
+brings up any additional O-Cloud Nodes in the O-Cloud.   276 
+During activation of other O-Cloud Nodes, the O-Cloud Management Plane activates IMS, which then notifies the 277 
+SMO of its availability.  The SMO then sends IMS the required set of O -Cloud Node Roles and Personalities to support.  278 
+The IMS loads necessary basic software for O-Cloud onto the other O-Cloud Nodes and also configures and activates 279 
+one or more DMSs. 280 
+It is assumed that hardware to deploy O-Cloud Management Software is pre-configured and ready. Network 281 
+connectivity between O-Cloud network gateways(s) and SMO is assumed to be ready, as per the "O-Cloud Pre-282 
+Deployment Processing Use Case" described in clause 3.1.1. 283 
+Personnel Service Management & Orchestration Framework
+RAN Planner
+RAN Planner
+Cloud Planner
+Cloud Planner
+Cloud Installation
+Project Mgr
+Cloud Installation
+Project Mgr
+Network Operator
+Network Operator
+FOCOM
+FOCOM
+RAN Buildout Plan of Record
+Cloud Build request (Blueprint)
+Cloud Pre-Install
+alt [If network connectivity to
+O-Cloud is not available ]
+Sets up connectivity between network gateway(s)
+of O-Cloud and SMO
+1 Service request
+2 Create object in Inventory
+and generate O-Cloud ID
+3 Confirm inventory update
+Ready for O-Cloud interaction
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        11 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.2.2 Sequence Description 284 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal The O-Cloud is initialized and communicating with the SMO.  
+Actors and Roles 
+Cloud Installation Project Manager: 
+Cloud Installer: 
+SMO: FOCOM 
+IMS 
+DMS 
+O-Cloud Node 
+Network Controller 
+ 
+Assumptions 
+1) Through some means (e.g., manual installation), an application will 
+be loaded to the O-Cloud, that application at minimum having the 
+following abilities: 
+a. Having knowledge of its own O-Cloud ID, IP address, the IP 
+address endpoint or url of the SMO and any necessary 
+security keys or passwords for communication using O2. 
+b. Being able to communicate at least the IMS Address 
+endpoint and Cloud Id of this O-Cloud instance. 
+c. Being able to generate a registration event to the SMO 
+including its Cloud ID. 
+d. Being able to process requests to load SW onto an O-Cloud 
+Node in the O-Cloud  
+ 
+ 
+Pre conditions 
+1) SMO is available  
+2) Network connectivity exists between the O-Cloud and SMO  
+3) SMO has basic software for the O-Cloud available for download 
+4) SMO holds inventory that includes the O-Cloud ID for the O-Cloud.  
+ 
+Begins when  Work order triggers O-Cloud installation processing.  
+Step 1, 2 (M) 
+Cloud Installation Project Manager generates a work order to the Cloud Installer 
+for the new O-Cloud;  
+Cloud Installer installs the new O -Cloud Nodes, sets up connectivity of the O -
+Cloud Nodes to the O-Cloud network gateway(s) (e.g., with Network Controller) 
+and responds to Cloud Installation Project Manager 
+ 
+Step 3 (M) 
+Cloud Installer notifies SMO of the new O-Cloud Build 
+Note: Cloud Installer must provide SMO with information to connect with the 
+new O -Cloud Build, including the target O-Cloud Node in the O -Cloud and 
+identity of the basic software for O-Cloud to be loaded on the O-Cloud 
+ 
+Step 4 (M) 
+SMO loads basic software for O-Cloud on the first O-Cloud Node; 
+First O-Cloud Node then brings up additional O-Cloud Nodes in the O -Cloud 
+including IMS (Note: details of how the IMS and other O-Cloud Nodes are 
+brought up are specific to the O-Cloud implementation) 
+ 
+Step 5 (M) 
+IMS loads basic O -Cloud software onto the  other O -Cloud Nodes , activates 
+DMS and creates SW inventory. 
+ 
+ 
+Ends when O-Cloud has IMS and DMS activated and has created SW inventory.  
+Exceptions None identified  
+Post Conditions O-Cloud ready to register with SMO , with information to connect to SMO and  
+activated IMS with SW inventory and activated DMS(s).    
+Traceability REQ-ORC-GEN3; REQ-ORC-GEN4; REQ -ORC-GEN5; REQ -ORC-O2-1; 
+REQ-ORC-O2-2  
+ 285 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        12 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.2.3 UML sequence diagram 286 
+ 287 
+Figure 3-2: Platform Software Installation 288 
+3.1.3 O-Cloud Registration and Initialization Use Case 289 
+3.1.3.1 High Level Description 290 
+This Use Case describes the sequence for registration and initialization of the newly deploye d O-Cloud.  The SMO 291 
+queries the O-Cloud for its SW inventory, checks to see if this requires any updates, configures the O -Cloud and queries 292 
+the O-Cloud for available DMS.  Following this sequence, the O-Cloud is available for NF deployments to be 293 
+instantiated.  294 
+Personnel Service Management & Orchestration Framework O-Cloud Platform
+Cloud Installation
+Project Mgr
+Cloud Installation
+Project Mgr
+Cloud Installer
+Cloud Installer
+FOCOM
+FOCOM
+IMS
+IMS
+IMS
+IMS
+Cloud HW Infrastructure Install
+1 Work order (Cloud Info)
+Installer installs new O-Cloud
+2 Inform about O-Cloud been Installed
+Cloud Software Install
+3 Inform about O-Cloud Build
+4 Load rirst O-Cloud Node
+First O-Cloud Node in the O-Cloud
+brings up additional O-Cloud Nodes
+For each O-Cloud Node in the O-Cloud
+O-Cloud Node requests software image boot from IMS
+IMS sends image load to O-Cloud Node
+O-Cloud Node notifies when booted
+IMS sends config to O-Cloud Node
+5
+IMS configures and
+activates DMS and
+creates SW inventory
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        13 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.3.2 Sequence Description 295 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal O-Cloud is initialized and registered with the SMO, ready for NF deployments 
+to be instantiated.  
+Actors and Roles 
+SMO: FOCOM 
+IMS 
+DMS 
+O-Cloud Node 
+ 
+Assumptions None  
+Pre conditions 
+1) SMO and O-Cloud IMS are available  
+2) Network connectivity exists between O-Cloud and SMO and between 
+all nodes of O -Cloud. All O-cloud nodes are preconfigured for the O-
+Cloud. 
+3) SMO has been configured with O-Cloud ID in its inventory and is ready 
+for O-Cloud registration 
+ 
+Begins when  IMS and DMS are ready to register O-Cloud to accept new NF deployments  
+Step 1 (M) 
+IMS initiates the O2 O-Cloud Registration Process using O2oam and O2ims 
+services (for details see [9])  
+Step 2-3 (M) SMO queries IMS for current SW inventory , and IMS responds with SW 
+inventory data.  
+Step 4-5 (alt) 
+SMO checks SW inventory. 
+1) If SW inventory does not match required inventory: 
+a. SMO executes software upgrade (see clause 3.1.6) 
+b. IMS installs new software, activates and notifies SMO it is 
+available 
+c. return to Step 2 
+2) If SW inventory matches the required inventory, continue to next Step 
+ 
+Step 6 (M) SMO configures O-Cloud using O2  
+Step 7-9 (M) 
+SMO queries O -Cloud to discover and Inventory new DMS using O2 
+Infrastructure Inventory Services [9] 
+O-Cloud returns list of new O -Cloud Deployment Management Services end 
+points. 
+Note: O-Cloud Inventory Services may provide additional information such as a 
+Cloud Inventory reference. 
+ 
+Step 10-12 (M) For each DMS, SMO retrieves DMS capabilities using O-Cloud Inventory 
+Update (see clause 3.1.4) and registers DMS in its inventory.  
+Ends when O-Cloud has registered with SMO and SMO has checked software version, 
+configuration, and available DMS  
+Exceptions O-Cloud ID not found in inventory  
+Post Conditions O-Cloud ready to support new NF deployments  
+Traceability REQ-ORC-GEN6; REQ -ORC-GEN7; REQ -ORC-GEN8; REQ -ORC-GEN9; 
+REQ-ORC-O2-3; REQ-ORC-O2-4; REQ-ORC-O2-5; REQ-ORC-O2-6  
+ 296 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        14 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.3.3 UML sequence diagram 297 
+ 298 
+Figure 3-3: O-Cloud Deployment Processing 299 
+ 300 
+3.1.4 O-Cloud Inventory Update Use Case (DMS Example) 301 
+3.1.4.1 High Level Description 302 
+This Use Case describes the procedure for the SMO and O-Cloud to update inventory information about its type and 303 
+current capabilities using O2 Infrastructure Inventory Services [9], including resource build configurations (aka 304 
+"flavors"), capacity, utilization and availability.  This procedure is invoked initially at deployment of the O-Cloud and 305 
+can be invoked at later times to identify changes in the capabilities of the O-Cloud. Two patterns are possible, one using 306 
+query/response from the SMO in order to get current inventory, e.g., before instantiating  a new NF deployment and one 307 
+triggered by autonomous indications from the O-Cloud when there has been a change in inventory status. 308 
+This example shows inventory update being used by SMO to update its inventory of DMS capabilities.  309 
+Personnel Service Management & Orchestration Framework O-Cloud Platform
+Cloud Installation
+Project Mgr
+Cloud Installation
+Project Mgr
+Cloud Installer
+Cloud Installer
+FOCOM
+FOCOM
+IMS
+IMS
+O-Cloud on Network
+O-Cloud Running
+O-Cloud begins Registration by updating its
+IMS Service URI in SMO inventory
+1 <<O2>> Update SMO Inventory with IMSServiceURI
+SMO begins discovery of the O-Cloud inventory and capabilities.
+2 <<O2>> Query SW inventory
+3 <<O2>> OK (O-Cloud SW Version Data)
+ O-Cloud SW inventory X detected
+alt [if SW inventory does not match required from workorder ]
+4 <<O2> Download new software
+ref
+O-Cloud Platform Software Update Use Case (Clause 3.1.6)
+5 <<O2>> <SW install Callback URI> (O-Cloud SW version data)
+Updated O-Cloud SW inventory Y detected
+6 <<O2>> Configure Infrastructure Monitoring (CM/FM/PM)
+7 <<O2>> Query Infrastructure inventory
+8 <<O2>> Query O-Cloud for available DMSs
+9 <<O2>> OK (DMS list)
+loop [foreach DMS ]
+SMO queries O-Cloud capabilities as in the Capabilities Exchange Use Case (Clause 3.1.4)
+10 <<O2>> retrieve DMS Data (deploymentManagerId)
+11 <<O2>> OK. (EP, Capabilities, Capacities, etc)
+12 Register DMSs
+SMO updates Inventory throughout the above processing.
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        15 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.4.2 Sequence Description 310 
+Use Case 
+Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal O-Cloud is initialized and communicating with the SMO, ready for 
+deployments to be instantiated.  
+Actors and 
+Roles 
+SMO: FOCOM/OAM Functions 
+IMS   
+Assumptions 1) Notification Event has been configured into the IMS by the SMO 
+  
+Pre conditions 
+1) SMO is available 
+2) O-Cloud has been installed and activated  
+3) SMO has registered O-Cloud and software version in its inventory   
+  
+Begins when  
+1) SMO is deploying or scaling up a new O-cloud or 
+2) SMO determines that it needs to query O -cloud to determine if O-
+Cloud can support a new NF deployment or 
+3) Capabilities change has occurred in the O-cloud and SMO has 
+previously subscribed to notification of capability changes. 
+ 
+Step 1,2 (alt) 
+In the Query/Response pattern, the SMO uses O2 Inventory Services to 
+update its inventory record for the O-Cloud DMS capabilities. 
+IMS responds with what it supports 
+ 
+Step 3 (alt)   
+In the Event Notification pattern, using O2 O-Cloud Monitoring Services [9] 
+IMS sends notification event to the SMO due to a change in inventory  
+Ends when SMO receives up-to-date capabilities information from IMS and updates the 
+O-Cloud inventory record  
+Exceptions None identified  
+Post Conditions SMO holds updated inventory  
+Traceability REQ-ORC-GEN10; REQ -ORC-GEN11; REQ -ORC-GEN12; REQ -ORC-
+GEN13; REQ-ORC-O2-7; REQ-ORC-O2-8  
+ 311 
+3.1.4.3 UML sequence diagram 312 
+ 313 
+Figure 3-4: O-Cloud Inventory Update 314 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        16 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.5 Hardware Infrastructure Scaling of O-Cloud Post Deployment 315 
+3.1.5.1 High Level Description 316 
+After the initial deployment of an O-Cloud, it may be necessary to scale up resources. In this use case, we examine how 317 
+the SMO will discover and manage a new O-Cloud Node that has been cabled and powered up to be part of an existing 318 
+O-Cloud. 319 
+3.1.5.2 Sequence Description 320 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+Additional O-Cloud Nodes are powered on for an existing O-Cloud; O-Cloud 
+initializes new O-Cloud Node  and communicates the presence of additional 
+resources to SMO. 
+ 
+Actors and Roles 
+Cloud Planner 
+Cloud Installer 
+SMO/ FOCOM, OAM Functions 
+IMS 
+O-Cloud Node 
+ 
+Assumptions 
+ 
+1) Notification Event has been configured into the IMS by the SMO 
+2) The additional O-Cloud Node is cabled to be part of the existing O -Cloud 
+at the site 
+ 
+Pre conditions 
+1) SMO is available 
+2) O-Cloud is operational and known to SMO  
+3) Network connectivity exists between the O-Cloud and the SMO 
+4) Network connectivity exists between the new O-Cloud Node and IMS 
+5) Cloud Installer knows (from Cloud Planner)  the need to add O -Cloud 
+Node(s) to the existing O-Cloud 
+6) IMS has been configured with the O-C loud blueprint for the new O -Cloud 
+Node 
+ 
+Begins when  Decision to add additional resources to an existing O-Cloud has been made and 
+new O-Cloud Node is installed and powered on.   
+Step 1 (M) 
+New O-Cloud Node interacts with IMS to get  basic software for O-Cloud load 
+and configuration  
+Step 2 (M) 
+SMO executes the O-Cloud Inventory Update procedure (clause 3.1.4), in this 
+use case using the Event Notification Pattern, IMS informs SMO of change in 
+inventory due to the new O-Cloud Node and SMO updates its inventory record 
+with the information in the notification. 
+ 
+Ends when O-Cloud has added new O-Cloud Node  
+Exceptions None identified  
+Post Conditions Additional O-Cloud Node is available in O-Cloud. 
+SMO holds updated inventory.  
+Traceability REQ-ORC-GEN14; REQ-ORC-GEN15; REQ-ORC-O2-8  
+ 321 
+3.1.5.3 UML sequence diagram 322 
+ 323 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        17 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 324 
+Figure 3-5: Hardware Infrastructure Scaling 325 
+3.1.6 O-Cloud Platform Software Upgrade Use Case 326 
+3.1.6.1 High Level Description 327 
+Edge clouds deployments can range in the 10K to 100K range across an operator network. Rolling O -Cloud software 328 
+upgrades need to be performed without service disruption for both VM and container -based workloads. Across a region, 329 
+it may be necessary to upgrade all edge O-Clouds in a serial fashion in order to minimize potential disruptions or in a 330 
+parallel fashion where a set amount of edge O-Clouds in a region are simultaneously upgraded. Compute and storage 331 
+nodes of individual edge O-Clouds can also be upgraded in a serial or parallel hitless fashion. Within an individual O -332 
+Cloud, the IMS migrates Network Function deployments from the affected O-Cloud Nodes before the software upgrade 333 
+in order to avoid service disruption (in this use case, it is assumed that IMS does this autonomously).  From an SMO 334 
+perspective, offloading the upgrade strategy of an edge O-Cloud to a regional and local controller substantially reduces 335 
+the upgrade complexity. 336 
+Fault handling of an O-Cloud upgrade is critical. Individual nodes can fail during the upgrade process and may need to 337 
+be replaced. Rolling back of the upgrade prior to a successful completion must also be supported.  338 
+In this use case, we examine how the SMO will upgrade a single O-Cloud.  It is assumed that the software upgrade does 339 
+not affect the IMS itself, and that the IMS is capable of performing the software upgrade and migrating NF deployments 340 
+from the affected O-Cloud Nodes without affecting active services. 341 
+Personnel Service Management & Orchestration Framework O-Cloud Platform
+Cloud Planner
+Cloud Planner
+Cloud Installer
+Cloud Installer
+FOCOM
+FOCOM
+OAM Functions
+OAM Functions
+IMS
+IMS
+Cloud Installer installs new O-Cloud Node
+New Node requests software image boot from IMS
+IMS sends image load to O-Cloud Node
+O-Cloud Node notifies when booted
+IMS sends config to O-Cloud Node
+New O-Cloud Node on Network
+1 New O-Cloud Node(s) added
+2 <<O2>> Notify O-Cloud Inventory Change
+(New O-Cloud Node Available)
+SMO executes O -Cloud Inventory Update (clause 3.1.4)
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        18 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.6.2 Sequence Description 342 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal Upgrade the platform software of an existing O-Cloud  
+Actors and Roles 
+Cloud Maintainer 
+SMO: FOCOM/OAM Functions 
+IMS 
+O-Cloud Node 
+ 
+Assumptions Software update to O-Cloud is available 
+IMS supports software upgrade and NF deployment migration  
+Pre conditions 
+1) SMO is available 
+2) O-Cloud is operational and known to SMO  
+3) Affected O -Cloud Nodes have no NF deployments running or NF 
+deployments can be migrated to other O-Cloud Nodes. 
+4) O-Cloud Node spare resources are available at the O-C loud in order to 
+support NF deployment migration during the upgrade process. 
+5) All O-Cloud software is patch current 
+6) The O-Cloud is healthy with no unexpected alarms 
+ 
+Begins when  Decision to upgrade the platform software is made.  
+Step 1 (M) 
+Cloud Maintainer requests that SMO upgrade platform software on an existing 
+O-Cloud instance.  
+Step 2,3 (M) 
+SMO triggers software download and validation procedure at the O-Cloud using 
+O2 Software Management Services   
+Step 4-6 (M) 
+IMS gets new software package from SMO and validates internally; 
+IMS notifies SMO that software download is complete  
+Step 7-8 (M) 
+SMO requests pre -check procedure be done by IMS to determine i f software 
+update is acceptable or not acceptable; 
+IMS responds with pre-check response 
+ 
+Step 9-10 (M) 
+If the pre-check indicates update is acceptable: 
+1) SMO directs IMS to activate the software update; 
+2) IMS migrates NF deployments from affected O -Cloud Nodes - note 
+original requirements for these NF deployments must continue to be 
+met; 
+3) IMS upgrades software image on the affected O-Cloud Nodes; 
+4) IMS checks the request from SMO; if restart is required, IMS performs 
+restart. 
+If the pre-check indicates update is not acceptable, stop procedure 
+ 
+Step 11-13 (M) 
+IMS determines that O -Cloud Node has upgraded software and is in running 
+state; 
+IMS updates its SW inventory. IMS  notifies SMO that O -Cloud software has 
+been upgraded and SMO updates its inventory. 
+ 
+Ends when O-Cloud has upgraded software successfully  
+Exceptions Software update is not acceptable, in which case upgrade does not proceed  
+Post Conditions 
+SMO holds updated inventory 
+O-Cloud running with new basic O-Cloud software 
+IMS holds updated SW inventory 
+ 
+Traceability REQ-ORC-GEN16; REQ-ORC-GEN17; REQ-ORC-O2-11  
+ 343 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        19 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.1.6.3 UML sequence diagram 344 
+ 345 
+Figure 3-6: O-Cloud Platform Software Upgrade 346 
+3.2 Network Function Basic Use Cases 347 
+3.2.1 Instantiate Network Function on O-Cloud 348 
+3.2.1.1 High Level Description 349 
+This Use Case describes the instantiation of a Cloud-Native Network Function as a new deployment on an O-Cloud, 350 
+and notification to the SMO once the instantiation of resources for the Network Function deployment has been 351 
+completed.   352 
+NOTE: The instantiation on the O-Cloud Node may be part of a larger procedure instantiating multiple connected 353 
+Network Functions, in which case the SMO will coordinate the timing of instantiation across O -Clouds 354 
+and O-Cloud Nodes, the configuration of transport needed between O-Cloud Nodes and other 355 
+requirements such as addressing and security used for connecting the Network Functions as below. 356 
+Instantiation of multiple connected NFs is not addressed in the use case. 357 
+3.2.1.2 Sequence Description 358 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal Network Function deployments are instantiated resulting in live Network 
+Function instances that can be configured by the SMO.  
+Personnel Service Management & Orchestration Framework O-Cloud Platform
+Cloud Maintainer
+Cloud Maintainer
+FOCOM
+FOCOM
+OAM Function
+OAM Function
+IMS
+IMS
+O-Cloud Software Upgrade
+1 O-Cloud Basic Software Upgrade request
+2 <<O2>> Download new Software
+(SW Package , CallbackURI)
+3 <<O2>> Accepted
+loop [for each file in the SW Package ]
+4 Get file
+5
+Validate file
+6 <<O2>> <SW install Callback URI>
+(IN_PROGRESS:SW Package Download Complete)
+SMO can process the inventory changes
+information from the message
+7 <<O2>> SW update pre-check request
+8 <<O2>> SW update pre-check response
+9 <<O2>> Activate SW update
+ Check if update will cause reset
+10 Optional upgrade image
+The IMS migrates NF deployments
+from affected O-Cloud Node. The IMS directs the O-Cloud Node
+to upgrade image.
+O-Cloud Platform Upgraded
+O-Cloud Node now running
+11 Update SW Inventory
+with O-Cloud upgrade
+12 <<O2>> <SW activate callback URI>
+(COMPLETE:O-Cloud SW version data)
+SMO can process the inventory changes
+information from the message
+13 Update inventory
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        20 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Actors and Roles 
+Network Function Install Project Manager 
+NFO - Network Function Orchestration 
+OAM Functions 
+DMS - Deployment Management Services 
+CNF - Cloud-Native Network Function (Application) 
+SMO Run Time Library (see OAM Architecture [5]) 
+ 
+Assumptions 
+1) The “Service Request” to the SMO for the new Network Function will 
+capture at a minimum: 
+a. The desired “Network Function” (NF) or type(s) associated 
+with the O-Cloud (e.g., RIC, CU-CP) 
+b. Other NF type-specific information (e.g., for a RAN NF type, 
+the “parent” instance in the NF hierarchy) 
+2) Note: as noted in a previous use case, this may be triggered by a 
+separate request for the new Network Function or the original request 
+for the O-Cloud deployment 
+3) The Network Function Install Project Manager has subscribed to 
+receive notifications from the SMO 
+ 
+Pre conditions 
+1) SMO is available  
+2) The O-Cloud instance has been installed successfully as per “O-Cloud 
+Deployment Processing” use case. 
+3) NF package has been onboarded onto the SMO The NF package 
+contains a descriptor that provides the deployment and resource 
+requirements for the NF. 
+4) NF Install Project Manager has selected a deployment option for the 
+NF from the Run Tim e Library and determined runtime variables for 
+the selected option  
+ 
+Begins when  New Network Function(s) are determined to be deployed on the O-Cloud  
+Step 1 (M) 
+Network Function Install Project Manager requests to SMO to instantiate new 
+Network Function(s) on the O-Cloud.  For each NF the request can either: 
+a) Specify placement requirements about where the Network Function 
+needs to be instantiated (e.g., the Service Request identifies the target 
+O-Cloud) (see Note), or 
+b) Specify relative placement co nstraints for the instantiation of the 
+Network Function, and SMO selects an O -Cloud to use to instantiate 
+the new Network Function (see Note), or 
+c) A combination of the above. 
+Note: This can range from a trivial exercise (e.g., the Service Request identifies 
+the target O-Cloud by Cloud Id) to a highly complex exercise (if the SMO wer e 
+to determine an appropriate vacant O-Cloud instance based on homing policies 
+such as latency tolerance, NF requirements to cloud capability matching, etc.).   
+See also step 3. 
+ 
+Step 2 (O) 
+If the Service Request contains multiple Network Functions, the SMO 
+decomposes the request and determines the sequence for the instantiation of 
+the Network Functions. 
+ 
+Step 3 (M) 
+For each Network Function in the Service Request for which placement 
+constraints but no placement location information is indicated in the request, the 
+SMO determines on which O -Cloud instances to instantiate the Network 
+Function. 
+ 
+Step 4 (M) 
+For each NF to be instantiated, the following steps 4-11 take place:  
+SMO creates an initial inventory record for the new NF for which NF 
+Deployments can be added to as they are created. 
+ 
+Step 5 (M) 
+Each NF Deployment requires a CloudNativeDescriptor (the cloud technology 
+file for VM or Container based NF) which is retrieved from the Run Time 
+Library before the NF Deployment is instantiated. 
+ 
+Step 6 (M) 
+For each NF Deployment of each Network Function in the Service Request, the 
+following steps 6, 7, 8 and 9 take place: 
+- SMO requests the DMS on the specified O -Cloud to create the new NF 
+Deployment 
+ 
+Step 7 (M) 
+DMS allocates the resources according to the NF Deployment request. During 
+the NF Deployment instantiation, initial SMO connectivity configuration can take 
+place, e.g., to inject into the NF Deployment the SMO’s O1 address and security 
+key information to support connectivity for Step 11. 
+ 
+Step 8 (M) 
+DMS informs SMO that instantiation of the NF Deployment is complete, 
+returning its NF Deployment ID  
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        21 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Step 9 (M) NFO Updates the deployment composition of the NF in inventory  
+Step 10 (M) After the last deployment module of a NF is instantiated the NFO updates the 
+inventory to reflect that NF instantiation is complete.  
+Step 11 (O) 
+For each newly deployed NF (now using O1) as needed: 
+- SMO configures the NF using the O -RAN Provisioning Management 
+Services [6] 
+- SMO may optionally configure the NF in a single step or in multiple steps 
+as desired.  For example, SMO may choose to configure separately basic 
+telecom, optional features, FM, PM, etc. 
+- SMO also updates addressing, security and transport in other RAN NFs to 
+support connectivity to the new NF 
+- Note: if multiple NFs are being deployed, the order in which SMO 
+configures them and activates them may depend on their relationship, also 
+addressing requirements include other O -RAN interfaces required for  the 
+NF beyond the O1 interface 
+ 
+Step 12 (M) 
+SMO notifies the Network Function Install Project Manager that the Network 
+Function(s) have been instantiated on the O-Cloud.  
+Ends when 
+Network Function(s) have been instantiated as NF deployment(s) on the O -
+Cloud and configured by the SMO  
+Exceptions None identified  
+Post Conditions Network Function(s) have been deployed on the O-Cloud and configured.  
+Traceability 
+REQ-ORC-GEN18; REQ -ORC-GEN19; REQ -ORC-GEN20; REQ-ORC-O1-1; 
+REQ-ORC-O2-10  
+ 359 
+@startuml 360 
+skinparam sequenceArrowThickness 2 361 
+skinparam ParticipantPadding 5 362 
+skinparam BoxPadding 10 363 
+autonumber 364 
+ 365 
+Box “Personnel” #lightblue 366 
+   Actor “NF Install\nProject Mgr” as OPS 367 
+End box 368 
+ 369 
+box “Service Management & \nOrchestration Framework” #gold 370 
+   Database “Run Time Library” as RTL 371 
+   Participant “NFO” as NFO 372 
+   Participant “OAM Functions” as OAM 373 
+end box 374 
+ 375 
+Box “O-Cloud Platform” #lightseagreen 376 
+   participant “DMS” as DMS  377 
+End box 378 
+ 379 
+Box “O-RAN” #lightpink 380 
+   Participant “CNF” as CNF 381 
+   Participant “CNF\nComponent” as CNFC 382 
+end box 383 
+ 384 
+OPS -> NFO : Deployment Request (selectedOption, overrideVariables) 385 
+ 386 
+Opt if Service Request contains multiple NFs 387 
+ 388 
+NFO-> NFO : Decompose and\n determine sequence 389 
+Note over NFO 390 
+The SMO determines the sequence 391 
+ for the instantiation of the 392 
+Network Functions. 393 
+End note 394 
+end 395 
+ 396 
+Loop foreach NF in the Service Request 397 
+   Opt If the Service Request does not specify O-Cloud instance for NF 398 
+      NFO -> NFO : Determine Homing 399 
+      Note over NFO 400 
+         The SMO determines on which 401 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        22 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+          O-Cloud instances to instantiate 402 
+         this/these Network Function(s) 403 
+         based on policies in the Cloud Descriptors</color> 404 
+      end note 405 
+   end 406 
+end 407 
+ 408 
+loop foreach NF in the Service Request 409 
+   NFO –> NFO : Add NF to Inventory 410 
+   Loop Foreach NF Deployment of the NF 411 
+      NFO –> RTL : Get CloudNativeDescriptor\nfor NF Deployment 412 
+      NFO -> DMS : <<O2>> NF Deployment Request(CloudNativeDescriptor, overrideVariables) 413 
+      DMS -> CNFC ** : Allocate resource\naccording to NF\nDeployment request 414 
+      DMS --> NFO : Notify NF Deployment instantiation is completed (DeploymentID) 415 
+      NFO -> NFO : Update NF deployment composition in Inventory  416 
+   End loop 417 
+   NFO –> NFO : Update Inventory to indicate NF instantiation is complete 418 
+   Opt config NF as needed 419 
+      OAM -> CNF : <<O1>> Configure NF 420 
+      Note over OAM,CNF 421 
+         SMO may optionally configure the NF 422 
+         in a single of multiple steps as needed. 423 
+      End note 424 
+   end 425 
+end 426 
+ 427 
+NFO --> OPS : NF Instantiation status (Success) 428 
+ 429 
+@enduml 430 
+ 431 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        23 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.1.3 UML sequence diagram 432 
+ 433 
+Figure 3-7: Instantiate Network Function 434 
+3.2.2 Scale Out of NF 435 
+3.2.2.1 High Level Description 436 
+This Use Case describes how to instantiate additional resources for NF deployments in order to expand the capacity of 437 
+an NF. This results in horizontal elasticity and allows the NF to consume the resources it needs based on the level of 438 
+demand based on network traffic. 439 
+NOTE: In this use case, scaling is managed by the SMO.  Self-management of scaling by the NF is for future 440 
+study. 441 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        24 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.2.2 Sequence Description 442 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+Additional resources in the form of NF deployments  are instantiated on the 
+O-Cloud to scale out a Network Function as needed to meet network 
+demands. 
+ 
+Actors and Roles 
+SMO: NFO and OAM Functions 
+DMS 
+Network Function (Application): 
+ 
+Assumptions 
+1) The descriptor for the NF identifies scaling units (NF deployment 
+scaling descriptors) that can be created and deleted for elasticity 
+of the base NF deployment. 
+2) The trigger can be notification from the NF, request from the 
+Network Operator or SMO internal analytics.  For internal trigger, it 
+is assumed that the SMO has a closed loop process to detect 
+when scale-out should occur. (This is loop 3 as per [O-RAN Arch])  
+ 
+Pre conditions 
+1) SMO is available  
+2) O-Cloud is available  
+3) NF has been successfully deployed 
+4) NF monitoring is in place and active 
+5) SMO has policies (or configuration)  related to  NF capacity 
+modification. 
+ 
+Begins when  
+Network demand increases beyond current NF capacity threshold, which 
+triggers the SMO NF capacity modification processing.  
+SMO determines that scale out is needed and determines based on the NF 
+descriptor what NF deployment scaling is required to increase NF capacity.   
+ 
+SMO selects what O-Cloud Resource Pool to use for the deployment unit.    
+ 
+Step 1 (M) 
+SMO requests the DMS for that Resource Pool to create the new deployment 
+unit  
+Step 2 (M) 
+DMS creates the new NF deployment and informs SMO that the NF 
+deployment unit has been created, returning its Deployment ID.   
+Step 3 (O) 
+In case the NF requires re-configuration after its scaling, the SMO configures 
+the NF using O -RAN O1 Provisioning Management Services [6] to use the 
+new NF deployment unit, placing it into traffic 
+ 
+Ends when 
+Network Function has been scaled out on the O -Cloud and reconfigured, if 
+required  
+Exceptions 
+O-Cloud cannot support new NF deployment unit.  NF deployment  unit 
+instantiation for scaling out the NF is cancelled and SMO is informed.  
+Post Conditions 
+Network Function capacity is increased to match increased demand. 
+ 
+Traceability 
+REQ-ORC-GEN22 
+ 
+ 443 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        25 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.2.3 UML sequence diagram 444 
+ 445 
+Figure 3-8: Scale Out of Network Function 446 
+3.2.3 Scale In of NF 447 
+3.2.3.1 High Level Description 448 
+This Use Case describes how to delete NF deployments to reduce the capacity of an O-Cloud-based ME realizing an O-449 
+RAN NF, to improve efficiency. This supports horizontal elasticity and allows the NF to consume only the resources it 450 
+needs based on the level of demand based on network traffic. 451 
+SMO Framework O-Cloud O-RAN
+NFO
+NFO
+OAM Functions
+OAM Functions
+DMS
+DMS
+ME
+ME
+Building Block Identity & Legend
+Building Block : Scale Out of NF
+Orchestration Use Cases and Requirements for O-RAN Virtualized RAN
+O-RAN-WG6.Orchestration-v02.00; clause 3.2.2
+Begin Building Block
+SMO determines new deployment requirements and selects Resource
+Pool for new NF deployment unit
+1 <<O2>> Create NF deployment unit
+{new deployment unit for NF Scale Out}
+Create new NF deployment unit
+2 <<O2>> Create NF deployment unit completed (Deployment ID)
+opt [Config NF as needed ]
+3 <<O1>> Configure {NF}
+NF places new NF
+deployment unit into traffic
+End Building Block
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        26 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.3.2 Sequence Description 452 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+Network Function resources in the form of NF deployment  units are 
+undeployed from the O -Cloud in order to scale in a Network Function and 
+reduce resource usage based on network demand. 
+ 
+Actors and Roles 
+SMO: NFO and OAM Functions 
+DMS 
+Network Function (Application): 
+ 
+Assumptions 
+1) The descriptor for the NF identifies scaling units (NF deployment 
+scaling descriptors) that can be created and deleted for elasticity 
+of the base NF deployment. The trigger can be notification from 
+the NF, request from the Network Operator or SMO internal 
+analytics.   
+2) For internal trigger it is assumed that the SMO has a closed loop 
+process to detect when scale-in should occur. 
+ 
+Pre conditions 
+1) SMO is available  
+2) O-Cloud is available  
+3) NF has been successfully deployed  
+4) NF Monitoring is in place and active 
+5) SMO has policies (or configuration) related to NF capacity 
+modification.. 
+ 
+Begins when  Network demand reduces to below current NF capacity , which triggers the 
+NF capacity change processing.  
+Step 1 (M) 
+SMO determines that NF capacity can be reduced and configures the NF to 
+prepare for deletion of an NF  deployment unit from the NF. SMO may 
+optionally indicate to the NF a specific NF deployment unit to remove (stop 
+using).   
+ 
+Step 2 (M) 
+NF confirms NF deployment unit being prepared for removal. 
+ 
+Step 3 (M) 
+SMO waits for NF drain ing of  traffic from NF deployment unit to be 
+completed.  
+Step 4 (M) 
+NF informs SMO that the NF deployment unit is free of traffic and returns its 
+Deployment ID  
+Step 5 (M) 
+SMO requests the DMS for that Resource Pool to delete the deployment unit 
+based on its Deployment ID    
+Step 6 (M) 
+DMS deletes the NF deployment and informs SMO that the NF deployment 
+unit has been deleted.   
+Ends when 
+Network Function has been scaled in on the O -Cloud and reconfigured if 
+required.  
+Exceptions 
+NF is unable to drain traffic from NF deployment unit.  SMO does not proceed 
+to request DMS to delete the NF deployment unit.  
+Post Conditions 
+Network Function capacity is reduced to match reduced demand. 
+ 
+Traceability 
+REQ-ORC-GEN23 
+ 
+ 453 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        27 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.3.3 UML sequence diagram 454 
+ 455 
+Figure 3-9: Scale In of Network Function 456 
+ 457 
+ 458 
+3.2.4 Software Upgrade of NF 459 
+3.2.4.1 High Level Description 460 
+This Use Case describes SMO-managed upgrade to the software of the Network Function. This covers the software 461 
+deployment and its activation.  Once activated the NF is configured by SMO similar to the NF deployment use case. 462 
+This use case illustrates the build-and-replace NF software upgrade approach.  This approach utilizes a graceful or soft 463 
+upgrade where the old NF is not deleted until this can be done without disrupting existing traffic it supports. Other 464 
+approaches could be developed specific to containerization such as break-fix, or the PNF form of Upgrade-in-place.  465 
+More complex scenarios such as support of zero traffic loss may be explored in future versions.  466 
+3.2.4.2 Sequence Description 467 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal Network Function software is upgraded according to build -and-replace 
+approach.  
+Actors and Roles 
+SMO: NFO and OAM Functions 
+DMS 
+Network Function (Application): 
+ 
+SMO Framework O-Cloud Platform O-RAN
+NFO
+NFO
+OAM Functions
+OAM Functions
+DMS
+DMS
+ME
+ME
+Building Block Identity & Legend
+Building Block : Scale In of NF
+Orchestration Use Cases and Requirements for O-RAN Virtualized RAN
+O-RAN-WG6.Orchestration-v02.00; clause 3.2.2
+Begin Building Block
+SMO determines new NF deployment requirements
+and may select NF deployment unit to terminate
+1 <<O1>> Configure {NF} (Deployment ID)
+2 <<O1>> Confirm NF deployment unit for removal (Deployment ID)
+NF removes NF deployment unit
+from traffic
+3 Wait for traffic drain to complete
+4 <<O1>> Notification traffic drained (Deployment ID)
+5 <<O2>> Delete NF deployment unit
+<DeploymentID>
+6 <<O2>> Delete NF deployment unit is completed
+End Building Block
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        28 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Assumptions 
+1) A mechanism is available for the element to start and stop receiving 
+traffic. This mechanism is likely to be specific to the NF. It is generally 
+referred to as "place in traffic" and "remove from traffic". The details 
+of how these are achieved are not depicted in this use case. 
+2) In this use case example the NF is one ME with one deployment 
+image. This may not always be the case in which several images and 
+deployments may be required before the new element can be placed 
+into traffic. 
+ 
+Pre conditions 
+1) SMO is available  
+2) O-Cloud is available 
+3) NF has been successfully deployed and is operational in the network 
+4) A new NF package and software image is available for the NF instance 
+at the SMO 
+ 
+Begins when  Network operations has determined to perform the upgrade  
+Step 1 (O) 
+SMO checks with DMS to see if software image for upgrade is already in O-
+Cloud software image repository. Note that if the version exists then no change 
+occurs.  
+ 
+Step 2 (M) 
+If new version of software image is not available on the O-Cloud software image 
+repository, the SMO requests to add the software image to the O-Cloud software 
+image repository.  
+ 
+Step 3 (M) SMO requests the DMS to instantiate a new NF deployment corresponding to 
+the new version of the NF  
+Step 4 (M) DMS allocates the resources according to the NF deployment request.  
+Step 5 (M) 
+SMO configures new NF instance into traffic.  Note: The Global identifier 
+handling while moving traffic from Old NF to New NF is not in scope of the 
+present use case. 
+ 
+Step 6,7 (M) SMO verifies that the new NF is properly processing traffic , e.g., while the NF 
+instance provides FM/PM reports.  
+The following steps are followed if the new NF is behaving as expected. 
+Step 8 (M) SMO configures the old NF instance to be taken out of traffic   
+Step 9 (M) SMO waits for all traffic to be migrated from old NF to new NF  
+Step 10 (M) 
+Once the old NF has been taken out of traffic, SMO tells DMS to delete the NF 
+deployment of old NF  
+Step 11 (M) DMS deletes the resources of the NF deployment of old NF  
+Rollback: The following steps are followed If there is a problem with the new NF 
+Step 12 (M) SMO configures the new NF instance to be taken out of traffic  
+Step 13 (M) SMO waits for all traffic to be migrated from new NF to old NF  
+Step 14 (OM) 
+Once the new NF has been taken out of traffic, SMO requests the DMS to delete 
+the NF deployment of new NF  
+Step 15 (M) DMS deletes resources of the NF deployment of new NF  
+Ends when Network traffic is flowing through the new NF executing the newer software 
+version.  
+Exceptions 
+1) Software fails to start or properly process traffic, Rollback is executed 
+2) Old NF cannot be taken out of traffic or upgrade involves multiple NFs.  
+Original NF (Old NF) is left running until traffic can be migrated. 
+ 
+ 
+Post Conditions NF is updated with new software version  
+Traceability REQ-ORC-GEN22, REQ-ORC-GEN23  
+ 468 
+ 469 
+3.2.4.3 UML sequence diagram 470 
+ 471 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        29 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 472 
+Figure 3-10: SW Upgrade of Network Function 473 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        30 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.2.5 Terminate Network Function on O-Cloud 474 
+3.2.5.1 High Level Description 475 
+This Use Case describes the termination of a Network Function on an O-Cloud, and notification to the SMO once the 476 
+termination of resources for the Network Function deployment has been completed.   477 
+3.2.5.2 Sequence description 478 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal To terminate network function instances(s) that have been instantiated in the O-
+Cloud.  
+Actors and Roles 
+Network Function Install Project Manager 
+SMO: NFO 
+SMO: OAM Functions 
+DMS 
+Network Function (Application) 
+ 
+Assumptions 
+1) The “Service Request” to the SMO includes the identifiers of the 
+network function instance(s) to be terminated. 
+2) The Network Function Install Project Manager has subscribed to 
+receive notifications from the SMO 
+3) The network function(s) to be terminated do not provide services. 
+ 
+Pre condition 1) SMO is available   
+Begins when  Existing Network Function(s) are determined to be terminated on the O-Cloud  
+Step 1 (M) 
+Network Function Install Project Manager requests SMO to terminate the 
+network function instance(s) by providing the identifiers of the network function 
+instance(s).   
+ 
+Step 2 (M) 
+For each NF deployment associated with each Network Function in the Service 
+Request, the step 3 to step 6 are executed:   
+Step 3 (M) SMO requests the DMS to terminate the NF deployment, by providing the 
+deployment ID.  
+Step 4 (M) DMS terminates the NF deployment, and deallocates the O -Cloud resources 
+assigned to such NF deployment.  
+Step 5 (M) 
+DMS informs SMO that the NF deployment has been terminated,  
+ 
+Step 6 (M) 
+SMO updates its inventory accordingly 
+ 
+Step 7 (M) 
+SMO notifies the Network Function Install Project Manager that the Network 
+Function(s) have been terminated.  
+Ends when 
+Network Function(s) in the O-Cloud have been terminated. 
+ 
+Exceptions None identified  
+Post Conditions 
+1) Network Function(s) have been terminated. 
+2) The consumer may unsubscribe to receive notification related to terminated 
+NF instance(s) from SMO. 
+ 
+Traceability 
+REQ-ORC-O2-11 
+ 
+ 479 
+3.2.5.3 UML sequence diagram 480 
+@startuml 481 
+Autonumber 482 
+skinparam sequenceArrowThickness 2 483 
+skinparam ParticipantPadding 5 484 
+skinparam BoxPadding 10 485 
+ 486 
+ 487 
+Box "Personnel" #lightblue 488 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        31 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+    Actor CPM as "Network Function Install\nProject Mgr" 489 
+End box 490 
+ 491 
+Box "Service Management & \nOrchestration Framework" #gold 492 
+   participant SMO as "NFO" 493 
+end box 494 
+ 495 
+Box "O-Cloud Platform" #lightseagreen 496 
+   participant IMF as "DMS" 497 
+End box 498 
+ 499 
+Box "O-RAN" #NavajoWhite 500 
+ participant NF as "Network Function" 501 
+End box 502 
+   CPM -> SMO: Service Request to \nterminate Network Function(s) \n with NF 503 
+identifier(s)  504 
+ 505 
+Loop for NF deployments for each NF in the Service Request 506 
+ 507 
+   SMO -> IMF: <<O2>> Terminate the NF\n deployment with the deployment\n ID 508 
+   Note over IMF 509 
+     The DMS determines on which  510 
+     O-Cloud instances to terminate  511 
+     this/these NF deployment(s) 512 
+     based on the deployment identifier. 513 
+   End note 514 
+   IMF--> IMF: NF deployment termination 515 
+   IMF --> NF: deallocate the resources assigned \nto such NF deployment 516 
+   IMF --> SMO: <<O2>> notify NF deployment \ntermination is completed 517 
+   SMO --> SMO: update the inventory \nto refelect NF termination  518 
+End 519 
+ 520 
+SMO -> CPM: notify NF instance \ntermination is completed 521 
+== End Use Case == 522 
+ 523 
+@enduml 524 
+ 525 
+ 526 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        32 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Figure 3-11: Terminate Network Function 527 
+3.3 Near-RT RIC/xAPP Use Cases 528 
+3.3.1 Configure O-Cloud for Near-RT RIC 529 
+3.3.1.1 High Level Description 530 
+This Use Case defines an optional procedure using Custom Resources to configure a Kubernetes O -Cloud to support the 531 
+Near-RT RIC function by using, as an example, the Kubernetes Custom Resource Definitions (CRD). 532 
+NOTE: S imilar procedure may be used for O-Cloud configuration for other functions as well. 533 
+The Near-RT RIC may require a Custom Resource to ensure proper lifecycle management of the near -RT RIC and its 534 
+xAPPs. This capability has to be added to the O-Cloud prior to a near-RT RIC service deployment. There are multiple 535 
+ways to add a custom resource. For example, Custom Resource Definitions (CRD) is easier and requires no 536 
+programming. Another possibility is to use API Aggregation which requires programming but is more flexible in terms 537 
+of API behaviors. Both options require a "service" in Kubernetes to be deployed. The following example illustrates the 538 
+CRD initial installation. 539 
+3.3.1.2 Sequence Description 540 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal Enable the cloud to advertise to the SMO that it supports a Near-RT RIC 
+deployment.  
+Actors and Roles 
+Cloud Installation Project Manager 
+SMO: NFO 
+DMS 
+ 
+Assumptions 
+O-Cloud is Kubernetes based and an instance of the Near-RT RIC Custom 
+Resource Definition has not been previously installed  
+Pre conditions 
+1) SMO is available  
+2) O-Cloud is available  
+3) Near-RT RIC Service Type Descriptor has been onboarded to the 
+SMO 
+ 
+Begins when  Cloud Installation Project Manager identifies that the O-Cloud is intended to 
+support the deployment of a Near-RT RIC  
+Step 1 (M) 
+Cloud Install Project Manager makes request to SMO to deploy the CRD 
+Service to an O-Cloud enabling it to support Near-RT RIC deployments  
+Step 2 (M) 
+The SMO decomposes the service request and identifies all O-Clouds to be 
+enabled.  
+Steps 3-5 
+These steps are repeated for each O-Cloud to be enabled. 
+ 
+Step 3 (M) 
+SMO request O-Cloud to create the CRD (Deploy Service) 
+ 
+Step 4 (M) 
+DMS returns status update when created 
+ 
+Step 5 (M) 
+The SMO recognizes that the O -Cloud can now support Near-RT RIC 
+deployments and updates the O -Cloud Capabilities  using the O -Cloud 
+Inventory Update process in clause 3.1.4.. 
+ 
+Step 6 (M) 
+The SMO informs the Cloud Installation Project Manager of the overall 
+success or failure of the request.  
+Exceptions 
+O-Cloud cannot support CRD Service deployment  or deployment fails .  
+Deployment is cancelled and SMO is notified of failure.  SMO informs Project 
+Manager. 
+ 
+Post Conditions 
+O-Cloud can support Near-RT RIC deployments. 
+SMO holds updated inventory.  
+Traceability 
+ 
+ 
+ 541 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        33 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.3.1.3 UML Sequence Diagram 542 
+ 543 
+Figure 3-12: Configure O-Cloud for Near-RT RIC 544 
+3.3.2 Deploy xAPP in Near-RT RIC 545 
+3.3.2.1 High Level Description 546 
+xAPPs are developed independent of the near-RT RIC in which they execute. This Use Case describes how an xAPP is 547 
+instantiated and associated with a near-RT RIC. 548 
+3.3.2.2 Sequence Description 549 
+ 550 
+Personnel Service Management & Orchestration Framework O-Cloud Platform
+Cloud Install
+Project Mgr
+Cloud Install
+Project Mgr
+NFO
+NFO
+DMS
+DMS
+Building Block Identity & Legend
+Building Block : Configure Kubernetes Cloud for Near -RT RIC
+Orchestration Use Cases and Requirements for O-RAN Virtualized RAN
+O-RAN-WG6.Orchestration-v03.00; section 3.1.3
+Assumptions and Prerequisites
+near-RT RIC Custom Resource Definition Service Package has
+been onboarded to the SMO and is available for deployment.
+O-Cloud is Kubernetes based and an instance of the near-RT
+RIC Custom Resource Definition HAS NOT been previously installed
+Enablement of O-Cloud to host near-RT RIC deployments has
+been approved by operations and all conflicts has been resolved
+Begin Building Block
+1 Service Request
+2 determine homing
+The SMO determines which O-Cloud(s) to enable
+as identified by the Project Manager
+loop [for each O -Cloud to be near -RT RIC enabled]
+3 <<O2>> deploy CRD Service
+4 <<O2>> notify CRD Service created
+5
+ Update Inventory for O-Cloud to indicate new Capability
+6 Status (Success )
+End Use  Ca se
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        34 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+xAPP deployment is instantiated on Near -RT RIC, resulting in enhanced 
+capabilities.   Configuration and communication between xAPP  and SMO is 
+mediated by the ME containing the Near-RT RIC MF. 
+ 
+Actors and Roles 
+xAPP Install Project Manager 
+NFO – Network Function Orchestration 
+OAM Functions 
+DMS – Deployment Management Services 
+Near-RT RIC  
+xAPP  
+ 
+Assumptions 
+The “Service Request” to the SMO for the new xAPP(s) may include 
+information for the SMO to use for homing purposes, such as desired xAPP 
+or xAPP type(s) associated with O-Cloud or RIC Instance 
+ 
+Pre conditions 
+1) SMO is available  
+2) The O-Cloud instance has been installed successfully as per “ O-
+Cloud Deployment Processing” use case. 
+3) Near-RT RIC NF has been deployed successfully on the O -Cloud 
+instance and has been activated and has connected to the SMO 
+using O1 
+4) xAPP has been onboarded onto the SMO containing an xAPP 
+descriptor that provides the deployment requirements for the xAPP. 
+5) No MOI exists for the xAPP in the Near-RT RIC 
+6) xAPP Install Project Manager has selected a deployment option 
+from the Run Time Library and determined runtime variables for the 
+selected option 
+ 
+Begins when  New xAPP(s) are to be instantiated on a Near-RT RIC hosted on an O-Cloud  
+Step 1 (M) 
+Network Function Install Project Manager makes request to SMO to deploy 
+new xAPP(s) on the Near-RT RIC  
+Step 2 (M) 
+The SMO decomposes the service request and identifies all xAPPs to be 
+deployed and the order in which they should be deployed.  
+Steps 3-15 These steps are repeated for each xAPP to be deployed as part of the service 
+request.  
+Step 3 (M) 
+The SMO determines which O -Cloud and Near -RT RIC Instance to deploy 
+the xAPP to. This can be done using Policies which match operator input or 
+other more complex homing policies or can be explicitly identified by the 
+Project Manager. 
+ 
+Step 4 (O) 
+If SMO needs additional deployment -related information for the template 
+override, e.g., the Near-RT RIC API NodePort assignment, SMO uses O1 to 
+retrieve configuration data from the Near -RT RIC, otherwise SMO uses 
+internal stored data 
+ 
+Step 5 (M) 
+1) SMO maps known RIC variables to xAPP variables to allow RIC 
+and xAPP to interoperate and fills in the xAPP configuration with 
+assigned values. 
+2) SMO uses config information to determine template override 
+parameters for xAPP and create an override file (see Note) 
+ 
+Step 6 (M) 
+For each xAPP Deployment of the xAPP, steps 6 - 10 take place: 
+SMO retrieves the CloudNativeDescriptor from the Run Time Library for the 
+current xAPP Deployment. 
+ 
+Step 7 (M) SMO directs the O-Cloud DMS using O2 to create the xAPP Deployment   
+Step 8 (M) 
+DMS allocates the resources according to the xAPP Deployment request. 
+During xAPP Deployment instantiation, initial SMO connectivity configuration 
+can take place. 
+ 
+Step 9 (M) 
+DMS returns notification to SMO over O2 indicating that the xAPP 
+deployment has been created and the Deployment ID  
+Step 10 (M) SMO updates its xAPP inventory with the received Deployment ID  
+Steps 11-14 (M)  
+The xAPP reads its initial configuration.  Once complete, xAPP registers with 
+the Near -RT RIC and exchanges its schemas and initial configuration as 
+needed.  Near-RT RIC uses this information to create and populate the xAPP 
+MOI(s), including configuring E2 subscri ptions, A1 Policies supported, A1 
+Enrichment Subscriptions, and inter xAPP data sharing. 
+ 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        35 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Step 15 (O) 
+If the SMO has previously subscribed to CM notifications from the Near -RT 
+RIC, then the Near-RT RIC sends SMO notification of an MOI create event.   
+Note: SMO will restart a new Netconf session to receive an update on Near-
+RT RIC capabilities including the newly deployed xAPP 
+ 
+Steps 16 (M) The SMO informs the Network Function Install Project Manager of the overall 
+success or failure of the request.  
+Ends when 
+xAPP(s) have been instantiated on the O-Cloud and configured by the SMO 
+via the Near-RT RIC  
+Exceptions 
+MOI Creation fails – Near RT RIC notifies SMO and SMO informs Network 
+Function Install Project Manager 
+xAPP Deploy fails – DMS notifies SMO and SMO informs Network Function 
+Install Project Manager 
+ 
+Post Conditions 
+xAPP is instantiated and incorporated under near-RT RIC management. 
+SMO holds updated inventory that includes “deployment ID” 
+Near-RT RIC holds MOI of the xAPP. 
+ 
+Traceability 
+REQ-ORC-GEN19, REQ-ORC-O1-2, REQ-ORC-O2-4 
+ 
+ 551 
+NOTE: Information could be, for example, RIC namespace, IP address or ports needed to access RIC services , as 552 
+determined by WG3 553 
+@startuml 554 
+skinparam sequenceArrowThickness 2 555 
+skinparam ParticipantPadding 5 556 
+skinparam BoxPadding 10 557 
+autonumber 558 
+ 559 
+Box “Personnel” #lightblue 560 
+   Actor “xAPP Install\nProject Mgr” as OPS 561 
+End box 562 
+ 563 
+box “Service Management & \nOrchestration Framework” #gold 564 
+   Database “Run Time Library” as RTL 565 
+   Participant “NFO” as NFO 566 
+   Participant “OAM Functions” as OAM 567 
+end box 568 
+ 569 
+Box “O-Cloud Platform” #lightseagreen 570 
+   participant DMS  571 
+End box 572 
+ 573 
+Box “O-RAN” #lightpink 574 
+   Participant “near-RT\nRIC” as CNF 575 
+   Participant “xAPP” as CNFC 576 
+end box 577 
+ 578 
+OPS -> NFO : Deployment Request 579 
+ 580 
+NFO -> NFO : Decompose and determine sequence 581 
+Note over NFO, OAM 582 
+The SMO determines the correct sequence for deploying the xAPPs 583 
+End note 584 
+ 585 
+Loop for each xAPP to be deployed 586 
+   NFO-> NFO : Determine homing 587 
+   Note over NFO, OAM 588 
+      The SMO determines on which RIC/O-Cloud to deploy this/these xAPP(s). 589 
+      This can be explicitly identified by the Operations Personnel or via homing 590 
+policies 591 
+   End note 592 
+ 593 
+   opt 594 
+      note over NFO, CNF : SMO needs additional information from Near-RT RIC 595 
+      OAM -> CNF : <<O1>> get-config 596 
+   End 597 
+ 598 
+   Note over NFO, CNF 599 
+      SMO maps known RIC variables to xAPP variables to allow RIC and 600 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        36 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+       xAPP to interoperate, and fills in the xAPP configuration with assigned values. 601 
+   End note 602 
+ 603 
+   NFO -> NFO : SMO uses RIC/xAPP config to\ncreate template override parameters. 604 
+ 605 
+    606 
+   Loop Foreach xAPP Deployment 607 
+      NFO –> RTL : Get CloudNativeDescriptor\nfor xAPP Deployment 608 
+      NFO -> DMS : <<O2>> xAPP Deployment Request (CloudDescriptor, RuntimeVariables) 609 
+      DMS -> CNFC ** : Allocate resource according\nto xAPP Deployment request 610 
+      DMS --> NFO : notify xAPP Deployment instantiation\nis completed (DeploymentID) 611 
+      NFO -> NFO :  612 
+      Note right 613 
+         Once complete, SMO updates 614 
+          its xAPP inventory record with 615 
+          the Deployment ID from the O-Cloud 616 
+      End note 617 
+ 618 
+      CNFC -> CNFC : 619 
+      Note left: xAPP reads its initial configuration 620 
+ 621 
+      CNFC -> CNF : Register (RTE Descriptor) 622 
+      CNFC -> CNF : xAPP exchanges schemas\nand initial config with RIC 623 
+      Note over CNF, CNFC 624 
+         The Near-RT RIC configures E2 subscriptions,A1  625 
+         Policies supported, A1 Enrichment Subscriptions,  626 
+         and inter xAPP data sharing. 627 
+      End note 628 
+ 629 
+      CNF -> CNF 630 
+      Note left: RIC creates and populates xAPP MOI 631 
+ 632 
+      Alt if SMO has subscribed to CM Notifications then 633 
+         CNF -> OAM : <<O1>> MOI Create Event 634 
+     end 635 
+ 636 
+   End loop 637 
+ 638 
+End loop 639 
+ 640 
+NFO --> OPS : xAPP Deployment status (Success) 641 
+ 642 
+@enduml 643 
+ 644 
+ 645 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        37 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.3.2.3 UML Sequence Diagram 646 
+ 647 
+Figure 3-13: Deploy xAPP 648 
+ 649 
+3.4 Multi-vendor network provisioning in a mixed PNF/VNF 650 
+environment 651 
+A Use Case description of multi-vendor provisioning of an O-RAN service can be found in the O-RAN OAM 652 
+Architecture specification [5]. 653 
+3.5 Reconfiguration of O-RAN Virtual Network Function(s) 654 
+3.5.1 High Level Description 655 
+A common orchestration request is the reconfiguration of one or a set of cloud -based O-RAN Virtual Network 656 
+Functions in order to affect the behavior of the RAN.  The action taken could be, for example, to re-optimize network 657 
+traffic patterns or update the load balancing of traffic across the RAN network.  The trigger for this action could be any 658 
+number of events such as non-real time traffic analysis by the Non-RT RIC, or input from non-RAN sources such as 659 
+upcoming natural events or scheduled human events.  660 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        38 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ In such cases the SMO will either be told or determine by its own analysis which Virtual Network Functions need 661 
+reconfiguration and in which order this is done if multiple Virtual Network Functions are involved.  If a problem 662 
+develops during reconfiguration then SMO may optionally invoke a fallback procedure to revert the Virtual Network 663 
+Functions to their original configuration.  As in reconfiguration of PNFs, O1 Interface [6] Provisioning Management is 664 
+used. 665 
+NOTE: T here may be a need for SMO to initially reroute traffic away from the affected Virtual Network 666 
+Functions and subsequently revert traffic to the original patterns.  This could be done by using Network 667 
+Function Reconfiguration on adjacent Network Functions that send or receive information from the 668 
+affected Network Functions. 669 
+3.5.2 Sequence Description 670 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+Reconfigure O -RAN Virtual Network Functions based on the need to modify 
+RAN network behavior, for example re-optimize traffic patterns or load balance 
+traffic in response to new conditions. 
+ 
+Actors and Roles 
+SMO: OAM Functions 
+SMO/Non-RT RIC: source point for RAN policy control function 
+Other RAN Elements: O-CU, O-DU 
+ 
+Assumptions 
+1) All relevant functions and components are instantiated.  
+2) O1 interface connectivity is established with RAN elements. 
+3) SMO will reconfigure transport as needed to accommodate traffic rerouting, 
+reconfigured network functions and traffic reversion 
+ 
+Pre conditions 
+1) Network is operational. 
+2) SMO has established the data collection and sharing process, and 
+SMO/Non-RT RIC has access to this data. 
+3) Trigger conditions for reconfiguration are set in the SMO/Non-RT RIC, e.g., 
+by the network operator. 
+ 
+Begins when  SMO/Non-RT RIC analyses performance data or other inputs and determines 
+that reconfiguration of RAN network functions is required.  
+Step 1 (M) SMO/Non-RT RIC request NF reconfiguration.  SMO/ OAM Functions  
+determines an order of reconfiguration across affected RAN network functions.  
+Step 2-4 (M) 
+SMO performs relevant configuration updates in RAN over O1 interface for each 
+network function that needs to be reconfigured, in an order determined by SMO 
+or specified to SMO.  Detailed procedures for O1 provisioning follow [6] section 
+2.1. 
+ 
+Step 5-7 (M) SMO determines via notification  from the affected network functions that 
+reconfiguration has been successful   
+Step 8 (M) 
+SMO/Non-RT RIC monitor s the performance of the RAN following 
+reconfiguration by collecting and monitoring the relevant performance KPIs and 
+counters using O1 
+ 
+Step 9-11 (O) 
+If a fallback procedure has been identified by SMO and it determines that 
+reconfiguration has not been successful, SMO initiates fallback by configuring 
+the affected network functions back to their original configuration. 
+ 
+Ends when The SMO/Non -RT RIC verifies that the O -RAN Virtual Network Function’s 
+performance monitoring conforms to the reconfiguration.  
+Exceptions None identified  
+Post Conditions 
+O-RAN Virtual Network Functions have been reconfigured. 
+SMO/Non-RT RIC continues to monitor the performance of the RAN by 
+collecting and monitoring the relevant performance KPIs and counters using O1 
+ 
+Traceability REQ-ORC-GEN21; REQ-ORC-O1-2  
+ 671 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        39 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.5.3 UML sequence diagram 672 
+ 673 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        40 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Figure 3-14: Reconfiguration 674 
+3.6 Recovery Use Cases 675 
+3.6.1 Introduction 676 
+When an operator experiences problems with an O-Cloud NF Deployment(s), O-Cloud Node(s), or O-Cloud instance, it 677 
+is possible for the operator to initiate a reset at different levels of the O-Cloud. These can include the following: 678 
+1. Application level reset 679 
+This causes an application within an NF on the O-Cloud to be reset on operator request, and is accomplished through 680 
+the O1 interface between SMO and the associated NF. Typically, the network operator tries to execute the Application 681 
+level reset as part of recovering from NF’s application failures via O1. 682 
+The Application level reset is out of scope of the present document since it is foreseen that the interactions are only on 683 
+the O1 interface. 684 
+2. NF Deployment level reset 685 
+Another level of reset is by acting upon the NF Deployments that realize an NF instance, where the network operator 686 
+can execute the NF Deployment level reset (refer to clause 3.6.2) via O2dms. This causes an NF Deployment within an 687 
+O-Cloud to be reset on operator request, and is accomplished through the O2dms interface between SMO and the DMS 688 
+responsible for the deployment management services of the NF Deployment of concern.  689 
+3. O-Cloud Node level reset 690 
+This causes one or more O-Cloud Nodes within an O-Cloud to be reset on operator request, and is accomplished 691 
+through the O2ims interface between SMO and the IMS responsible for infrastructure management services for that O -692 
+Cloud Node. This can be used as part of recovery of the resources within the O-Cloud, i.e., the O-Cloud Node level 693 
+reset (refer to clause 3.6.3). This level of reset needs extra trigger considerations because it can affect multiple NF’s 694 
+supported by the O-Cloud Node or Nodes. 695 
+4. O-Cloud instance level reset 696 
+This causes an O-Cloud instance to be reset on operator request.  This last level of reset, i.e., O-Cloud instance level 697 
+reset, can be seen as a last resort action and it needs extra trigger considerations because it can affect  multiple NFs and 698 
+O-Cloud Nodes residing in the O-Cloud instance. 699 
+Editor’s Note: It is for further study whether this can be accomplished through the O2 interface. 700 
+The ordering or which one of the resets to use or execute is up to network operator policies, e.g. in some cases a 701 
+cascading might be tried, while in others cases the operator might decide to activate a specific reset without cascading 702 
+among them. 703 
+For illustrative purposes, the following is explanation about typical system reset cases in legacy deployments. In legacy 704 
+deployment cases, when the xNB experiments some issue at the software level, e.g. the software on the xNB is not 705 
+responding to the operations of the remote management tool due to possible software failures, “physical hardware” level 706 
+reset is performed to re-gain software level control. For performing this action, typically an OSS sends a “system reset” 707 
+signal to the target xNB. This procedure is necessary to reset the system (CU and DU) in xNB without performing a 708 
+“manual intervention” at the radio antenna site, e.g., “personnel pushing power button”. Figure x-x illustrates an 709 
+example of remote system reset in the legacy deployment case.  System reset does not apply in exactly the same way for 710 
+recovery of NF and O-Cloud systems but reset at different levels can be supported using O2 as described above. 711 
+ 712 
+Figure 3-15: Remote System Reset of legacy xNB by OSS 713 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        41 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.6.2 Network Function Deployment Level Reset Use Case 714 
+3.6.2.1 High level description 715 
+When one or more O-RAN NF(s) is (are) experimenting some failure, and the error could not be fixed by using the O1 716 
+interface services, as a possible step, the SMO could request the O-Cloud platform to perform an NF Deployment level 717 
+reset to fix the problem. 718 
+The reset of an NF Deployment may be performed via different means depending on the type of resources conforming 719 
+the NF Deployment (e.g., VM or container). For instance, both in VM -based and container-based NF Deployments, the 720 
+capability to restart the VM or OS Container/Pod can be leveraged.  721 
+This use case describes the procedure for the SMO to reset specific NF Deployments using the O2dms interface 722 
+services. This procedure can be invoked when some fatal error is identified which is foreseen i t can be resolved by 723 
+resetting NF Deployment. 724 
+3.6.2.2 Sequence description 725 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal SMO and DMS attempt to fix the failure on O-RAN NF’s responsiveness via O1 
+interface by requesting the reset of NF Deployments.  
+Actors and Roles 
+Cloud Maintainer 
+SMO: NFO/OAM Functions 
+DMS 
+NF Deployment 
+ 
+Assumptions 
+1) Notification Event has been configured in the DMS by the SMO 
+2) NF does not respond on O1 
+3) SMO can be aware of NF Deployments failures 
+ 
+Pre conditions 
+1) SMO is available  
+2) The O-Cloud has been installed and activated and is known to SMO  
+3) Network connectivity exists between the O-Cloud and SMO 
+ 
+Begins when  
+Network operations has determined, either by explicit request or via some 
+network operation policies , to triggers the NF Deployment level reset and SMO 
+has a work order with the specific set of NF Deployments to reset. 
+ 
+Step 1 (M) 
+SMO sends a request to the DMS using O2dms services to reset one or more 
+NF Deployments.  
+Step 2 (M) 
+The DMS performs the reset of the NF Deployments indicated in the request. 
+ 
+NOTE 1: Steps 2 can be looped for each NF Deployments to reset. 
+NOTE 2: Regarding the “reset” mechanisms, see also description in clause 
+3.6.2.1. 
+ 
+Ends when 
+The updated NF Deployment is notified to SMO 
+ 
+Exceptions None identified.  
+Post Conditions NF Deployments have been reset. 
+SMO is notified about the updated NF Deployment status.  
+Traceability 
+REQ-ORC-O2-12 
+ 
+ 726 
+3.6.2.3 UML sequence diagram 727 
+@startuml 728 
+Autonumber 729 
+skinparam sequenceArrowThickness 2 730 
+skinparam ParticipantPadding 5 731 
+skinparam BoxPadding 10 732 
+skinparam SequenceReferenceAlign center 733 
+ 734 
+ 735 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        42 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Box "Personnel" #lightblue 736 
+   Actor Operator as "Network operator" 737 
+End box 738 
+ 739 
+Box "Service Management & Orchestration Framework" #gold 740 
+   Participant FCC as “NFO” 741 
+end box 742 
+ 743 
+Box "O-Cloud Platform" #lightseagreen 744 
+   participant CPM as "DMS" 745 
+End box 746 
+ 747 
+== NF Deployment Reset == 748 
+ 749 
+   Note over Maintainer 750 
+ Operator triggers SMO  751 
+ NF Deployment Reset for one or 752 
+ More NF Deployments 753 
+   End note 754 
+ 755 
+FCC –> CPM : <<O2>> Reset NF Deployment(s) 756 
+   Note over CPM 757 
+      DMS processes request. 758 
+   End note 759 
+ 760 
+   Loop For each NF Deployment in the request 761 
+      CPM -> CPM : DMS resets NF Deployment 762 
+ 763 
+   END 764 
+ 765 
+ CPM -> FCC : NF Deployment status update notification 766 
+ 767 
+   Note over FCC 768 
+ SMO notifies Operator of 769 
+ NF Deployment Reset completion 770 
+   End note 771 
+ 772 
+== End Use Case == 773 
+@enduml 774 
+ 775 
+ 776 
+Figure 3-16: NF Deployment level recovery 777 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        43 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.6.3 O-Cloud Node Level Reset Use Case 778 
+3.6.3.1 High level description 779 
+When one or more O-RAN NF(s) is (are) experimenting some failure, and the error could not be fixed by using the O1 780 
+or O2dms interface services, as a possible step, the SMO could request the O-Cloud platform to perform an O-Cloud 781 
+Node level reset to fix the problem. In addition, certain events received by SMO about malfunctioning O-Cloud Node 782 
+resources could indicate or trigger the need to reset those resources, even in the case that such resou rce is not actually 783 
+being allocated for running the whole or part of an O-RAN NF. 784 
+The reset of an O-Cloud Node may be performed via different means. For instance, the O-Cloud Node could be 785 
+restarted (stop and start the node), or reallocating/replacing the O-Cloud Node to other O-Cloud infrastructure 786 
+resources. 787 
+This use case describes the procedure for the SMO to reset specific O-Cloud Nodes using the O2ims interface services. 788 
+This procedure can be invoked when some fatal error is identified which is foresee n it can be resolved by resetting O-789 
+Cloud infrastructure resources. 790 
+3.6.3.2 Sequence description 791 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal SMO and IMS attempt to fix the failure on O -RAN NF’s responsiveness via O1 
+interface by requesting the reset of O-Cloud Nodes.  
+Actors and Roles 
+Cloud Maintainer 
+SMO: FOCOM 
+IMS 
+O-Cloud Node 
+ 
+Assumptions 
+1) Notification Event has been configured in the IMS by the SMO 
+2) NF does not respond on O1 
+3) SMO can be aware of O-Cloud Nodes failures 
+ 
+Pre conditions 
+1) SMO is available  
+2) The O-Cloud has been installed and activated and is known to SMO  
+3) Network connectivity exists between the O-Cloud and SMO 
+ 
+Begins when  Work order from the Cloud Maintainer triggers the O -Cloud Node level reset. 
+The work order can indicate a specific set of O-Cloud Nodes.  
+Step 1 (M) 
+SMO sends a request to the IMS using O2ims services to reset one or more O-
+Cloud Nodes.  
+Step 2 (M) 
+The IMS performs the reset of the O-Cloud Nodes indicated in the request. 
+ 
+NOTE: Steps 2 can be looped for each O-Cloud Nodes to reset.  
+Ends when 
+The updated O-Cloud status is notified to SMO 
+ 
+Exceptions None identified.  
+Post Conditions O-Cloud Nodes have been reset. 
+SMO is notified about the updated O-Cloud status.  
+Traceability 
+REQ-ORC-O2-13 
+ 
+ 792 
+3.6.3.3 UML sequence diagram 793 
+@startuml 794 
+Autonumber 795 
+skinparam sequenceArrowThickness 2 796 
+skinparam ParticipantPadding 5 797 
+skinparam BoxPadding 10 798 
+skinparam SequenceReferenceAlign center 799 
+ 800 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        44 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+  801 
+Box "Personnel" #lightblue 802 
+   Actor Maintainer as "Cloud Maintainer" 803 
+End box 804 
+ 805 
+Box "Service Management & Orchestration Framework" #gold 806 
+   Participant FCC as “FOCOM” 807 
+end box 808 
+ 809 
+Box "O-Cloud Platform" #lightseagreen 810 
+   participant CPM as "IMS" 811 
+End box 812 
+ 813 
+== O-Cloud Node Reset == 814 
+ 815 
+   Note over Maintainer 816 
+ Cloud Maintainer triggers SMO  817 
+ O-Cloud Node Reset for one or 818 
+ More O-Cloud Nodes 819 
+   End note 820 
+ 821 
+FCC –> CPM : <<O2>> Reset O-Cloud Node(s) 822 
+   Note over CPM 823 
+      IMS processes request. 824 
+   End note 825 
+ 826 
+   Loop for each Node in the request 827 
+      CPM -> CPM : IMS resets O-Cloud Node 828 
+      CPM -> CPM : NF Deployment reallocated as needed 829 
+ 830 
+   END 831 
+ 832 
+ CPM -> FCC : O-Cloud status update notification 833 
+ 834 
+   Note over FCC 835 
+ SMO notifies Cloud Maintainer of 836 
+ O-Cloud Node Reset completion 837 
+   End note 838 
+ 839 
+== End Use Case == 840 
+@enduml 841 
+ 842 
+ 843 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        45 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Figure 3-17: O-Cloud Node level recovery 844 
+3.7 Fault Use Cases 845 
+3.7.1 Alarm Subscription Use Case 846 
+3.7.1.1 High Level Description 847 
+This Use Case supports IMS Alarm Event Subscription as described in ETSI Sol15 Clause 5.9 [12] as a pattern, 3GPP 848 
+TS29.501-G50 [13]. 849 
+An alarm subscription allows for one or more consumers to receive alarm event notifications. This is accomplished by 850 
+the potential subscriber(s) issuing a subscription to the publisher of alarm events.  851 
+3.7.1.2 Sequence Description 852 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+This use case describes a flow where one or more consumers to receive alarm 
+event notifications can issue a subscription to IMS which publishes alarm 
+events.  
+Each SUBSCRIBER has a consumer subscription identifier .  T here is one  
+consumer subscription identifier per subscription. It doesn’t have to be unique 
+for that subscription. The consumer subscription identifier is a character string 
+that can be associated with meta-data within the SMO. 
+ 
+Actors and Roles Alarm Event Subscriber (1..n) [e.g. SMO, could be a Proxy].  
+Alarm Event Publisher [e.g. IMS, DMS]  
+Assumptions 
+There can be multiple subscribers to a single publisher. The subscriber-
+publisher cardinality is not enforced nor monitored. 
+ 
+Each subscription is associated with one subscriber. Thus, each subscription 
+will only go to one endpoint. In other words, there cannot be multiple endpoints 
+for single subscription.  
+ 
+The subscriber may not be the ultimate consumer of notifications. The 
+subscriber is not necessarily the same entity as the endpoint for notifications. 
+ 
+Preconditions 
+Operational Subscriber [1…n], Publisher.  
+ 
+Connectivity (Precondition) – The Subscriber has connectivity to the publisher 
+by some mechanism.  
+ 
+O-Cloud is installed, operating, and registered with SMO. 
+ 
+Begins when  
+The use case is triggered when a subscriber wishes to:  
+(1) NOTIFICATION – A subscriber wishes to be notified of O-Cloud Faults  
+(2) ALARM SUBSCRIPTION CHANGE – To change the characteristics of an 
+alarm subscription a user would need to create  a new alarm subscription 
+followed by deleting the previous alarm subscription. This is done because there 
+is no alarm subscription update procedure.  The sequence is recommended to 
+ensure that no alarms are missed during these two independent operations.  
+(3) TRIGGER - An O-Cloud operator may also initiate a subscription. 
+ 
+Step 1 (M) 
+NOTIFICATION CRITERIA – This gives a notification criterion which initiates 
+the subscription.  
+Step 2 (M) 
+SUBSCRIPTION – The subscriber sends an alarm event subscription TO the 
+publisher. The subscription includes the Consumer Subscription Identifier  
+Step 3 (M) 
+CALLBACK NOTIFICATION CHECK (Should) – A Reachability Check can be 
+performed between the subscriber and publisher. This is a connectivity and 
+authorization check. This check is optional. However, it is recommended that a 
+reachability check is performed.   This step should be performed; though it is 
+stated as optional in ETSI SOL00015. 
+ 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        46 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Step 4 (M) (ALT) REACHABILITY SUCCESS – This step indicates that the reachability 
+check has passed successfully.  
+Step 5 (M) (ALT) REACHABILITY FAILURE – This step indicates that the reachability 
+check has failed.  
+Step 6 (M) (ALT) Subscription Denied (FAILURE) – The IMS has failed the reachability 
+check. IMS will proceed to deny the subscription.  
+Step 7 (M) 
+(ALT) SUBSCRIPTION STATUS (FAILURE) – If the reachability check has 
+failed, the subscription status will indicate a failure. The use case will end at this 
+point. This is a return to Step 2. 
+ 
+Step 8 (M) 
+SUBSCRIPTION ACKNOWLEDGE – The published indicates a subscription 
+acknowledge. This essentially indicates a success for the subscription. 
+(Optional) The consumer subscription identifier  may be passed back in the 
+subscription acknowledge. 
+ 
+Step 9 (M) 
+SUBSCRIPTION STATUS (SUCCESS) – A subscription status will indicate a 
+success back to cloud operator. This is a return to Step 1.  
+Ends when 
+This use case ends when a subscription status has been sent successfully or 
+on one of the failure cases, when there was a subscription failure.  
+Exceptions 
+FAIL CASE 1 : FAILURE INDICATION  - The Subscription acknowledge 
+indicates a failure.  
+FAIL CASE 2: CONNECTIVITY ISSUE - Can’t reach the publisher. 
+EXCEPTION CASE 1 : NON-SEQUITUR FILTER – The specified filter for the 
+subscription has been formulated such that no alarms would ever be sent.  For 
+example, if a filter specified to give [(all severity = major) and (all severity = not 
+major)] would never return any alarms.  
+ALTERNATE CASE 1 : VALIDITY CHECK (Optional) – A validity check 
+confirms the reachability of the callback endpoint, checking that the publisher 
+has permission to reach the consumer through a TLS connection. If a validity 
+check is performed AND it fails, this would lead to Fail Case 2 (Connectivity 
+Issue). 
+ 
+Post Conditions 
+(1) The publisher has the subscriber call -back (a fully qualified URL) and it is 
+persisted.  
+(2) The publisher has created its own internal association for subscription which 
+includes the consumer subscription identifier, the call- back URL and filter 
+criteria. 
+ 
+Traceability 
+[REQ-ORCH-O2-14], [REQ-ORCH-O2-15] 
+ 
+ 853 
+3.7.1.3 UML sequence diagram 854 
+ 855 
+@startuml 856 
+Autonumber 857 
+skinparam sequenceArrowThickness 2 858 
+skinparam ParticipantPadding 5 859 
+skinparam BoxPadding 10 860 
+ 861 
+ 862 
+Box "Personnel" #lightblue 863 
+   Actor Operator as "Cloud Operator" 864 
+End box 865 
+ 866 
+Box "Service Management & Orchestration\nFramework\n(Subscriber)" #gold 867 
+   Participant FCM as "FOCOM" 868 
+end box 869 
+ 870 
+Box "O-Cloud Platform (Publisher)"#lightseagreen 871 
+   participant CPM as "IMS" 872 
+End box 873 
+ 874 
+Note over Operator, CPM 875 
+   Preconditions:  876 
+     SMO has connectivity to O-Cloud 877 
+     O-Cloud has registered its IMS with the SMO 878 
+End Note 879 
+ 880 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        47 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ == IMS Alarm Event Subscription Use Case == 881 
+Operator -> FCM : Notification Criteria 882 
+Note over FCM 883 
+  Subscribers have //consumer// 884 
+  //subscription identifier//. 885 
+End Note 886 
+Activate FCM 887 
+ 888 
+FCM -> CPM : Subscription 889 
+Activate CPM 890 
+Note over CPM 891 
+   Subscription has //consumer// 892 
+   //subscription identifier// 893 
+End Note 894 
+Opt Reachability Test 895 
+CPM -> FCM : Callback Reachability Check (Should) 896 
+Activate FCM 897 
+ 898 
+Alt If Reachable and Authorized 899 
+CPM <-- FCM : Success  900 
+Else #FFDDDD 901 
+CPM <-- FCM : Failure 902 
+Note left 903 
+  Failure Case 904 
+End Note 905 
+Deactivate FCM 906 
+ 907 
+CPM --> FCM : Subscription Denied (Failure) 908 
+FCM --> Operator : Subscription Status (Failure) 909 
+Note left FCM 910 
+  Use Case Ends 911 
+End Note 912 
+End 913 
+End 914 
+Note over CPM 915 
+  Subscription Entry  916 
+  is created 917 
+End Note 918 
+ 919 
+CPM --> FCM : Subscription Acknowledge 920 
+Deactivate CPM 921 
+ 922 
+FCM --> Operator : Subscription Status (Success) 923 
+Deactivate FCM 924 
+ 925 
+== End Use Case == 926 
+ 927 
+@enduml 928 
+ 929 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        48 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 930 
+Figure 3-18: Alarm Subscription 931 
+3.7.2 Alarm Notification Use Case 932 
+3.7.2.1 High Level Description 933 
+This Use Case supports Alarm Notification(s) by the alarm publisher (IMS).  A condition occurs on an O-Cloud 934 
+resource which causes the current alarm list to change. This triggers an evaluation of the alarm subscription criteria by 935 
+the publisher (IMS). If deemed relevant by the subscription criteria, the alarm is sent to the subscription endpoint. The 936 
+alarm is sent in an alarm notification which is an event that carries the details of these relevant alarms. Alarm  937 
+notifications are sent from a publisher to subscriber(s). See the Alarm subscription use case for more details on Alarm 938 
+subscriptions. 939 
+3.7.2.2 Sequence Description 940 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        49 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Goal 
+This use case describes the series of actions that occur when a O-Cloud 
+resource encounters a fault that eventually results in an alarm being published 
+by the Alarm Event Publisher (IMS). 
+All faults are logged by the O -Cloud. Note: that simple devices  may not have 
+the ability to log their faults, hence the O -Cloud would log faults for them. Log 
+management is an area of LCM/FCAPS. 
+ 
+Actors and Roles 
+O-Cloud Resource – This is a resource in the O-Cloud that encounters a 
+fault. See WG6 O2 CADS [7] for definition of an O-Cloud Resource. 
+Alarm Event Publisher – The IMS is the owner of the O-Cloud alarms. The 
+IMS raises the Alarm. The IMS may use other internal functions to help 
+determine whether faults should become alarms. The O-Cloud or O-Cloud 
+resource might remediate a fault obviating the need to raise an alarm. 
+Alarm Event Subscriber (1..n)  – This entity has subscribed to the publisher 
+successfully. For the IMS case, it would be the FOCOM. 
+ 
+Assumptions 
+There can be multiple subscribers (SMOs) to a single publisher (IMS).  
+Each subscription is associated with a particular subscriber. You do not get 
+multiple endpoints for multiple consumers of it. The subscriber could be a 
+proxy. 
+A fault is an error that the O-Cloud resource detects. All faults should be 
+stored and logged in the O-Cloud resource. An Alarm is a notification to an 
+end user of a problem that might need their attention. Note that not all faults 
+need to be raised and reported as alarms from the publisher. 
+ Preconditions The subscriber has successfully completed an alarm event subscription (Use 
+Case)  
+Begins when  When a fault is detected or reported from an O-Cloud resource  
+Step 1.1 (M) FAULT 1 DETECTED – An O-Cloud resource encounters failure #1, or fault #1 
+is detected.    
+Step 1.2 (M) 
+FAULT 2 DETECTED  – That O -Cloud resource also detects another fault: 
+failure #2, or fault #2.   
+Step 1.3 (M) 
+FAULT LOGGED – The O-Cloud resource logs both the faults. Fault #1 and 
+Fault #2 are logged internally to the resource.  
+Step 2 (O) 
+ALARM ANALYSIS (OPTIONAL)  – The O -Cloud itself remediates faults if 
+possible. For example, the resource or O -Cloud may resolve fault 1. The O -
+Cloud evaluates what faults should become alarms. For example, it may 
+determine that fault 2 should be raised as an alarm and not fault 1. Analysis is 
+done to determine if the fault(s) should become alarms. The O-Cloud or O-Cloud 
+resource might remediate a fault obviating the need to raise an alarm. The O -
+Cloud implementer decides what O -
+Cloud resource faults should become 
+alarms. 
+ 
+Step 3 (O) 
+ALARM ENRICHMENT & CORRELATION (OPTIONAL)  – Alarm analysis 
+might be performed. Alarm correlation might be performed as described in the 
+O2 GA&P [9].  
+ 
+Step 4 (O) ALARM ESCALATION (OPTIONAL) – Alarm escalation might be performed 
+as described in the O2 GA&P [9].   
+Step 5 (M) ALARM LOGGED – The IMS logs all alarm(s).  Note: The Alarm logging use 
+cases are FFS.  
+Step 6 (M) 
+ALARM FILTERING & PUBLISHING – Alarm Filters are evaluated. If the alarm 
+is not filtered by the subscription criteria, the Alarm is published by the alarm 
+event publisher (IMS) for any subscriber. The Alarm is then reported to the 
+FOCOM subscriber. This use case flow illustrates that  even though multiple 
+faults were raised on an O -Cloud resource only one alarm was raised in this 
+case.  Either success or failure of the alarm notification should be logged. 
+ 
+Ends when 
+This use case ends when the Alarm Notification has been sent, or on one of the 
+error cases.  
+Exceptions 
+(Alt 1) – Faults are filtered by the O -Cloud. For example, fault 1 has been 
+resolved/filtered, and only fault 2 is reported.  
+(Alt 2) –  IMS filters on what should be reported, and in this example, alarm 2 
+passed the filter so it is reported. 
+ 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        50 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ Post Conditions Alarms that pass filters are published to subscribers with a valid subscription.  
+Traceability 
+[REQ-ORC-O2-16] 
+ 
+ 941 
+3.7.2.3 UML sequence diagram 942 
+ 943 
+@startuml 944 
+skinparam sequenceArrowThickness 2 945 
+skinparam ParticipantPadding 5 946 
+skinparam BoxPadding 10 947 
+ 948 
+ 949 
+Box "Service Management & Orchestration\nFramework (Subscriber)" #gold 950 
+   Participant FCM as "FOCOM" 951 
+end box 952 
+ 953 
+Box "O-Cloud Platform (Publisher)"#lightseagreen 954 
+ participant IMS as “IMS” 955 
+ participant OCR as "OC Resource" 956 
+End box 957 
+ 958 
+Note over FCM, OCR 959 
+   Precondition:  Subscriber (SMO) has registered to IMS Publisher 960 
+End Note 961 
+== Sending IMS Alarm Event Use Case == 962 
+Autonumber 1.1 963 
+OCR -> OCR : Fault1\nRaised 964 
+OCR -> OCR : Fault2\nRaised 965 
+OCR -> OCR : Faults\nLogged 966 
+Note over IMS, OCR 967 
+  Fault1 and Fault2 are evaluated 968 
+  and determined if they should be alarms  969 
+  to be reported.  970 
+  Fault correlation may be performed. 971 
+End Note 972 
+Alt if a Fault is alarmable 973 
+Autonumber 2 974 
+IMS -> IMS : Alarm Analysis (Optional) 975 
+IMS -> IMS : Alarm Correlation (Optional) 976 
+IMS -> IMS : Alarm Escalation (Optional) 977 
+IMS -> IMS : Alarm Logged 978 
+Alt Evaluate Subscriptions 979 
+Note left IMS 980 
+  Alarm is not filtered by subscription criteria. 981 
+  Therefore notification is sent. 982 
+End Note 983 
+ IMS ->> FCM : Alarm Reported to FOCOM Subscriber 984 
+End 985 
+End 986 
+ 987 
+== End Send IMS Alarm Event Use Case == 988 
+ 989 
+ 990 
+@enduml 991 
+ 992 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        51 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 993 
+ 994 
+Figure 3-19: Alarm Notification 995 
+3.7.3 Alarm Query Use Case 996 
+3.7.3.1 High Level Description 997 
+This Use Case supports Alarm Query (Alarm History) for O2ims. Alarm query allows for the SMO to query for specific 998 
+kinds of alarms or groups of alarms based on the alarm query criteria. This is useful for an operator to investigate, track, 999 
+or debug a system. 1000 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        52 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+3.7.3.2 Sequence Description 1001 
+Use Case Stage Evolution / Specification <<Uses>> 
+Related use  
+Goal 
+This Use Case describes the query for alarm(s) from resources. The SMO 
+queries for specific kinds of alarms or groups of alarms through query criteria. 
+Alarms are managed by the O-Cloud and this use case allows a user (SMO) to 
+request for a set of alarms based on the query criteria. 
+The alarm query criteria specify the alarm characteristics which must be 
+matched by IMS alarms to be returned as an alarm query results. 
+In the IMS case, A fault query is a message which is expecting a response 
+message from the IMS which matches the query criteria. FOCOM (SMO) 
+queries the IMS for alarms over O2ims. 
+Alarm queries within certain periods of time can be used for reconciliation. 
+Combinations of alarm queries can be used for analysis. 
+An “alarm status” for all the O-Cloud resources can be accomplished by an 
+alarm query with a criterion of “all O-Cloud resources” and “all alarms” (on 
+those resources). 
+ 
+Actors and Roles 
+SMO – The FOCOM within the SMO is used in this use case to represent any 
+consumer of the query service. 
+IMS – The IMS within the O-Cloud is used to represent any provider of the query 
+service. 
+ 
+Assumptions 
+The NFO (SMO) can query for alarms WITHOUT an alarm subscription to the 
+IMS. 
+There is no relationship between an alarm subscription’s filter criteria and an 
+alarm query’s criteria. 
+ 
+Preconditions SMO has connectivity to IMS/DMS.  
+Begins when  This use case begins when the cloud operator at the SMO (subscriber) initiates 
+an Alarm Query.  
+Step 1.1 (O) 
+(Alt) ALARM QUERY  INITIATED FROM OPERATOR  – An alarm  query is 
+initiated from the Operator to the FOCOM with query criteria that specifies what 
+type of alarms the operator is interested in.  
+ 
+Step 1.2 (O) 
+(Alt) ALARM QUERY INITIATED FROM SMO – An alarm query may also be 
+initiated from the FOCOM (SMO) with query criteria that specifies what type of 
+alarms to retrieve from the IMS. 
+ 
+Step 2 (M) ALARM QUERY FROM FOCOM TO IMS – An alarm query is processed by the 
+FOCOM (SMO) towards the IMS in the O-Cloud with the alarm query criteria.  
+Step 3 (M) 
+(ALT) SUCCESSFUL ALARM RESPONSE – The response is returned in 
+response for the Alarm Query with alarm content matching the alarm query 
+criteria.  
+Note: An alarm query on an O-Cloud resource with no alarms will return a 
+successful alarm response with a null set of alarms. 
+Note: To get historical alarms the cloud operator would just perform an alarm 
+query with the appropriate criteria. For example, an alarm query with the 
+criteria to request for all alarms with cleared status would return historical 
+alarms based on the retention policy of the alarm list.  
+ 
+Step 4 (M) 
+(ALT) ALARM OBJECT NOT FOUND – This is an alt step. This is an 
+exception case for the Alarm Query basic case. In this situation, the alarm that 
+was to be queried was not found. A “alarm not found” response is sent to the 
+subscriber. For example, an alarm query was performed on a non-existent O-
+Cloud resource. 
+ 
+Step 5 (M) 
+(ALT) ALARM NO CONTENT  – This is an alt step. This is an exception case 
+for the Alarm Query basic case. In this situation, the query parameters returned 
+no content (an empty set). A “no content” response is sent to the subscriber. 
+For example, if the given criteria [( all severity = major ) and ( all severity = not 
+major)] would never return any alarms. 
+ 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        53 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Step 6 (M) 
+(ALT) ALARM OTHER QUERY FAILURE – This is an alt step. This exception 
+case occurs when the Alarm Query encounters a problem that is not defined as 
+part of this scenario. 
+ 
+Ends when This scenario ends at any of the ALT cases, or with a successful Alarm Query 
+response.  
+Exceptions 
+This use case can encounter three basic alternate cases.  
+OBJECT NOT FOUND - The first an alarm query is attempted on a non-
+existent O-Cloud resource. 
+NO CONTENT - The second alternate case is a “No Content” case where the 
+Query parameters return an empty set. 
+OTHER QUERY FAILURE – A problem occurs that is not defined as part of this 
+use case. 
+ 
+Post Conditions Alarms are returned matching the criteria in the query have been returned  
+Traceability 
+[REQ-ORC-O2-17], [REQ-ORC-O2-18] 
+ 
+ 1002 
+3.7.3.3 UML sequence diagram 1003 
+ 1004 
+@startuml 1005 
+Autonumber 1006 
+skinparam sequenceArrowThickness 2 1007 
+skinparam ParticipantPadding 5 1008 
+skinparam BoxPadding 10 1009 
+ 1010 
+ 1011 
+Box "Personnel" #lightblue 1012 
+   Actor Operator as "O-Cloud \nSMO operator" 1013 
+End box 1014 
+ 1015 
+Box "Service Management & Orchestration\nFramework - Subscriber" #gold 1016 
+ Participant FCM as "FOCOM" 1017 
+end box 1018 
+ 1019 
+Box "O-Cloud Platform (IMS/DMS) - Publisher"#lightseagreen 1020 
+ participant IMS as “IMS” 1021 
+End box 1022 
+ 1023 
+== IMS Alarm Query == 1024 
+Alt Alarm Query 1025 
+Autonumber 1.1 1026 
+Operator -> FCM : Alarm Query (optional) 1027 
+Else 1028 
+FCM -> FCM : Alarm Query (optional) 1029 
+End 1030 
+Autonumber 2 1031 
+FCM -> IMS : Alarm Query 1032 
+Alt Successful Query 1033 
+ IMS --> FCM : Alarm Response  1034 
+Else Exception: Query criteria returns elements not found 1035 
+     IMS --> FCM : Alarm Object Not Found 1036 
+Else Exception: Non-sequitur alarm query 1037 
+ IMS --> FCM : Alarm No Content 1038 
+Else Exception: Other failure conditions 1039 
+     IMS --> FCM : Alarm Other Query Failure  1040 
+End 1041 
+ 1042 
+== End IMS Alarm Query == 1043 
+ 1044 
+ 1045 
+@enduml 1046 
+ 1047 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        54 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 1048 
+ 1049 
+Figure 3-20: Alarm Query 1050 
+4 Orchestration Requirements 1051 
+The following section contains requirements on the O-Cloud, SMO, O1 and O2 based on the Orchestration Use Cases 1052 
+above. 1053 
+4.1 General Requirements 1054 
+[REQ-ORC-GEN1] 
+The O-RAN SMO shall support the creation of a globally unique identifier 
+(O-Cloud ID) which can uniquely identify an O -Cloud instance in a 
+provider's network. 
+Use Case 
+3.1.1 
+[REQ-ORC-GEN2] The O-RAN SMO shall be able to create an inventory placeholder based on 
+a O-Cloud ID for an O-Cloud expected to be managed by the SMO 
+Use Case 
+3.1.1 
+[REQ-ORC-GEN3] 
+The O-RAN SMO shall be able to initiate an O-Cloud build out by loading 
+the first O-Cloud server and providing a “blueprint” of the functionality and 
+resources needed. 
+Use Case 
+3.1.2 
+[REQ-ORC-GEN4] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+orchestrate the control plane and resource nodes from O -Cloud Nodes as 
+they are detected. 
+Use Case 
+3.1.2 
+
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        55 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+[REQ-ORC-GEN5] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+notify the SMO when it has completed the O-Cloud build and is ready to be 
+integrated to the SMO. 
+Use Case 
+3.1.2 
+[REQ-ORC-GEN6] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+provide SMO with information about its current SW inventory and platform 
+software 
+Use Case 
+3.1.3 
+[REQ-ORC-GEN7] The O-RAN SMO shall be able to verify an O-Cloud instance is at the SW 
+inventory or build expected for platform software for given deployment 
+Use Case 
+3.1.3 
+[REQ-ORC-GEN8] 
+The SMO shall be able to configure an O -Cloud to notify the SMO of O -
+Cloud Configuration Changes, Faults detected within, and performance of 
+O-Cloud Nodes. 
+Use Case 
+3.1.3 
+[REQ-ORC-GEN9] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+provide on demand a list of its DMS  with the resource locations that each 
+can support and information linking the DMS with the deployment 
+descriptor model types that each support. 
+Use Case 
+3.1.3 
+[REQ-ORC-GEN10] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+provide on demand a list of resource build configurations (aka "flavors") 
+that it can currently support.   
+Use Case 
+3.1.4 
+[REQ-ORC-GEN11] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+provide on demand a report of capacity that it could sup port based on the 
+"flavors" it has defined.   
+Use Case 
+3.1.4 
+[REQ-ORC-GEN12] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+provide on demand a report of availability that it can still support  and 
+utilization, based on the "flavors" it has defined.   
+Use Case 
+3.1.4 
+[REQ-ORC-GEN13] The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+notify the SMO when there is a change in Inventory status. 
+Use Case 
+3.1.4 
+[REQ-ORC-GEN14] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+detect, configure and incorporate new O -Cloud Nodes into the O -Cloud 
+instance according to the rules identified in the O-Cloud blueprint. 
+Use Case 
+3.1.5 
+[REQ-ORC-GEN15] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+notify the SMO when resources which can affect the total capacity of the 
+O-Cloud are changed. 
+Use Case 
+3.1.5 
+[REQ-ORC-GEN16] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+support secure get of software packages from a server within the SMO for 
+the purpose of upgrading the O-Cloud software build. 
+Use Case 
+3.1.6 
+[REQ-ORC-GEN17] 
+The O-RAN O-Cloud Infrastructure Management Services shall be able to 
+evaluate a downloaded software package and verify that it can be activated 
+without impacting applications or networks executing on the affected O -
+Cloud resources. 
+Use Case 
+3.1.6 
+[REQ-ORC-GEN18] The O-RAN SMO shall be able to separate requests for managing an O -
+Cloud and managing O-RAN Network Functions on the O-Cloud. 
+Use Case 
+3.2.1 
+[REQ-ORC-GEN19] 
+The O-RAN SMO shall determine which locations within the O-Cloud that 
+should be used for implementing an end-to-end service or an xAPP if these 
+are not specified in the service request 
+Use Case 
+3.2.1, 3.3.2 
+[REQ-ORC-GEN20] The O -Cloud Deployment Management Services  shall be able to use a 
+descriptor to orchestrate the creation and management of NF deployments. 
+Use Case 
+3.2.1 
+[REQ-ORC-GEN21] The O-RAN SMO shall be able to restore a NF to a previous configuration 
+as needed for network recovery. 
+Use Case 
+3.4, see also 
+[8] 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        56 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+[REQ-ORC-GEN22] 
+The O-Cloud Deployment Management Service shall be able to create new 
+NF deployment units on request from the SMO in order to support scale out 
+or software upgrade of an NF. 
+Use Case 
+3.2.2, 3.2.4 
+[REQ-ORC-GEN23]  
+The O-Cloud Deployment Management Service shall be able to delete NF 
+deployment units on request from the SMO in order to support scale in or 
+software upgrade of an NF. 
+Use Case 
+3.2.3, 3.2.4 
+ 1055 
+4.2 Orchestration Requirements Relating to O1 1056 
+Defines requirements for O-RAN managed function IM elements and FM/PM elements needed for orchestration usi ng 1057 
+the O1 interface. 1058 
+[REQ-ORC-O1-1] 
+The O-RAN SMO shall be able to subscribe to notification of configuration 
+events, fault events and performance metrics from an O-RAN NF instantiated 
+on an O-Cloud, using the O1 interface. 
+Use Case 
+3.2.1 
+[REQ-ORC-O1-2] An O-RAN NF instantiated on an  O-Cloud  shall be able to send notification 
+of configuration changes to the O-RAN SMO using the O1 interface. 
+Use Case 
+3.3.2, 3.4 
+ 1059 
+NOTE: These requirements may overlap with those in [5] and may be moved to [5] in future. 1060 
+4.3 Orchestration Requirements Relating to O2 1061 
+[REQ-ORC-O2-1] The O-RAN SMO shall be able to provide a boot image for a remote node 
+using the O2 interface. 
+Use Case 
+3.1.2 
+[REQ-ORC-O2-2] 
+The O -RAN SMO shall be able  to send a cloud descriptor, (i.e., cloud 
+deployment and configuration files) for initial cloud startup  using the O2 
+interface. 
+Use Case 
+3.1.2 
+[REQ-ORC-O2-3] The O-RAN SMO shall be able to query the O-Cloud for attributes such as 
+SW inventory using the O2 interface. 
+Use Case 
+3.1.3 
+[REQ-ORC-O2-4] 
+The O-Cloud shall be able to receive a request to download software sent to 
+it from the SMO using the O2 interface, such as request for download of an 
+xAPP deployment. 
+Use Case 
+3.1.3, 3.3.2 
+[REQ-ORC-O2-5] 
+The O-RAN SMO shall be able to subscribe to notification of configuration 
+events, fault events and performance metrics from the O-Cloud using the O2 
+interface. 
+Use Case 
+3.1.3 
+[REQ-ORC-O2-6] The O -RAN SMO shall be able  to query the O -Cloud f or the DMS end 
+points it supports using the O2 interface. 
+Use Case 
+3.1.3 
+[REQ-ORC-O2-7] The O-RAN SMO shall be able to query the O-Cloud for attributes such as 
+capabilities and capacities using the O2 interface. 
+Use Case 
+3.1.4 
+[REQ-ORC-O2-8] 
+The O-Cloud shall be able to send asynchronous events to the SMO when 
+available capabilities or capacities are changed, including when new 
+hardware is added, using the O2 interface. 
+Use Case 
+3.1.4, 3.1.5 
+[REQ-ORC-O2-9] The O -Cloud shall be able  to asynchronously notify the SMO when a 
+software upgrade completes, using the O2 interface. 
+Use Case 
+3.1.6 
+[REQ-ORC-O2-10] 
+The O-RAN SMO shall be able to request the O-Cloud to create a Network 
+Function deployment using cloud resources  through the O2 int erface, and 
+subsequently manage the Network Function using the O1 interface. 
+Use Case 
+3.2.1 
+[REQ-ORC-O2-11] The O-RAN SMO shall be able to request the O-Cloud to terminate Network 
+Function deployment(s) through the O2 interface. 
+Use Case 
+3.2.5 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        57 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+[REQ-ORC-O2-12] The O -RAN SMO shall be able to request the O -Cloud to reset NF 
+Deployment(s) through the O2 interface. 
+Use Case 
+3.6.2 
+[REQ-ORC-O2-13] The O-RAN SMO shall be able to request the O -Cloud to reset O -Cloud 
+Node(s) through the O2 interface. 
+Use Case 
+3.6.3 
+[REQ-ORC-O2-14] The O-RAN SMO shall be able to issue a subscription to the O -Cloud to 
+receive alarm event notifications using the O2 interface.  
+Use Case 
+3.7.1 
+(IMS O2 
+Alarm 
+Subscription) 
+[REQ-ORC-O2-15] 
+Each subscriber should have a consumer subscription identifier. 
+Note: The consumer subscription identifier  is an identifier provided by the 
+consumer that is reflected in the alarm notification. 
+Use Case 
+3.7.1 
+(IMS O2 
+Alarm 
+Subscription) 
+[REQ-ORC-O2-16] 
+The IMS in the O-Cloud (alarm publisher) shall be able to asynchronously 
+notify the  endpoint specified by the  SMO ( alarm subscriber) of alarm 
+notifications related to O-Cloud resources using the O2 interface. 
+ 
+Use Case 
+3.7.2 
+(IMS O2 
+Alarm 
+Notification) 
+[REQ-ORC-O2-17] 
+The SMO shall be able to query the O-Cloud for alarms on O-Cloud 
+resources with query criteria which define the alarm characteristics that the 
+SMO is interested in using the O2 interface.  
+Use Case 
+3.7.3 
+(IMS O2 
+Alarm 
+Query) 
+[REQ-ORC-02-18] The IMS O-Cloud shall return alarms in response to the SMO alarm query 
+that match the alarm query criteria using the O2 interface. 
+Use Case 
+3.7.3 
+(IMS O2 
+Alarm 
+Query) 
+ 1062 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        58 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Annex A: Terminology Used in O-Cloud Requirements 1063 
+The following terms and definitions are used in the O-Cloud requirements. 1064 
+Requirements Term Description 
+deployment descriptor Deployment descriptor is a completed data model which provides an O -Cloud the 
+necessary information to create a deployment. 
+deployment descriptor 
+model type 
+Deployment descriptors use a model type such as TOSCA, HELM, or HOT Templates 
+to describe the deployment to be performed. The type of model used by the descriptor 
+should be included in its metadata. 
+NF deployment NF deployment (or “Deployment”) is defined in [9]. 
+NF deployment unit Part of a NF deployment that may be individually scaled. 
+flavor In the case of O-Clouds the deployment units are in defined patterns known as 
+[deployment] flavors [2]. The flavors are part of the deployment descriptor.  
+capacity This is the capacity that an entity is designed for. For each flavor defined the 
+maximum that could be deployed should be reported to the SMO. Cloud Scale Up and 
+Scale Down would affect these values and cause the change to be reported to the 
+SMO. 
+utilization This is the count that is currently allocated from the O-Cloud capacity, for each flavor. 
+availability This is the count that could be allocated based on the capacity minus the utilization, for 
+each flavor. 
+cloud descriptor This is the outlined plan for the O-Cloud.   From this plan the O-Cloud Infrastructure 
+Management Services knows which pools are expected to be available as resources are 
+discovered and what version of software is required for O-Cloud Nodes in each pool. 
+cloud blueprint This is information about the functionality and resources needed in an O-Cloud build 
+out. 
+ 1065 
+ 1066 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        59 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+Annex ZZZ:  O-RAN Adopter License Agreement 1067 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER AGREES TO 1068 
+THE TERMS OF THIS AGREEMENT.   1069 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN ALLIANCE 1070 
+and the entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates 1071 
+(the “Adopter”). 1072 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 1073 
+SECTION 1:  DEFINITIONS 1074 
+ 1075 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common 1076 
+control with another entity, so long as such control exists.  For the purpose of this Section, “Control” 1077 
+means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 1078 
+ 1079 
+1.2 “Compliant Portion” means only those specific portions of products (hardware, software or 1080 
+combinations thereof) that implement any O-RAN Specification. 1081 
+ 1082 
+1.3  “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, 1083 
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 1084 
+ 1085 
+1.4 “Minor Update” means an update or revision to an O -RAN Specification published by O -RAN 1086 
+ALLIANCE that does not add any significant new features or functionality and remains interoperable with 1087 
+the prior version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates. 1088 
+ 1089 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, 1090 
+other than design patents and design registratio ns, throughout the world, which (i) are owned or 1091 
+otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, 1092 
+Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the 1093 
+right to grant a license without the payment of consideration to a third party; and (iii) are necessarily 1094 
+infringed by implementation of a Final Specification (without considering any Contributions not included 1095 
+in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not 1096 
+commercial) grounds, taking into account normal technical practice and the state of the art generally 1097 
+available at the date any Final Specification was published by the O-RAN ALLIANCE or the date the patent 1098 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, 1099 
+use or operate an implementation which complies with a Final Specification without infringing that claim. 1100 
+For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by 1101 
+technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary 1102 
+Claims. 1103 
+ 1104 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 1105 
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include 1106 
+in their license a term allowing the licensor to suspend the license against a licensee who brings a patent 1107 
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of 1108 
+their Affiliates. 1109 
+ 1110 
+SECTION 2: COPYRIGHT LICENSE 1111 
+ 1112 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN ALLIANCE hereby grants to Adopter 1113 
+a nonexclusive, nontransferable, irrevocable, non -sublicensable, worldwide copyright license to obtain, 1114 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        60 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+use and modify O -RAN Specifications, but not to further d istribute such O -RAN Specification in any 1115 
+modified or unmodified way, solely in furtherance of implementations of an O-RAN Specification. 1116 
+ 1117 
+2.2 Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in a 1118 
+separate written agreement with O-RAN ALLIANCE. 1119 
+ 1120 
+SECTION 3: FRAND LICENSE 1121 
+ 1122 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based 1123 
+on a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non-Discriminatory 1124 
+(FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, 1125 
+irrevocable (but subject to Defensive S uspension), non -sublicensable, worldwide license under their 1126 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 1127 
+Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a 1128 
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or 1129 
+(b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic 1130 
+Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the 1131 
+distribution by the Adopter’s distributors an d the use by the Adopter’s customers of such licensed 1132 
+Compliant Portions. 1133 
+ 1134 
+3.2  Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 1135 
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims 1136 
+to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor 1137 
+or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 1138 
+ 1139 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent 1140 
+License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates 1141 
+under FRAND terms and conditions with or without compensatio n (royalties) a nonexclusive, non -1142 
+transferable, irrevocable (but subject to Defensive Suspension), non -sublicensable,  worldwide license 1143 
+under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise 1144 
+distribute Compliant Portions; provided, however, that such license will not extend: (a) to any part or 1145 
+function of a product in which a Compliant Portion is incorporated that is not itself part of the Compliant 1146 
+Portion; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is 1147 
+not making a reciprocal grant to Adopter , as set forth in Section 3.1.  For the avoidance of doubt, the 1148 
+foregoing license includes the distribution by the Members’, Contributors’, Academic Contributors’, 1149 
+Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic 1150 
+Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Portions. 1151 
+ 1152 
+SECTION 4:  TERM AND TERMINATION 1153 
+ 1154 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 1155 
+ 1156 
+4.2 O-RAN ALLIANCE on behalf of its Members, Contributors and Academic Contributors may terminate 1157 
+this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of 1158 
+curing such breach within thirty (30) days after being given notice specifying the breach. 1159 
+ 1160 
+4.3 Sections 1, 3, 5 -  11 of this Agreement shall survive any termination of this Agreement.  Under 1161 
+surviving Section 3, after termination of this Agreement, Adopter will continue t o grant licenses (a) to 1162 
+entities who become Adopters after the date of termination; and (b) for future versions of O -RAN 1163 
+Specifications that are backwards compatible with the version that was current as of the date of 1164 
+termination. 1165 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        61 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 1166 
+SECTION 5: CONFIDENTIALITY 1167 
+ 1168 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -1169 
+RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less 1170 
+than reasonable care.  Any disclosure by Adopter to  its Affiliates, contractors and consultants should be 1171 
+subject to an obligation of confidentiality at least as restrictive as those contained in this Section.  The 1172 
+foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without 1173 
+any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; 1174 
+(3) rightfully received without a duty of confidentiality; (4) disclosed by O -RAN ALLIANCE or a Member, 1175 
+Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; 1176 
+(5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 1177 
+governmental body, or as required by law, provided that Adopter provides reasonable prior written notice 1178 
+to O-RAN ALLIANCE, and cooperates with O -RAN ALLIANCE and/or the applicable Member, Contributor 1179 
+or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter 1180 
+with O-RAN ALLIANCE’s prior written approval.  1181 
+ 1182 
+SECTION 6:  INDEMNIFICATION 1183 
+ 1184 
+Adopter shall indemnify, defend, and hold harmless the O -RAN ALLIANCE, its Members, Contributors or 1185 
+Academic Contributors, and their employees, and agents and their respective successors, heirs and 1186 
+assigns (the “ Indemnitees”), against any liability, damage, loss, or expense (including reasonable 1187 
+attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with 1188 
+any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the 1189 
+licensed O -RAN Specifications or Adopter’s commercialization of products that comply with O -RAN 1190 
+Specifications. 1191 
+ 1192 
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY 1193 
+ 1194 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 1195 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR 1196 
+THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES 1197 
+RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE 1198 
+WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY 1199 
+HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 1200 
+ 1201 
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 1202 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O- RAN ALLIANCE AND THE MEMBERS, 1203 
+CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF 1204 
+MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY 1205 
+PARTICULAR PURPOSE, ERROR- FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O- RAN 1206 
+SPECIFICATIONS. 1207 
+ 1208 
+SECTION 8:  ASSIGNMENT 1209 
+ 1210 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make 1211 
+any grants or other sublicenses to this Agreement, except as expressly authorized hereunder , without 1212 
+having first received the prior, written consent of the O -RAN ALLIANCE, which consent may be withheld 1213 
+in O-RAN ALLIANCE’s sole discretion.  O-RAN ALLIANCE may freely assign this Agreement. 1214 
+ 1215 
+ 1216 
+ 1217 
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS 1218 
+
+                                                                                     
+ 
+ 
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                        62 
+       O-RAN.WG6.ORCH-USE-CASES-v02.01 TS 
+ 
+ 1219 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors  (including 1220 
+future Members, Contributors and Academic Contributors ) are entitled to rights as a third -party 1221 
+beneficiary under this Agreement, including as licensees under Section 3. 1222 
+ 1223 
+SECTION 10:  BINDING ON AFFILIATES 1224 
+ 1225 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 1226 
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are 1227 
+applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 1228 
+ 1229 
+SECTION 11:  GENERAL 1230 
+ 1231 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law 1232 
+provisions.   1233 
+ 1234 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and 1235 
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties,  1236 
+whether written or oral, relating to the subject matter of this Agreement. 1237 
+ 1238 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules 1239 
+and regulations with respect to its and its Affiliates’ performance under this Agreement, including without 1240 
+limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter 1241 
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 1242 
+ 1243 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created 1244 
+between Adopter, or O-RAN ALLIANCE or its Members, Contributors or Academic Contributors.  Except as 1245 
+expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of 1246 
+Adopter, or O-RAN ALLIANCE or its Members, Contributors or Academic Contributors. 1247 
+ 1248 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held 1249 
+to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions 1250 
+will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and 1251 
+restrictions of this Agreement will remain in full force and effect. 1252 
+ 1253 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of 1254 
+any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or 1255 
+otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ 1256 
+or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any 1257 
+other instance; rather the same shall be and remain in full force and effect. 1258 
+ 1259 

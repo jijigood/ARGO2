@@ -1,0 +1,1601 @@
+O-RAN.WG6.O-Cloud Notification API-v02.01
+Technical Specification 
+O-RAN Working Group 6
+O-Cloud Notification API Specification for Event Consumers
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy)
+ to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this specification 
+in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may 
+print or download extracts of the material on this site for you
+r personal use, or copy the material on this site 
+for the purpose of sending to individual third parties for their information provided that you acknowledge O-
+RAN ALLIANCE as the source of the material and that you inform 
+the third party that these conditions 
+apply to them and that they must comply with them.
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the copyright statement on the cover page of this specification.
+
+ C opyright © 2020 by the O -RAN ALLIANCE e.V. 
+ Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ. 
+O-RAN.WG6.O-Cloud Notification API-v02.01
+Technical Specification 
+O-RAN Working Group 6
+O-Cloud Notification API Specification for Event Consumers
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving,   
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License 
+Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189
+
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  2 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Revision History 1 
+  2 
+Date Revision Author Description 
+05/10/2021 00.00.01 Aaron Smith (RH) 
+Udi Schwager (WRS) 
+Initial skeleton. 
+07/22/2021 01.00.00 Kaustubh Joshi (AT&T) Approved for publication. 
+03/28/2022 02.00.00 Padma Sudarsan 
+(VMWare) 
+Incorporated 2 approved CRs (VMware, Wind 
+River, RedHat, Altiostar) 
+ 
+03/05/2022 02.00.01 Udi Schwager (Wind 
+River) 
+Ready for TSC review. 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  3 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Table of Contents 3 
+Revision History ........................................................................................................................................... 2 4 
+Chapter 1 Introductory Material .................................................................................................................... 4 5 
+ Scope 4 6 
+ References.............................................................................................................................................................. 4 7 
+ Definitions and Abbreviations.................................................................................................................................  5 8 
+ Definitions........................................................................................................................................................... 5 9 
+ Abbreviations ...................................................................................................................................................... 5 10 
+Chapter 2 Introduction .................................................................................................................................. 6 11 
+Chapter 3 Usage of HTTP ............................................................................................................................. 7 12 
+ General .................................................................................................................................................................. 7 13 
+ HTTP standard headers ........................................................................................................................................ 7 14 
+ Content type ........................................................................................................................................................ 8 15 
+ Void 8 16 
+ Resource addressing ............................................................................................................................................ 9 17 
+Chapter 4 Subscription API Definition ........................................................................................................ 11 18 
+ Resource Structure ............................................................................................................................................... 11 19 
+ Resources and HTTP Methods ........................................................................................................................... 12 20 
+ Subscription resource definition ......................................................................................................................... 13 21 
+ Individual subscription resource definition ......................................................................................................... 15 22 
+Chapter 5 Status Notifications API Definition ............................................................................................. 18 23 
+ Description ........................................................................................................................................................... 18 24 
+ Event Consumer Notification Resource Definition ............................................................................................. 19 25 
+Chapter 6 Event Pull Status Notifications API Definition ............................................................................ 23 26 
+ Description ........................................................................................................................................................... 23 27 
+ Resources Pull Status Notification Definition ..................................................................................................... 24 28 
+Chapter 7 Event Data Model ....................................................................................................................... 26 29 
+ Subscription Data Model ...................................................................................................................................... 26 30 
+ Structured data types .......................................................................................................................................... 26 31 
+ Status Notifications Data Model ........................................................................................................................... 26 32 
+ Structured data types .......................................................................................................................................... 26 33 
+ Event Data Model .............................................................................................................................................. 27 34 
+ Synchronization Event Specifications................................................................................................................. 29 35 
+ Appendix A .......................................................................................................................................................... 34 36 
+ Helper/Sidecar containers .................................................................................................................................. 34 37 
+Helper/Sidecar value: ................................................................................................................................................. 34 38 
+Annex ZZZ: O-RAN Adopter License Agreement ...................................................................................... 35 39 
+Section 1: DEFINITIONS .......................................................................................................................................... 35 40 
+Section 2: COPYRIGHT LICENSE ............................................................................................................................ 35 41 
+Section 3: FRAND LICENSE..................................................................................................................................... 35 42 
+Section 4: TERM AND TERMINATION ................................................................................................................... 36 43 
+Section 5: CONFIDENTIALITY ................................................................................................................................ 36 44 
+Section 6: INDEMNIFICATION ................................................................................................................................ 36 45 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY ................................................................................. 37 46 
+Section 8: ASSIGNMENT ......................................................................................................................................... 37 47 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS ................................................................................................ 37 48 
+Section 10: BINDING ON AFFILIATES ................................................................................................................... 37 49 
+Section 11: GENERAL .............................................................................................................................................. 37 50 
+ 51 
+52 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  4 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 1 Introductory Material 53 
+ Scope 54 
+This Technical Specification has been produced by the O-RAN Alliance. 55 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 56 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-57 
+RAN with an identifying change of release date and an increase in version number as follows: 58 
+Release x.y.z 59 
+where: 60 
+x the first digit is incremented for all changes of substance, i.e.  technical enhancements, corrections, updates, 61 
+etc. (the initial approved document will have x=01). 62 
+y the second digit is incremented when editorial only changes have been incorporated in the document. 63 
+z the third digit included only in working versions of  the document indicating incremental changes during the 64 
+editing process. 65 
+The present document describes a REST API that allows Event Consumers (EC) such as a vDU or CNF to subscribe to 66 
+events/status from the O-Cloud.  The cloud infrastructure shall provide Event Producers (EP) to enable cloud workloads 67 
+to receive events/status that might be known only to the O-Cloud infrastructure. 68 
+ References 69 
+The following documents contain provisions which, through reference in this text, constitute provisions of th is 70 
+specification (see also https://www.o-ran.org/specifications). 71 
+[1] 3GPP TR 21.905, Vocabulary for 3GPP Specifications. 72 
+[2] 3GPP TS 28.622, Telecommunication management; Generic Network Resource Model (NRM) Integration 73 
+Reference Point (IRP); Information Service (IS). 74 
+[3] O-RAN WG1, O-RAN Architecture Description – v02.00, Technical Specification. 75 
+[4] O-RAN WG1, Operations and Maintenance Architecture – v03.00, Technical Specification. 76 
+[5] O-RAN WG4, Control, User and Synchronization Plane Specification – v06.00, Technical Specification.  77 
+[6] O-RAN WG6, Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN – v02.01, Technical 78 
+Report. 79 
+[7] O-RAN Infrastructure Project, https://wiki.o-ran-sc.org/display/IN/Infrastructure+Home 80 
+[8] IETF RFC 7540: "Hypertext Transfer Protocol Version 2 (HTTP/2)". 81 
+[9] IETF RFC 8259: "The JavaScript Object Notation (JSON) Data Interchange Format".  82 
+[10]  IETF RFC 7231: "Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content". 83 
+[11]  IETF RFC 7230: "Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing". 84 
+[12]  IETF RFC 7807: "Problem Details for HTTP APIs". 85 
+[13] IETF RFC 7235 for authentication mechanisms over HTTP/1.1, 86 
+[14] 3GPP TS 29.501, 5G System; Principles and Guidelines for Services Definition 87 
+[15] CloudEvents.io specification, https://github.com/cloudevents/ 88 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  5 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+ Definitions and Abbreviations 89 
+ Definitions 90 
+For the purposes of the present document, the terms given in 3GPP TR 21.905 [1] and the following apply. A term defined 91 
+in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 [1]. 92 
+Managed Element  The definition of a Managed Element (ME) is given in 3GPP TS 28.622 [2] section 4.3.3.  The 93 
+ME supports communication over management interface(s) t o the manager for purposes of 94 
+control and monitoring.  95 
+Managed Function  The definition of a Managed Function (MF) is given in 3GPP TS 28.622 [2] section 4.3.4.  An 96 
+MF instance is managed using the management interface(s) exposed by its containing ME 97 
+instance. 98 
+Network Function The near -RT RIC, O -CU-CP, O -CU-UP, O -DU, and O-RU logical functions that can be 99 
+provided either by virtualized or non-virtualized methods.  100 
+O-Cloud This refers to a collection of O-Cloud Resource Pools at one or more location and the software 101 
+to manage Nodes and Deployments hosted on them.  An O-Cloud will include functionality to 102 
+support both Deployment -plane and Management services. The O -Cloud provides a single 103 
+logical reference point for all O-Cloud Resource Pools within the O-Cloud boundary. 104 
+O-RAN Physical NF  A RAN NF software deployed on tightly integrated hardware sharing a single Managed 105 
+Element identity. 106 
+O-RAN Cloudified NF  A RAN NF software deployed on an O -Cloud with its own Managed Element identity, i.e., 107 
+separate from the identity of the O-Cloud. 108 
+ Abbreviations 109 
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An 110 
+abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 111 
+3GPP TR 21.905 [1]. 112 
+AAL Acceleration Abstraction Layer 113 
+API Application Programming Interface 114 
+BBU Base Band Unit 115 
+CNF Cloud-Native Network Function 116 
+FFS For Further Study 117 
+O-CU O-RAN Centralized Unit 118 
+O-DU O-RAN Distributed Unit 119 
+O-RU O-RAN Radio Unit 120 
+RIC RAN Intelligent Controller 121 
+SMO Service Management and Orchestration 122 
+VNF Virtualized Network Function 123 
+  124 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  6 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 2 Introduction  125 
+This document describes a REST API that allows Event Consumers (EC) such as a vO-DU or CNF to subscribe to 126 
+events/status from the O-Cloud.  The cloud infrastructure will provide Event Producers (EP) to enable cloud workloads 127 
+to receive events/status that might be known only to the infrastructure.   128 
+An EC will use the REST API to subscribe to specific event types or categories of events by specifying the event / 129 
+status producer address.   The addressing scheme is covered in Resource Addressing.  An EC will be able to 130 
+unsubscribe from receiving events and status by deleting the subscription through the REST API.  The REST API is an 131 
+integration point to an event and status framework that is running in the underlying O-Cloud (IMS and/or DMS).   132 
+The REST API and associated event framework implementation is intended to be used in situations where the path from 133 
+event detection to event consumption must have the lowest possible latency.  Intra-node delivery of events is a primary 134 
+focus with inter-node delivery also supported.  135 
+The event framework described here is not intended to be an island of communication and should interact with north-136 
+bound interfaces such as O2 through the IMS. Hence, this Event Consumers API is not intended to replace O2ims 137 
+notifications (including PTP loss of sync), but rather to complement it. Please see the CAD [6] for more information. 138 
+Interfacing with external entities is necessary for communication with orchestrating entities and for permanent storage 139 
+of event information for root-cause analysis.  Communication with external entities is intended to be in one direction 140 
+with events flowing from this framework outward.  The flow of events from this framework to external entities must not 141 
+affect the latency performance of the framework for intra-node or inter-node delivery. 142 
+Please note that while this API document describes an interface to general events and status provided by the cloud 143 
+infrastructure, the discussions and examples in this document will focus on events and status related to PTP / 144 
+Synchronization as it this is the first defined use case that affects the vO-DU per the CUSP [5] requirements. 145 
+“If an O-DU transits to the FREERUN state, the O-DU shall disable RF transmission on all connected O-RUs, and 146 
+keep it turned off until synchronization is reacquired.” 147 
+“Whether in ‘synchronized’ or ‘Holdover’ state, it is expected that O-DU monitors the ‘SYNCED/HOLDOVER’ status 148 
+of the O-RUs under its management.” 149 
+Please note that the timing requirements for notification regarding FREERUN should follow WG4 guidelines when 150 
+available in the CUSP document. These guidelines may influence the future evolution and design of this API. Please see 151 
+the CUSP [5] for more information. 152 
+ 153 
+Subscription/Publication use case:  154 
+- Subscription by the Event Consumer (e.g. vO-DU or other CNF) triggers the readiness of the Event Consumer 155 
+to receive the notifications.   156 
+- The REST API handler implementation, provided by the Cloud infrastructure, resides in the application 157 
+(workload) and is an application appropriate implementation of a REST API handler. 158 
+- Upon subscription, the EC will receive an initial notification of the EP resource status. For example, the 159 
+current synchronization status of the PTP system will be sent to the EC when subscribing to the sync-status 160 
+address. Or as another example, the current interface carrier status will be sent to the EC when subscribing to 161 
+the interface-status address.  This initial notification allows the joining application to synchronize to the current 162 
+status of the system being observed. 163 
+- Event Consumers will be able to subscribe to resource status notifications offered by the cloud. 164 
+- Multiple Event Consumers in the same container, Pod, or VM can subscribe to events and status as the REST 165 
+API allows multiple receive endpoint URI. 166 
+- If the eventing framework cannot provide the requested subscription the eventing framework will deny the 167 
+subscription request and Event Consumer (vO-DU, vO-CU etc) will be able to make a decision if to proceed 168 
+with its operation     169 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  7 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   170 
+Chapter 3 Usage of HTTP  171 
+ General  172 
+HTTP/2, IETF RFC 7540, shall be used. 173 
+ HTTP/2 shall be transported over Transmission Control Protocol (TCP), 174 
+as required by HTTP/2 (see IETF RFC 7540 [8]) HTTP standard headers 175 
+ 176 
+ Request header fields 177 
+This clause describes the usage of selected HTTP header fields of the request messages in the O-Cloud APIs.  178 
+ 179 
+Table 3.1.3.2-1: Header fields supported in the request message 180 
+ 181 
+Header field name Reference Descriptions 
+Accept IETF RFC 7231 [10] This field is used to specify response media types that are 
+acceptable by the client sending the request. 
+Content-Types that are acceptable for the response. 
+This header field shall be present in the HTTP request message 
+sent by the client  if the response is expecte d to have a non-
+empty message body. 
+Content-Type IETF RFC 7231 [10] This field is used to indicate the media type of the associated 
+representation. 
+This header field shall be present if the request has a non-empty 
+message body. 
+Authorization IETF RFC 7235 [13] The authorization token for the request  and is optional. In a 
+local scenario (i.e. within the POD/VM) this is not mandated. If 
+the consumer is external to the POD/VM then Authorization is 
+mandated. 
+Accept-Encoding IETF RFC 7231 [10] This field may be  used to indicate what response content -
+encodings (e.g gzip) are acceptable in the response. 
+Content-Length IETF RFC 7230 [11] This field is used to provide the anticipated size, as a decimal 
+number of octets, for a potential payload body. 
+Content-Encoding IETF RFC 7231[10] This field may be used in some requests to indicate the content 
+encodings (e.g gzip) applied to the resource representation  
+beyond those inherent in the media type. 
+ 182 
+ Response header fields 183 
+This clause describes the usage of selected HTTP header fields of the response messages in the O-Cloud APIs.  184 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  8 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   185 
+Table 3.1.3.3-1: Header fields supported in the response message 186 
+ 187 
+Header field name Reference Descriptions 
+Content-Type  IETF RFC 7231 [10] This header field shall be used to indicate the media type of the 
+associated representation. 
+Content-Length IETF RFC 7231 [10] This header field may be used to provide the anticipated size, 
+as a decimal number of octets, for a potential payload body. 
+This header field shall be present if the response has a non-
+empty message body. 
+Location IETF RFC 7231 [10] This field may be used in some responses to refer to a specific 
+resource in relation to the response. 
+Used in redirection, or when a new resource has been created. 
+This header field shall be present if the response status code is 
+201 or 3xx. 
+ 
+Content-Encoding IETF RFC 7231 [10] This header may be used in some responses to indicate to the 
+HTTP/2 client the content encodings (e.g gzip) applied to the 
+resource representation beyond those inherent in the media 
+type. 
+WWW-Authenticate IETF RFC 7235 [13] Challenge if the corresponding HTTP request has not provided 
+authorization, or error details if the corresponding HTTP 
+request has provided an invalid authorization token.  This is 
+optional. Wh en the notification producer and consumer are 
+locally present in the same compute, API authorization is not 
+mandatory. 
+Retry-After IETF RFC 7231 [10] Used to indicate how long the user agent ought to wait before 
+making a follow-up request. 
+It can be used with 503 responses. 
+The value of this field can be an HTTP -date or a number of 
+seconds to delay after the response is received. 
+ 188 
+ Content type 189 
+JSON, IETF RFC 8259 shall be used as content type of the HTTP bodies specified in the present specification.The use 190 
+of the JSON format shall be signaled by the content type "application/json". 191 
+"Problem Details" JSON object shall be used to indicate additional details of the error in a HTTP response body and 192 
+shall be signalled by the content type "application/problem+json", as defined in IETF RFC 7807. 193 
+ Void 194 
+. 195 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  9 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+ Resource addressing 196 
+The format of the resource address is shown in Table 1.  The resource address specifies the Event Producer with a 197 
+hierarchical path.  The path format provides the ability for management and monitoring to extend beyond a single 198 
+cluster and node.   199 
+Table 1: Resource address format 200 
+/{clusterName}/{siteName}(/optional/hierarchy/..)/{nodeName}/{resource} 
+ 
+An example hierarchy could include an IMS and DMS designator i.e., /ims-1/dms-2/node1/ptp/status.   The event 201 
+framework is minimally required to support nodeName addressing.  The event framework addressing nomenclature for 202 
+nodeName shall match the O-Cloud technology naming scheme.   203 
+ 204 
+Field definitions are shown in Table 2. 205 
+Table 2: Resource address fields 206 
+Address Component Description Example 
+/optional/hierarchy/nodeName/... or 
+/./nodeName/... 
+The hierarchical name that uniquely 
+specifies the DMS where the 
+nodeName node resides. name of 
+the cloud where the producer exists.  
+A ‘.’ is used to indicate the current 
+DMS where the Event Consumer 
+nodeName node is located.  The 
+additional hierarchy is optional.  If 
+addressing begins with /./ a 
+nodeName or nodeName wildcard 
+is required. 
+/dms1/nodeName1/... to specify a 
+specif DMS and node, or 
+/./nodeName/...1 to specify the 
+current DMS and specific node 
+/././…... to specify the current DMS 
+and current node. 
+nodeName1 Name of the Worker node or 
+Compute node where the producer 
+exists.  The name must map to the 
+nomenclature in use for the 
+underlying cloud infrastructure.  A 
+regular expression with * or . may 
+be specified to subscribe to multiple 
+nodes. 
+node27 
+node* -> all nodes 
+. -> current node 
+ 
+resource  
+The hierarchical path for the 
+subsystem that will produce the 
+notifications.   The hierarchical path 
+is inclusive such that all 
+notifications for subsystems below 
+the specified path will be delivered 
+as part of the subscription.  The full 
+path can be used to explicitly 
+specify a single type of 
+notification.  Multiple subscriptions 
+can be used to select a subset of 
+A subscription to /sync would 
+deliver notifications for all types of 
+synchronization events 
+implemented by the 
+synchronization subsystem. Since 
+this cover all notification, 
+individual subscriptions (as 
+described below) will be ignored. 
+ 
+A subscription to /sync/sync-
+status/sync-state would deliver 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  10 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+notification types for event 
+delivery.specified level. 
+notifications for the 
+event.sync.sync-
+status.synchronization-state-change 
+event only. 
+ 
+Individual subscriptions to 
+/sync/sync-status/sync-state and 
+/sync/gnss-status/gnss-sync-status 
+would deliver notifications for both 
+the overall synchronization health 
+(event.sync.sync-
+status.synchronization-state-
+change) and GNSS specific status 
+(event.sync.gnss-status.gnss-state-
+change). 
+ 
+Note: In the future, Resource can be 
+expanded to other infrastructure 
+subsystems such as thermal 
+notifications and network interface 
+link status. 
+ 207 
+1Note: This field is part of the environment variables provided to the CNF by the Downward API (see 208 
+https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/#the-downward-209 
+api) 210 
+ 211 
+ 212 
+ 213 
+ 214 
+ 215 
+ 216 
+ 217 
+ 218 
+ 219 
+ 220 
+ 221 
+ 222 
+ 223 
+ 224 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  11 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 4 Subscription API Definition  225 
+ Resource Structure  226 
+Figure 1 shows the overall resource URI structure defined for the subscription’s API. Table 3 lists the individual 227 
+resources defined, and the applicable HTTP methods with the message flow diagram, Figure 2. 228 
+ 229 
+ 230 
+ 231 
+ 232 
+ 233 
+ 234 
+Figure 1: Resource URI structure of the subscription’s API 235 
+ 236 
+ 237 
+ 238 
+               Figure 2: Message flow diagram 239 
+
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  12 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+ 
+ *Helper provided by cloud vendors 
+ 
+Table 3: Resources and methods overview 
+Resource 
+name Resource URI 
+HTTP 
+method or 
+custom 
+operation 
+Description 
+Subscriptions {apiRoot}/ocloudNotifications/{apiMajorVersion}/sub
+scriptions 
+POST To create a new individual 
+subscription resource. 
+GET Get a list of subscription 
+resources. 
+Individual 
+subscription 
+{apiRoot}/ocloudNotifications/{apiMajorVersion} 
+/subscriptions/{subscriptionId} 
+GET Get Detail of individual 
+subscription resources. 
+DELETE Delete individual 
+subscription resources. 
+ 
+ 
+ 240 
+ Resources and HTTP Methods 241 
+An Event Consumer (e.g. vDU or other CNF) will use a POST request to subscribe to receive notifications per its 242 
+desirable resource.  This resource is mapped to a data type/payload (see data model).  243 
+Workload Helper* 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  13 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  The POST’s payload will also include the notification endpoint (callback URI) for the API Producer to send the 244 
+notifications back to the EC. 245 
+The API Producer, in this case the Helper (see appendix A), will validate that the resource requested is offered by the 246 
+cluster and available at the particular address.  If the resource does not exist an error code will be sent to the client’s 247 
+EndpointURI. This will be followed by a sanity check of the requested notification endpoint and creating the resource if 248 
+communication to the notification endpoint is successful. To reduce security concerns and lifecycle management burden 249 
+the notification endpoint URI must be part of the same localhost, this is the localhost shared by the Event Consumer and 250 
+Helper, with the assumption that they are located in the same POD or VM. 251 
+  Subscription resource definition 252 
+The resource URI is: 253 
+{apiRoot}/ocloudNotifications/{apiMajorVersion}/subscriptions 254 
+The resource URI variables supported by the resource shall be defined as Table 4 illustrates. 255 
+   Table 4: Resource URI variables for this resource 256 
+Name Definition 
+apiRoot described in clause 4.4.1 of 3GPP TS 29.501  
+apiMajorVersion v1 (subject to change in future, v2..vN) 
+ 257 
+ Subscription POST Method 258 
+The POST method creates a subscription resource for the Event Consumer.  As the result of successfully executing this 259 
+method, a new subscription resource shall exist as defined in clause 1.2, and a variable value (subscriptionId) will be 260 
+used in the representation of that resource. An initial status notification for the type of event  (for example, PTP 261 
+synchronization status) shall be triggered.  The status describes the initial status of the producer resource when 262 
+successfully executing this method as defined in clause 1.1.4, followed by any PTP status notifications (triggered if 263 
+there is a change in PTP status). 264 
+ 265 
+URI query parameters supported by the method shall be defined as Table 5 illustrates. 266 
+Table 5: URI query parameters supported by a method on the resource 267 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 268 
+Data structures supported by the request body of the POST method shall be specified as Table 6 illustrates. 269 
+Table 6: Data structures supported by the request body on the resource 270 
+Data type P Cardinality Description 
+Subscriptioninfo M 1 The payload will include an event notification request, 
+endpointUri and  ResourceAddress (NodeName in this 
+case). See note below. 
+ 271 
+Note: The Subscriptioninfo is defined in the subscription data model section 272 
+ 273 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  14 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  Data structures supported by the response body of the method shall be specified as Table 7 illustrates. 274 
+Table 7: Data structures supported by the response body on the resource 275 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+SubscriptionInfo M 1 201 Shall be returned when the 
+subscription resource is created 
+successfully. 
+See note below. 
+n/a   400 Bad request by the EC. For example, 
+the endpoint URI does not include 
+‘localhost’. 
+n/a   404 Subscription resource is not 
+available. For example, PTP is not 
+supported by the node. 
+n/a   409 The subscription resource already 
+exists. 
+ 276 
+Note: The SubscriptionInfo is defined in the subscription data model section, see Table 30 277 
+ 278 
+Example Create Subscription Resource: JSON request 279 
+ 280 
+{ 
+{ 
+"ResourceAddress": "/east-edge-10/vdu3/sync-source", 
+"EndpointUri "http://localhost:{port}/{path} 
+ } 
+} 
+ 
+ 281 
+ 282 
+Example Create Subscription Resource: JSON response 283 
+ 284 
+{ 
+“SubscriptionId”: “789be75d-7ac3-472e-bbbc-6d62878aad4a”, 
+"ResourceAddress": "/east-edge-10/vdu3/sync-source", 
+“UriLocation”: “http://localhost:8080/ocloudNotifications/v1/subsciptions/789be75d-7ac3-472e-bbbc-
+6d62878aad4a” 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  15 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+"EndpointUri ": "http://localhost:9090/publishers/{publisherid}" 
+ 
+} 
+ 285 
+ Subscription GET Method 286 
+The GET method queries the subscription object and its associated properties.  As a result of a successful execution of 287 
+this method a list of subscription object(s) and their associated properties will return by the API Producer. 288 
+ 289 
+URI query parameters supported by the method shall be defined as Table 8 illustrates. 290 
+ 291 
+    Table 8: URI query parameters supported by a method on the resource 292 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 293 
+ 294 
+Data structures supported by the response body of the method shall be specified as Table 9 illustrates. 295 
+ 296 
+ 297 
+Table 9: Data structures supported by the response body on the resource 298 
+ 
+ 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+SubscriptionInfo M 0..N 200 Returns the subscription resources 
+and their associated properties that 
+already exist.  
+See note below. 
+n/a O 0..1 400 Bad request by the EC. For example, 
+the endpoint URI does not include 
+‘localhost’. 
+ 299 
+Note: The SubscriptionInfo is defined in the subscription data model section, see Table 30 300 
+ Individual subscription resource definition 301 
+The resource URI is: 302 
+{apiRoot}/ocloudNotifications/{apiMajorVersion}/subscriptions/{subscriptionId} 303 
+ 304 
+The resource URI variables supported by the resource shall be defined as Table 10 illustrates. 305 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  16 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   306 
+Table 10: Resource URI variables for this resource 307 
+Name Definition 
+apiRoot described in clause 4.4.1 of 3GPP TS 29.501  
+apiMajorVersion v1 (subject to change in future, v2..vN) 
+subscriptionId Identifier for subscription resource, created after a successful subscription. See table 
+Data Model’s table 30  
+ 308 
+ Individual Subscription DELTE Method 309 
+The DELETE method deletes an individual subscription resource object and its associated properties. As the result of a 310 
+successful execution of this method a subscription resource object (the one associated with the subscriptionId) and its 311 
+associated properties will be deleted by the API Producer. 312 
+ 313 
+URI query parameters supported by the method shall be defined as Table 11 illustrates. 314 
+    Table 11: URI query parameters supported by a method on the resource 315 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 316 
+Data structures supported by the request body of the DELETE method shall be specified as Table 12 illustrates. 317 
+Table 12: Data structures supported by the request body on the resource 318 
+Data type P Cardinality Description 
+n/a    
+ 319 
+ 320 
+Data structures supported by the response body of the method shall be specified as Table 13 illustrates. 321 
+ 322 
+Table 13: Data structures supported by the response body on the resource 323 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+n/a   204 DELETE 
+../subscriptions/{subscriptionId} deletes 
+an individual subscription resource. 
+ 324 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  17 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+ Individual Subscription GET Method 325 
+The GET method combined with the subscriptionId variable queries an individual subscription object and its associated 326 
+properties. As a result of successful execution of this method an individual subscription resource object (the one 327 
+associated with the subscriptionId) and its associated properties will return by the API Producer. 328 
+ 329 
+URI query parameters supported by the method shall be defined as Table 14 illustrates. 330 
+ 331 
+ Table 14: URI query parameters supported by a method on the resource 332 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 333 
+Data structures supported by the request body of the GET method shall be specified as Table 15 illustrates. 334 
+ 335 
+Table 15: Data structures supported by the request body on the resource 336 
+Data type P Cardinality Description 
+n/a    
+ 337 
+Data structures supported by the response body of the method shall be specified as Table 16 illustrates. 338 
+ 339 
+ 340 
+ 341 
+Table 16: Data structures supported by the response body on the resource 342 
+ 
+ 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+SubscriptionInfo  M 1 200 Returns the subscription resource object 
+and its associated properties. 
+See note below. 
+n/a   404 Subscription resources are not available 
+(not created). 
+    343 
+Note: The SubscriptionInfo is defined in the subscription Data Model section 344 
+ 345 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  18 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 5 Status Notifications API Definition  346 
+ Description  347 
+After a successful subscription (a subscription resource was created) the Event Consumer (e.g. vO-DU or other CNF) 348 
+shall be able to receive event notifications from the subscribed resource.   349 
+Events are sent by the Event Framework when a change of resource state occurs.  The significance of the change of 350 
+state is dependent upon the Event Producer service.  An example for the PTP use case might be that a synchronization-351 
+state-change has occurred, i.e. FREERUN->LOCKED or LOCKED->HOLDOVER.   352 
+The HTTP method for delivering the notification (push) to the EC shall be POST and the notification shall be sent to the 353 
+endpoint reference provided by the EC client during the creation of the subscription resource (see Table 17  The 354 
+payload body of the POST request shall contain the event payload (see event data model). 355 
+Figure 3 illustrates an intra-node (local notification) event delivery.  In this example, the following occurs: 356 
+1. The Event Framework determines that an event condition has occurred 357 
+2. The Event Consumer (vO-DU etc) has previously subscribed to the event type and the API Producer performs 358 
+a POST to the EV (vO-DU etc) with the complete JSON event payload 359 
+ 360 
+Figure 3: Local Notification 361 
+ 362 
+ 363 
+ 364 
+ 365 
+
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  19 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   366 
+ 367 
+Table 17: API Producer Notification methods overview 368 
+Resource URI HTTP method or custom 
+operation 
+Description 
+http://localhost:{port}/{path} 
+  
+POST Deliver notification to subscriber. 
+Sanity check of the endpoint URI. 
+ 
+ Event Consumer Notification Resource Definition 369 
+The EC’s endpoint URI is used by the API Producer (Helper) to deliver events to the Event Consumer (e.g. vO-DU or 370 
+CNF). 371 
+The EC’s Endpoint URI2 is:  372 
+http://localhost:{port}/{path} 373 
+The resource URI variables supported by the resource shall be defined as Table 18 illustrates. 374 
+ 375 
+Table 18 Resource URI variables for this resource 376 
+Name Definition 
+Port The port of the endpoint URI provided by the subscriber  
+Path The path of the endpoint URI provided by the subscriber 
+ 377 
+ Consumer Notification Delivery Method 378 
+The HTTP method for the notification that corresponds to an explicit subscription shall be POST and the notification 379 
+shall be sent to the endpoint reference provided during the creation of the subscription resource. The payload body of 380 
+the POST request shall contain the event notification payload (see event data model). 381 
+URI query parameters supported by the method shall be defined as Table 19 illustrates. 382 
+ 383 
+__________________________________________________________ 384 
+2Note: To reduce security concerns and lifecycle management burden the endpoint URI must be part of the same 385 
+localhost, this is the localhost shared by the EC and API Producer in a POD or VM.   386 
+ 387 
+Table 19: URI query parameters supported by a method on the resource 388 
+Name Data Type P Cardinality Description Applicability 
+n/a      
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  20 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   389 
+Data structures supported by the request body of the POST method shall be specified as Table 20 illustrates. 390 
+Table 20: Data structures supported by the request body on the resource     391 
+Data type P Cardinality Description 
+Event M 1 The payload will include event notification3. 
+ 
+Data structures supported by the response body of the method shall be specified as Table 21 illustrates. 392 
+Table 21: Data structures supported by the response body on the resource 393 
+ 
+ 
+ 
+ 
+ 
+     Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+n/a M 1 204 Success (notification was received).  
+n/a   400 Bad request by the API Producer. 
+n/a   404 Not found.  
+n/a   408 Request timeout. 
+ 
+    394 
+ 395 
+ 396 
+ 397 
+ 398 
+ 399 
+ 400 
+ 401 
+ 402 
+ 403 
+__________________________________________ 404 
+3Note: The Notification is defined in the notification Data Model section 405 
+ 406 
+ 407 
+Figure 4 shows an example event notification payload received by an Event Consumer. 408 
+  Figure 4: Example Push Event Notification: request body in JSON 409 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  21 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+{ 
+  "specversion" : "1.0",  
+  "type" : ”event.synchronization-state-change", 
+  "source" : “/sync/sync-status/sync-state", 
+  "id" : "831e1650-001e-001b-66ab-eeb76e069631",  
+  "time" : "2021-03-05T20:59:59.998888999Z", 
+  “data”: {  
+     "version" : “1.0”,  
+     “values” : [ 
+          {  
+              “type”: “notification” 
+              “ResourceAddress” : “/east-edge-10/vdu3/sync-source”,               “value_type” : “enumeration”, 
+               "value" : ”HOLDOVER" 
+          } 
+    ] 
+  } 
+} 
+ 
+ 410 
+ Notification Sanity Check Method 411 
+The Event Consumer POST request to create a subscription resource will trigger the initial delivery of producer status 412 
+of the resource that will be sent to the endpoint URI provided by Event Consumer. The purpose is to confirm that the 413 
+endpoint URI is valid and to send the initial status for the resource. If the validation fails, the subscription for the 414 
+resource will not be created.     415 
+ 416 
+URI query parameters supported by the method shall be defined as Table 22 illustrates. 417 
+   Table 22: URI query parameters supported by a method on the resource 418 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 419 
+Data structures supported by the request body of the POST method shall be specified as Table 23 illustrates. 420 
+ 421 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  22 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   Table 23: Data structures supported by the request body on the resource 422 
+Data type P Cardinality Description 
+Event M 1 The payload will include event notification. See note below. 
+ 423 
+Note: The Notification is defined in the notification Data Model section 424 
+ 425 
+Data structures supported by the response body of the method shall be specified as Table 24 illustrates. 426 
+Table 24: Data structures supported by the response body on the resource 427 
+ 
+ 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+n/a M 1 204 The API Producer tests the endpoint URI 
+before creating a subscription resource.  
+n/a O 0..1 404 URI not found. 
+ 428 
+ 429 
+ 430 
+ 431 
+ 432 
+ 433 
+ 434 
+ 435 
+ 436 
+ 437 
+ 438 
+ 439 
+ 440 
+ 441 
+ 442 
+ 443 
+ 444 
+ 445 
+ 446 
+ 447 
+ 448 
+ 449 
+ 450 
+ 451 
+  452 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  23 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 6 Event Pull Status Notifications API Definition  453 
+ Description 454 
+In addition to receiving event status notifications the Event Consumer (e.g. vO-DU or CNF) shall be able to pull event 455 
+status notifications. This status notifications will be limited only to the node that the vO-DU resides on. 456 
+Figure 5 illustrates event pull status notifications and Table 25 describes resources and methods.  457 
+ 458 
+Figure 5: Pull Notifications 459 
+ 
+*Helper is provided by cloud vendors 
+   460 
+Event Consumer / API Consumer 
+ 
+API Producer 
+1. GET PTP Status 
+Helper 
+vDU 
+2. 200 OK with event status content 
+Event Consumer / API Consumer 
+ API Producer 
+Workload 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  24 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  Table 25: Pull Events Notifications methods overview 461 
+Resource name Resource URI HTTP 
+method or 
+custom 
+operation 
+Description 
+Pull Status Notifications {apiRoot}/ocloudNotifications/{api
+MajorVersion}/{ResourceAddress
+}/CurrentState 
+ 
+GET Event Consumer pulls status 
+notifications 
+ 
+ 
+ 
+ Resources Pull Status Notification Definition 462 
+The resource URI is: 463 
+{apiRoot}/ocloudNotifications/{apiMajorVersion}/{ResourceAddress}/CurrentState 464 
+The resource URI variables supported by the resource shall be defined as Table 26 illustrates. 465 
+ 466 
+Table 26: Resource URI variables for this resource 467 
+Name Definition 
+apiRoot described in clause 4.4.1 of 3GPP TS 29.501  
+apiMajorVersion v1 (subject to change in future, v2..vN) 
+ResourceAddress see Table 1 
+ Event Pull Status Notification GET Method 468 
+The GET method combined with the ResourceAddress variable pulls the event status notifications. As a result of 469 
+successful execution of this method the Event Consumer will receive the current event status notifications of the node 470 
+that the Event Consumer resides on. 471 
+URI query parameters supported by the method shall be defined as Table 27 illustrates. 472 
+Table 27: URI query parameters supported by a method on the resource 473 
+Name Data type P Cardinalit
+y Description Applicability 
+n/a      
+ 474 
+Data structures supported by the request body of the GET method shall be specified as Table 28 illustrates. 475 
+ 476 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  25 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  Table 28: Data structures supported by the request body on the resource 477 
+Data type P Cardinality Description 
+n/a    
+ 478 
+Data structures supported by the response body of the method shall be specified as Table 29 illustrates. 479 
+ 480 
+Table 29: Data structures supported by the response body on the resource 481 
+ 
+ 
+ 
+ 
+Response body 
+Data type P Cardinalit
+y 
+Response 
+codes 
+Description 
+Event M 1 200 The payload includes event notification as 
+defined in the Data Model. 
+n/a O 0..1 404 Event notification resource is not available on 
+this node. 
+ 482 
+Editor’s note: Currently the pull status operator returns the PTP Sync State event as defined in PTP Sync-State.  In 483 
+future versions of this specification, status information can be expanded to other metrics / information pertinent to the 484 
+operation of the system.   485 
+  486 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  26 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Chapter 7 Event Data Model  487 
+ Subscription Data Model 488 
+This clause specifies the subscription data model supported by the API. 489 
+ Structured data types 490 
+This clause defines the structures to be used in resource representations. 491 
+ Type: SubscriptionInfo 492 
+Table 30 shows the data types used for subscription. 493 
+Table 30: Definition of type <SubscriptionInfo> 494 
+Attribute name Data type P Cardinality Description Applicability 
+SubscriptionId string M 1 Identifier for the created subscription 
+resource. 
+The EC can ignore it in the POST body 
+when creating a subscription resource 
+(this will be sent to the client after the 
+resource is created). 
+See note 1 below. 
+ 
+UriLocation string M 1 ../subscriptions/{subscriptionId} 
+The EC can ignore it in the POST body 
+when creating a subscription resource 
+(this will be sent to the client after the 
+resource is created). 
+See note 1 below. 
+ 
+ResourceAddress string M 1 see Resource Addressing  
+EndpointUri string M 1 Endpoint URI (a.k.a callback URI), e.g. 
+http://localhost:8080/resourcestatus/pt
+p 
+Please note that ‘localhost’ is 
+mandatory and cannot be replaced 
+by an IP or FQDN. 
+ 
+ 495 
+Note 1: The API Producer (Helper) shall ignore SubscriptionId and UriLocation if sent by the EC for creating 496 
+subscription. 497 
+ Status Notifications Data Model 498 
+This clause specifies the event Status Notification data model supported by the API.  The current model supports JSON 499 
+encoding of the CloudEvents.io specification [15]  for the event payload.  500 
+ Structured data types 501 
+This clause defines the structures to be used in notification representations.  502 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  27 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  Table 31 shows the data types used in the event data model JSON. 503 
+ 504 
+ 505 
+ 506 
+ 507 
+ 508 
+ 509 
+Table 31: Data Model Types 510 
+CloudEvents JSON 
+Boolean boolean 
+Integer number, only the integer component optionally prefixed with a minus sign is 
+permitted 
+String string 
+Binary string, Base64-encoded binary 
+URI string following RFC 3986 
+URI-reference string following RFC 3986 
+Timestamp string following RFC 3339 (ISO 8601) 
+ 
+ Event Data Model 511 
+ 
+ 512 
+ 513 
+ 514 
+Table 32: Top-Level JSON Schema 515 
+Property Type Constraint Description 
+id String rcv-only Identifies the event.  The Event Producer SHALL ensure that 
+source + id is unique for each distinct event. 
+type String req This attribute contains a value describing the type of event 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  28 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+related to the originating occurrence. 
+source URI-reference rcv-only Identifies the context in which an event happened. 
+specversion String rcv-only The version of the CloudEvents specification which the event 
+uses. This enables the interpretation of the context. 
+time Timestamp req Time at which the event occurred. 
+data String  
+(JSON array) 
+req Array of JSON objects defining the information for the event   
+version String req Version of the Notification API Schema generating the event. 
+‘1.0’ until a future revision. 
+values String 
+(JSON array) 
+req A json array of values defining the event. 
+ 
+ 
+ 516 
+Table 35: Data Array Object Schema 517 
+Property Type Description 
+data_type String Type of value object. ( notification | metric) 
+ResourceAddress String 
+(path) 
+See Table 2   
+value_type Enumeration The type format of the value property () 
+value String String representation of value in value_type format 
+Table 34 shows an example event that contains Sync-State information. 
+Table 34: Example Event -- Sync-State 
+{ 
+    "id": "A 234-1234- 1234" , 
+    "specversion" : "1.0", 
+    "s ource ": "/sync/sync -status/sync -state" , 
+    "type ": "event.sync.sync -status.synchroni zati on- state -change" , 
+    "tim e ": "2021 -03-05T20:59:00.999999999Z" , 
+    " data": { 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  29 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+        " versi on": "1.0", 
+        " val ues": [ 
+            { 
+                "data_type" : "n otific a tio n ", 
+                "ResourceAddress" : "/east-edge-10/Node3/sync/sync -status/sync -state" , 
+                "value_type" : "enumeration" , 
+                "va lu e ": "HOLDOVER" 
+            } 
+        ] 
+    } 
+} 
+ 
+ 
+ Synchronization Event Specifications 518 
+The following sections define the events related to synchronization events. 519 
+Editor's Note: synchronization state change events are addressed first due to priority of the RAN use cases, the event 520 
+distribution infrastructure and associated interfaces are not limited to one specific event category, and events from other 521 
+subsystems will be added in the future versions of this document. 522 
+Editor's Note: the present event set is aligned with / based on the WG4/WG5 YANG models; however, use of some 523 
+other definitions such as composite clock modes in G.8275 (10/2020), Appendix VIII (or composite of the two 524 
+approaches) *may* be more useful to convey the information in detail required to adequately specify the states in the 525 
+cloud nodes context.  526 
+ 527 
+ Synchronization State 528 
+This notification abstracts the underlying technology that the node is using to synchronize itself. It provides the overall 529 
+synchronization health of the node. This notification includes the health of the OS System Clock which is consumable 530 
+by application(s). 531 
+ 532 
+Table 36: Synchronization State Notification 533 
+ 534 
+Property Value Description 
+type event.sync.sync-
+status.synchronization-state-
+change  
+Notification used to inform about the overall synchronization 
+state change 
+source /sync/sync-status/sync-state Overall synchronization health of the node, including the 
+OS System Clock 
+value_type enumeration  
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  30 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+ 
+ 
+value 
+LOCKED Equipment is in the locked mode, as defined in ITU-T 
+G.810 
+HOLDOVER Equipment clock is in holdover mode, as defined in ITU-T 
+G.810 
+FREERUN Equipment clock isn't locked to an input reference, and is 
+not in the holdover mode, as defined in ITU-T G.810 
+  535 
+ PTP Synchronization State 536 
+Table 37: Synchronization State Notification 537 
+Property Value Description 
+type event.sync.ptp-status.ptp-state-
+change  
+Notification used to inform about ptp synchronization state 
+change 
+source /sync/ptp-status/lock-state ptp-state-change notification is signalled from equipment at 
+state change 
+value_type enumeration  
+ 
+ 
+value 
+LOCKED Equipment is in the locked mode, as defined in ITU-T 
+G.810 
+HOLDOVER Equipment clock is in holdover mode, as defined in ITU-T 
+G.810 
+FREERUN Equipment clock isn't locked to an input reference, and is 
+not in the holdover mode, as defined in ITU-T G.810 
+ 538 
+ Void 539 
+ Void 540 
+ GNSS-Sync-State 541 
+Table 40: GNSS-Sync-State Notification 542 
+Property Value Description 
+type event.sync.gnss-status.gnss-state-
+change 
+Notification used to inform about gnss synchronization state 
+change 
+source /sync/gnss-status/gnss-sync- gnss-state-change notification is signalled from equipment 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  31 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+status at state change 
+value_type enumeration  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+value 
+SYNCHRONIZED GNSS functionality is synchronized 
+ACQUIRING-SYNC GNSS functionality is acquiring sync 
+ANTENNA-DISCONNECTED GNSS functionality has its antenna disconnected 
+BOOTING GNSS functionality is booting 
+ANTENNA-SHORT-CIRCUIT GNSS functionality has an antenna short circuit 
+FAILURE-MULTIPATH GNSS Sync Failure -  Multipath condition detected 
+FAILURE-NOFIX GNSS Sync Failure - Unknown 
+FAILURE-LOW-SNR GNSS Sync Failure - Low SNR condition detected 
+FAILURE-PLL GNSS Sync Failure - PLL is not functioning 
+ Void 543 
+ OS Clock Sync-State 544 
+Table 37: OS clock Sync-State Notification 545 
+Property Value Description 
+type event.sync.sync-status.os-clock-
+sync-state-change 
+The object contains information related to a notification 
+source /sync/sync-status/os-clock-sync-
+state 
+State of node OS clock synchronization is notified at state 
+change 
+value_type enumeration  
+ 
+ 
+value 
+LOCKED Operating System real-time clock is in the locked mode, 
+node operating system clock is synchronized to traceable & 
+valid time/phase source 
+HOLDOVER Operating System real-time clock is in holdover mode 
+FREERUN Operating System real-time clock isn't locked to an input 
+reference, and is not in the holdover mode 
+ 546 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  32 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+    547 
+ SyncE Lock-Status-Extended 548 
+This notification is a companion to the SyncE Lock-state notification and provides additional detail about the synce 549 
+PLL states. 550 
+Table 39: SyncE-Extended Lock-State Notification 551 
+Property Value Description 
+type event.sync.synce-status.synce-
+state-change-extended 
+Notification used to inform about synce synchronization 
+state change, enhanced state information 
+source /sync/synce-status/lock-state-
+extended 
+synce-state change notification is signalled from equipment 
+at state change, enhanced information 
+value_type enumeration  
+ 
+ 
+value 
+LOCKED The integrated ordinary clock is synchronizing to the 
+reference, recovered from SyncE signal 
+HOLDOVER The integrated ordinary clock is not synchronizing to 
+the reference recovered from the SyncE signal, and is 
+in holdover mode 
+FREERUN The integrated ordinary clock is not synchronizing to 
+the reference, recovered from SyncE signal 
+ 
+ PTP Clock Class Change 552 
+A PTP Clock Class change notification is generated when the PTP clock change attribute in the Announce message 553 
+changes.   554 
+Table 36: PTP Clock class change Notification 555 
+Property Value Description 
+type event.sync.ptp-status.ptp-clock-
+class-change  
+Notification used to inform about ptp clock class changes.   
+source /sync/ptp-status/clock-class ptp-clock-class-change notification is generated when the 
+clock-class changes.   
+value_type metric  
+value Uint8 New clock class attribute 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  33 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   556 
+ SyncE Clock Quality Change 557 
+A SyncE Clock Quality change notification is generated when the SyncE clock quality attribute in the Announce 558 
+message changes.   559 
+Table 43: SyncE Clock class change Notification 560 
+Property Value Description 
+type event.sync.synce-status.synce-
+clock-quality-change  
+Notification used to inform about changes in the clock 
+quality of the primary SyncE signal advertised in ESMC 
+packets 
+source /sync/synce-status/clock-quality synce-clock-quality-change notification is generated when 
+the clock-quality changes.   
+value_type metric  
+value Uint8 New clock quality attribute 
+ 561 
+  562 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  34 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+   563 
+ 
+ Appendix A 564 
+ Helper/Sidecar containers 565 
+Reference: https://kubernetes.io/blog/2015/06/the-distributed-system-toolkit-patterns/ 566 
+Helper/Sidecar containers extend and enhance the "main" container, they take existing containers and make them 567 
+better.   568 
+As an example, consider a container that runs the Nginx web server.  Add a different container that syncs the file system 569 
+with a git repository, share the file system between the containers and one has built built Git push-to-deploy. And it has 570 
+been done in a modular manner where the git synchronizer can be built by a different team, and can be reused across 571 
+many different web servers (Apache, Python, Tomcat, etc).  Because of this modularity, the git synchronizer may be 572 
+written and tested only once and reused across numerous apps.  573 
+ 574 
+Helper/Sidecar value: 575 
+• Interacts with the notification framework on behalf of the vO-DU 576 
+• Decouples the app logic from the notification framework, hence removes the burden of implementing a lot of code 577 
+on the vO-DU and maintaining this code 578 
+• Single secure and reliable API endpoint since it is exposed over the localhost 579 
+• Eliminating the discovery of an external pod implementation 580 
+  581 
+
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  35 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Annex ZZZ: O-RAN Adopter License Agreement 582 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER 583 
+AGREES TO THE TERMS OF THIS AGREEMENT. 584 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity 585 
+that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 586 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 587 
+Section 1: DEFINITIONS 588 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 589 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 590 
+fifty (50%) percent or more of the voting stock or equity in an entity. 591 
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, 592 
+software or combinations thereof) that fully conforms to a Final Specification. 593 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 594 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 595 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not 596 
+add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 597 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 598 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 599 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 600 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such 601 
+Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a 602 
+third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not 603 
+included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not 604 
+commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date 605 
+any Final Specification was published by the O -RAN Alliance or the date the patent claim first came into existence, 606 
+whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or opera te a Compliant Implementation 607 
+without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be 608 
+implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered 609 
+Necessary Claims. 610 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 611 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a t erm 612 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing 613 
+Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 614 
+Section 2: COPYRIGHT LICENSE 615 
+2.1 Subject to the terms and conditions of this Agreement, O -RAN Alliance hereby grants to Adopter a nonexclusive, 616 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O -RAN 617 
+Specifications, but not to further distribute such O -RAN Specification in any modified or unmodified way, solely in 618 
+furtherance of implementations of an ORAN 619 
+Specification. 620 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 621 
+agreement with O-RAN Alliance. 622 
+Section 3: FRAND LICENSE 623 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 624 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) term s and 625 
+conditions with or without compensation (royalties) a nonexclusive, non- transferable, irrevocable (but subject to 626 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 627 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 628 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  36 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that 629 
+is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant 630 
+to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 631 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 632 
+customers of such licensed Compliant Implementations. 633 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 634 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 635 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 636 
+its Affiliates for its license of Necessary Claims to its licensees. 637 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement 638 
+to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non-639 
+Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non -640 
+transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their 641 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant 642 
+Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a 643 
+Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, 644 
+Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as 645 
+set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the 646 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the 647 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant 648 
+Implementations. 649 
+Section 4: TERM AND TERMINATION 650 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 651 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 652 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) 653 
+days after being given notice specifying the breach. 654 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 655 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the 656 
+date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the version 657 
+that was current as of the date of termination. 658 
+Section 5: CONFIDENTIALITY 659 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 660 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. 661 
+Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 662 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 663 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) 664 
+publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by 665 
+O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on 666 
+such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 667 
+governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O -RAN 668 
+Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to 669 
+have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval. 670 
+Section 6: INDEMNIFICATION 671 
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or Academic 672 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 673 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed 674 
+upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments arising 675 
+out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with 676 
+O-RAN Specifications. 677 
+
+                                                                                                      
+________________________________________________________________________________________________  
+Copyright © 2020 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                  37 
+O-RAN.WG6.O-Cloud Notification API-v02.01 
+  
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 678 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 679 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY 680 
+OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 681 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 682 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 683 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O-RAN 684 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 685 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIANCE AND THE 686 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 687 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 688 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY WARRANTY OR 689 
+CONDITION FOR O-RAN SPECIFICATIONS. 690 
+Section 8: ASSIGNMENT 691 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 692 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 693 
+written consent of the O -RAN Alliance, which consent may be withheld in O -RAN Alliance’s sole discretion. O-RAN 694 
+Alliance may freely assign this Agreement. 695 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 696 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 697 
+Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, 698 
+including as licensees under Section 3. 699 
+Section 10: BINDING ON AFFILIATES 700 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 701 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder 702 
+and are also entitled to the benefits of the rights of Adopter hereunder. 703 
+Section 11: GENERAL 704 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  705 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 706 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 707 
+to the subject matter of this Agreement.  708 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulations 709 
+with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and 710 
+antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any 711 
+communication that would violate the antitrust laws. 712 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 713 
+or O -RAN A lliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 714 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 715 
+Contributors or Academic Contributors. 716 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void 717 
+or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from 718 
+the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full 719 
+force and effect. 720 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 721 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be 722 
+construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or 723 
+rely upon any such pr ovision, right or remedy in that or any other instance; rather the same shall be and remain in full 724 
+force and effect. 725 

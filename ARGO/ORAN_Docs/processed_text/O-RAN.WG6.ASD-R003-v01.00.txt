@@ -1,0 +1,132 @@
+Contents
+List of figures	3
+List of tables	3
+Foreword	4
+Modal verbs terminology	4
+1	Scope	5
+2	References	5
+2.1	Normative references	5
+2.2	Informative references	5
+3	Definition of terms, symbols and abbreviations	5
+3.1	Terms	5
+3.2	Symbols	6
+3.3	Abbreviations	6
+4	Objective	6
+5	Conventions	6
+6	Application Service Descriptor information elements	7
+6.1 	Overview	7
+6.2 	Application Service Descriptor Information Element	8
+6.3 	Deployment Item (DeploymentItem) Information Element	9
+6.4 	External connection point (ExtCpd) Information Element	10
+6.5	NetworkInterfaceRealizationRequirements Information Element	10
+6.6	ExtCpdParamMappings Information Element	13
+6.7	EnhancedClusterCapabilities Information Element	14
+Annex (informative):  Change History	16
+List of figures
+Figure 6.1-1: DeploymentDescriptor with ASD representation	8
+List of tables
+Table 6.2-1: ASD Information Model	8
+Table 6.3-1: DeploymentItem IE	9
+Table 6.4-1: ExtCpd IE	10
+Table 6.5-1 NetworkInterfaceRealizationRequirements IE	10
+Table 6.6-1: ExtCpdParamMappings IE	13
+Table 6.7-1: EnhancedClusterCapabilities IE	14
+Foreword
+This Technical Specification (TS) has been produced by WG6 of the O-RAN Alliance.
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+1	Scope
+The present document specifies the structure and format of the Application Service Descriptor (ASD).
+2	References
+2.1	Normative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are necessary for the application of the present document.
+[1]	Kubernetes label key-value-nomenclature https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+[2]	O-RAN-WG6.ORCH-USE-CASES-R003: “Cloudification and Orchestration Use Cases and Requirements for O-RAN Virtualized RAN”.
+2.2	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+[i.1]	O-RAN.WG6.AppLCM-Deployment-R003-v01.00: “Application Life Cycle Management (LCM) for Deployment Technical Recommendation”.
+[i.2]	O-RAN.WG10.OAM-Architecture-R003: “O-RAN Operations and Maintenance Architecture”.
+[i.3]	Kubernetes node features https://kubernetes-sigs.github.io/node-feature-discovery/stable/get-started/index.html
+3	Definition of terms, symbols and abbreviations
+3.1	Terms
+For the purposes of the present document, the terms given in [2] apply.
+3.2	Symbols
+Void.
+3.3	Abbreviations
+For the purposes of the present document, the following abbreviations apply:
+ASD	Application Service Descriptor
+CNI	Container Network Interface
+DC	Data Center
+DPDK	Data Plane Development Kit
+GARP	Gratuitous ARP (Address Resolution Protocol)
+GPU	Graphics Processing Unit
+IPAM	IP Address Management
+K8s	Kubernetes
+LAG	Link Aggregation Group
+LI	Lawful Interception
+MAC	Media Access Control
+NAD	Network Attachment Definition
+NF	Network Function
+NW	Network
+OAM	Operations, Administration and Management
+O-RAN	Open Radio Access Network
+OVS	Open vSwitch
+PCIe	Peripheral Component Interconnect Express
+PF	Physical Function
+SMO	Service Management and Orchestration
+SR-IOV	Single Root I/O Virtualization
+URI	Uniform Resource Identifier
+UUID	Universally Unique Identifier
+VLAN	Virtual Local Area Network
+VF	Virtual Function
+vNIC	virtual Network Interface Card
+VPN	Virtual Private Network
+VPP	Vector Packet Processing
+4	Objective
+The present document delivers a specification of the information elements and attributes applicable to the ASD.
+5	Conventions
+The attributes of the ASD information elements are described in the tables provided in section 6.2. Each table has 5 columns, with the following significance:
+The "Attribute" column provides the attribute name.
+The "Qualifier" column indicates whether the support of the attribute is mandatory, optional or conditional from the SMO perspective.
+The "Cardinality" column contains the minimum and maximum cardinality of this information element (e.g., 1, 0 … N, 1 … N). A cardinality range starting with 0 indicates that the attribute need not always be included and 1 indicates that the attribute needs to be always included.
+The "Type" column provides information on the type of the attribute values. It can be the name of an Information Element. If a cell in the "Type" is marked as "Not specified", which indicates that the specification of the type is left to the data model.
+The "Description" provides a brief explanatory description, additional constraints, and examples.
+6	Application Service Descriptor information elements
+6.1 	Overview
+The Application Service Descriptor (ASD) contains data that describes an application and that is used by the SMO as input for the deployment of the application workload.
+The ASD is a complementary descriptor to the cloud-native deployment artifacts. Hence, it contains design-time information provided by the application vendor that is not described/available in the cloud native artifacts. Such complementary information in the ASD can include specific infrastructure capabilities requirements for the deployment of the application software workload, constraints on the Kernel type needed, additional networking requirements needed beyond primary connectivity described in the cloud native artifacts, any special CNI (Container Network Interfaces), etc [i.1].
+ASD can support an application workload deployment on OS container infrastructures, and it is applicable to O-RAN NF Deployments, xApps, and rApps.
+Figure 6.1-1 illustrates the representation of O-RAN OAM Application Packaging Model as depicted in version 10.00 of [i.2] and shows how the Application Service Descriptor is positioned within the Application Package Model.
+Figure 6.1-1: DeploymentDescriptor with ASD representation
+6.2 	Application Service Descriptor Information Element
+For the O-RAN NF Deployments the Application Service Descriptor (ASD) is a main top level descriptor template which consists of the attributes described in Table 6.2-1 below.
+Table 6.2-1: ASD Information Model
+6.3 	Deployment Item (DeploymentItem) Information Element
+The deploymentItem defined in O-RAN Operations and Maintenance Architecture [i.2] is realized by the DeploymentItem IE which has the DeploymentItem structure described in Table 6.3-1 below.
+The DeploymentItem IE describes the type of cloud native artifact, its order of deployment in case multiple cloud native artifacts are employed with the same ASD, and the list of parameters that can be parameterized in this cloud native deployment artifact at deployment time.
+Table 6.3-1: DeploymentItem IE
+6.4 	External connection point (ExtCpd) Information Element
+The ExtCpd IE describes endpoints exposed by the application to enable orchestrators to string together or optimally place linked applications.
+Table 6.4-1: ExtCpd IE
+6.5	NetworkInterfaceRealizationRequirements Information Element
+The NetworkInterfaceRealizationRequirements IE describes details related to secondary networks that attach the OS containers to the logical or physical networks.
+Table 6.5-1 NetworkInterfaceRealizationRequirements IE
+6.6	ExtCpdParamMappings Information Element
+The ExtCpdParamMappings IE describes required information on what parameters to be provided to the deployment tools for the ExtCpd instance.
+Table 6.6-1: ExtCpdParamMappings IE
+6.7	EnhancedClusterCapabilities Information Element
+The EnhancedClusterCapabilities IE describes information which is used to aid placement of the application service on a suitable cluster.
+Table 6.7-1: EnhancedClusterCapabilities IE
+Annex (informative): 
+Change History

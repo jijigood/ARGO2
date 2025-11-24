@@ -1,0 +1,1180 @@
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Technical Report
+O-RAN Working Group 6
+(Cloudification and Orchestration Workgroup)
+Study on O-Cloud Energy Savings
+Copyright © 2025 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this document in any form without the prior
+written permission of O-RAN ALLIANCE e.V. is prohibited, save that you may print or download extracts of the material of this document for
+your personal use, or copy the material of this document for the purpose of sending to individual third parties for their information
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions
+apply to them and that they must comply with them.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Contents
+Contents..............................................................................................................................................................2
+Listoffigures......................................................................................................................................................4
+Listoftables.......................................................................................................................................................4
+Foreword.............................................................................................................................................................5
+Modalverbsterminology....................................................................................................................................5
+Executivesummary............................................................................................................................................5
+Introduction.........................................................................................................................................................5
+1 Scope........................................................................................................................................................7
+2 References................................................................................................................................................7
+2.1 Informativereferences........................................................................................................................................7
+3 Definitionofterms,symbolsandabbreviations.......................................................................................8
+3.1 Terms............ ......................................................................................................................................................8
+3.2 Symbols...............................................................................................................................................................8
+3.3 Abbreviations......................................................................................................................................................8
+4 O-CloudEnergySavingsbackground,concepts,andassumptions.........................................................8
+4.1 O-CloudEnergySavingsObjectives..................................................................................................................8
+4.2 O-CloudEnergySavingsconceptandassumptions............................................................................................9
+4.2.1 Overview ......................................................................................................................................................9
+4.2.2 O-CloudResourceEnergyManagement.......................................................................................................9
+4.3 Architectureoptionstoachieveenergysavingsoptimisation...........................................................................12
+4.3.1 Overview ....................................................................................................................................................12
+4.3.2 EnergySaving PolicyappliedviaKubernetesAPI.....................................................................................12
+4.3.3EnergySaving PolicyappliedbyNFDeployment...................................................................................................13
+5 EnergySavingsUseCases.....................................................................................................................14
+5.1 UseCase1:O-CloudNodeShutdowninIdleMode........................................................................................14
+5.1.1 Overview ....................................................................................................................................................14
+5.1.2 DescriptionandUMLDiagrams.................................................................................................................15
+5.1.3 PotentialRequirements................................................................................................................................16
+5.2 UseCase2:CPUcorefrequencyandpinningconfigurationchangebySMO................................................16
+5.2.1 Overview ....................................................................................................................................................16
+5.2.2 DescriptionandUMLDiagrams.................................................................................................................18
+5.2.3 PotentialRequirements................................................................................................................................19
+5.3 UseCase3:C-stateusageforNFDeployment.................................................................................................20
+5.3.1 Overview ....................................................................................................................................................20
+5.3.2 C-stateConfigurationforNFDeployments................................................................................................20
+5.3.3 PotentialRequirements................................................................................................................................21
+5.4 UseCase4:O-CloudNodeClusterModeSelection........................................................................................21
+5.4.1 Overview ....................................................................................................................................................21
+5.4.2 DescriptionandUMLDiagrams.................................................................................................................22
+5.4.3 PotentialRequirements................................................................................................................................23
+6 PowerConsumption,EnergyConsumptionandEfficiencyMeasurementandKPIs............................23
+6.1 Overview...........................................................................................................................................................23
+6.2 Power,energyconsumptionmetricsofInfrastructure......................................................................................23
+6.2.1 Overview ....................................................................................................................................................24
+6.2.2 MeasurementandKPIDefinition................................................................................................................24
+6.3 Power,EnergyConsumptionMetricsofContainers.........................................................................................25
+6.3.1 Overview ....................................................................................................................................................25
+6.3.2 MeasurementandKPIDefinition................................................................................................................25
+6.4 Power,energyconsumptionmetricsofNFdeploymentandCloudifiedNF....................................................26
+6.4.1 Overview ....................................................................................................................................................26
+6.4.2 MeasurementandKPIDefinition................................................................................................................26
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+6.5 EnergyefficiencyofCloudifiedNF..................................................................................................................27
+6.5.1 Overview ....................................................................................................................................................28
+6.5.2 MeasurementandKPIDefinition................................................................................................................28
+7 Void........................................................................................................................................................28
+8 Conclusions............................................................................................................................................29
+AnnexA(Informative):....................................................................................................................................29
+A.1PowerModellingExample........................................................................................................................29
+Changehistory/Changerequest(history).........................................................................................................31
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Listoffigures
+Figure4.2-1:KeyComponentsInvolvedin/withanO-Cloud..........................................................................................10
+Figure4.2-2:C-Stateexample...........................................................................................................................................11
+Figure4.3-1:EnergySavingPolicyappliedviaKubernetes®API..................................................................................13
+Figure4.3-2:EnergySavingPolicyappliedbyNFDeployment.....................................................................................14
+Figure5.1-1:O-CloudNodeShutdowninIdleMode......................................................................................................16
+Figure5.2-1:CPUcorefrequencyandpinningconfigurationchangebySMO...............................................................19
+Figure5.3-1:C-stateusageforNFDeployment...............................................................................................................21
+Figure5.4-1:O-CloudNodeClusterModeselection.......................................................................................................23
+Listoftables
+Table5.1-1:O-CloudNodeShutdowninIdleModeSequenceDescription....................................................................15
+Table5.2-1:CPUcorefrequencyandpinningconfigurationSequenceDescription.......................................................18
+Table5.4-1:ExamplesofModesandtheirDescription....................................................................................................22
+Table5.4-2:O-CloudNodeClusterModeselectionSequenceDescription.....................................................................22
+Table6.2-1:O-CloudResourceInfrastructurePowerConsumptionMetrics...................................................................24
+Table6.2-2:O-CloudNodeResourceEnergyConsumption ...........................................................................................25
+Table6.3-1:ContainerEnergyConsumption....................................................................................................................25
+Table6.3-2:ContainerResourceUtilization.....................................................................................................................26
+Table6.4-1:EstimatedNFDeploymentPowerConsumption..........................................................................................27
+Table6.4-2:EstimatedNFDeploymentEnergyConsumption.........................................................................................27
+Table6.4-3 EstimatedCloudified NFPowerConsumption..............................................................................................27
+Table6.4-4 EstimatedCloudified NFEnergyConsumption ...........................................................................................27
+Table6.5-1 TypesofEnergyEfficiencyMeasures............................................................................................................28
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Foreword
+ThisTechnicalReport(TR)hasbeenproducedbyWG6oftheO-RANALLIANCE.
+ThecontentofthepresentdocumentissubjecttocontinuingworkwithinO-RANandmaychangefollowingformalO-
+RANapproval.ShouldtheO-RANALLIANCEmodifythecontentsofthepresentdocument,itwillbere-releasedby
+O-RANwithanidentifyingchangeofversiondateandanincreaseinversionnumberasfollows:
+versionxx.yy.zz
+where:
+xx: thefirstdigit-groupisincrementedforallchangesofsubstance,i.e.technicalenhancements,
+corrections,updates,etc.(theinitialapproveddocumentwillhavexx=01).Always2digits
+withleadingzeroifneeded.
+yy: theseconddigit-groupisincrementedwheneditorialonlychangeshavebeenincorporated
+inthedocument.Always2digitswithleadingzeroifneeded.
+zz: thethirddigit-groupincludedonlyinworkingversionsofthedocumentindicating
+incrementalchangesduringtheeditingprocess.Externalversionsneverincludethethird
+digit-group.Always2digitswithleadingzeroifneeded.
+Modal verbs terminology
+Inthepresentdocument"shall","shall not","should","should not","may","need not","will","will not","can"and
+"cannot"aretobeinterpretedasdescribedinclause3.2oftheO-RANDraftingRules(Verbalformsfortheexpression
+ofprovisions).
+"must"and"must not"areNOT allowedinO-RANdeliverablesexceptwhenusedindirectcitation.
+Executive summary
+OpenRANenergymanagementisakeysustainability objectiveforallmobileoperatorsaroundtheworld.Thiscould
+helpOpenRANtechnologytoscaleforcommercialdeploymentsand speedupO-RANtechnologydevelopment.
+Telecomsindustryrequiresastandardizedapproachnotonlyforachievingenergysaving,butalsoforevaluating,
+testing,measuring,andmonitoringenergyconsumptionofOpenRANClouddeployments.ThisTechnicalReport(TR)
+analysessomeenergytechniquesthatcanbeutilizedwithintheO-CloudtoachievepromisingreductioninOpenRAN
+Clouddeploymentpowerconsumption.
+Introduction
+EnergyconsumptionofRANhasbecomeakeypartoftheoperators’OPEX.TheenergycostonRANisexpectedto
+continuetogrowwithincreasedadoptionof5Gtechnology enablerssuchasMassiveMIMOandB5G/6G. Energy
+efficiencyisthereforeessentialandcrucialforOpenRANtechnologytoscaleforcommercialdeployments.Telecoms
+industryrequiresastandardizedapproachnotonlyforachievingenergysaving,butalsoforevaluating,testing,
+measuring,andmonitoringenergyconsumptionofdis-aggregatedMulti-vendorOpenRANClouddeployments.
+ThistechnicalreportfocusesonthepowermanagementtechniquesthatcouldbeimplementedwithintheO-Cloudto
+reduceenergyconsumption.O-RANreliesontheO-Cloud todeployRANNetworkfunctions.Therefore,energy
+savingsusingpowermanagementtechniqueswithintheO-CloudcouldenablesignificantreductionofOpenRAN
+powerconsumption.ThisTRfurtheraimstoprovidepotentialconcepts,requirements,userstoriesandusecases
+optimizingtheO-CloudresourcesusedbytheRANapplication,andthusacceleratinginnovationtointroduceenergy
+efficiencyinOpenRANdeployments.
+InO-RANarchitecture.,theSMOcollectsdatafromthedeployedapplications(O1)alongwithO-Clouddatarelatedto
+theCloudinfrastructureandNFDeployments(O2IMSandDMS).Thesedatacanbeusedtocreatepoliciesforenergy
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+savingsandtriggertheenergysavingactivities.Inthefollowingsectionsdifferentpowermanagementtechniquesare
+reviewed,whichcanbeusedtoreducetheO-Cloudenergyconsumptionandderiverecommendations.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+1 Scope
+ThepresentdocumentreportsaboutpowermanagementtechniquesthatcouldbeimplementedwithintheO-
+Cloudtoreduceenergyconsumptionandachieveenergysavings.
+2 References
+2.1 Informative references
+Thefollowingreferenceddocumentsarenotnecessaryfortheapplicationofthepresentdocument,buttheyassistthe
+userwithregardtoaparticularsubjectarea.
+[1] O-RANWG6,CloudArchitectureandDeploymentScenariosforO-RANVirtualizedRAN-v06.00,
+TechnicalReport.Seehttps://www.o-ran.org/specifications.
+[2] 3GPPTS28.554:“TechnicalSpecificationGroupServicesandSystemAspects;Managementand
+orchestration;5GendtoendKeyPerformanceIndicators(KPI)”,Release17,March2023
+[3] Intel® TechnologyGuide:“PowerManagement-TechnologyOverview”. See
+https://networkbuilders.intel.com/solutionslibrary/power-management-technology-overview-technology-guide
+[4] O-RANWG1,DecoupledSMOArchitecture-v02.00,TechnicalReport. Seehttps://www.o-
+ran.org/specifications.
+[5] Intel® TechnologyGuide:“PowerManagement-UserWaitInstructionsPowerSavingforDPDKPMD
+PollingWorkloads”. Seehttps://networkbuilders.intel.com/solutionslibrary/power-management-user-wait-
+instructions-power-saving-for-dpdk-pmd-polling-workloads-technology-guide
+[6] O-RANWG6,O2InterfaceGeneralAspectsandPrinciples-v06.00,TechnicalSpecification. See
+https://www.o-ran.org/specifications
+[7] O-RANWG6,O2IMSInterfaceSpecification-v04.00,TechnicalSpecification. Seehttps://www.o-
+ran.org/specifications.
+[8] RedfishResourceandSchemaGuide.DMTFRedfishDSP2046(2022.2):"RedfishResourceandSchema
+Guide,"published2022-09-15.
+[9] DMTFRedfishDSP2051:"RedfishTelemetryWhitePaper,"published2020-03-27.
+[10] ETSIGRNFV-EVE021(V5.1.1):“NetworkFunctionsVirtualisation(NFV)Release5;Evolutionand
+Ecosystem;ReportonenergyefficiencyaspectsforNFV”.
+[11] 3GPPTS28.554:“TechnicalSpecificationGroupServicesandSystemAspects;Managementand
+orchestration;5GendtoendKeyPerformanceIndicators(KPI)”,Release17,March2023
+[12] ETSIES203228:“EnvironmentalEngineering(EE);Assessmentofmobilenetworkenergyefficiency”,
+v1.3.1
+[13] 3GPPTS28.552:“TechnicalSpecificationGroupServicesandSystemAspects;Managementand
+orchestration;5Gperformancemeasurements”,Release18,March2023
+[14] O-RANWG6,O2dmsInterfaceSpecification:ProfilebasedonETSINFVProtocolandDataModels-
+v06.00,TechnicalSpecification. Seehttps://www.o-ran.org/specifications.
+[15] O-RANWG6,O2dmsInterfaceSpecification:KubernetesNativeAPIProfileforContainerizedNFsv04.00,
+TechnicalSpecification. Seehttps://www.o-ran.org/specifications.
+[16] KubernetesEfficientPowerLevelExporter(Kepler):https://sustainable-computing.io/
+[17] KeplerGithubRepo:https://github.com/sustainable-computing-io/kepler
+[18] KeplerPowerModel:https://sustainable-computing.io/design/power_model/
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+[19] O-RANWG1,NetworkEnergySavingUseCasesTechnicalReport-v02.00,TechnicalReport,See
+https://www.o-ran.org/specifications.
+3 Definition of terms, symbols and abbreviations
+3.1 Terms
+Forthepurposesofthepresentdocument,thetermsanddefinitionsgiveninO-RAN.WG6.CADS[1]andthefollowing
+apply.Atermdefinedinthepresentdocumenttakesprecedenceoverthedefinitionofthesameterm,ifany,inO-
+RAN.WG6.CADS[1].
+3.2 Symbols
+Forthepurposesofthepresentdocument,thefollowingsymbolsapply:
+PNF Deployment, estimated EstimatedpowerconsumptionofaNFDeploymentrunningintheO-Cloud
+ECNF Deployment, estimated EstimatedenergyconsumptionofaNFDeploymentrunningintheO-Cloud
+PcloudifiedNF, estimated EstimatedpowerconsumptionofaCloudifiedNF
+ECcloudifiedNF, estimated EstimatedenergyconsumptionofaCloudifiedNF
+EEcloudifiedNF EnergyefficiencyofaCloudifiedNF
+3.3 Abbreviations
+Forthepurposesofthepresentdocument,theabbreviations giveninO-RAN.WG6.CADS[1],3GPPTS28.554[2],
+andO-RAN.WG1.NESUC[19]apply.
+4 O-CloudEnergySavingsbackground,concepts,and
+assumptions
+4.1 O-CloudEnergySavingsObjectives
+ThepresentTechnicalReportispartoftheWG6UCTGNetworkEnergySavingpre-normativephase.Theobjectivesof
+thepre-normativephaseareasfollows:
+ StudyO-CloudEnergysavingsUsecasesincludingpotentialrequirements,keyissues,andbenefitsof
+proposedsolutions.
+ StudyKPIsandfocusonspecifyingO-Cloudhardwareand/orsoftwaremeasurementandtelemetryforO-
+Cloudenergysaving,including:
+‐ StudyifnewmeasurementsandtelemetrydataforO-Cloudenergysaving wouldbecollectedfromthe
+O-Cloudanddescribecorrespondingmeasurementsandtelemetrydatainappropriatespecifications.
+‐ Studypotentialenergysavingrelevantmeasurementsand telemetryforO-Cloudresources,resource
+pools,O-CloudnodegroupsandO-Cloudnodes.
+ StudypotentialimpactandenhancementstoO-RANinterfacessuchasO2IMS/DMS,O1,and R1.
+AlgorithmsdiscussedandanalysedaspartoftheO-CloudEnergySavingspre-normativephasewillbeexamplesonly
+andwillnotbepartofanyspecificationasoutcomeofthis pre-normativephaseorsubsequentworkitems.
+Foreachusecasesolutionproposal,thedetailedobjectivesare:
+ Review,evaluateapplicabilityof,andselectfromexistingdeploymentalternativesandAI/MLdeployment
+scenariosanddocumentrespectivefindings:
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+‐ EvaluateenergysavingsgainsbasedonaO-Cloudenergyconsumptionmodel.
+‐ Studyonapersub-usecasebasispotentialimpactandenhancementsonO-RANinterfaces(e.g. O1,O2,
+R)intermsofrequiredinputdataandoutputconfigurationdata.
+‐ Reviewexisting counters,KPIs,anddatamodelsasspecified/studiedinotherorganizations,suchas
+3GPP.
+‐ Studypotentialenhancementsonexistingcounters,KPIs,anddatamodelsordefinenewcounters,KPIs,
+anddatamodelsofallinvolvedO-RANentities.
+4.2 O-CloudEnergySavingsconceptandassumptions
+4.2.1 Overview
+Withthemovetowardscommercialoff-the-shelf(COTS)serversforO-Cloudimplementations,O-RANvendorsare
+freetoleveragethemanyexistingtechnologiesinCOTSserversandcloudsforenergysavings.Itisassumedthatsome
+ofthesetechnologiesmaybeusedinO-Clouds.Thissectionwillgiveabriefbackgroundonthedifferenttechnologies
+availableinmodernGeneral-Purposeserverssee[3].
+4.2.2 O-CloudResourceEnergyManagement
+4.2.2.1 Overview
+AnO-CloudResourceisdefinedinanO-Cloudinfrastructureasonethatmaybeprovisionedandmanagedthroughan
+abstraction[1].O-Cloudinfrastructurehastwokindsofresources:physicalandlogicalresources.Aphysicalresourceis
+definedasakindofresourcethathasamanifestationintherealworld.Alogicalresourceisdefinedasakindof
+resourcethatusesseveralphysicalresources,oraportionofphysicalresources,orseveralsoftwareentities.
+Forexample,somekindsofphysicalresourcescouldbeservers,switches,andstorageunits.
+Forexample,somekindsoflogicalresourcesareOpenStackandK8sclusters.
+VariousEnergyManagementmethodscanbeappliedonO-CloudResourcestoreducethepowerconsumptioninO-
+Cloud.Someoftheexamplesaregivenbelow.
+CPUEnergyManagement-ApplyingvariousmethodstoadjusttheCPUfrequencyandVoltagetoreducetheCPU
+energyconsumption.
+ClockGating-DisablingaportionofacircuitinCPUthatresultsinlowerpowerconsumption.
+AdaptiveLinkRate-Withthistechnology,thedatarateforanetworklinkcanbeadjustedduringtheperiodoflow
+networktraffic.
+IdleStatesand Performancestates-O-CloudResourcescanhavecertainidlestates/performancestatesenabledduring
+theperiodoflowutilization.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 4.2-1: Key Components Involved in/with an O-Cloud
+4.2.2.2 CPUEnergyManagement
+4.2.2.2.1 Overview
+EnergyefficiencyandmanagementinO-CloudcanbeaccomplishedbyCPUEnergyManagement.CPUenergy
+consumptioncanbemanagedbyintroducingdifferentlevelsofenergyconsumptionwithCPUfrequencyandvoltage
+scaling.CPUenergysavingscanbeachievedbymodifyingthepowerstatesofCPUorotherconfigurablemethodsfor
+CPUenergymanagement.
+4.2.2.2.2 DirectMethod
+ThepredictableandlinearmethodtoscaletheCPUfrequencyandvoltage:
+ Sleepstates(C-States)-ThesestatesareusedtoalterenergyusagefromCPUsystemsinapowermanagement
+strategyemployedindependentlyortogetherwithP-State.
+ PerformanceStates(P-States) -ThesestatesareusedtoalterenergyusagefromCPUsystemsinapower
+managementstrategyemployedtogetherwithC-State.
+ ThermalStates(T-States) –Thesestatesareusedforthermalmanagementtoreducetheheatand powerofa
+CPUbyfrequencyandvoltagescaling.
+C-statesarepowerstatesthataCPUcanusetoreducepowerconsumptiononaper-corelevel,oronaCPUpackage
+level,bypoweringdownportionsofthecore,package,orboth.Disablingportionsofthecoreallowsforlargepower
+savingsbutprevents thecorefromexecutinginstructions.C-statescanbeusedtomoveindividualcoresorthefullCPU
+Packagetoanidlestate,reducingthepowerconsumptionoftheserver.Figure4.2-2belowshowsanexampleofsome
+ofthedifferentC-statesupported.NotethatotherC-statesmaybesupportedandhavedifferentcharacteristics.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 4.2-2: C-State example
+C-statescanbemanagedorcontrolledinseveraldifferentmethods
+ Hardware:Incertainconfigurations,thePowerControlUnit(PCU)intheCPUisresponsiblefor
+autonomouslycoordinatingcoreandpackageC-stateswhileBIOSconfigurationallowsyoutolimittheC-
+statesavailabletotheplatform,ensuringitnevergoesbelowyourrequiredC-state.Alternatively,Linux
+Kerneldrivers(suchasacpi_idleorintel_idle)andtheLinuxKernelschedulergovernC-states.
+ OperatingSystem:CoreC-statesarecontrolledbytheOSasdefinedbytheACPISpecification.TheOScan
+tellthethreadsinacoretogotoaparticularC-stateusingtheMWAITandMONITORinstructionfor
+example.InsupportedCPUs,applicationsoftwarecanusethewaitpkginstructionstorequestpower-optimised
+statesC0.1andC0.2forexample.
+ Application:SoftwaretechniquescanbeusedtoinfluencekernelcontrolofC-statesforexampleaSWthread
+thatsleepsusingstandardLinuxsystem,suchasusleep()canhelptheLinuxKerneltosleepthecoreifthereis
+nootherworktobescheduledonthatcore.InsupportedCPUs,applicationsoftwarecanusetheusermode
+waitpkginstructionstodirectlyrequestpower-optimisedstatesC0.1andC0.2forexample[5].
+APerformanceState(P-state)isanoperatingpointwhereaCPUcoreisoperatingataspecificfrequencyandvoltage
+whileexecutinginstructions.AsthecoremovestolowerP-states,thefrequencyandassociatedvoltagedropsresulting
+inreducedpowerconsumptionandperformance.TheAdvancedConfigurationandPowerInterface(ACPI)definesthe
+performancestatesthatareexposedtosystemsoftware.SoftwareinterfacesallowP-statestobecontrolledpercore.P-
+statescanbeusedtodynamicallyreducefrequencypercore,reducingthepowerconsumptionoftheserver.
+P-statesmaybemanagedorcontrolledinseveraldifferentmethods
+ Hardware:Hardware-ControlledPerformanceStates(HWP)givetheoptiontopassP-statecontroltothe
+hardware,allowingittomakemuchfasterandfineradjustmentstothefrequencyandvoltage,basedoneach
+core’sloadandOShints.WithoutHWP,theOScandirectlyrequestP-statesthroughtheLinuxKerneldrivers
+(suchasacpi_cpufreqdriver,intel_pstatedriver).
+ OperatingSystem:P-statescanbemanagedfromuserspaceviatheLinuxKernelsystemfilesystem,suchas
+“sysfs”.Bydefault,theP-stateshaveamanagementroutineknownasagovernorthatdecideshowtocontrol
+thefrequencyinresponsetotheworkload.
+ Application:AsdemonstratedbytheDPDKPowerManagementlibraryauserspaceapplicationcansave
+powerbydynamicallyadjustingCPUfrequency.TheuserspaceapplicationcanrequestaspecificP-state
+configurationfromthekernel.
+NOTE: Linux®istheregisteredtrademarkofLinuxTorvaldsintheU.S.andothercountries.
+4.2.2.2.3 IndirectMethod
+Thesearethemethodswhicharecomplex,havedependenciesanddonotfollowthecause-and-effectpattern.By
+applyingthesemethods,theenergyconsumptionoftheCPUcanbereduced.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+ CPUaffinity–AssigningspecificprocessesorthreadstoacorecanhelpimproveNFperformancewhichcan
+reducetheCPUenergyconsumption.
+ Consumingleastnumberofcoreswithtechnologysuchassimultaneousmultithreadingallowsothercoresto
+remaininlowpoweroridlestatewhichcanreduceenergyconsumption.
+ Scheduling–Schedulingofthreadsandprocessesinanenergyefficientmanner
+4.2.2.3 ModesandPoliciesforEnergySavingsinO-Cloud
+AModereferstoasettingwhichcancontainasetofdifferentpoliciesand/orconfigurations,thataimstoimprove
+certaincharacteristicsofasystem,e.g.,forenergyefficiencyorperformance.SomeoftheModescanbeusedtosave
+theenergyofanO-Cloudbyrepresentingdifferentlevelsofenergyconsumption.
+AsdefinedinWG1.Decoupled-SMO-Architecture[4],section5.13.1,aPolicyreferstoasetofrules,guidelines,or
+conditionsthatgovernthebehaviorandactionsofO-RANresourcesandservices.Thesepoliciescanbeusedforenergy
+savingsinO-Cloud.
+4.3 Architectureoptionstoachieveenergysavingsoptimisation
+4.3.1 Overview
+O-CloudNoderesources(forexamplecompute,network,storage)usedbyanNFDeploymentcanbeoptimisedto
+reducepowerconsumptionbasedoncurrentorpredictedresourceusage.Thefollowingsectionsexaminehowenergy
+savingsoptimisationscanbeappliedtotheO-CloudusingtheO-RANarchitectureandinterfacesandidentifyany
+potentialchanges.
+NOTE: TherecanbeotherpossiblealternativestoachieveEnergySavingsand Optimisationthatarenot
+presentedinthepresentdocumentversion.
+4.3.2 EnergySavingPolicyappliedviaKubernetesAPI
+Description:
+ NFDeploymentscanbedeployedwithKubernetesExtendedResourcesthatareassociatedwithaspecific
+powermanagementconfigurationofthenoderesources.
+ Forexample,CPUcoresonaparticularnodearesettoacertainidlingmode(e.g.,c1),whenNFDeployment
+iscreatedthecontainer(s) thatrequestedthesecoresviatheExtendedResourcewillusethem.
+ PleasenotethatExtendedResourcescanalso beassociatedwithasetupthatismoredynamic,itdependson
+theoperator/controllerfeatures,forexample,changingconfigurationofresourcesusedbytheNF
+Deploymentsduringacertaintimeofaday.
+ SMOviarAppcanlearntrafficpatternsandmodifytheExtendedResourcesconfiguration.Forexample,
+changingthehoursthatapplicationisusing ahighperformancecoresandlowperformancecoresdueachange
+intrafficconsumption.
+NOTE1: TherealizationofthisoptionisdonewithKubernetes’soperators-CustomResourcesdefinetheenergy
+savingcapabilitiesandexposeittotheNFDeploymentsviaExtendedResourceswhicharedeclaredas
+partofNFDeploymentmanifests(e.g.,helmcharts).
+NOTE2: SMO/rAppcommunicateschangestotheCustomResources.
+NOTE3: Kubernetes®andK8s®areregisteredtrademarksoftheLinuxFoundation,intheUnitedStatesandother
+countries.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 4.3-1: Energy Saving Policy applied via Kubernetes® API
+4.3.3EnergySavingPolicyappliedbyNFDeployment
+Description:
+ InthisoptiontheenergysavingpolicycanbeappliedbytheSMOandcanbeadjustedbytheNFDeployment
+oravailabledirectlyfromtheNFDeployment,meaningthatthatNFDeploymentappliesitsenergysaving
+policywithouttheneedoftheSMO,ifithasthecapabilityofdoingso.
+ Forexample,initialpolicywasrequestedforlowpowerconsumptionbetween2AMand5AM,however,due
+totrafficincreasetheapplicationadjustsitsassignedresourcestoaccommodatethenewtrafficdemand.
+ NFDeploymentusesO-Cloudresourceinterfacetoadjustpowermanagementofitsassignedresources
+(potentialnewinterfacebetweentheNFDeploymentandO-Cloud).
+NOTE1: ThisoptionrequiresanewinterfacebetweentheNFDeploymentandO-Cloud(cloudplatform)toadjust
+thepowerconsumptionofitsassignedresourcesbutappliesonlyforthecaseswhereNodeCluster
+resourcesareexclusivelyassignedtotheNFDeployment,notbeing sharedwithotherentitiesandother
+DeploymentintheNodeCluster,forexample,vfio.
+NOTE2: ItistheresponsibilityofthecloudplatformtodetermineiftheresourcesthatareassignedtotheNF
+Deploymentaresharedornot.Requestsforsharedresourceswillnotbegrantedandwillbedenied.
+NOTE3: Toimplementsuchinterface,theO-Cloud(cloudplatform)exposesanendpointtotheNFDeployment,
+forexample,thisexposurecanbedoneviathePodenvironmentvariables,exposingacertainportonthe
+Pod’slocalhost.
+NOTE4: ThisarchitectureoptionisallowingNFDeploymenttoadjustitsownallocated/assignedresources
+directlyandfast(lowlatency)whentrafficsuddenlychanges,however,thisoptioncouldpotentiallyface
+conflictingrequestsand/orraceconditionsespeciallyifalsocontrolledbySMO,whichneedtobetaken
+intoaccountwhenconsideringthisoptionandcreatingrequirementsaccordingly.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 4.3-2: Energy Saving Policy applied by NF Deployment
+5 EnergySavingsUseCases
+5.1 UseCase1:O-CloudNodeShutdowninIdleMode
+5.1.1 Overview
+ThisusecasedescribesamethodtoperformO-CloudEnergySavingbyshuttingdownO-Cloud Node(s)inidletimes
+throughNon-RTRICprovidedguidance.
+Typically,VirtualNetworkFunctions(VNFs)canberepresentedassingleorchainsofcloudresources(Virtual
+Machines(VMs)orcontainers)whicharedeployedinsidedatacentersonaO-Cloudsite..Inordertoachievecost
+efficiency,networkoperatorsaimatminimizingthepowerconsumptionoftheir NFVinfrastructure.Thiscanbe
+achievedbyusingtheminimumsetofphysicalserversrequiredbythevirtualfunctionsintermsofcomputing,memory,
+diskrelatedparameters.
+AO-CloudNodeasdefinedinO-RAN.WG6.CADS[1]isthebasiccomputationalresourcedesignatorandcanbe
+commonlythoughtofasaserver.ProgramsrunningonNodesarepackagedasworkloads.Acloudresourcemight
+comprisefunctionalitiessupportingoneormultipleNF(s) orpartsofoneormultipleNF(s).InsuchaO-Cloud
+environment,somenodesmaybecomeidleasworkloadsshiftandchange.Byidentifyingandshuttingdowntheseidle
+nodes,energyconsumptioncanbereduced,leadingtocostsavingsandincreasedefficiency inresourceutilization.
+Non-RTRICcancollectO1andO2relateddata,storedatapatternsandresourceusage(CPU,memory,network,etc.)
+ofO-CloudNodes.Thisdataisutilizedtotrainapredictivemodelthatcanidentifyidletimeswhentheresourcesare
+notbeingutilized.
+Basedonthepredictions,non-RTRICcanrecommendtheshuttingdownofidleO-CloudNodestoreducecostsand
+improveefficiency.Itisimperativetonotethatthenon-RTRICtakesintoconsiderationthepotentialimpactofshutting
+downanidlenodeonfuturesystemperformance.Therefore,theNon-RTRICwillonlyrecommendshuttingdowna
+nodeifitpredictsaprolongedperiodofidleness,inordertoavoidunnecessaryandfrequentshutdownsandstartupsof
+nodes.
+NOTE: Thisuse-casetakesintoconsiderationtheassumptionthattheNodesareidle,andSMOhaverelocated
+theworkloadsthatarenotautonomouslyrelocatedbytheDMS.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+5.1.2 DescriptionandUMLDiagrams
+Table 5.1-1: O-Cloud Node Shutdown in Idle Mode Sequence Description
+Use Case Stage Evolution / Specification
+Goal Shutting down of O-Cloud Node(s) in idle times for energy saving purpose.
+Actors and Roles Cloud Maintainer: Recommend O-Cloud Node Shutdown
+SMO (FOCOM/NFO) : Actions to implement goal
+Non-RT RIC Including rAPP : O1 & O2 related data analysis, recommendation to trigger O-Cloud
+Node shutdown
+NF – Network Function (Application)
+Assumptions - The “Service Request” to the FOCOM includes the identifiers of the O-CloudNode(s) to be
+shut down.
+- The trigger can be given from the Cloud Install Project Manager or rApps (via Non-RT RIC).
+- The Cloud Maintainer or rApp has subscribed to receive notifications from the SMO.
+- SMO (FOCOM/NFO) can get reccomendation from rApps via Non-RT RIC, where rApps has
+its own algorithm that decides when to shut down O-Cloud HW nodes.
+Pre- conditions - SMO is available
+- O-Cloud is available
+- O2-IMS alarm events have been subscribed by Cloud Maintainer and or Non-RT RIC.
+- Non-RT RIC/rApp can receive O-Cloud telemetry data from FOCOM.
+- SMO has relocated the workloads that are not autonomously relocated by the DMS
+- The Non-RT RIC has processed a recommendation for shutting down a O-Cloud HW
+Node(s), based on the prediction of an extended period of idleness for the involved O-Cloud
+Node(s).
+Begins when The recommendation for shutting down existing O-Cloud Node(s) has been completed Cloud
+Maintainer or by rApps via Non-RT RIC.
+Step 1,2 (M) Cloud Maintainer or rApps via Non-RT RIC recommends FOCOM to shut down the O-Cloud HW
+node(s)
+Step 3 (M) FOCOM requests to IMS to shutdown down one or more O-Cloud HW Nodes.
+Step 4 (M) IMS shutdown the requested O-Cloud nodes.
+Step 5 (M) IMS informs SMO that the O-Cloud HW Node(s) Shutdown is completed.
+Step 6 (M) FOCOM informs Non-RT RIC (rApp) through SMO that the O-Cloud HW Node(s) Shutdown is
+completed.
+Ends when O-Cloud HW node(s) have been shut down.
+Post-conditions O-Cloud HW Node(s) have been Shut down for energy saving.
+SMO/Non-RT RIC continues to monitor the load on the O-Cloud by collecting and monitoring the
+relevant performance and matrices using O1 and O2.
+Traceability Traceability has not been specified in the present document.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 5.1-1: O-Cloud Node Shutdown in Idle Mode
+5.1.3 PotentialRequirements
+NOTE: PotentialrequirementsforWG6,aswellashighlevelrequirementsforotherO-RANWGshavenotbeen
+specifiedinthepresentdocument.
+5.2 UseCase2:CPUcorefrequencyandpinningconfiguration
+changebySMO
+5.2.1 Overview
+ThisUseCasedescribesCPUcorefrequencyandpinningchangesforO-Cloudplatformbasedonenergysavingpolicy
+whichisgeneratedbynon-RTRICorCloudOperator,especiallyfortheCPUallocatedtoVNF/CNFinidleorlow
+CPUutilization/loadtosaveenergy.Thiscanbeoneofthepossibledeploymentscenarios,forinstance,smallsite
+deploymentscenarios.
+WhentheservicethroughputorUEnumbersarelow,aswellasCPUutilizationorloadofVNF/CNFislow,theCPU
+frequencymodeallocatedtodedicatedVNF/CNFcanbechangedtoenergysavingmode,or someoftheCPUcoresfor
+dedicatedVNF/CNFcanbeclosedbasedontheCPUcorepinning,or theCPUstatesfordedicatedVNF/CNFcanbe
+changedtosaveO-Cloudenergy.
+ForExample:O-Cloudtelemetrydata,suchasCPUFrequency,CPUUtilization,CPUTemperature,CPUStateetc.,can
+becollectedthroughO2imsandO2dmsandreportedtoSMO.Furthermore,configurationdataoftheCPU,suchas
+CPUcorepinninginformation,vCPUnumberetc.,canbecollectedbySMOaswellassentbyO-CloudtoSMO
+throughO2interface.ThentheO-Cloud energysavingpolicybasedonSMOpre-configuredorgeneratedbyCloud
+OperatororNon-RTRIC/rApp,suchasCPUfrequencymodeorCPUcoresconfigurationfordedicatedVNF/CNF,will
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+begeneratedand providedthroughO2ims/O2dmstohelpupdateVNF/CNFdeploymentforenergysaving.Furthermore,
+theO-CloudenergysavingpolicygenerationcouldbefurthercombinedwithO1telemetrydataforVNF/CNFtoensure
+VNF/CNFperformance.
+NOTE1: Inthisusecase,O-Cloudenergysavingpolicycanbepre-configuredbySMO,given fromCloud
+OperatortoNFO/FOCOMoritcanbeautomaticallytriggeredfromNon-RTRIC/rApp.
+NOTE2: Inthisusecase,O1telemetrydataintegrationwithO-Cloudenergysaving policygenerationisoutofthe
+scopeofthepresentdocument.
+NOTE3: Thisusecasemaybeapplicableforscenarioswherethededicated/isolatedcoresareallocatedforan
+application.
+NOTE4: Thescenariosforsharedcoresbetweendifferentapplicationshasnotbeenspecifiedinthepresent
+document.
+NOTE5: Atthetimeofdevelopingthisusecase,theoverallenergysavingpolicyconcepthasnotyetfully
+developed.Also,therolesandresponsibilityofNFO,FOCOM,DMS,IMSand non-RT/rAppneedstobe
+furtheraligned.Itisexpectedthatthepotentialrequirementswhicharedescribedinclause5.2.3willbe
+refinedasenergysavingpolicyconceptandarchitectureevolve.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+5.2.2 DescriptionandUMLDiagrams
+Table 5.2-1: CPU core frequency and pinning configuration Sequence Description
+Use Case Stage Evolution / Specification
+Goal CPU core frequency and pinning configuration for O-Cloud platform, especially for the CPU
+allocated to VNF/CNF in idle or low CPU utilization/load to save energy.
+Actors and Roles
+Cloud Operator
+SMO:
+NFO, FOCOM
+Non-RT RIC/rApp
+O-Cloud Platform: DMS, IMS
+Assumptions
+- The “Service Request” for data collection and deploy management includes the identifiers of
+the target VNF/CNF instances and the O-Cloud node where the VNF/CNF is located.
+- The O-Cloud energy saving policy can be pre-configured by SMO internally, or given from
+the Cloud Operator or Non-RT RIC/rApps.
+- NFO can get trigger from Non-RT RIC/rApp, where rApps has its own algorithm which
+decides what CPU configuration for VNF/CNF, and when to update it.
+Pre- conditions
+- SMO is available
+- O-Cloud is available
+- VNF/CNF has been successfully deployed.
+- VNF/CNF monitoring is in place and active.
+- Non-RT RIC/rApp can receive O-Cloud telemetry data from O2 interface.
+Begins when The energy saving related data is to be collected and CPU configuration, such as CPU frequency
+mode or CPU cores for dedicated VNF/CNF is to be determined.
+Step 1 (M)
+The O-Cloud telemetry data is received by SMO through O2 interface, for example FOCOM
+receives O-Cloud IMS telemetry data through O2ims, and NFO receives O-Cloud DMS telemetry
+data through O2dms.
+Alternatively, the O-Cloud telemetry data, including IMS and DMS telemetry data can be further
+reported to Non-RT RIC/rApp or Cloud Operator.
+The O-Cloud telemetry data may includes CPU Frequency, CPU Utilization, CPU Temperature,
+CPU power State, etc to help generate O-Cloud CPU configuration.
+Step 2 (O)
+Non-RT RIC/rApp or Cloud Operator monitors O-Cloud performance based on the received O-
+Cloud telemetry data, and based on such telemetry data, it generates an O-Cloud energy saving
+policy.
+Step 3 (O) Non-RT RIC/rApp or Cloud Operator send the O-Cloud energy saving policy to NFO or FOCOM.
+Step 4 (M)
+SMO(NFO/FOCOM) sends CPU configuration request to O-Cloud through O2dms or O2ims
+such as CPU frequency mode, CPU core pinning configuration for dedicated VNF/CNF, vCPU
+number, which indicates the CPU configuration for O-Cloud network functions, based on the
+received O-Cloud telemetry data as well as the energy saving policy pre-configured by SMO
+internally, or generated by Cloud Operator or Non-RT RIC/rApp(see note).
+Step 5 (M) O-Cloud IMS or DMS updates the VNF/CNF deployment based on the CPU configuration from
+NFO or FOCOM, such as configuring CPU frequency mode or configuring CPU core pinning.
+Step 6 (M) O-Cloud DMS or IMS informs SMO that the CPU configuration for VNF/CNF is completed.
+Step 7 (O) SMO informs Non-RT RIC/rApp or Cloud Operator the change of CPU configuration.
+Ends when The CPU configuration action for VNF/CNF is completed successfully.
+Exceptions
+The CPU configuration action for VNF/CNF is failed during the execution of the configuration
+change, such as the VNF/CNF have been terminated or corresponding O-Cloud HW node have
+been shut down.
+Post-conditions SMO continues to monitor the performance on the O-Cloud by collecting and monitoring the
+relevant matrices through O2 interface.
+Traceability [5.2.3.1] [5.2.3.2] [5.2.3.4] [5.2.3.5]
+NOTE: The application downtime while change the CPU configuration will depend on the implementation, such as
+the running applications as well as the applications that accept downtime within a certain range.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 5.2-1: CPU core frequency and pinning configuration change by SMO
+5.2.3 PotentialRequirements
+5.2.3.1 General
+O2supportsO-Cloudinformationtoidentifytheclusterandthenetworkfunctioninstance.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+5.2.3.2 MeasurementandConfigurationdata
+O-CloudresourceconsumptionandconfigurationaremadeavailabletoSMOthroughO2interface.
+5.2.3.3Security
+NOTE: Potentialrequirementsforsecurityhavenotbeenspecifiedinthepresentdocument.
+5.2.3.4 O-CloudSupport
+ThisusecasehasmultipledependenciesofO-Cloudcapabilities:
+ O-CloudhasacapabilitytocollecttheO-CloudhardwareresourceinformationandtelemetrysuchasCPU
+Frequency,CPUUtilization,CPUcorePinning,vCPUnumber,CPUTemperature,CPUState.
+ O-CloudhasacapabilitytoexposeorshareO-CloudhardwareresourcedatatoSMOthroughO2interface.
+ O-CloudhasacapabilitytoreceivespecificCPUconfigurationofspecificNFdeploymentinstance,where
+CPUconfigurationdatacanbeCPUFrequency,CPUcorePinning.
+5.2.3.5 HighLevelRequirementsforotherO-RANWGs
+DifferentoptionsforO-Cloud energysavingpolicygeneratedinthis usecasecallsforjointlycollaborationwith
+differentworkingWGswithascopedescribingenergysavingpolicy,architectures,andOAM,suchtopicsarethe
+following:
+ O-CloudenergysavingpolicyismadeavailablebyCloudOperator,Non-RTRIC/rApp,orothers.
+ O-Cloudenergysavingtelemetrydata(fromO2)couldbefurthercombinedwithO1telemetrydatafor
+VNF/CNFtoensureVNF/CNFperformance.O1integrationisoutthescopeofthepresentdocument.
+ SMOiscapabletoreceiveandprocesstheenergysavingpolicy.
+ SMOhasacapabilitytorequesttheinformationonceO-Cloudhardwareresourcechanges.
+5.3 UseCase3:C-stateusageforNFDeployment
+5.3.1 Overview
+ThisUseCasedescribesascenariowhereaNFDeploymentmayrequestdeploymentwithaspecific energysavings
+configuration(C-stateconfiguration)ofaCPUduring NFDeploymentinstantiation.TheO-Cloud maychangethe
+energysavingconfigurationtosupportsucharequest.
+5.3.2 C-stateConfigurationforNFDeployments
+TheO-CloudmayneedtosupportNFDeploymentsthathavedifferentdeploymentrequirementsforC-state
+configuration.InthefigurebelowanexamplescenarioisdepictedwhereoneNFDeployment(NFDeployment1)
+supportsuptoC6statewhileanotherNFDeployment(NFDeployment2)onlysupportsuptoC1state.Inaddition
+therecanbescenariosthatwithinaNFDeploymenttheremaybedifferentrequirementsforC-statecontrolonaper
+corebasis.InthesamefigureNFDeployment2hassuchascenariowhereitrequiresseveralcoreswithC1-state
+enabledandonecore(CoreN)withC-statesdisabled(oronlyC0enabled).
+TheO-Cloudshouldalsobecapableofconfiguringtheun-usedcoresintoC6-statewhenthereisnoworkloaddeployed
+onthem,seeninthebelowfigureinCore2.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 5.3-1: C-state usage for NF Deployment
+Themainchange forthis usecaseistosupportenergysavingsC-stateconfigurationin thedefinitionoftheDeployment
+Artifact(s),whichshouldbeupdated toincludeO-Cloud energy savingsC-state.Placementoftheapplicationonanode
+supportingtherequirementsexpressedintheartifact,C-stateconfiguration,istheresponsibilityoftheO-Cloud.
+5.3.3 PotentialRequirements
+5.3.3.1 General
+ThedeploymentartifactsfortheNFDeploymentshouldallowtheapplicationvendorstospecifytheirC-state
+requirementsinastandardizedway.
+5.3.3.2 MeasurementandConfigurationdata
+Nomeasurementdatarequired.
+5.3.3.3 Security
+NOTE: Potentialrequirementsforsecurityhavenotbeenspecifiedinthepresentdocument.
+5.3.3.4 O-CloudSupport
+TheO-Cloudshouldunderstandthe C-state(s)requestedfortheNFDeploymentsandsupporttheC-stateconfiguration
+intheO-Cloud.
+5.3.3.5 HighLevelRequirementsforotherORANWGs
+NOTE: PotentialrequirementsforotherO-RANWGshavenotbeenspecifiedinthepresentdocument.
+5.4 UseCase4:O-CloudNodeClusterModeSelection
+5.4.1 Overview
+ThisusecasedescribestheprocessingofarequesttoselectaspecificMode,asdefinedinsection4.2.2.3onanO-
+CloudNodeCluster,fromtheFOCOMtowardstheIMSovertheO2imsinterface.Theusecaseaimstoselectaspecific
+Mode,forinstance,EcoMode,toachieveenergysavingsonanO-CloudNodeCluster.Beforethisusecaseisstarted,it
+isexpectedthattheSMOhasconcludedthataspecificModeneedstobeactivatedonanO-CloudNodeCluster.When
+theusecaseisconcluded,anymodifiedO-Cloud(exposed)resourcesareupdatedbytheIMS.
+ThetargetedModeisexpressedintheClusterTemplate,definingthecapabilitiesandcapacitiesattheSMOlevel,
+whereastheconfigurationsorpoliciesaredefinedintheClusterTemplateartifactsattheO-Cloudlevel.AnO-Cloud
+NodeClustersupportsdifferentmodes,andeachindividualmodehasruntimesettings.Furthermore,aModesetting
+aimstooperatetheO-CloudNodeClusterwithaspecificsetofconfigurationsorpolicies.
+Table5.4-1exemplifiesthethreetypesofModesthatcanachievevarying levelofenergysavingsinanO-CloudNode
+Cluster.Theexamplesareonlyprovidedforillustrativepurposesinthecontextofthepresentusecase.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Table 5.4-1: Examples of Modes and their Description
+Modes Description
+EcoMode HighEnergySavingsfortheO-Cloudresources
+BalancedMode StrikeabalancebetweenEnergysavingsandPerformanceduringvarying
+levelsofsystemutilization
+PerformanceMode HighperformanceandresourceavailabilityinO-Cloudwithoutenergy
+savings
+5.4.2 DescriptionandUMLDiagrams
+Table 5.4-2: O-Cloud Node Cluster Mode selection Sequence Description
+Use Case Stage Evolution / Specification
+Goal To achieve energy savings by selecting a specific Mode on an O-Cloud Node Cluster
+Actors and Roles SMO: FOCOM
+O-Cloud: IMS
+Pre- conditions
+‐ SMO and O-Cloud are available and have connectivity.
+‐ The Cluster Template for the O-Cloud Node Cluster is available, and it defines
+cluster available/supported Modes.
+Assumptions
+‐ There is always a single mode activated on an O-Cloud Node Cluster.
+‐ The SMO has concluded which specific Mode that needs to be activated on an
+O-Cloud Node Cluster, as known, e.g., based on the expected energy savings or
+performance gains, and the compatibility with the already deployed NF
+Deployments (if any).
+‐ The creation and updates of the O-Cloud Node Cluster (e.g., K8s Cluster) are
+performed according to the Cluster Template.
+Begins when A specific Mode needs to be activated on an O-Cloud Node Cluster to achieve energy
+savings.
+Step 1(M) A Request to activate a particular Mode, e.g. “Eco”referenced in Cluster Template on
+O-Cloud Node Cluster (ClusterID) is sent from FOCOM to IMS.
+Step 2(M) IMS performs Mode activation on O-Cloud Node Cluster as per Cluster Template
+artifact defined in O-Cloud.
+Step 3(ALT) SUCCESS: IMS sends a success response to FOCOM for the activation of a
+particular Mode on the O-Cloud Node Cluster
+Step 4 (ALT) EXCEPTION: O-Cloud Node Cluster is unavailable
+Step 5(ALT) EXCEPTION: Insufficient O-Cloud Resources to activate a particular Mode on the O-
+Cloud Node Cluster
+Step 6 (ALT) EXCEPTION: IMS encountered an unexpected condition processing the request
+Ends when This use case ends when the activation request of Mode is successful, or an
+exception has been encountered.
+Exceptions
+‐ CLUSTER UNAVAILABLE – The O-Cloud Node Cluster is Unavailable to
+activate a particular Mode
+‐ INSUFFICIENT RESOURCES – There are no sufficient O-Cloud Resources to
+activate a particular Mode on the O-Cloud Node Cluster
+‐ UNEXPECTED CONDITION – The IMS might not be able to activate requested
+Mode on an O-Cloud Node Cluster perhaps due to a software fault. In this case,
+the unexpected condition exception is encountered.
+Post-conditions
+Upon successful activation, the O-Cloud Node Cluster is operating in the specified
+Mode with its mode-specific run-time settings.
+Upon Failure, the O-Cloud Node Cluster remains in its previous operational state
+without any changes to the Mode.
+Traceability [5.4.3.1], [5.4.3.2]
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Figure 5.4-1: O-Cloud Node Cluster Mode selection
+5.4.3 PotentialRequirements
+5.4.3.1 General
+ModeactivationrequestsofModesaremadeoverO2imsinterface.
+5.4.3.2 O-CloudSupport
+1. TheO-CloudsupportsModeactivationrequestsfromSMO,andtheModeisactivatedbytheIMS.
+2. TheClusterTemplateartifactswillincludetherealizationdefinitionoftheModes.
+6 PowerConsumption,EnergyConsumptionandEfficiency
+MeasurementandKPIs
+6.1 Overview
+Inthis section,measurementsandKPIsrelatedtopowerconsumption,energyconsumptionandenergyefficiencyare
+described.Power,measuredinwatt(W),referstotherateofusingenergyatanygivenmoment,whileenergy,measured
+inwatt-hours(Wh),kilowatt-hours(kWh)orjoules(J),referstothetotalamountofenergyconsumedoveraperiodof
+time.Energyefficiency,measuredincapacity/joule(J),istherelationshipbetweentheusefuloutputandenergy
+consumption.Energyefficiencycanbeachievedbyreducingthepowerconsumptiontodeliverthesameoutputorby
+improvingoutputdeliveredforthesameenergy consumption.
+6.2 Power,energyconsumptionmetricsofInfrastructure
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+6.2.1 Overview
+MeasuringtheenergyconsumptionofO-CloudResourcescouldpotentiallyhelpinunderstandingtheimpactof
+potentialenergysavingoptimisationsontheO-Cloudresources.Suchmeasurementsalsohelpdeterminingwhetherthe
+energyefficiencypoliciesarehavingadesiredeffect,andhelpstosetnewpoliciesorupdateexistingpolicies.
+NOTE1: O-CloudResourcescanbephysicalorlogicalinnature.Thelisted measurementsapplytobothtypes,but
+logicalresourcesrequiresomelevelofcomputationandestimation.Forexample,VM-basedO-Cloud
+Nodesmightneedcomputation,whilephysicalO-CloudResourcesmightgatherthemeasurementsfrom
+physicalsensors.
+NOTE2: Thepotentialmappingbetweentheexistingenergysavingsusecases(inClause5)and power/energy
+consumptionmetricsofinfrastructureisnotspecifiedinthepresentdocumentversion.
+6.2.2 MeasurementandKPIDefinition
+6.2.2.1 O-CloudResourcePowerConsumption
+Table6.2-1liststhepowerconsumptionmeasurementsattheO-CloudResourcelevel.Themetricscanbereportedper
+O-CloudResourceataconfigurableinterval,typicallymeasuredinminutes.
+Table 6.2-1: O-Cloud Resource Infrastructure Power Consumption Metrics
+Measurement Data
+Name Description Unit
+PowerCapacity ThetotalamountofpowerthatcanbeallocatedtotheO-CloudResource
+(Instantaneous),
+W
+PowerConsumed TheactualpowertheO-CloudResourceconsumes(Instantaneous) W
+AveragePowerConsumed TheaveragepowerconsumedbytheO-CloudResourceoverameasurement
+window.
+W
+MaxPowerConsumed MaximumpowerconsumedbytheO-CloudResourceoverameasurement
+window.
+W
+MinPowerConsumed MinimumpowerconsumedbytheO-CloudResourceoverameasurement
+window.
+W
+Themeasurementsintable6.2-1mayapplytorelevantO-CloudResourcesthatconsumespoweranddefinedasa
+resourcebytheO-CloudOperator. PleaserefertothedefinitionsandattributesoftheO-CloudResourceasspecifiedin
+theO2GA&P[6]andO-CloudInfrastructureInventory[7]respectively.
+Aspersection3.9.8ofO2GA&P[9],thePMdictionaryisprovidedbytheO-Cloud Resourcetypevendor,anditis
+expectedthatpowerandenergyconsumptionmetricsandKPIscanbemadepartofsuchaPMdictionary.
+NOTE:AsperSection3.9.10ofO2GA&P[9],theO-CloudResourcemightdirectlyprovidethemaximum,
+minimum,andaveragevalues,orthePMjobmightperformasemantictransformationontheprimitiveor
+rawmeasurementsavailableinthePMdictionary.
+RelevantinformationonthemeasurementsfortheO-CloudResources,whicharephysical,isavailableintheDMTF
+Redfishspecifications[8][9].
+EnergyconsumptionperO-CloudResourcecanbederivedfromtheaveragepowerconsumptionmetric,i.e.,
+AveragePowerConsumed,overaperiodoftime.Theentityresponsibleforenergyconsumptionmeasurementisoutof
+scopeofthepresentdocument.
+6.2.2.2 O-CloudNodeEnergyConsumption
+Table6.2-2liststheenergyconsumptionmeasurementsattheO-Cloudnoderesourcelevel.Themetricscanbereported
+pernodeataconfigurableinterval,typicallymeasuredinminutes.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Table 6.2-2: O-Cloud Node Resource Energy Consumption
+Measurement Data
+Name Description Unit
+ECnode,core RepresentsthetotalenergyconsumptionofallCPUcoresonthenode. J
+ECnode,uncore Representsthetotalenergyconsumptionofuncorecomponents(e.g.,caches,
+memorycontrollers)onthenode.
+J
+ECnode,dram RepresentsthetotalenergyconsumptionofDRAMonthenode. J
+ECnode,package RepresentsthetotalenergyconsumptionoftheCPUpackageonthenode. J
+ECnode,other Representsthetotalenergyconsumptionofotherhostcomponents(e.g.,network
+interfaces,storagedevices)onthenode.
+J
+ECnode,acc Representsthetotalenergyconsumptionofhardwareacceleratorsonthenode. J
+ECnode,platform Representstheoverallenergyconsumptionoftheentirehost. J
+NOTE:Notallmeasurementdatalistedaboveismandatorytobereported.Thescopeofthisdocumentdoesn’t
+addressexposingtheabovemetricsandKPIsovertheO2interfaceorcollectingthemforinternalpurposes
+bytheO-Cloud.Thefuturegranularityofthemetricsselectedforstandardizationwilltakeintoaccountthe
+impactonperformance.Theexactmetric(s)tobeusedforpowermanagementis/aredeterminedbyvarious
+factorswhichinclude:
+ ThenatureoftheworkloadoftheNFdeploymenttobemanagedonthenode.Forexample,ifthe
+workloadisCPUbound,ECnode,coremaybeusedtoassess itsenergyconsumption.Iftheworkloadis
+memoryboundorhardwareacceleratorbound,ECnode,dramorECnode,accmaybebeusedinstead.
+ TheavailabilityofcountersfromthehardwareandO-Cloud vendors.
+ Thepowermeasurementorestimationtoolused.
+6.3 Power,EnergyConsumptionMetricsofContainers
+6.3.1 Overview
+AssessingcontainerlevelpowerandenergyconsumptioniscrucialfordeterminingthepeakperformanceoftheNF
+deployedontheO-Cloud,consideringtheenergyusageduringoperation.Theseevaluationsarealsoinstrumentalin
+measuringtheefficacyofenergyefficiencystrategies,facilitatingmodificationstocurrentpolicies,ortheintroduction
+ofnewones,basedontheresultsobserved.FortheexecutionofthisfunctionwithKubernetes,wesuggestthe
+incorporationofenergy-relatedsystemstatisticstobeexportedasmetrics.
+6.3.2 MeasurementandKPIDefinition
+6.3.2.1 ContainerEnergyConsumption
+Table6.3-1liststheKPIsrelatedtoestimatedcontainerlevelenergyconsumption.
+Table 6.3-1: Container Energy Consumption
+Measurement Data
+Name Description Unit
+ECcontainer,total Representsthetotalenergyconsumptionacrosshardware componentswithinaspecified
+container.
+J
+ECcontainer,core Tracksthetotalenergyusedbyacontainer'sCPUcores,itcanbemeasuredorestimated. J
+ECcontainer,dram IndicatesthecumulativeenergydrawofacontainerinDRAM,providinginsightintoits
+memory-relatedenergyfootprint.
+J
+ECcontainer,uncore Providestheaccumulatedenergyconsumptionofspecificuncoreelementsincludingthelast-
+levelcache,integratedhardwareaccelerator(s),andmemorycontroller.
+J
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 26
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+ECcontainer,package ProvidesacumulativemeasurementoftheenergyconsumedbytheentireCPUsocket,
+encompassingallcoresanduncorecomponentsincludingthelast-levelcache,integrated
+hardwareaccelerator,andmemorycontroller.ItisgenerallyexpectedthatPackageEnergyis
+equivalenttothesumofCPUcoresandhardwareacceleratorenergycounters.
+J
+ECcontainer,other Representsenergyconsumptionfornon-CPUandnon-DRAMcomponents.Tocalculate
+individualcomponentusage,thistotalistypicallyreducedbymeasuredCPUandDRAM
+power.
+J
+ECcontainer,acc Measuresthetotalhardwareacceleratorpowerconsumptionallocatedtoaparticular
+container.
+J
+NOTE:TheKPIslistedaboveareexpectedtoundergofurther analysisandpossiblynotallofthemwillbecome
+mandatorytobereported.Thescopeofthisdocumentdoesn’taddressexposingtheabovemetricsand KPIs
+overtheO2interfaceorcollectingthemforinternalpurposesbytheO-Cloud.Thefuturegranularity ofthe
+metricsselectedforstandardizationwilltakeinto accounttheimpactonperformance.TheexactKPIstobe
+usedforpowermanagementaredeterminedbyvariousfactorswhichinclude:
+ Thenatureofthecontainerworkloadtobemonitored.Forexample,iftheworkloadisCPUbound,
+ECcontainer,coremaybeusedtoassessitsenergyconsumption.Iftheworkloadismemoryboundor
+hardwareacceleratorbound,ECcontainer,dramorECcontainer,accmaybebeusedinstead.
+ TheavailabilityofthecountersfromthehardwareandO-Cloudvendors.
+ Thepowermeasurementorestimationtoolused.
+6.3.2.2 Containerresourceutilization
+Table6.3-2liststhemeasurementdatarelatedtocontainerlevelresourceutilization.
+Table 6.3-2: Container Resource Utilization
+Measurement Data
+Name Description Unit
+CPUTime Thismetriccapturesthecontainer'stotalCPUusage,measuredthroughCPUtime,thatis
+reportedbythetracingtechnology.Itisusedasaninputforpowerestimationmodels.
+us
+Fordetailsonapowermodelingexample,pleaserefertoAnnexA,SectionA.1
+6.4 Power,energyconsumptionmetricsofNFdeploymentand
+CloudifiedNF
+6.4.1 Overview
+MeasuringthepowerandenergyconsumptionofO-CloudResourcesassociatedwithanNFDeploymentand
+CloudifiedNFcouldhelpmonitorandanalyzeenergyconsumptionperNFDeploymentandCloudifiedNFonanO-
+Cloud.Suchmeasurementsalsohelpdeterminingwhethertheenergyefficiencypoliciesarehavingadesiredeffect,and
+helpstosetnewpoliciesorupdateexistingpolicies.
+NOTE: Thepotentialmappingbetweentheexistingenergysavingsusecases(inClause5)and power/energy
+consumptionmetricsofNFdeployment/CloudifiedNFisnotspecifiedinthecurrentO-CloudEnergy
+SavingsTRdocument.
+6.4.2 MeasurementandKPIDefinition
+6.4.2.1 NFDeploymentpowerandenergyconsumption
+AsbeenstudiedinETSIGRNFV-EVE021[10],clause7.2.20,thepower/energyconsumptionofNFDeploymentcan
+beeitherestimatedbasedontherelativeresourceusageofthemonitoredobjectwithrespecttoothermonitoredobjects
+placedonthesamecomputeresourceorobtainedthrough“real”measurementbyanentity(e.g.,anOStool)whichcan
+measurethepowerconsumptionofthemonitoredobject.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 27
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+ForestimatedNFDeploymentenergyconsumption,clause6.7.3.1.4of3GPPTS28.554[11]specifiesthe"estimated
+virtualcomputeresourceinstanceenergyconsumptionbasedonmeanvCPUusage".Inthiscase,theenergy
+consumptionofavirtualcomputeresourceinstanceisestimatedasaproportionoftheenergyconsumptionoftheO-
+CloudNodeonwhichtheresourceinstanceruns.TheproportionisobtainedbydividingthevCPUmeanusageofthe
+virtualcomputeresourceinstancebythesumofthevCPUmeanusageofallvirtualcomputeresourceinstancesrunning
+onthesameO-Cloud Node.Table6.4-1andTable6.4-2listtheKPIsrelatedtoestimatedNFDeploymentpowerand
+energyconsumptions.
+Table 6.4-1: Estimated NF Deployment Power Consumption
+KPI
+Name Description Unit
+PNF
+Deployment,
+estimated
+AKPIthatgivesanestimationofthepowerconsumptionofaNFdeploymentrunningintheO-
+Cloud.ThisKPIisderivedfromthepowerconsumptionofO-CloudResourcesallocatedtothat
+NFDeploymentbasedonthemeanusageoftheresource(e.g.vCPUmeanusage).
+W
+Table 6.4-2: Estimated NF Deployment Energy Consumption
+KPI
+Name Description Unit
+ECNF
+Deployment,
+estimated
+AKPIthatgivesanestimationoftheenergyconsumptionofaNFdeploymentrunningintheO-
+Cloud.ThisKPIisderivedfromtheenergyconsumptionofO-Cloud resourcesallocatedtothat
+NFDeploymentbasedonthemeanusageoftheresource(e.g.vCPUmeanusage).
+J
+Asbeinganestimationabove,itsvaluemightnotbeaccurateenough.Therefore,otherformstomeasuringthe
+power/energyconsumptionofNFDeploymentisstillanopenissue.Anexamplesolutionforobtainingmoregranular
+andrefinedestimation-“real”measuredvalueofthemonitoredobjecthasbeenstudiedandintroduced inETSIGR
+NFV-EVE021[10].Theexactmechanismforcomputingthe“real”measuredpowerconsumptionofNFDeployment
+mightbelefttovendorspecificimplementationandleftoutsidethestandardizationscope.Thiscomputationcan
+leveragestandardizedmetricsregardingthe“real”measuredpowerconsumptionofindividualcomponentsconforming
+theNFDeployment.
+NFDeploymentlevelpowerandenergyconsumptionestimationrequireinventoryknowledgeoftheNFDeployment
+deployedontheO-CloudNodesandtheirresourcesusage(e.g.,CPUusage).
+6.4.2.2 CloudifiedNFpowerandenergyconsumption
+Table6.4-3andTable6.4-4listtheKPIsrelatedtoestimatedCloudified NFpowerandenergyconsumption.
+Table 6.4-3 Estimated Cloudified NF Power Consumption
+KPI
+Name Description Unit
+PcloudifiedNF,
+estimated
+AKPIthatgivesanestimationofthepowerconsumptionofaCloudifiedNF.ThisKPIis
+obtainedbysumminguptheestimatedpowerconsumptionofitsconstituentNFdeployment(s).
+W
+Table 6.4-4 Estimated Cloudified NF Energy Consumption
+KPI
+Name Description Unit
+ECcloudifiedNF,
+estimated
+AKPIthatgivesanestimationoftheenergyconsumptionofaCloudified NF.ThisKPIis
+obtainedbysumminguptheestimatedenergyconsumptionofitsconstituentNFdeployment(s).
+J
+6.5 EnergyefficiencyofCloudifiedNF
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 28
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+6.5.1 Overview
+AssessingenergyefficiencyKPIofaCloudifiedNF,iscrucialforunderstandingwhethertheCloudifiedNFdeployed
+ontheO-Cloudisperformingoptimallyconsideringtheenergyconsumedforitsoperation.Suchmeasurementsalso
+helpdeterminingwhethertheenergyefficiencypoliciesarehavingadesiredeffectandhelpstosetnewpoliciesor
+updateexistingpolicies.
+NOTE: Thepotentialmappingbetweentheexistingenergysavingsusecases(inClause5)and theenergy
+efficiencyofCloudifiedNFisnotspecifiedinthepresentdocumentversion.
+6.5.2 MeasurementandKPIDefinition
+TheapproachforassessingenergyefficiencyofCloudifiedNFstronglydependsonthefunctionalityand purposeofthe
+CloudifiedNF.Ingeneral,theenergyefficiencyofaCloudifiedNFcanbedeterminedbyassessingitsdelivered
+performanceversusitsenergyconsumptionoveradefinedtimeintervalfollowingformula:
+퐸퐸푐푙표푢푑푖푓푖푒푑 푁퐹 =
+푃푒푟푓퐶푙표푢푑푖푓푖푒푑 푁퐹
+퐸퐶퐶푙표푢푑푖푓푖푒푑 푁퐹
+Wherein푃푒푟푓퐶푙표푢푑푖푓푖푒푑 푁퐹 correspondstotheserviceperformanceoftheCloudifiedNFand퐸퐶Cloudified NF isthe
+energyconsumptionassociatedtotheCloudified NFoveradefinedtimeintervalasmeasuredorestimatedaccordingto
+clause6.4.
+Thedeliveredperformancecanbebasedondifferenttypesofmeasuresthatarelistedbelowdependingontheexact
+servicetheCloudifiedNFprovides.
+Table 6.5-1 Types of Energy Efficiency Measures
+Measurement Approach Description Unit
+EnergyefficiencyassessmentbasedonPDCP
+SDUdatavolume
+3GPPTS28.554[11],clause6.7.1andETSIES
+203228[12],clause5.3
+bit/J
+Energyefficiencyassessmentbasedoncoverage ETSIES203228[12],clause5.3 m²/J
+Energyefficiencyassessmentbasedonlatency
+(used forURLLCslice)
+3GPPTS28.554[11],clause6.7.2.3.2andETSI
+ES203228[7],clause5.3
+(0.1ms*J)-1
+Energyefficiencyassessmentbasedonboth
+latency anddatavolume
+(used forURLLCslice)
+3GPPTS28.554[11],clause6.7.2.2and6.7.2.2a bit/(0.1ms*J)
+Energyefficiencyofregisteredsubscribers
+(used forMIoTslice)
+3GPPTS28.554[11],clause6.7.2.4.1 user/J
+EnergyefficiencyofnumberofactiveUEs
+(used forMIoTslice)
+3GPPTS28.554[11],clause6.7.2.4.2 user/J
+NOTE: FurtherinformationonhowtheseKPIsarecalculatedareavailableintherelevant3GPPandETSI
+specifications.Selectionofaparticularwayofmeasuringtheenergyefficiencydependsonthe
+requirements,typeofdeploymentsanduse-cases.ItisexpectedthattheSMOcancomputetheEnergy
+consumptionandefficiencyofaCloudifiedNFbasedonmeasurementsfromtheO-Cloud.Energy
+efficiencycalculationsmayinvolvecollaborationwithotherworkinggroups,suchasWG10.
+InETSIES203228[12],thetimedurationoftheenergy efficiencymeasurementisweekly,monthly,oryearly.
+7 Void
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 29
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+8 Conclusions
+TheobjectiveoftheTechnicalReportwastobetterunderstandhowtoreducepowerconsumptionofO-Cloudthrough
+optimizedresourcemanagement,establishingastandardizedframeworkforenergyefficiencymeasurement,evaluation,
+andmonitoring,anddevelopingusecasestodemonstratepower-savingtechniques.Afterthisinitialanalysisthis
+TechnicalReportconcludesthatenergymanagementtechniquesmightbeusedtoenhanceO-Cloudenergyefficiency.
+InthisTechnicalReportthefollowingpotentialusecasesforEnergySavingswereoutlinedandstudied:
+ UseCase1:O-Cloud NodeShutdown inIdleMode
+ UseCase2:CPUcorefrequencyandpinning configurationchangebySMO
+ UseCase3:C-stateusageforNFDeployment
+ UseCase4:O-Cloud NodeClusterModeSelection
+TheusecasesaboverequirefurtheranalysistounderstandwhethertheycouldbeusedtorealizeO-Cloudenergy
+savings.AdetailedimpactanalysisoftheseusecasesontheoverallO-RANarchitecturemayalsobeneededbutis
+beyondthescopeofthepresentdocument.
+ThereportidentifiespotentialrelevantmetricsandKPIsfortheoperationofO-Cloud EnergySavings.Variousmetrics
+andKPIswereconsidered,includingpowerandenergyconsumptionoftheinfrastructure,containers,NFDeployments,
+andCloudifiedNFs,aswellastheenergyefficiencyofCloudifiedNFs.Theintroducedmetricsand Keyperformance
+indicatorsinthis reportrequirefurtheranalysistounderstandwhethertheycouldbeusedtorealizeenergysavings.
+Annex A (Informative):
+A.1 Power Modelling Example
+NOTE: Thissectionincludesinformativereferencestoindustryimplementations
+KeplerisaCNCFopensourceprojectthataddressestheneedtomeasureenergyconsumptioninanO-Cloud.It
+providespod-levelpowermeasurementsbasedontwopowermodellingapproaches. Themodellingapproachthatis
+useddependsontheconstraintspresented bythespecificusagescenario.Theusagescenariosmaybebrokendowninto
+twocategories:
+1. Bare-Metal
+a. Bare-metalwithdirectaccesstoreal-timenodepowermetricsviahostOSAPIs
+b. Bare-metalwith nodirectaccesstoreal-timenodepowermetricsviahostOSAPIs,eitherdueto
+security,performance,orconfigurationissues
+2. VMsthatdonotsupportnativeaccesstoreal-timenodepowermetrics
+Keplerusesaratiomethod(PowerRatioModel)toattributepowerconsumptionbasedonresource(cpu/dram/gpu)
+consumption.Ifacontainerusesx%oftheresource,and theresourceconsumesyjoulesovertheobservationwindow,
+thenthecontainerisattributedx%*yjoules.
+Foreachresource,Keplerusesdifferentwaystomeasureconsumption.ForCPU/DRAM,KeplertrackshowmanyCPU
+instructions(onbaremetalservers)orCPUtime(onVMs,ifCPUinstructionsarenotavailable)theprocesseswithin
+thecontaineruse.ForDRAMconsumption,Keplerusescachemisses(onbaremetalservers)oradirtypagefunction
+callcounterintheLinuxkernel(onaVM,ifcachemissesarenotreadable).
+WhilethePowerRatioModelisalwaysused,whendirectaccesstoreal-timenodepowermetricsisnotavailablePower
+EstimationModellingisusedtocalculatetheseinputsusingPre-trainedModels.
+Theresultingmodellingapproachesareasfollows:
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 30
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+ Power Ratio Modelling: Calculatesgranularpowervalues.Itdeterminesdetailedpowerconsumptionfigures
+bydividingindividualusageratiosbytheoverallpowerconsumption.Thisapproachisautomatically
+employedwhenthetotalpowerconsumptionisreadilyavailable(default).
+ Power Estimation Modelling: Powerestimationisdonebyatrainedmodelthatleveragesusagemetricsas
+inputfeatures.Thisapproachfacilitatespowerestimationeveninscenarioswheredirectpowermeasurement
+isnotfeasible.Themodelsupportsestimationatthreegranularitylevels:
+‐ Node-level:encompassingtotalpowerconsumptionofanode,includingfans,powersupplies,andother
+ancillarycomponents.
+‐ Component-level:targetingpowerconsumptionofindividualnodecomponents,suchasCPUsand
+memorymodules.
+‐ Pod-level:targetingpowerconsumptionattheKubernetesPodlevel.
+(Alsosee[GetstartedwithKeplerModelServer](../kepler_model_server/get_started.md))
+Inscenarioswhereaccesstoactualnodepowermeasurementsisnotavailable,suchasforpodsrunningonVMsina
+publiccloud,Pre-trainedPowerModelsareusedtocalculateoverallpowerconsumption.
+Pre-trainedPowerModels(examples:)canbeleveraged fordiversedeploymentscenarios.Thesemodelssupportboth
+powerratioandpowerestimationmodellingforbothRAPL(RuntimeAveragePowerLimit)andACPI(Advanced
+ConfigurationandPowerInterface)powersources.Keyfeaturesoftheavailablemodelsinclude:
+ AbsPower models: Theseestimatebothidleanddynamicpowerconsumption.
+ IdlePower models: Thesefocussolelyontheidlepowerestimationthatclaims,butdoesnotuse,the
+resources.
+ DynPower models: Thesefocussolelyondynamicpowerestimation.
+Toensuremodelaccuracyandtransparency,theMAE(meanabsoluteerror)foreachmodelisalsopublished.
+ExampleusageandapplicationscenariosofdifferenttypesofpowermodellingrelatedtothemetricsandKPIs
+describedpreviouslycanbereferencedfromthetableinhttps://sustainable-computing.io/design/power_model/.
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 31
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+Change history/Change request (history)
+Date Revision Description
+2022.08.03 Skeleton
+01.00
+Draftversion01.00
+2022.10.07 Skeleton
+01.00V13
+Skeletonapproved
+2023.06.07 Skeleton
+01.00v14
+UpdateSkeleton,addsections:
+4.1 ArchitectureoptionstoachieveCPUoptimisation,
+4.2 6EnergyConsumptionandEfficiency-MeasurementsandDescription
+2023.06.13 TR
+00.00.01
+MergetheapprovedCRs,including:
+2022.11.16-WG6-CR-0001-O-RAN-O-Cloud-Energy-Saving-Introduction-v04,
+2022.11.23-WG6-CR-0001-O-RAN-O-Cloud-Energy-Saving-backgroundconceptsassumptions-
+v05,
+RMI-2022.11.30-WG6-CR-0003-O-RAN-O-Cloud-Energy-Saving-TR-Node-Shutdown-v07,
+CMCC.AO-2022.10.12-WG6-CR-0001-O-RAN-O-Cloud-Energy-Saving-CPUcorefrequencyand
+piningconfiguration-v17
+2023.10.18 TR
+00.00.02
+MergetheapprovedCR：
+INT-2023.02.12-WG6-CR-0001-O-RAN-O-Cloud-Energy-Saving-Cstate-deploymentv7
+2023.10.27 TR
+00.00.03
+MergetheapprovedCR：
+DELL.AO-2023.06.12-WG6-CR-0004-O-Cloud-Energy-Consumption-and-Efficiency-
+Measurements-v12
+2024.03.11 TR
+00.00.04
+MergetheeditorialCRsforTR：
+NOK-2024.02.20-WG6-CR0108-Clause6_xEditor’sNotesproposechangev3
+VDF.AO-2024.02.24-WG6-CR-002-IncorporateEditorNotes-v04
+CMCC.AO-2024.02.23-WG6-CR-0001-O-CloudEnergySavingsTReditorialchanges-v04
+MergethetechnicalCRsforTR：
+WRS-AO_O-RAN.WG6.Architecturesoptionsforresourceoptimisationv10
+NOK-2023.03-06-WG6-CR-068-EnergySavingsinO-Cloudusingmodes-v11
+NOK-2023.03.03-WG6-CR-0069-O-Cloudenergysavingsconceptsandassumptions-v08.docx
+Othereditorialchangesincludingreferences,stylesandcontents.
+2024.03.14 TR
+00.00.05
+Editorialchangesincluding:
+Removethesection4.2.2and4.2.3andmovethecontentsto4.2.1.1.
+Updatethewordingin“EnergySavingMode”to“Mode”anddescribe“forenergysaving”in
+section5.4.2and5.4.3.
+Updatethecopyrightto2024
+2024.03.21 TR
+00.00.06
+EditorialchangesbasedonthecommentsreceivedbeforeMar21:
+UpdatethewordinginIntroductionclauseand4.2.1.1
+Updatethetypo,“TBD”,titleoftableandstylefortheTR.
+2024.03.22 TR
+00.00.07
+EditorialchangesbasedonthecommentsreceivedonMar21:
+UpdatethewordingfortheTR.
+Add2NOTESfor“Linux”and“KubernetesandK8s”trademarks.
+Re-organizedsomesub-sectionstosolve“hangingparagraphs”.
+2024.07.11 TR
+01.00.01
+Editorialchangesbasedonthereceivedcommentssofar.
+MergethetechnicalCRsforTR：
+WRS-AO_O-RAN.WG6.AddtionalArchitecturesoptionsforresourceoptimizationv05
+ERI.AO-2024.04.19-WG6-CR-0030-O-Cloud_Node_Cluster_Mode_Selection-v07
+RHT.AO-2023.11.24-WG6-CR-0001-O-Cloud-Energy-Efficiency-Measurements-v0.17
+2024.07.19 TR
+01.00.02
+Editorialchangesbasedonthereceivedcommentssofar.
+2024.07.21 TR
+01.00.03
+Editorialchangesbasedonthereceivedcommentssofar.
+2024.07.22 TR replacingthesentence“NotallKPIslistedabovearemandatorytobereported”with“TheKPIs
+listedaboveareexpected toundergofurtheranalysisandpossiblynotallofthemwillbecome
+
+________________________________________________________________________________________________
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 32
+O-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00
+01.00.04 mandatorytobereported”intheclause6.3.2.
+2025.01.15 TR
+02.00.01
+Modifyingclauses6.2.2.2and6.3ofESTRrelatedtoO-CloudNodeEnergyConsumptionand
+Power,EnergyConsumptionMetricsofContainers
+2025.01.15 TR
+02.00.02
+Definethesubsectionsforsection7
+2025.01.15 TR
+02.00.03
+Updatethesubsection7.1
+2025.02.26 TR
+02.00.04
+Updatethesubsection7.1
+2025.07.08 TR
+02.00.05
+CompletetheO-RAN.WG6.O-CLOUD-ESTR-v02.00.05oftheWG6EnergySavingsTRby
+updatingtheSection7andSection8.
+2025.07.18 TR
+03.00.00
+FinalversionO-RAN.WG6.TR.O-CLOUD-ES-R004-v03.00

@@ -1,0 +1,1059 @@
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Technical Report 
+O-RAN Working Group 1
+Study on O-RAN Slicing
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform 
+the third party that these conditions apply to them and that they must comply with them.
+
+                                  
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00  
+Technical Report  
+ 
+O-RAN Working Group 1  
+Study on O-RAN Slicing  
+  
+ 
+ 
+ 
+  
+ 
+Prepared by the O-RAN Alliance e.V. Copyright © 2020 by the O-RAN Alliance e.V. By using, accessing or downloading any part of this 
+O-RAN specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are 
+bound to the terms of the O-RAN Adopter License Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ          1 
+ 
+ 
+ 
+ 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        2 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Revision History  1 
+Date Revision Author Description 
+2019.12.16 02.00.01 Arda Akman (Netsia) Initial version of v2.0 (and deletion of v1.0 revision history) 
+2019.12.26 02.00.02 Arda Akman (Netsia), 
+Tuğba Arıcı (Netsia) 
+Update to SDO Mapping table to add 
+- Fault Management 
+- Security Aspects 
+2019.12.29 02.00.03 Arda Akman (Netsia), 
+Tuğba Arıcı (Netsia) 
+Updates to GSMA section to reflect the latest GSMA specs 
+2020.01.20 02.00.04 Arda Akman (Netsia), 
+Burcu Yargıçoğlu 
+Şahin (Netsia) 
+Addition of O1, A1, E2, O2 impact and Deployment Options 
+sections through CR: 
+- ORAN-WG1.Netsia_CR_StudyO-RAN-
+Slicing_20012020 
+2020.03.01 02.00.05 Arda Akman (Netsia) Updated references, abbreviations, deployment options and 
+other editorial updates 
+2020.03.09 02.00.06 Arda Akman (Netsia) Updates to various sections based on review feedback during 
+WG1 approval process  
+ 2 
+ 3 
+  4 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        3 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Contents  1 
+Revision History ................................................................................................................................................. 2 2 
+Chapter 1 Introduction ........................................................................................................................................ 4 3 
+1.1 Scope ................................................................................................................................................................. 4 4 
+1.2 References.......................................................................................................................................................... 4 5 
+1.3 Definitions and Abbreviations ........................................................................................................................... 5 6 
+1.3.1 Definitions .................................................................................................................................................... 5 7 
+1.3.2 Abbreviations ............................................................................................................................................... 6 8 
+Chapter 2 Objective ............................................................................................................................................ 7 9 
+Chapter 3 Common Terminology ....................................................................................................................... 8 10 
+Chapter 4 Slicing in SDOs ................................................................................................................................. 9 11 
+4.1 Slicing in 3GPP .................................................................................................................................................. 9 12 
+4.2 Slicing in ONAP .............................................................................................................................................. 11 13 
+4.3 Slicing Orchestration in 3GPP SA5 and ETSI NFV MANO ........................................................................... 12 14 
+4.4 Slicing in ETSI ZSM ....................................................................................................................................... 14 15 
+4.5 Slicing in GSMA ............................................................................................................................................. 16 16 
+Chapter 5 O-RAN Slicing Framework ............................................................................................................. 18 17 
+5.1 O-RAN Slicing Architecture............................................................................................................................ 18 18 
+5.1.1 Non-RT RIC ............................................................................................................................................... 18 19 
+5.1.2 Near-RT RIC .............................................................................................................................................. 18 20 
+5.1.3 O-RAN Central Unit (O-CU) ..................................................................................................................... 18 21 
+5.1.4 O-RAN Distributed Unit (O-DU) ............................................................................................................... 18 22 
+5.1.5 A1 Impact ................................................................................................................................................... 19 23 
+5.1.6 E2 Impact ................................................................................................................................................... 19 24 
+5.1.7 O1 Impact ................................................................................................................................................... 19 25 
+5.1.8 O2 Impact ................................................................................................................................................... 19 26 
+Chapter 6 Deployment Options ........................................................................................................................ 20 27 
+Annex A (informative): Additional Information .............................................................................................. 23 28 
+A.1 Slicing SDO Mapping Table ............................................................................................................................ 23 29 
+Annex ZZZ O-RAN Adopter License Agreement ........................................................................................... 24 30 
+ 31 
+ 32 
+ 33 
+  34 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        4 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 1 Introduction 1 
+1.1 Scope 2 
+This Technical Report has been produced by O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O-RAN WG1 Slicing Task Group  and may 4 
+change following formal O-RAN approval. In the event that O-RAN Alliance decides to modify the contents of the present 5 
+document, it will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version 6 
+number as follows: 7 
+Release x.y.z 8 
+where: 9 
+x the first digit is incremented for all changes of substance, i.e. technical enha ncements, corrections, updates, 10 
+etc. (the initial approved document will have x=01). 11 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  12 
+z the third digit included only in working versions of the document i ndicating incremental changes during the 13 
+editing process. 14 
+This document provides common terminology for slicing, an overview of slicing activities in different SDOs (3GPP, 15 
+ETSI, ONAP, GSMA, etc.) and provides the high level view of O -RAN slicing framework and architecture along with 16 
+different deployment options. 17 
+ 18 
+1.2 References 19 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 20 
+document. 21 
+- References are either specific (identified by date of publication, edition number, version number, etc.) or 22 
+non-specific. 23 
+- For a specific reference, subsequent revisions do not apply. 24 
+- For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 25 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 1 6. 26 
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications” 27 
+[2] 3GPP TS 23.501: “System Architecture for the 5G System”, Release 16, December 2019 28 
+[3] 3GPP TR 28. 801: “ Study on management and orchestration of network slicing for next generation network ”, 29 
+Release 15, January 2018. 30 
+[4] 3GPP TS 28.530: “Aspects; Management and orchestration; Concepts, use cases and requirements” , Release 16, 31 
+January 2020. 32 
+[5] 3GPP TS 28.541: “Management and orchestration; 5G Network Resource Model (NRM); Stage 2 and stage 3 ”, 33 
+Release 16, January 2020. 34 
+[6] 3GPP TS 38.300: “NR and NG-RAN Overall Description”, Release 16, January 2020. 35 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        5 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+[7] ETSI GR NFV-EVE 012: “Report on Network Slicing Support with ETSI NFV Architecture Framework”, 1 
+Release 3, December 2017.  2 
+[8] ETSI GS NFV-IFA 008: “Ve-Vnfm reference point - Interface and Information Model Specification”, Release 2, 3 
+February 2018.  4 
+[9] ETSI GS NFV-IFA 013: “Os-Ma-Nfvo reference point - Interface and Information Model Specification”, 5 
+Release 2, February 2018.  6 
+[10] GSMA: “An Introduction to 5G Network Slicing”, 2017.  7 
+[11] GSMA: “From Vertical Industry Requirements to Network Slice Characteristics”, August 2018 .  8 
+[12] GSMA: “Network Slicing, Use Case Requirements”, April 2018.   9 
+[13] GSMA: ”Generic Network Slice Template”, Release 2, October 2019 10 
+[14] ETSI GS ZSM 003: “Zero-touch Network and Service Management (ZSM); End to end management and 11 
+orchestration of network slicing”. 12 
+1.3 Definitions and Abbreviations 13 
+1.3.1 Definitions 14 
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [1] and the following apply. 15 
+A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP 16 
+TR 21.905 [1]. 17 
+A1: Interface between non -RT RIC and Near -RT RIC to enable policy -driven guidance of Near -RT RIC 18 
+applications/functions, and support AI/ML workflow. 19 
+E2:  Interface connecting the Near-RT RIC and one or more O -CU-CPs, one or more O -CU-UPs, and one or more O -20 
+DUs. 21 
+FCAPS: Fault, Configuration, Accounting, Performance, Security. 22 
+Intents: A declarative policy to steer or guide the behaviour of RAN functions, allowing the RAN function  to calculate 23 
+the optimal result to achieve stated objective. 24 
+near-RT RIC: O-RAN near-real-time RAN Intelligent Controller: a logical function that enables near -real-time control 25 
+and optimization of RAN elements and resources via fine-grained data collection and actions over E2 interface. 26 
+non-RT RIC: O-RAN non-real-time RAN Intelligent Controller: a logical function that enables non -real-time control 27 
+and optimization of RAN elements and resources, AI/ML workflow including model training and updates,  and policy-28 
+based guidance of applications/features in near-RT RIC. 29 
+NMS: A Network Management System. 30 
+O-CU: O-RAN Central Unit 31 
+O-CU-CP: O-RAN Central Unit – Control Plane: a logical node hosting the RRC and the control plane part of the PDCP 32 
+protocol. 33 
+O-CU-UP: O-RAN Central Unit – User Plane: a logical node hosting the user plane part of the PDCP protocol and the 34 
+SDAP protocol. 35 
+O-DU: O-RAN Distributed Unit: a logical node hosting RLC/MAC/High-PHY layers based on a lower layer functional 36 
+split. 37 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        6 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+O-RU: O-RAN Radio Unit: a logical node hosting Low-PHY layer and RF processing based on a lower layer functional 1 
+split.  This is similar to 3GPP’s “TRP” or “RRH” but more specific in including the Low-PHY layer (FFT/iFFT, PRACH 2 
+extraction).   3 
+O1: Interface between mana gement entities (NMS/EMS/MANO) and O -RAN managed elements, for operation and 4 
+management, by which FCAPS management, Software management, File management shall be achieved.  5 
+RAN: Generally referred as Radio Access Network. In terms of this document, any component below near-RT RIC per 6 
+O-RAN architecture, including O-CU/O-DU/O-RU. 7 
+ 8 
+1.3.2 Abbreviations 9 
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An 10 
+abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 11 
+3GPP TR 21.905 [1].  12 
+eNB eNodeB (applies to LTE)  13 
+gNB gNodeB (applies to NR) 14 
+KPI Key Performance Indicator  15 
+KQI Key Quality Indicator 16 
+Near-RT RIC Near-RT RIC 17 
+Non-RT RIC Non-Real-Time RIC 18 
+NS  Network Service 19 
+O-CU O-RAN Central Unit 20 
+O-DU O-RAN Distributed Unit 21 
+O-RU O-RAN Radio Unit  22 
+PNF Physical Network Function 23 
+PRB Physical Resource Block 24 
+RIC O-RAN RAN Intelligent Controller 25 
+RRM Radio Resource Management 26 
+SDO Standards Developing Organizations (For ex: 3GPP, ETSI, ONAP, O -RAN) 27 
+SMO Service and Management Orchestration 28 
+VNF Virtual Network Function 29 
+NSD NFV Network Service Descriptors 30 
+NST Network Slice Templates 31 
+ 32 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        7 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 2 Objective 1 
+The current document aims to define the common terminology for slicing, captures slicing activities in different SDOs 2 
+(3GPP, ETSI, ONAP, GSMA, etc.) and provides the high level view of O-RAN slicing framework and architecture, with 3 
+the purpose of helping identify requirements for O -RAN defined interfaces and functions, eventually leading to formal 4 
+drafting of interface specifications.  5 
+ 6 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        8 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 3 Common Terminology 1 
+In this chapter, it is aimed to list slice specific definitions to agree on a common terminology.   2 
+Network slice instance: a set of network functions and the resources for these network functions which are arranged and 3 
+configured, forming a complete logical network to meet certain network characteristics. [3] 4 
+Network s lice subnet instance: a set of network functions and the resources for these network functions  which are 5 
+arranged and configured to form a logical network. [3] 6 
+Network s lice subnet template: description of the structure (and contained components) and configuration of the 7 
+network slice subnet. [3] 8 
+Network slice template: description of the structure (and contained components) and configuration of a network slice. 9 
+[3] 10 
+Physical resource isolation : regime of resource management when a physical resource used by one network slice 11 
+instance cannot be shared with another network slice instance. [3] 12 
+ 13 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        9 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 4 Slicing in SDOs 1 
+4.1 Slicing in 3GPP 2 
+Architecture Including Network Slicing 3 
+Network slicing concept is considered as one of the key feature of 5G networks. Service-based 5G architecture including 4 
+network slicing is defined in 3GPP TS 23.501  [2]. Figure 4.1-1 represents the non -roaming reference architecture and 5 
+interfaces utilised in control plane.  6 
+ 7 
+UE (R)AN UPF
+AF
+AMF SMF
+PCF UDM
+DNN6
+NRFNEF
+N3
+N2 N4
+AUSF
+Nausf Namf Nsmf
+NpcfNnrfNnef Nudm Naf
+NSSF
+Nnssf
+N9
+SCP
+ 8 
+Figure 4.1-1: Reference architecture 9 
+ 10 
+Network Slice Identification and Service Types 11 
+A network slice is always defined with RAN part and CN part in a PLMN (see Clause 5.15.1 in [2]). The network slicing 12 
+support is based on the principle that flows of the different slices handled by different PDU sessions. Granularity of slice 13 
+awareness is in PDU session level (see Clause 16.3.1 in [6]). 14 
+S-NSSAI is a unique identifier for each network slice. NSSAI (Network Slice Selection Assistance Information) includes 15 
+one or a list of s -NSSAIs which is a combination of mandatary SST (Slice/Service Type) and an optional SD (Slice 16 
+Differentiator). The operator may choose to serve same Slice/Service Type but using different s-NSSAIs in case of serving 17 
+same features to different group of users. 18 
+To support roaming use cases more efficiently, some SST values are standardised for the most common service types as 19 
+shown in the Table 4.1-2 defined as in 3GPP TS 23.501 [2]. 20 
+Slice/Service type SST value Characteristics 
+eMBB 1 Slice suitable for the handling of 5G enhanced Mobile Broadband. 
+URLLC 2 Slice suitable for the handling of ultra- reliable low latency communications. 
+MIoT 3 Slice suitable for the handling of massive IoT. 
+V2X 4 Slice suitable for the handling of V2X services. 
+Table 4.1-2: Standardized SST values 21 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        10 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+Key Principles of Network Slicing  2 
+A single UE can connect one or more Network Slice instances simultaneously. The maximum number of simultaneous 3 
+connection is 8 per UE. If UE has multiple simultaneous connections to the different slices, only one signalling connection 4 
+is used.  5 
+5G QoS model is ba sed on QoS Flows. GBR QoS f lows require guaranteed flow bit rate. N on-GBR QoS f lows, by 6 
+contrast, do not require guaranteed flow bit rate. QoS differentiation is supported within a network slice.  7 
+NG-RAN should support resource management between slices. SLA is provided between slices. Multiple slices could be 8 
+supported on a single RAN and resource isolation is maintained between slices. Shared resources should be managed by 9 
+RRM policies or other mechanisms to prevent SLA violations for other slices.  10 
+Slice availability depends on the deployment scenario. Some slices might be offered globally while some others might be 11 
+only in a local area.  12 
+Selection of a Network Slice 13 
+AMF selection procedure is made based on NSSAI or Temp ID. NSSAI is used when UE does not have Temp ID. 14 
+Otherwise, RAN uses the NSSAI reported by UE during initial access procedure to select appropriate AMF. If both of 15 
+them is not available, RAN routes UE to a default AMF.  16 
+After RRC connection and AMF Selection are completed successfully, selected AMF sends Initial Context Setup Request 17 
+message to RAN to complete UE context. This message includes allowed NSSAI, s-NSSAI for each PDU session. When 18 
+required resources and policies for the selected slice(s) are ready, RAN side sends an Initial Context Setup Response 19 
+message to AMF 3GPP TS 38.300 [6]. 20 
+Management and Orchestration of Network Slicing 21 
+Network slice is a logical network that provides specific network capabilities and network characteristics. There are some 22 
+aspects that a network slice includes. A deployed network slice forms a Network Slice Instance (NSI). An NSI has all the 23 
+physical and logical resources and the functionalities to serve a business use case. The NSI contains Core Part and Access 24 
+Part. To create an NSI, configurations and policies are required for each instance. The NSI lifecycle includes 25 
+commissioning, operation and decommissioning phases as shown in Fig 4.1-2. 26 
+ 27 
+ 28 
+ 29 
+Figure 4.1-2: NSI lifecycle 30 
+ 31 
+In the preparation phase NSI does not exist and necessary preparations are handled, such as network slice design, capacity 32 
+planning and on-boarding. Commissioning phase includes the creation of the NSI where all needed resources are allocated 33 
+and configured per slice requirements. Operation phase is the state that NSI is operating and supporting services to the 34 
+specified types. In the activation step, any action required to make NSI active is included. Supervision, reporting and 35 
+modification steps are involved in operation phase. To illustrate, KPI reporting, reconfiguration of NSI or scaling are used 36 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        11 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+in these phases. Decommissioning phase involves termination of the NSI and releasing of the resources assigned to it (see 1 
+Clause 4.3.1 in [4]). 2 
+Network Resource Model and RRM Slice Policies 3 
+3GPP TS 28.541 [5] has introduced the Information Model in the Network Resource Model (NRM) to fulfill management 4 
+and orchestration of 5G networks. Regarding the network slicing feature modeling at the NRCellCU level, the model 5 
+basically lists the s -NSSAI(s) supported in the cell and RRM policy to share resources  among listed slices. 6 
+RRMPolicyType attribute is used to describe RRM policy to be applied. 7 
+4.2 Slicing in ONAP 8 
+ONAP 5G slicing activity is ongoing in Frankfurt R6 release. ONAP R5 includes the feature of Network Slicing modeling 9 
+as a prerequisite for Slic ing orchestration that is work in progress in R6. The Network Slice model leverages the shared 10 
+service/resource approach that is essential for modeling the network slice where VNF’s/PNF’s may be shared by several 11 
+slices. 12 
+The shared service approach is similar to ETSI NFV nested services approach, so its TOSCA implementation may be 13 
+easily translated into Network Service descriptors defined by the ETSI NFV -SOL001 specification for TOSCA based 14 
+NFV descriptors. 15 
+The graphical r epresentation of the example of modelling the eMBB Network Slice having 3 slice segments (RAN, 16 
+transport and core) is shown below in Figure 4.2-1. 17 
+ 18 
+ 19 
+Figure 4.2-1: Example model of eMBB Network Slice 20 
+ 21 
+Nested Network Service is the approach for shared resources (VNF/NS) 22 
+ 23 
+ Nested network service TOSCA implementation in ETSI NFV-SOL001 24 
+ PNFD may be part of Nested Service 25 
+ 26 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        12 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Sharing of Network Slice resources (PNF’s and VNF’s) for ONAP release 6 is proposed using Nested services 1 
+approach (based on work done for Release 5) including wrapping PNFs/VNF’s within Network Services and defining 2 
+operations and properties on Service level. The Network slicing orchestration in ONAP R6 will include assigning 3 
+workflows to the operations. 4 
+Following this approach, the topology model for O-RAN segment would be as shown below in Figure 4.2-2: 5 
+ 6 
+ 7 
+Figure 4.2-2: High level O-RAN topology model 8 
+  9 
+4.3 Slicing Orchestration in 3GPP SA5 and ETSI NFV MANO 10 
+According to ETSI NFV Network Slicing Report [7], network slicing has been defined by different SDOs , there is no 11 
+common definition  for network slicing . Therefore, understanding of network slicing is different  from each other . 12 
+Nonetheless, the report does not introduce use cases or features but analyses n etwork slicing in external SDOs. In this 13 
+report, how these external use cases should be mapped to NFV and the ETSI NFV architecture is explained.  14 
+As stated in  3GPP TR 28.801  [3], a network slice may contain one or more network slice subnets and each of them 15 
+includes one or more network functions. VNFs and PNFs are managed as these network functions  in the ETSI NFV 16 
+architecture. Related to network slicing management, there are three different management functions identified in 3GPP 17 
+TR 28.801 [3]: 18 
+ Communication Service Management Function ( CSMF): translates the communication service  related 19 
+requirement to network slice related requirements.  20 
+ Network Slice Management Function (NSMF): responsible for management and orchestration of NSI. Provides 21 
+communication with the Network Slice Subnet Management Function (NSSMF) and Communication Service 22 
+Management Function. 23 
+ Network Slice Subnet Management Function (NSSMF): responsible for management and orchestration of NSSI.  24 
+As shown in the Figure 4 .3-1, Os-Ma-nfvo reference point is used for interaction between 3GPP slice management 25 
+functions and NFVO. Similarly, Ve -Vnfm-em reference point is used for exchanges between NFMF and VNF 26 
+Manager. Further analysis is required  on these reference points  to apply deployment scenarios including 3GPP 27 
+network slicing related management functions and NFV-MANO. Further details are available in ETSI GS NFV-IFA 28 
+008 [8] and ETSI GS NFV-IFA 013 [9].  29 
+ 30 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        13 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+NSMF
+NSSMF
+CSMF
+3GPP Slice Related 
+Management Functions
+NFVO
+Os-Ma-nfvo
+VNFM
+VIM
+NFMF
+PNF VNF
+Ve-Vnfm-em
+ 1 
+Figure 4.3-1: Network slice management in an NFV framework 2 
+ 3 
+Figure 4.3-2 shows an example of a 5G network realized by an end-to-end network slice, consisting of network slice 4 
+subnet #1 for 5G core networks and network slice subnet #2 for 5G radio networks (see Clause 4.1.3 in TS 28.530 [4]).  5 
+ 6 
+ 7 
+Figure 4.3-2: 5G network with network slicing 8 
+ 9 
+The following diagram (Figure 4.3-3) shows the interaction between 3GPP and ETSI NFV to create a network slice 10 
+subnet instance for RAN network functions.  11 
+ 12 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        14 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+NFMF
+1. Allocate a network slice subnet instance for RAN network functions
+NSSMF NFVONSMF
+4. notification of instantiation of VNFs (O-CU and O-DU)
+3. instantiate VNFs (O-CU and O-DU)
+5. VNFs have been instantiated
+6 notification of successful NS instantiation
+VNFM
+2. Instantiate a NS, containing VNFs (O-CU and O-DU) and PNF (O-RU)
+7. notifications of successful network slice subnet creation
+ 2 
+Figure 4.3-3: High level view of network slice subnet instance creation 3 
+ 4 
+1. NSMF sends request to allocate a network slice subnet instance for RAN network functions, e.g. O -CU, O-DU, 5 
+and O-RU. 6 
+2. NSSMF decides to instantiate a Network Service (NS) instance for a new network slice subnet instance.  7 
+3. NFVO sends request to instantiate the VNFs for O-CU, O-DU.  8 
+4. VNFM instantiates VNFs and notifies NFMF that VNFs have been instantiated.  9 
+5. VNFM responds to NFVO informing that VNFs have ben instantiated.  10 
+6. NFVO notify NSSMF that NS has been instantiated.  11 
+7. NSSMF responds to NSMF with status equals to successful for the operation of network slice subnet instance 12 
+creation. 13 
+ 14 
+4.4 Slicing in ETSI ZSM 15 
+The management services (MnSs) for end -to-end network slicing are provided by a set of management domains (MDs). 16 
+Including that for network slicing defined by 3GPP SA5 and that for NFV defined by ETSI NFV, provides various MnSs 17 
+as shown in Figure 4.4-1 [14]. 18 
+ 19 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        15 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+Figure 4.4-1: Example of MDs to support network slicing using NFV 2 
+ 3 
+In this operator deployment example: 4 
+ E2E Service MD provides MnSs for E2E network slices/network slice subnets, e.g. Service Orchestration service 5 
+(Serv-Orch), which orchestrates the individual network slice subnets (NSSs) provided by Radio Access Network 6 
+(RAN), Transport Network (TN) and Core Network (CN), and stitches them into a E2E network slice subnet being 7 
+exposed as a network slice. The MnSs in this MD may also manage NSSs of Data Network (aka. SGi Network) 8 
+using MD for NFV. It is expected that parts of spec ifications developed by 3GPP SA5 are re -used for the MnSs in 9 
+this MD. This MD exposes e.g. management capabilities of E2E network slices (provisioning, performance 10 
+assurance, fault supervision, etc.). 11 
+ MD for NSS in TN provides MnSs for NSSs of TN, e.g. Dom -Orch service. This MD may consume TN resources 12 
+outside of ZSM supported by e.g. Configuration Management service(s) (Conf -Mgmt). It is expected that parts of 13 
+specifications developed by e.g. BBF, MEF, IETF and/or ETSI NFV are re-used for the MnSs in this MD. This MD 14 
+exposes e.g. management capabilities of NSS of TN (provisioning, performance assurance, fault supervision, etc.).  15 
+ MD for NSS in RAN provides MnSs for NSSs of RAN, e.g. Dom-Orch service. This MD may consume application 16 
+level RAN resources (i.e. application part of RAN Network Functions)  outside of ZSM supported by e.g. Conf -17 
+Mgmt, and it may also consume MnSs for Network Services which include virtualized resources from MD for NFV. 18 
+It is expected that parts of specifications developed by 3GPP SA5 are re-used for the MnSs in this MD. This MD 19 
+exposes e.g. management capabilities of NSS of RAN (provisioning, performance assurance, fault supervision, etc.). 20 
+ MD for NSS in CN provides MnSs for NSSs of CN, e.g. Dom -Orch service. This MD may consume applic ation 21 
+level CN resources outside of ZSM (i.e. application part of CN Network Functions)  supported by e.g. Conf-Mgmt, 22 
+and it may also consume MnSs for Network Services which include virtualized resources from MD for NFV. It is 23 
+expected that parts of specifications developed by 3GPP SA5 are re-used for the MnSs in this MD. This MD exposes 24 
+e.g. management capabilities of NSS of CN (provisioning, performance assurance, fault supervision, etc.).  25 
+ MD for NFV provides MnSs for NFV Network Service(s) (at resource le vel), e.g. Dom -Orch service (NFV 26 
+Orchestrator). This MD may also have Conf -Mgmt (VNF Manager) and MnSs for managing 27 
+compute/network/storage resources (Virtualized Infrastructure Manager). It is expected that parts of specifications 28 
+developed by ETSI NFV are re-used for the MnSs in this MD. This MD exposes e.g. management capabilities related 29 
+to NFV Network Services (Create/Read/Update/Delete of the Network Services, on -boarding of catalogues for 30 
+those, etc.). 31 
+ 32 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        16 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Using the operator deployment scenario in Figure 4.4-1, a service over an E2E network slice instance comprising of  RAN 1 
+access + virtualized application can be deployed. Figure 4.4-2 describes the particular instance of service consumption 2 
+across the domains. 3 
+ 4 
+E2E Service Management Domain
+Virtualzation 
+management domain
+(NFVO)
+Transport management 
+domain
+Core management 
+domain 
+(with VNFs)
+(NSSMF) 
+Radio access 
+management Domain
+(with virtualized RAN)
+(NSSMF)
+ 5 
+Figure 4.4-2: Example management services’ consumption to show E2E slice deployment.  6 
+ 7 
+The steps of deployment are: 8 
+1) The E2E service breaks up the E2E network slicing deployment requests into  9 
+a) Part of the E2E network slice (for fixed users and Transport) + 3GPP Core Part of the E2E network slice (for 10 
+Mobile users) + 3GPP RAN part of the E2E network slice + application service (Virtualized)  11 
+2) A part of the E2E network slice is handed over to the TN management domain using the appropriate management 12 
+services exposed by the transport management domain.   13 
+3) The 3GPP core part (CP: AMF/SMF, UPF, N1,N6)  goes to the core management system  14 
+a) The core management domain requests the connectivity (N1, N6) to the transport management domain  15 
+b) The Core management domain hands over the VN Fs (AMF/SMF, UPF…) to the virtualization management 16 
+domain 17 
+4) The access part goes to radio access service management domain  18 
+a) The radio access management domain uses the management services of the virtualization management domain 19 
+to deploy the virtualized RAN part 20 
+5) The virtualized application AS is handed over to be deployed by the virtualization management system.  21 
+ 22 
+ 23 
+4.5 Slicing in GSMA 24 
+ 25 
+GSMA published a document [10] which aims to provide an introduction to network slicing functionality. It shows how 26 
+network slicing can be used by business customers. Business customers are referred as users of the 5G services which 27 
+could be enterprises, specialized industries or individuals. Network slicing is analyzed from the business customers’ point 28 
+of view in addition to set of use cases.  29 
+ 30 
+It is highlighted that different business customers has various requirements like ultra -reliable services, ultra -high-31 
+bandwidth communication or extremely low latency. Running multiple logical networks on a common physical 32 
+infrastructure is enabled by network slicing. Network slice contained 5G networks allow business customers to have 33 
+connectivity having different business requirements which are governed by SLAs.  34 
+ 35 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        17 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Network slicing provides  ability to customize capabilities and functionality of the mobile network offered to  business 1 
+customers. Customized services are classified as Network  Connection Service and Network Resource Service. The first 2 
+one indicates the connectivity functionalities of the customer e.g. near real -time latency, guaranteed SLA, seamless 3 
+mobility and energy efficiency. The second one describes the case that customers are granted access to the operator 4 
+network resources to run their proprietary applications. In addition to network resource services, the network is able to 5 
+provide additional services i.e. big data analytics, cloud computing, edge computing and positioning. 6 
+ 7 
+GSMA lists some use cases for the business customers to underline potential of network slicing. Industry sectors including 8 
+automotive, logistic, healthcare, government are indicated as potential application of the network slicing. 9 
+ 10 
+As the successor of the previous document, GSMA conducted a study on the service requirements expressed by various 11 
+business customers. In addition to detailed analysis of the service requirements, recommendations for the industry has 12 
+been provided. Finally, a generic slice template has been introduced and all the attributes a network slice could have, has 13 
+been discussed [12]. Generic Slice Template (GST) lists set of attributes with names and units that characterise a network 14 
+slice (e.g. throughput, supported functionalities). GST categorises the attributes into c haracter attributes and scalability 15 
+attributes. Former defines generic slice attributes independent from the NSC and NSP (e.g. latency, throughput), while 16 
+latter provides information about scalability of the slice e.g. number of terminals, area of the serv ice. 17 
+Another concept defined to represent network slices with a common language is Network Slice Type (NEST). The NEST 18 
+is a GST filled with proper values based on a specific business use case. Moreover, NEST is the input for the network 19 
+slice preparation phase which leads to service profile definition in 3GPP.   20 
+ 21 
+GSMA Network Slicing Taskforce (GSMA -NEST) has two main object ives which are defining the GST [13] and 22 
+identifying set of slices whose characteristics are accepted by the industry. GSMA -NEST aims to deliver NESTs with 23 
+industry approved slice characteristics which could be used by the operators [11]. 24 
+ 25 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        18 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 5 O-RAN Slicing Framework 1 
+5.1 O-RAN Slicing Architecture 2 
+5.1.1 Non-RT RIC 3 
+The fundamental role of the Non-RT RIC in O -RAN architecture is to apply AI/ML based algorithms to pro vide 4 
+innovative RAN use cases. Hence, Non-RT RIC is a key component to allow advanced RAN slicing technology to be 5 
+applied in O -RAN framework.  For this purpose, Non-RT RIC should be aware of RAN slices and related slice 6 
+properties/configurations as well as slice performan ce metrics to actively assist slice assurance through optimization 7 
+methods, including AI/ML models. 8 
+To generate AI/ML models to be deployed in the Near -RT RIC , Non -RT RIC  retrieves slice specific PMs and 9 
+configuration parameters of the  slices and optionally external enrichment information from external servers . Complex 10 
+problems for Near-RT RIC e.g. applying RRM policies can be tackled by learning capabilities of AI/ML. Training models 11 
+enable non -real-time optimization of the slice specific par ameters over O1 interface. Moreover, these performance, 12 
+configuration and other data are used to assist Near-RT RIC to provide dynamic slice optimization. Appling dynamic 13 
+slice optimization in the Near-RT RIC is used to prevent SLA violations between the slices.  14 
+5.1.2 Near-RT RIC 15 
+Near-RT RIC enables xApps to control RAN elements and their resources through the E2 interface in near real-time (sub 16 
+second). Similar to Non-RT RIC, Near-RT RIC xApps should be aware of RAN slices and can utilize slice aware 17 
+algorithms for slice SLA assurance purposes. Once the slices are up and running, slice specific PMs from E2 nodes will 18 
+be gathered and sent to Near-RT RIC and Near-RT RIC will use the se PMs and the slice configuration data to ap ply 19 
+dynamic slice optimization to assure slice SLAs, through E2 interface (to be discussed).  20 
+These dynamic slice optimization algorithms can be built into the Near-RT RIC, can be guided from Non-RT RIC through 21 
+A1 policies, or can be sent down as AI/ML models from Non-RT RIC. 22 
+5.1.3 O-RAN Central Unit (O-CU) 23 
+In order to apply RAN slicing in O -RAN framework, both O-CU and O-DU needs to support slicing features as defined 24 
+by 3GPP. Furthermore slicing can be enhanced with the assistance of O -RAN specific Near-RT RIC dynamic slice 25 
+optimization through E2 interface. 26 
+O-CU is the O-RAN entity which runs the upper layer protocols of the RAN stack, such as Radio Resource Management.  27 
+Since RRM is responsible for managing resources, and in case of slicing – the allocation of resources between slices, O-28 
+CU needs to execute slice specific resource allocation strategies and drive O-DU(s) similarly. O-CU will interact with 29 
+Near-RT RIC to provide slice specific PMs as well as getting dynamic guidance through E2 interface.  30 
+5.1.4 O-RAN Distributed Unit (O-DU) 31 
+O-DU is the O -RAN entity which runs the lower layer protocols of the RAN stack, including MAC layer which is the 32 
+layer that schedules Physical Resource Blocks to UEs. As part of slicing, MAC layer needs to allocate PRBs ac cording 33 
+to the RRM strategies provided by the Operator and slice management entities. O-DU will receive the slice configuration 34 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        19 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+parameters from O1 interface, and dynamic slice optimization guidance from RIC through E2 interface  and will provide 1 
+slice specific PMs through O1 interface to SMO and E2 interface to Near-RT RIC. 2 
+5.1.5 A1 Impact 3 
+A1 interface will be used to support policy based guidance for slicing use cases, such as SLA assurance. In addition to 4 
+policy guidance towards Near-RT RIC, Non-RT RIC should be able to receive feedback related to deployed policies over 5 
+A1 interface. In case of external data enrichment, Non -RT RIC should be able to transfer slice specific enrichment data 6 
+to Near-RT RIC over A1 interface as well. 7 
+5.1.6 E2 Impact 8 
+E2 interface will be used to drive E2 nodes’ slice configuration and behaviour, such as slice based radio resource 9 
+allocations, scheduling policies, and configuration policies that may affect performance characteristics of the 10 
+corresponding network slice. Near-RT RIC should be able to configure and receive slice specific performance data from 11 
+the E2 nodes over the E2 interface for near real-time optimization (as compared to PMs collected over the O1 interface, 12 
+which is a slower loop) . Slice specific PMs can include PRB utilization, average delay and DRB related measurements 13 
+that are already defined in 3GPP. However, E2 SM(s) can be extended to support non-3GPP slice specific PM collection 14 
+so that policy control algorithms running on the Near-RT RIC are improved to meet the slice SLA requirements.   15 
+5.1.7 O1 Impact 16 
+The primary role of O1 interface is to enable slice specific configuration of O -RAN nodes based on the service 17 
+requirements. 3GPP 28.541  [5] has defined the Information Models to list attributes of the slice profiles with the slice 18 
+specific requirements, including RRM policy attributes to provide ratio of radio resources to split among the supported 19 
+slices. In addition to slice specific configuration capabilities, O1 interface i s used to gather slice specific performance 20 
+metrics and fault information from O -RAN Nodes. As extensions to O -RAN specific slicing configuration and 21 
+performance measurement attributes are defined, these information will be sent over O1 interface as well.  22 
+5.1.8 O2 Impact 23 
+O2 is the interface used for life cycle management of virtual O-RAN network functions. In case of network slicing, after 24 
+the preparation phase, SMO might instantiate necessary O-RAN network functions (such as Near-RT RIC, O-CU-CP, O-25 
+CU-UP, O-DU) through instantiation procedures as part of the RAN NSSI creation and provisioning, NSSI modification 26 
+and NSSI deletion . It is expected that Non -RT RIC is instantiated as part of SMO and does not require any lifecycle 27 
+management activities. 28 
+ 29 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        20 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Chapter 6 Deployment Options 1 
+ 2 
+This section provides possible deployment options with respect to network slice management topology and their possible 3 
+effects on O-RAN slicing architecture. Based on 3GPP specifications Network Slice Management Function (NSMF) and 4 
+Network Slice Subnet Management Function (NSSMF) are responsible for end-to-end slice management and slice subnet 5 
+management respectively. Within the scope of O -RAN, RAN slice subnet management function is the primary focus 6 
+including but not limited to its interac tions with the Service Management and Orchestration Framework. Possible 7 
+architectural impacts of different deployment options are planned to be investigated and captured in O -RAN Slicing 8 
+Architecture Specification document. 9 
+In the following sub sections, f our possible deployment options are presented. Please note that while ETSI based 10 
+NFVO/VNFM interface types are depicted as examples, depending on SMO type these interfaces and NFVO/VNFM 11 
+components can be different. As other SMOs (such as ONAP) make progres s with RAN slicing, the relevant interfaces 12 
+can be captured in the next iterations of this document. 13 
+ 14 
+Option 1 15 
+In this option, both NSMF and NSSMF are deployed within the SMO.  16 
+ 17 
+Figure 3: NSMF and NSSMF are deployed within the SMO 18 
+ 19 
+Option 2 20 
+In this case, both NSMF and NSSMF are deployed outside the SMO. 21 
+ 22 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        21 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+Figure 4: External deployment of NSMF and NSSMF 2 
+ 3 
+Option 3 4 
+In this option, NSMF is placed within SMO. However, NSSMF is deployed outside the SMO.  5 
+ 6 
+ 7 
+Figure 5: External NSSMF deployment 8 
+ 9 
+Option 4 10 
+In this case, NSMF is in the outside of SMO while NSSMF is deployed within SMO.  11 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        22 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+Figure 6: NSSMF within the SMO 2 
+  3 
+
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        23 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Annex A (informative): Additional Information 1 
+A.1 Slicing SDO Mapping Table 2 
+ 3 
+Areas 3GPP ONAP ETSI OSM GSMA ETSI ZSM 
+Use cases and high 
+level requirements 
+3GPP TS 22.261   Network Slicing 
+Use Case 
+Requirements  
+ 
+GSMA-NEST 
+(Network 
+Slicing Task 
+Force) 
+ 
+Architectural 
+requirements 
+3GPP TS 23.501 
+3GPP TS 23.502 
+(Procedures 
+involving slicing) 
+3GPP TR 28.801 
+    
+Management and 
+orchestration 
+3GPP TS 28.531 
+3GPP TS 28.530 
+3GPP TS 28.541 
+3GPP TR 28.801 
+R4 (Dublin) for 
+Network Slice 
+Model,  
+R5 (El Alto) for 
+Orchestration of 
+Network Slicing 
+Model 
+ETSI GS 
+NFV-IFA 014  
+ETSI GS 
+NFV-IFA 013 
+(Os-Ma-nfvo) 
+ETSI GS 
+NFV-IFA 008 
+(Ve-Vnfm) 
+ ETSI GS 
+ZSM 002 
+(Reference 
+Architecture) 
+Slice Configuration 3GPP TS 28.531 
+3GPP TS 28.541 
+TOSCA based 
+service and 
+network slice 
+modelling 
+ETSI GS 
+NFV-IFA 014 
+(Network 
+Service 
+Templates 
+Specification) 
+NG.116 - 
+Generic 
+Network Slice 
+Template 
+(attributes are 
+listed) 
+ 
+Security aspects of 
+network slicing 
+3GPP TR 33.811     
+Slice specific 
+Performance 
+Management (PM), 
+KPIs 
+3GPP TS 28.552 
+3GPP TS 28.554 
+ 
+    
+Fault Management 3GPP TS 28.801 
+3GPP TS 28.530 
+3GPP TS 28.515-
+517 
+3GPP TS 32.111 
+3GPP TS 28.545 
+(Fault Supervision) 
+3GPP TS 28.545 
+    
+  4 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        24 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+Annex ZZZ O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT.   3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity 4 
+that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+ 7 
+SECTION 1:  DEFINITIONS 8 
+ 9 
+1.1  “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common 10 
+control with another entity, so long as such control exists.  For the purpose of this Section, “Control” means 11 
+beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity. 12 
+ 13 
+1.2  “Compliant Portion” means only those specific portions of products (hardware, software or 14 
+combinations thereof) that implement any O-RAN Specification. 15 
+ 16 
+1.3  “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, 17 
+including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 18 
+ 19 
+1.4  “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance 20 
+that does not  add any significant new features or functionality and remains interoperable with the prior 21 
+version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates. 22 
+ 23 
+1.5  “Necessary Claims” means those claims of all present and future patents and patent applications, other 24 
+than design patents and design registrations, throughout the world, which (i) are owned or otherwise 25 
+licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor 26 
+or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant 27 
+a license without the payment of consideration to a third party; and (iii) are necessarily infringed by 28 
+implementation of a Final Specification (without considering any Contributions not included in the Final 29 
+Specification). A claim is necessarily infringed only when it is not possible on technical (but not 30 
+commercial) grounds, taking into account normal technical practice and the state of the art generally 31 
+available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 32 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, 33 
+use or operate an implementation which complies with a Final Specification without infringing that claim. 34 
+For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by 35 
+technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary 36 
+Claims. 37 
+ 38 
+1.6  “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, 39 
+Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include 40 
+in their license a term allowing  the licensor to suspend the license against a licensee who brings a patent 41 
+infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of 42 
+their Affiliates. 43 
+ 44 
+SECTION 2: COPYRIGHT LICENSE 45 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        25 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+2.1  Subject to the terms and conditions of this Agreement, O -RAN Alliance hereby grants to Adopter a 2 
+nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use 3 
+and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified 4 
+or unmodified way, solely in furtherance of implementations of an O-RAN Specification. 5 
+ 6 
+2.2  Adopter shall not use O -RAN Specifications except as expressly set forth in this Agreement or in a 7 
+separate written agreement with O-RAN Alliance. 8 
+ 9 
+SECTION 3: FRAND LICENSE 10 
+ 11 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on 12 
+a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non -Discriminatory 13 
+(FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, 14 
+irrevocable (but subject to Defensive Suspension), non -sublicensable,  worldwide license under their 15 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 16 
+Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a 17 
+product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) 18 
+to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic 19 
+Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the 20 
+distribution by the Adopter’s distributors  and the use by the Adopter’s customers of such licensed 21 
+Compliant Portions. 22 
+ 23 
+3.2  Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their 24 
+Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims 25 
+to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor 26 
+or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees. 27 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent 28 
+License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates 29 
+under FRAND terms and conditions with or without compensation  (royalties) a nonexclusive, non -30 
+transferable, irrevocable (but subject to Defensive Suspension), non -sublicensable,  worldwide license 31 
+under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise 32 
+distribute Compliant Portions; provided, however, that such license will not extend: (a) to any part or 33 
+function of a product in which a Compliant Portion is incorporated that is not itself part of the Compliant 34 
+Portion; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is 35 
+not making a reciprocal grant to Adopter, as set forth in Section 3.1.  For the avoidance of doubt, the 36 
+foregoing license includes the distribution by the Members’, Contributors’, Academic Contributors’, 37 
+Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic 38 
+Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Portions. 39 
+ 40 
+SECTION 4:  TERM AND TERMINATION 41 
+ 42 
+4.1  This Agreement shall remain in force, unless early terminated according to this Section 4. 43 
+ 44 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        26 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+4.2  O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate 1 
+this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing 2 
+such breach within thirty (30) days after being given notice specifying the breach. 3 
+ 4 
+4.3  Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement.  Under surviving 5 
+Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who 6 
+become Adopters after the date of termination; and (b) for future versions of O -RAN Specifications that 7 
+are backwards compatible with the version that was current as of the date of termination. 8 
+ 9 
+SECTION 5: CONFIDENTIALITY 10 
+ 11 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -12 
+RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less 13 
+than reasonable care.  Any disclosure by Adopter to its Affiliates, contractors and consultants should be 14 
+subject to an obligation of confidentiality at least as restrictive as those contained in this Section.  The 15 
+foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without 16 
+any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; 17 
+(3) rightfully received without a duty of confidentiality; (4) disclosed by O -RAN Alliance or a Member, 18 
+Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; 19 
+(5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 20 
+governmental body, or as required by law, provided that Adopter provides reasonable prior written notice 21 
+to O-RAN Alliance, and cooperates with O -RAN Alliance and/or the applicable Member, Contributor or 22 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with 23 
+O-RAN Alliance’s prior written approval.  24 
+ 25 
+SECTION 6:  INDEMNIFICATION 26 
+ 27 
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or 28 
+Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns 29 
+(the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees 30 
+and expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, 31 
+investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O -RAN 32 
+Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications. 33 
+ 34 
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY 35 
+ 36 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND 37 
+ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE 38 
+LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, 39 
+INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM IT S 40 
+PERFORMANCE OR NON -PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE 41 
+WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 42 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. 43 
+ 44 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        27 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH N O WARRANTIES OR CONDITIONS 1 
+WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O -RAN 2 
+ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS 3 
+EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, 4 
+SECURITY, SATISFACTORY QUA LITY, NONINFRINGEMENT, FITNESS FOR ANY 5 
+PARTICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY WARRANTY OR CONDITION 6 
+FOR O-RAN SPECIFICATIONS. 7 
+ 8 
+SECTION 8:  ASSIGNMENT 9 
+ 10 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make 11 
+any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having 12 
+first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN 13 
+Alliance’s sole discretion.  O-RAN Alliance may freely assign this Agreement. 14 
+ 15 
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS 16 
+ 17 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors  (including 18 
+future Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary 19 
+under this Agreement, including as licensees under Section 3. 20 
+ 21 
+SECTION 10:  BINDING ON AFFILIATES 22 
+ 23 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal 24 
+entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable 25 
+to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder. 26 
+ 27 
+SECTION 11:  GENERAL 28 
+ 29 
+This Agreement is governed by the laws of Germany without regard to its co nflict or choice of law 30 
+provisions.   31 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and 32 
+expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether 33 
+written or oral, relating to the subject matter of this Agreement. 34 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules 35 
+and regulations with respect to its and its Affiliates’ performance under this Agreement, including without 36 
+limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter 37 
+acknowledges that this Agreement prohibits any communication that would violate the antitrust laws. 38 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created 39 
+between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.  Except as 40 
+expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, 41 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. 42 
+
+ 
+_______________________________________________________________________________________________ 
+Copyright © 2020 by the O-RAN Alliance. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ        28 
+O-RAN.WG1.Study-on-O-RAN-Slicing-v02.00 
+ 1 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held 2 
+to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions 3 
+will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and 4 
+restrictions of this Agreement will remain in full force and effect. 5 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of 6 
+any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or 7 
+otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or 8 
+third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other 9 
+instance; rather the same shall be and remain in full force and effect. 10 
+ 11 
+…. 12 
+ 13 
+ 14 
+ 15 

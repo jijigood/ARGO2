@@ -1,0 +1,2456 @@
+O-RAN-WG3.RICAPI-R003-v01.00
+Technical Specification
+O-RAN Working Group 3
+(Near-Real-time RIC and E2 Interface Workgroup)
+Near-RT RIC APIs specification
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+Contents
+Foreword	4
+Modal verbs terminology	4
+1	Scope	5
+2	References	5
+2.1	Normative references	5
+2.2	Informative references	6
+3	Definition of terms, symbols and abbreviations	6
+3.1	Terms	6
+3.2	Symbols	6
+3.3	Abbreviations	6
+4	General	7
+4.1	Introduction	7
+4.2	General Principles	7
+4.3	Version Control	7
+5	A1-related API	7
+5.1	Overview	7
+5.2	A1-related API Procedures	9
+5.2.1	A1 Policy Setup procedure	9
+5.2.2	A1 Policy Update procedure	11
+5.2.3	A1 Policy Delete procedure	12
+5.3	Elements for A1-related API Communication	14
+5.3.1	General	14
+5.3.2	Message Functional Definition and Content	14
+5.3.3	Information Element Definitions	16
+5.3.4	Message and Information Element Abstract Syntax	19
+5.3.5	Message Transfer Syntax	22
+6	E2-related API	22
+6.1	Overview	22
+6.1.1	Protocol Stack	22
+6.1.2	List of E2 related APIs, procedures and messages	22
+6.2	E2-related API Procedures	24
+6.2.1	E2_Subscription_API procedures	24
+6.2.2	E2_Indication_API procedures	28
+6.2.3	E2_Control_API procedures	29
+6.3	Elements for E2-related API Communication	31
+6.3.1	General	31
+6.3.2	Message Functional Definition and Content	32
+6.3.3	Information Element Definitions	39
+6.3.4	Message and Information Element Abstract Syntax	42
+6.3.5	Message Transfer Syntax	50
+7	SDL API	51
+7.1	Overview	51
+7.1.1	Protocol Stack	51
+7.1.2	List of SDL APIs, procedures and messages	51
+7.2	SDL API Procedures	52
+7.2.1	SDL Client Registration procedure	52
+7.2.2	SDL Client Deregistration procedure	52
+7.2.3	SDL Subscribe Information procedure	52
+7.2.4	SDL Information Push procedure	54
+7.2.5	SDL Information Update Notify procedure	54
+7.2.6	SDL Information Fetch procedure	55
+7.3	Elements for SDL API Communication	56
+7.3.1	General	56
+7.3.2	Message Functional Definition and Content	57
+7.3.3	Information Element Definitions	60
+7.3.4	Message and Information Element Abstract Syntax	65
+7.3.5	Message Transfer Syntax	70
+8	Management API	71
+8.1	Overview	71
+8.1.1	Protocol Stack	71
+8.1.2	List of Management APIs, procedures and messages	71
+8.2	Management API Procedures	72
+8.2.1	xApp Registration Procedure	72
+8.3	Elements for Management API Communication	73
+8.3.1	General	73
+8.3.2	Message Functional Definition and Content	73
+8.3.3	Information Element Definitions	75
+8.3.4	Message and Information Element Abstract Syntax	76
+8.3.5	Message Transfer Syntax	78
+9	Enablement API	78
+9.1	Overview	78
+9.1.1	Protocol Stack	78
+9.1.2	List of Enablement APIs, procedures and messages	78
+9.2	Enablement API Procedures	79
+9.2.1	Enabl_Discovery_API Procedures	79
+9.2.2	Enabl_Events_API Procedures	81
+9.3	Elements for Enablement API Communication	85
+9.3.1	General	85
+9.3.2	Message Functional Definition and Content	85
+9.3.3	Information Element Definitions	89
+9.3.4	Message and Information Element Abstract Syntax	91
+9.3.5	Message Transfer Syntax	95
+10	Common definitions across APIs	95
+10.1	Information element definitions	95
+10.1.1	PTI	95
+10.1.2	xApp ID	96
+10.1.3	API Name	96
+10.1.4	API Version	96
+10.1.5	A1 Policy Type ID	96
+10.1.6	Global E2 Node ID	96
+10.1.7	RAN Function ID	97
+10.1.8	SCTP API PDU	97
+10.2	Information element abstract syntax	97
+10.2.1	Abstact syntax in Protocol Buffers	97
+Revision history	100
+History	101
+Foreword
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+1	Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+The present document specifies the signalling and data transport protocols for Near-RT RIC APIs. The protocols are developed in accordance with the functionalities and interactions stated in [2].
+2	References
+2.1	Normative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are necessary for the application of the present document.
+[1]	3GPP TR 21.905: “Vocabulary for 3GPP Specifications”.
+[2]		O-RAN.WG3.RICARCH-v03.00.00: “O-RAN, Near-Real-time RAN Intelligent Controller, Near-RT RIC Architecture”.
+[3] 	O-RAN.WG3.E2AP-v02.01.00: “O-RAN, Near-Real-time RAN Intelligent Controller, E2 Application Protocol(E2AP)”.
+[4] 	Protocol buffers. Available at https://developers.google.com/protocol-buffers/.
+[5]	gRPC. Available at https://www.grpc.io/.
+[6] 	O-RAN.WG11.SecReqSpecs: “O-RAN, Security Requirements Specifications”.
+[7]	O-RAN.WG2.A1TD-v04.00: “O-RAN, A1 interface: Type Definitions”.
+[8]		O-RAN.WG3.E2SM-v02.01.02: “O-RAN, Near-Real-time RAN Intelligent Controller, E2 Service Model (E2SM)”.
+[9] 	IETF RFC 4122: “A Universally Unique IDentifier (UUID) URN Namespace”.
+2.2	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are not necessary for the application of the present document but they assist the user with regard to a particular subject area.
+[i.1]Semantic Versioning Specification. Available at https://semver.org.
+3	Definition of terms, symbols and abbreviations
+3.1	Terms
+For the purposes of the present document, the following terms apply:
+Near-RT RIC: as defined in [2].
+Near-RT RIC APIs: interfaces that connect xApp and Near-RT RIC platform.
+Near-RT RIC Platform: a software platform to host xApps. The Near-RT RIC is comprised of the Near-RT RIC Platform and xApps.
+xApp: as defined in [2].
+3.2	Symbols
+No Symbol is defined in this document.
+3.3	Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply:
+API	Application Programming Interface
+Near-RT RIC	Near-real-time RAN Intelligent Controller
+PTI	Procedure Transaction Identity
+4	General
+4.1	Introduction
+Section 4 specifies the principles and conventions commonly applied to Near-RT RIC API design with the Network API approach as described in section 7.1.2 of [2].
+4.2	General Principles
+For each Near-RT RIC API, the following principles should be followed:
+-	A default solution that includes network protocol and message encoding should be defined to ensure interoperability. The default solution requires mandatory support by all Near-RT RIC platforms and xApps. Additionally, one or more alternative solutions may be defined.
+The common data types applicable to several API categories should be collected in Section 10.
+4.3	Version Control
+An API version shall consist of at least 3 fields, following a MAJOR.MINOR.PATCH pattern according to the Semantic Versioning Specification [i.1] unless specified otherwise.
+EXAMPLE:	"1.0.0".
+The basic rules as reproduced from [i.1] shall apply for incrementing the versions:
+-	MAJOR version is incremented if backward incompatible change is made.
+-	MINOR version is incremented if functional change is made in a backward compatible way.
+-	PATCH version is incremented if correction is made in a backward compatible way.
+5	A1-related API
+5.1	Overview
+5.1.1	Protocol Stack
+In this version of specification, the default protocol stack for the A1 related APIs is shown on Figure 5.1.1-1.
+Note: the network layer for security protection is FFS.
+Figure 5.1.1-1: Protocol stack for A1 related APIs
+The A1 related APIs use gRPC [5] with Protocol Buffers [4] as the application layer serialization protocol.
+5.1.2	List of A1 related APIs, procedures and messages
+The A1 related API procedures introduced in section 9.2 of [2] are categorized under the A1 related APIs. These APIs include:
+A1 Policy API:  enabling A1 policy related operations for the xApps.
+A1 Enrichment Information (A1-EI) API: enabling A1-EI related operations for the xApps.
+These APIs are summarized in Table 5.1.2-1.
+Table 5.1.2-1: List of A1 related APIs
+The table 5.1.2-2 lists the API procedures for each A1 related API.
+Table 5.1.2-2: List of A1 related API procedures
+The table 5.1.2-3 lists the messages for each A1 related API procedure.
+Table 5.1.2-3: List of A1 related API messages
+5.2	A1-related API Procedures
+5.2.1	A1 Policy Setup procedure
+5.2.1.1	General
+The purpose of the A1 Policy Setup procedure is to enable the execution of the transferred A1 policy.
+5.2.1.2	Successful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY SETUP REQUEST
+ap->rp: A1 POLICY SETUP RESULT\n[A1 Policy Setup Result=success]
+@enduml
+Figure 5.2.1.2-1 : A1 Policy Setup procedure, successful operation
+The Near-RT RIC Platform initiates the procedure by sending A1 POLICY SETUP REQUEST message to xApp.
+The A1 POLICY SETUP REQUEST message shall contain the information required by the xApp to setup one A1 policy including A1 Policy Type ID IE, A1 Policy ID IE, and A1 Policy Object IE.
+Upon reception of the A1 POLICY SETUP REQUEST message, the xApp shall transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements, and shall trigger Near-RT RIC Platform to accommodate E2 / A1-EI operation(s) requirements.
+If Near-RT RIC Platform is able to accommodate E2 / A1-EI operation(s) requirements, xApp replies A1 POLICY SETUP RESULT message with A1 Policy Setup Result IE set to success to Near-RT RIC Platform. And xApp should store the received A1 Policy Type ID IE, A1 Policy ID IE, A1 Policy Object IE as basic elements of A1 policy profile, and label the status of corresponding A1 policy as “enforced”.
+5.2.1.3	Unsuccessful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY SETUP REQUEST
+ap->rp: A1 POLICY SETUP RESULT\n[A1 Policy Setup Result=failure]
+@enduml
+Figure 5.2.1.3-1 : A1 Policy Setup procedure, unsuccessful operation
+If xApp cannot transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements due to unsupported A1 policy type, xApp replies A1 POLICY SETUP RESULT message with A1 Policy Setup Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not supported A1 policy type.
+If xApp cannot transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements due to violation of of the requirements as stated in 5.2.1.2.2, 5.2.2.2.2, 5.2.3.2.2, 5.2.4.2.2, 5.2.5.2.2, 5.2.6.2.2, 5.2.7.2.2 and 5.2.8.2.2 of [7], xApp replies A1 POLICY SETUP RESULT message with A1 Policy Setup Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not allowed statements, restrictions and extensions.
+If Near-RT RIC Platform cannot accommodate E2 / A1-EI operation(s) requirements, xApp replies A1 POLICY SETUP RESULT message with A1 Policy Setup Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Near-RT RIC Platform cannot accommodate E2 / A1-EI operations requirements.
+5.2.1.4	Abnormal conditions
+If A1 policy indicated by A1 Policy Type ID IE, A1 Policy ID IE contained in A1 POLICY SETUP REQUEST message is being enforced by xApp, xApp replies A1 POLICY SETUP RESULT message with A1 Policy Setup Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to A1 policy already enabled at xApp.
+5.2.2	A1 Policy Update procedure
+5.2.2.1	General
+The purpose of the A1 Policy Update procedure is to update the execution of the transferred A1 policy.
+5.2.2.2	Successful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY UPDATE REQUEST
+ap->rp: A1 POLICY UPDATE RESULT\n[A1 Policy Update Result=success]
+@enduml
+Figure 5.2.2.2-1 : A1 Policy Update procedure, successful operation
+The Near-RT RIC Platform initiates the procedure by sending A1 POLICY UPDATE REQUEST message to xApp.
+The A1 POLICY UPDATE REQUEST message shall contain the information required by the xApp to update one A1 policy including A1 Policy Type ID IE, A1 Policy ID IE, and A1 Policy Object IE.
+Upon reception of the A1 POLICY SETUP REQUEST message, the xApp shall transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements. If the transformed E2 / A1-EI operation(s) requirements are the same as before, xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to success to Near-RT RIC Platform; else, xApp shall trigger Near-RT RIC Platform to accommodate E2 / A1-EI operation(s) requirements.
+If Near-RT RIC Platform to accommodate E2 / A1-EI operation(s) requirements succeeds, xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to success to Near-RT RIC Platform. And xApp should update the stored information of A1 Policy Object IE of A1 policy profile, and label the status of corresponding A1 policy as “enforced”.
+5.2.2.3	Unsuccessful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY UPDATE REQUEST
+ap->rp: A1 POLICY UPDATE RESULT\n[A1 Policy Update Result=failure]
+@enduml
+Figure 5.2.2.3-1 : A1 Policy Update procedure, unsuccessful operation
+If xApp cannot transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements due to not support the corresponding A1 policy type, xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not supported A1 policy type.
+If xApp cannot transform the received A1 policy into appropriate E2 / A1-EI operation(s) requirements due to violation of the requirements as stated in 5.2.1.2.2, 5.2.2.2.2, 5.2.3.2.2, 5.2.4.2.2, 5.2.5.2.2, 5.2.6.2.2, 5.2.7.2.2 and 5.2.8.2.2 of [7], xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not allowed statements, restrictions and extensions.
+If Near-RT RIC Platform cannot accommodate E2 / A1-EI operation(s) requirements, xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Near-RT RIC Platform cannot accommodate E2 / A1-EI operations requirements.
+5.2.2.4	Abnormal conditions
+If A1 policy indicated by A1 Policy Type ID IE, A1 Policy ID IE contained in A1 POLICY UPDATE REQUEST message is not enabled by xApp, xApp replies A1 POLICY UPDATE RESULT message with A1 Policy Update Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not enabled A1 policy at xApp.
+5.2.3	A1 Policy Delete procedure
+5.2.3.1	General
+The purpose of the A1 Policy Delete procedure is to terminate the execution of the transferred A1 policy.
+5.2.3.2	Successful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY DELETE REQUEST
+ap->rp: A1 POLICY DELETE RESULT\n[A1 Policy Delete Result=success]
+@enduml
+Figure 5.2.3.2-1 : A1 Policy Delete procedure, successful operation
+The Near-RT RIC Platform initiates the procedure by sending A1 POLICY DELETE REQUEST message to xApp.
+The A1 POLICY DELETE REQUEST message shall contain the information required by the xApp to delete one A1 policy including A1 Policy Type ID IE, A1 Policy ID IE.
+Upon reception of the A1 POLICY DELETE REQUEST message, the xApp shall locate the E2 / A1-EI operation(s) associated with the A1 policy indicated by A1 Policy Type ID IE, A1 Policy ID IE contained in A1 POLICY DELETE REQUEST message, and shall trigger Near-RT RIC Platform to terminate the accommodation of located E2 / A1-EI operation(s).
+No matter Near-RT RIC Platform to terminate the accommodation of located E2 / A1-EI operation(s) succeeds or not, xApp replies A1 POLICY DELETE RESULT message with A1 Policy Delete Result IE set to success to Near-RT RIC Platform. And xApp should delete the stored A1 policy profile associated.
+5.2.3.3	Unsuccessful operation
+@startuml
+Participant rp as “Near-RT RIC Platform”
+Participant ap as “xApp”
+rp->ap: A1 POLICY DELETE REQUEST
+ap->rp: A1 POLICY DELETE RESULT\n[A1 Policy Delete Result=failure]
+@enduml
+Figure 5.2.3.3-1 : A1 Policy Delete procedure, unsuccessful operation
+If xApp cannot locate the E2 / A1-EI operation(s) associated with the A1 policy indicated by A1 Policy Type ID IE, A1 Policy ID IE contained in A1 POLICY DELETE REQUEST message, xApp replies A1 POLICY DELETE RESULT message with A1 Policy Delete Result IE set to failure to Near-RT RIC Platform, possible with Cause IE set to Not enabled A1 policy at xApp.
+5.2.3.4	Abnormal conditions
+Not applied.
+5.3	Elements for A1-related API Communication
+5.3.1	General
+5.3.2	Message Functional Definition and Content
+5.3.2.1	A1 POLICY SETUP REQUEST
+This message is sent by the RIC Platform and is used to request the destinated xApp to enable the execution of the nested A1 policy.
+Direction: RIC Platform → xApp
+5.3.2.2	A1 POLICY SETUP RESULT
+This message is sent by the xApp as response to the request to enable the execution of the nested A1 policy.
+Direction: xApp → RIC Platform
+5.3.2.3	A1 POLICY UPDATE REQUEST
+This message is sent by the RIC Platform and is used to request the destinated xApp to update the execution of the nested A1 policy.
+Direction: RIC Platform → xApp
+5.3.2.4	A1 POLICY UPDATE RESULT
+This message is sent by xApp as response to the request to update the execution of the nested A1 policy.
+Direction: xApp → RIC Platform
+5.3.2.5	A1 POLICY DELETE REQUEST
+This message is sent by the RIC Platform and is used to request the destinated xApp to terminate the execution of the nested A1 policy.
+Direction: RIC Platform → xApp
+5.3.2.6	A1 POLICY DELETE RESULT
+This message is sent by xApp as response to the request to terminate the execution of the nested A1 policy.
+Direction: xApp → RIC Platform
+5.3.2.7	A1 POLICY QUERY REQUEST
+5.3.2.8	A1 POLICY QUERY RESULT
+5.3.2.9	A1 POLICY STATUS UPDATE
+5.3.2.10	A1 POLICY STATUS UPDATE ACK
+5.3.2.11	A1 POLICY STATUS UPDATE ERROR
+5.3.2.12	A1-EI SUBSCRIPTION SETUP REQUEST
+5.3.2.13	A1-EI SUBSCRIPTION SETUP RESULT
+5.3.2.14	A1-EI SUBSCRIPTION UPDATE REQUEST
+5.3.2.15	A1-EI SUBSCRIPTION UPDATE RESULT
+5.3.2.16	A1-EI SUBSCRIPTION DELETE REQUEST
+5.3.2.17	A1-EI SUBSCRIPTION DELETE RESULT
+5.3.2.18	A1-EI DELIVERY
+5.3.2.19	A1-EI QUERY REQUEST
+5.3.2.20	A1-EI QUERY RESULT
+5.3.3	Information Element Definitions
+5.3.3.1	Message Type
+The Message Type IE identifies the message being sent. It is mandatory for all messages.
+5.3.3.2	A1 Policy Type ID
+Defined in 10.1.5.
+5.3.3.3	A1 Policy ID
+The A1 Policy ID IE identifies one A1 policy under one A1 policy type.
+5.3.3.4	Result
+The Result IE indicates the procedure succeeds or not.
+5.3.3.5	Cause
+The Cause IE indicates the reason for a particular event in A1-related API.
+The meaning of the different cause values is described in the following table. In general, “not supported” cause values indicate that the related capability is missing. On the other hand, “not available” cause values indicate that the related capability is present, but insufficient resources were available to perform the requested action.
+5.3.4	Message and Information Element Abstract Syntax
+5.3.4.1	Solution 1: gRPC with Protocol Buffers
+5.3.4.1.1			Usage of gRPC with Protocol Buffers
+This solution uses Protocol Buffers as message encoding, and also as the Interface Definition Language (IDL) for gRPC [5].
+Table 5.3.4.1.1-1 lists the mapping of A1-related APIs and corresponding gRPC services.
+Table 5.3.4.1.1-1: Mapping of A1-related APIs and gRPC services
+A procedure of an A1-related API is mapped to a gRPC method.
+Table 5.3.4.1.1-2 lists the A1-related API specifications included in this document.
+Table 5.3.4.1.1-2: List of A1-related APIs abstract syntax
+5.3.4.1.2			API Definitions
+5.3.4.1.2.1	A1_Policy_API
+syntax = "proto3";
+package ricapi.a1_policy_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "a1_related_apis_common_ies_ver_1_0_0.proto";
+// gRPC service and rpc definition
+service A1_Policy_API {
+rpc A1PolicySetupProc(A1PolicySetupInitMsg) returns (A1PolicySetupOutMsg) {};
+rpc A1PolicyUpdateProc(A1PolicyUpdateInitMsg) returns (A1PolicyUpdateOutMsg) {};
+rpc A1PolicyDeleteProc(A1PolicyDeleteInitMsg) returns (A1PolicyDeleteOutMsg) {};
+}
+message A1PolicySetupInitMsg {
+optional A1PolicySetupRequest a1_policy_setup_request = 1;
+}
+message A1PolicySetupOutMsg {
+oneof type_of_message {
+A1PolicySetupResult a1_policy_setup_result = 1;
+}
+}
+message A1PolicyUpdateInitMsg {
+optional A1PolicyUpdateRequest a1_policy_update_request = 1;
+}
+message A1PolicyUpdateOutMsg {
+oneof type_of_message {
+A1PolicyUpdateResult a1_policy_update_result = 1;
+}
+}
+message A1PolicyDeleteInitMsg {
+optional A1PolicyDeleteRequest a1_policy_delete_request = 1;
+}
+message A1PolicyDeleteOutMsg {
+oneof type_of_message {
+A1PolicyDeleteResult a1_policy_delete_result = 1;
+}
+}
+// ---------------- messages of a1_policy_API ----------------
+// -------- messages of A1 Policy Setup procedure --------
+message A1PolicySetupRequest {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+optional a1_related_apis_common_ies.v1.A1PolicyObject a1_policy_object = 3;
+}
+message A1PolicySetupResult {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+optional a1_related_apis_common_ies.v1.Result a1_policy_setup_result = 3;
+optional a1_related_apis_common_ies.v1.Cause cause = 4;
+optional a1_related_apis_common_ies.v1.A1PolicyObject a1_policy_object = 5;
+}
+// -------- messages of A1 Policy Update procedure --------
+message A1PolicyUpdateRequest {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+optional a1_related_apis_common_ies.v1.A1PolicyObject a1_policy_object = 3;
+}
+message A1PolicyUpdateResult {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+optional a1_related_apis_common_ies.v1.Result a1_policy_update_result = 3;
+optional a1_related_apis_common_ies.v1.Cause cause = 4;
+optional a1_related_apis_common_ies.v1.A1PolicyObject a1_policy_object = 5;
+}
+// -------- messages of A1 Policy Delete procedure --------
+message A1PolicyDeleteRequest {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+}
+message A1PolicyDeleteResult {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+optional a1_related_apis_common_ies.v1.A1PolicyId a1_policy_id = 2;
+optional a1_related_apis_common_ies.v1.Result a1_policy_delete_result = 3;
+optional a1_related_apis_common_ies.v1.Cause cause = 4;
+}
+5.3.4.1.3			Information Element Definitions
+syntax = "proto3";
+package ricapi.a1_related_apis_common_ies.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+// ----------------------------- Information Elements -----------------------------
+// --------------A--------------
+message A1PolicyObject {
+optional string value = 1;
+}
+message A1PolicyId {
+optional string value = 1;
+}
+// --------------C--------------
+message Cause {
+oneof cause_group {
+A1RelatedApiLayerCause a1_related_api_layer_cause = 1;
+TransportLayerCause transport_layer_cause = 2;
+ProtocolLayerCause protocol_layer_cause = 3;
+MiscCause misc_cause = 4;
+}
+enum A1RelatedApiLayerCause {
+A1_RELATED_API_LAYER_UNSPECIFIED = 0;
+NOT_SUPPORTED_A1_POLICY_TYPE = 1;
+NOT_ALLOWED_STATEMENTS_RESTRICTIONS_AND_EXTENSIONS = 2;
+NEAR_RT_RIC_PLATFORM_CANNOT_ACCOMMODATE_E2_A1_EI_OPERATIONS_REQUIREMENTS = 3;
+A1_POLICY_ALREADY_ENABLED_AT_XAPP = 4;
+NOT_ENABLED_A1_POLICY_AT_XAPP = 5;
+}
+enum TransportLayerCause {
+TRANSPORT_UNSPECIFIED = 0;
+TRANSPORT_RESOURCE_UNAVAILABLE = 1;
+}
+enum ProtocolLayerCause {
+PROTOCOL_UNSPECIFIED = 0;
+TRANSFER_SYNTAX_ERROR = 1;
+ABSTRACT_SYNTAX_ERROR_REJECT = 2;
+ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY = 3;
+MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE = 4;
+SEMANTIC_ERROR = 5;
+ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE = 6;
+}
+enum MiscCause {
+MISC_UNSPECIFIED = 0;
+CONTROL_PROCESSING_OVERLOAD = 1;
+HARDWARE_FAILURE = 2;
+OAM_INTERVENTION = 3;
+}
+}
+// --------------R--------------
+enum Result {
+RESULT_SUCCESS = 0;
+RESULT_FAILURE = 1;
+}
+5.3.5	Message Transfer Syntax
+5.3.5.1	Solution 1: gRPC with Protocol Buffers
+The message transfer syntax for Solution 1 is serialized Protocol Buffers [4].
+6	E2-related API
+6.1	Overview
+6.1.1	Protocol Stack
+In this version of specification, the default protocol stack for the E2 related APIs is shown on Figure 6.1.1-1.
+Note: the network layer for security protection is FFS.
+Figure 6.1.1-1: Protocol stack for E2 related APIs
+The E2 related APIs use SCTP with Protocol Buffers [4] as the application layer serialization protocol.
+6.1.2	List of E2 related APIs, procedures and messages
+The E2 related API procedures introduced in section 9.3 of [2] are categorized under the E2 related APIs. These APIs include:
+E2 Subscription API: enabling xApp to setup, modify and delete E2 subscriptions with the Near-RT RIC platform.
+E2 Indication API: enabling xApp to receive E2 indications associated with an E2 subscription.
+E2 Control API: enabling xApp to consume E2 control service from the Near-RT RIC platform.
+E2 Guidance API: enabling xApp to acquire E2 related guidance from the Near-RT RIC platform and mitigate potential conflicts with other xApps.
+These APIs are summarized in Table 6.1.2-1.
+Table 6.1.2-1: List of E2 related APIs
+The table 6.1.2-2 lists the API procedures for each E2 related API.
+Table 6.1.2-2: List of E2 related API procedures
+The table 6.1.2-3 lists the messages for each E2 related API procedure.
+Table 6.1.2-3: List of E2 related API messages
+6.2	E2-related API Procedures
+6.2.1	E2_Subscription_API procedures
+6.2.1.1	E2 Subscription Procedure
+6.2.1.1.1	General
+This procedure is used by an xApp to request an E2 subscription to Near-RT RIC platform.
+6.2.1.1.2	Successful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION (Request)
+near -> app: E2 SUBSCRIPTION (Success)
+@enduml
+Figure 6.2.1.1.2-1: E2 Subscription procedure, successful operation
+The xApp initiates the procedure by sending an E2 SUBSCRIPTION (Request) message to the Near-RT-RIC platform. The message contains a unique Procedure Transaction ID IE assigned by the initiating xApp, the Global E2 Node ID IE, the RAN Function ID IE, and the E2 Subscription Details IE including one or more requested E2 actions.
+Note: When execution order of multiple actions is not concerned, it is recommended that an E2 Subscription procedure contains a single action, to allow efficient reuse of E2 subscriptions.
+At reception of the E2 SUBSCRIPTION (Request) message, the Near-RT-RIC platform shall:
+-	Search existing E2 subscription(s) for matched Global E2 Node ID IE, RAN Function ID IE and matched contents in E2 Subscription Details IE. If a matched E2 subscription exists, add the initiating xApp as a new subscriber of the E2 subscription.
+-	Initiate appropriate E2AP procedure(s) to establish RIC subscription with the target E2 Node, if existing E2 subscriptions are insufficient to fulfill the request.
+If the subscription request is successfully fulfilled, the Near-RT RIC platform shall send an E2 SUBSCRIPTION (Success) message back to the xApp. Similar to [3], a successfully fulfilled request shall be sent if the E2 event trigger and at least one requested E2 action are admitted.
+In the E2 SUBSCRIPTION (Success) message, Near-RT RIC platform shall include the associated Procedure Transaction ID IE, Global E2 Node ID IE, RAN Function ID IE and an E2 Request ID IE assigned by the Near-RT RIC platform. The message shall also indicate the admitted E2 action(s) in the Actions Admitted List IE, each with the associated E2 Action ID IE assigned by the Near-RT RIC platform.  The same E2 Request ID IE and E2 Action ID IE shall be present in any subsequent E2 INDICATION message(s). The message shall indicate, if exist, the E2 action(s) not admitted in the Actions Not Admitted List IE with appropriate cause(s).
+6.2.1.1.3	Unsuccessful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION (Request)
+near -> app: E2 SUBSCRIPTION (Reject)
+@enduml
+Figure 6.2.1.1.3-1: E2 Subscription procedure, unsuccessful operation (Reject)
+If the subscription request is rejected by the Near-RT RIC platform, an E2 SUBSCRIPTION (Reject) message shall be sent back to the xApp. The message shall include associated Procedure Transaction ID IE which is replicated from the corresponding request, the Global E2 Node ID IE, the RAN Function ID IE and appropriate Cause IE.
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION (Request)
+near -> app: E2 SUBSCRIPTION (Failure)
+@enduml
+Figure 6.2.1.1.3-2: E2 Subscription procedure, unsuccessful operation (Failure)
+If the subscription request fails due to failure in E2AP procedure, the Near-RT RIC platform shall send an E2 SUBSCRIPTION (Failure) message back to the xApp. The message shall include the associated Procedure Transaction ID IE which is replicated from the corresponding request, Global E2 Node ID IE, RAN Function ID IE and appropriate cause.
+6.2.1.1.4	Abnormal Conditions
+Not applied.
+6.2.1.2	E2 Subscription Delete Procedure, xApp initiated
+6.2.1.2.1	General
+This procedure is used by an xApp to unsubscribe from an E2 subscription on Near-RT RIC platform.
+6.2.1.2.2	Successful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION DELETE (Request)
+near -> app: E2 SUBSCRIPTION DELETE (Success)
+@enduml
+Figure 6.2.1.2.2-1: E2 Subscription Delete procedure (xApp initiated), successful operation
+The xApp initiates the procedure by sending the E2 SUBSCRIPTION DELETE (Request) message to the Near-RT-RIC platform. The message contains the Global E2 Node ID IE and the E2 Request ID IE to indicate the target E2 subscription.
+At reception of the E2 SUBSCRIPTION DELETE (Request) message, the Near-RT-RIC platform shall, if the delete request is accepted by the Near-RT-RIC platform:
+-	Check for other subscriber(s) of the target E2 subscription. If such subscriber(s) exists, the E2 subscription shall be maintained by the Near-RT RIC platform but no longer serve the initiating xApp; if not, the E2 subscription shall be deleted.
+-	Initiate appropriate E2AP procedure(s) with the target E2 Node, if necessary, to map the change in the target E2 subscription to its corresponding RIC subscription.
+Upon success of the above processing for the target E2 subscription, the Near-RT RIC platform shall stop delivering its associated E2 INDICATION message(s) to the initiating xApp and respond the xApp with an E2 SUBSCRIPTION DELETE(Success) message. The E2 SUBSCRIPTION DELETE (Success) message shall include the same Global E2 Node ID IE and E2 Request ID IE from the request message.
+6.2.1.2.3	Unsuccessful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION DELETE (Request)
+near -> app: E2 SUBSCRIPTION DELETE (Reject)
+@enduml
+Figure 6.2.1.2.3-1: E2 Subscription Delete procedure (xApp initiated), unsuccessful operation (Reject)
+If the Near-RT RIC platform rejects the request message, an E2 SUBSCRIPTION (Reject) message shall be sent back to the initiating xApp. The message shall include associated Procedure Transaction ID IE which is replicated from the corresponding request, the Global E2 Node ID IE, the RAN Function ID IE and appropriate Cause IE.
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 SUBSCRIPTION DELETE (Request)
+near -> app: E2 SUBSCRIPTION DELETE (Failure)
+@enduml
+Figure 6.2.1.2.3-2: E2 Subscription Delete procedure (xApp initiated), unsuccessful operation (Failure)
+If the associated E2AP procedure(s) fails for the E2 subscription, the Near-RT RIC platform shall send an E2 SUBSCRIPTION DELETE (Failure) message back to the initiating xApp.   The message shall include associated Procedure Transaction ID IE which is replicated from the corresponding request, the Global E2 Node ID IE, the RAN Function ID IE and appropriate Cause IE.
+6.2.1.2.4	Abnormal Conditions
+Not applied.
+6.2.2	E2_Indication_API procedures
+6.2.2.1	E2 Indication Procedure
+6.2.2.1.1	General
+This procedure is used by the Near-RT RIC platform to deliver to target xApp the subscribed information associated with an E2 subscription. The procedure is triggered by the reception of an E2AP RIC INDICATION message from an E2 Node.
+6.2.2.1.2	Successful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+near -> app: E2 INDICATION (Push)
+@enduml
+Figure 6.2.2.1.2-1: E2 Indication procedure, successful operation
+The Near-RT-RIC platform initiates the procedure by sending the E2 INDICATION message containing the Global E2 Node ID IE, the E2 Request ID IE, the E2 Action ID IE to the target xApp. The message shall also contain the E2 Indication Type IE, the E2 Indication Header IE and the E2 Indication Message IE to carry the information from corresponding fields in the E2AP RIC INDICATION message. The E2 Indication SN IE and the E2 Call process ID IE shall also be included, if corresponding fields are present in the E2AP RIC INDICATION message.
+At reception of the E2 INDICATION message an xApp shall:
+- 	Use the Global E2 Node ID IE, the E2 Request ID IE and the E2 Action ID IE to associate the received message to its previous request for E2 subscription. The E2 Request ID and the E2 Action ID have been assigned in the E2 SUBSCRIPTION (Success) message for each requested E2 action in the E2 SUBSCRIPTION (Request) message.
+- 	Process the information carried in the E2 Indication SN IE, the E2 Indication Type IE, the E2 Indication Header IE, the E2 Indication Message IE and the E2 Call process ID IE.
+6.2.2.1.3	Unsuccessful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+near -> app: E2 INDICATION (Push)
+app --> near: E2 INDICATION (Failure)
+@enduml
+Figure 6.2.2.1.3-1: E2 Indication procedure, unsuccessful operation (Failure)
+If an error is detected in the received message, the xApp may send E2 INDICATION (Failure) message back to the Near-RT RIC platform. The message shall include the associated Global E2 Node ID IE, E2 Request ID IE, RAN Function ID IE, E2 Action ID IE, and appropriate cause. The E2 Indication SN IE shall also be included if present in the corresponding E2 INDICATION (Push) message.
+6.2.2.1.4	Abnormal Conditions
+Not applied.
+6.2.3	E2_Control_API procedures
+6.2.3.1	E2 Control procedure
+6.2.3.1.1	General
+This procedure is used by an xApp to request for E2 control service to Near-RT RIC platform.
+6.2.3.1.2	Successful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 CONTROL (Request)
+near  app: E2 CONTROL (Success)
+@enduml
+Figure 6.2.3.1.2-1: E2 Contol procedure, successful operation
+The xApp initiates the procedure by sending the E2 CONTROL (Request) message to the Near-RT-RIC platform, containing the Global E2 Node ID IE, the RAN Function ID IE, optionally the E2 Call Process ID IE, E2 Control Header IE, E2 Control Message IE, optionally the E2 Control Ack Request IE and optionally the E2 Control Timer IE.
+At reception of the E2 CONTROL (Request) message, the Near-RT-RIC platform shall:
+-	Evaluate whether to reject the request due to potential control conflict, when such evaluation is required by conflict mitigation related configuration.
+-	Initiate appropriate E2AP RIC Control procedure with the target E2 Node, if the request is not rejected by the Near-RT-RIC platform.
+The Near-RT-RIC platform may use the value in the E2 Control Timer IE, if present, as a one-time value of the E2AP timer TRICcontrol in Clause 9.5 of [3], which is valid only for this transaction.
+If the control request is successfully performed, and if the optional E2 Control Ack Request IE in the request is absent or set to “Ack”, an E2 CONTROL (Success) message shall be responded to the initiating xApp. The E2 CONTROL (Success) message shall include the Global E2 Node ID IE, the RAN Function ID IE, optionally the E2 Call Process ID IE, and optionally the E2 Control Outcome IE. The xApp may use the information contained in the optional E2 Control Outcome IE to determine subsequent actions.
+If the control request is successfully performed, and if the optional E2 Control Ack Request IE in the request is set to “NoAck”, an E2 CONTROL (Success) message is not needed and xApp may consider it success.
+6.2.3.1.3	Unsuccessful Operations
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 CONTROL (Request)
+near -> app: E2 CONTROL (Reject)
+@enduml
+Figure 6.2.3.1.3-1: E2 Control procedure, unsuccessful operation (Reject)
+If the request is rejected by the Near-RT RIC platform, an E2 CONTROL (Reject) message shall be responded to the initiating xApp with appropriate Cause IE.  The xApp may use the information contained in the Cause IE to determine subsequent actions.
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: E2 CONTROL (Request)
+near -> app: E2 CONTROL (Failure)
+@enduml
+Figure 6.2.3.1.3-2: E2 Control procedure, unsuccessful operation (Failure)
+If the request is accepted by the Near-RT RIC platform but failed in the E2AP RIC Control procedure, the Near-RT RIC platform shall send an E2 CONTROL (Failure) message back to the xApp with appropriate Cause IE. The xApp may use the information contained in the Cause IE and the optional E2 Control Outcome IE to determine subsequent actions.
+6.2.3.1.4	Abnormal Conditions
+Not applied.
+6.3	Elements for E2-related API Communication
+6.3.1	General
+6.3.2	Message Functional Definition and Content
+6.3.2.1	E2 SUBSCRIPTION (Request)
+This message is sent by an xApp to the Near-RT RIC platform for an E2 Subscription.
+Direction: xApp -> Near-RT RIC platform
+6.3.2.2	E2 SUBSCRIPTION (Success)
+This message is sent by the Near-RT RIC platform after the xApp’s subscription request is successfully accepted with respect to the target E2 Node.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.3	E2 SUBSCRIPTION (Reject)
+This message is sent by the Near-RT RIC platform after the xApp’s subscription request is rejected by Near-RT RIC platform with respect to the target E2 Node.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.4	E2 SUBSCRIPTION (Failure)
+This message is sent by the Near-RT RIC platform after the xApp’s subscription request is accepted by Near-RT RIC platform but failed by E2 Node, with respect to the target E2 Node.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.5	E2 SUBSCRIPTION DELETE (Request)
+This message is sent by the xApp to the Near-RT RIC platform to request deletion of one target E2 subscription.
+Direction: xApp -> Near-RT RIC platform
+6.3.2.6	E2 SUBSCRIPTION DELETE (Success)
+This message is sent by the Near-RT RIC platform to the xApp to indicate success for the delete request of the target E2 subscription.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.7	E2 SUBSCRIPTION DELETE (Reject)
+This message is sent by the Near-RT RIC platform to the xApp when the Near-RT RIC platform rejects the delete request for the target E2 subscription.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.8	E2 SUBSCRIPTION DELETE (Failure)
+This message is sent by the Near-RT RIC platform to the xApp when the delete request for a target E2 subscription fails due to failure in the associated E2AP procedure(s).
+Direction: Near-RT RIC platform -> xApp
+6.3.2.9	E2 SUBSCRIPTION DELETE QUERY (Required)
+6.3.2.10	E2 SUBSCRIPTION DELETE QUERY (Accept)
+6.3.2.11	E2 SUBSCRIPTION DELETE QUERY (Decline)
+6.3.2.12	E2 SUBSCRIPTION DELETE NOTIFICATION
+6.3.2.13	E2 INDICATION (Push)
+This message is sent by the Near-RT RIC platform to the xApp for delivery of subscribed information associated with an E2 subscription.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.14	E2 INDICATION (Failure)
+This message is sent by the xApp to the Near-RT RIC platform if an error is detected in E2 INDICATION (Push) message.
+Direction: xApp -> Near-RT RIC platform
+6.3.2.15	E2 CONTROL (Request)
+This message is sent by the xApp to the Near-RT RIC platform for an E2 control request.
+Direction: xApp -> Near-RT RIC platform
+6.3.2.16	E2 CONTROL (Success)
+This message is sent by the Near-RT RIC platform to the xApp for a successfully performed E2 control request.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.17	E2 CONTROL (Reject)
+This message is sent by the Near-RT RIC platform to the xApp if the corresponding E2 control request is rejected by the Near-RT RIC platform.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.18	E2 CONTROL (Failure)
+This message is sent by the Near-RT RIC platform to the xApp if the corresponding E2 control request is accepted by the Near-RT RIC platform but fails in the E2 Node.
+Direction: Near-RT RIC platform -> xApp
+6.3.2.19	E2 GUIDANCE (Request)
+6.3.2.20	E2 GUIDANCE (Response)
+6.3.2.21	E2 GUIDANCE (Modification)
+6.3.3	Information Element Definitions
+6.3.3.1	Message Type
+This IE uniquely identifies the message being sent. It is mandatory for all messages.
+6.3.3.2	E2 Request ID
+This IE is assigned by Near-RT RIC platform to uniquely identify an E2 subscription among all the E2 subscriptions associated with the same E2 Node.
+6.3.3.3	Void
+6.3.3.4	Cause
+This IE is used to indicate the reason for a particular event for the E2-related APIs.
+Note:	Not all causes from E2AP are applicable.
+6.3.3.4a	E2-related API Cause
+The purpose of the E2-related API Cause IE is to indicate the reason for a particular event for the E2-related APIs.
+The meaning of the different cause values is described in the following table. In general, "not supported" cause values indicate that the related capability is missing. On the other hand, "not available" cause values indicate that the related capability is present, but insufficient resources were available to perform the requested action.
+6.3.3.5	Criticality Diagnostics
+The Criticality Diagnostics IE is sent by the xApp or the Near-RT RIC Platform when parts of a received message have not been comprehended or were missing. When applicable, it contains information about which IEs were not comprehended or were missing.
+6.3.3.6	E2 Control Timer
+This IE specifies the suggested time to wait before timeout for the RIC Control procedure in E2AP[3].
+6.3.4	Message and Information Element Abstract Syntax
+6.3.4.1	Solution 1: SCTP with Protocol Buffers
+6.3.4.1.1	Usage of SCTP with Protocol Buffers
+This solution uses Protocol Buffers as message encoding, and SCTP as the transport protocol.
+The PDU on the SCTP connection uses the structure as defined in Section 10.1.8 where its API Payload IE serves as a container for individual API messages in Section 6.3.4.1.2 which can be E2SubscriptionApiPayload or E2IndicationApiPayload or E2ControlApiPayload.
+Table 6.3.4.1.1-1 lists the E2 related API abstract syntax included in this document.
+Table 6.3.4.1.1-1: List of E2 related APIs abstract syntax
+6.3.4.1.2	API Definitions
+6.3.4.1.2.1	E2_Subscription_API
+syntax = "proto3";
+package ricapi.e2_subscription_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "e2_related_apis_common_ies_ver_1_0_0.proto";
+// top-level PDU
+message E2SubscriptionApiPayload {
+oneof procedure_type {
+E2SubscriptionProc e2_subscription_proc = 1;
+E2SubscriptionDeleteProc e2_subscription_delete_proc = 2;
+E2SubscriptionDeleteQueryProc e2_subscription_delete_query_proc = 3;
+E2SubscriptionDeleteNotificationProc e2_subscription_delete_notification_proc = 4;
+}
+}
+// ---------------- procedures of E2_Subscription_API ----------------
+message E2SubscriptionProc {
+oneof type_of_message {
+E2SubscriptionRequest e2_subscription_request = 1 ;
+E2SubscriptionSuccess e2_subscription_success = 2 ;
+E2SubscriptionReject e2_subscription_reject = 3 ;
+E2SubscriptionFailure e2_subscription_failure = 4 ;
+}
+}
+message E2SubscriptionDeleteProc {
+oneof type_of_message {
+E2SubscriptionDeleteRequest e2_subscription_delete_request = 1 ;
+E2SubscriptionDeleteSuccess e2_subscription_delete_success = 2 ;
+E2SubscriptionDeleteReject e2_subscription_delete_reject = 3 ;
+E2SubscriptionDeleteFailure e2_subscription_delete_failure = 4 ;
+}
+}
+message E2SubscriptionDeleteQueryProc {
+oneof type_of_message {
+E2SubscriptionDeleteQueryRequired e2_subscription_delete_query_required = 1 ;
+E2SubscriptionDeleteQueryAccept e2_subscription_delete_query_accept = 2 ;
+E2SubscriptionDeleteQueryDecline e2_subscription_delete_query_reject = 3 ;
+}
+}
+message E2SubscriptionDeleteNotificationProc {
+oneof type_of_message {
+E2SubscriptionDeleteNotificationDeleted e2_subscription_delete_notification_deleted = 1 ;
+}
+}
+// ---------------- messages of E2_Subscription_API ----------------
+// -------- messages of E2 Subscription procedure --------
+message E2SubscriptionRequest {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional E2SubscriptionDetails e2_subscription_details = 4;
+message E2SubscriptionDetails {
+optional e2_related_apis_common_ies.v1.E2EventTriggerDefinition e2_event_trigger_definition = 1;
+repeated E2ActionToBeSetupItem sequence_of_actions = 2 ;
+message E2ActionToBeSetupItem {
+optional e2_related_apis_common_ies.v1.E2ActionId requested_e2_action_id = 1 ;
+optional e2_related_apis_common_ies.v1.E2ActionType e2_action_type = 2 ;
+optional e2_related_apis_common_ies.v1.E2ActionDefinition e2_action_definition = 3 ;
+optional e2_related_apis_common_ies.v1.E2SubsequentAction e2_subsequent_action = 4 ;
+}
+}
+}
+message E2SubscriptionSuccess {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+repeated E2ActionAdmittedItem e2_actions_admitted_list = 5;
+repeated E2ActionNotAdmittedItem e2_actions_not_admitted_list = 6;
+message E2ActionAdmittedItem {
+optional e2_related_apis_common_ies.v1.E2ActionId requested_e2_action_id = 1 ;
+optional e2_related_apis_common_ies.v1.E2ActionId e2_action_id = 2 ;
+}
+message E2ActionNotAdmittedItem {
+optional e2_related_apis_common_ies.v1.E2ActionId requested_e2_action_id = 1 ;
+optional e2_related_apis_common_ies.v1.Cause cause = 2 ;
+}
+}
+message E2SubscriptionFailure {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.Cause cause = 4;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 5;
+}
+message E2SubscriptionReject {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.Cause cause = 4;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 5;
+}
+// -------- messages of E2 Subscription Delete procedure --------
+message E2SubscriptionDeleteRequest {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+}
+message E2SubscriptionDeleteSuccess {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+}
+message E2SubscriptionDeleteFailure {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+optional e2_related_apis_common_ies.v1.Cause cause = 5;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 6;
+}
+message E2SubscriptionDeleteReject {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+optional e2_related_apis_common_ies.v1.Cause cause = 5;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 6;
+}
+// -------- messages of E2 Subscription Delete Query procedure --------
+message E2SubscriptionDeleteQueryRequired {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+optional e2_related_apis_common_ies.v1.Cause cause = 5;
+}
+message E2SubscriptionDeleteQueryAccept {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+}
+message E2SubscriptionDeleteQueryDecline {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+optional e2_related_apis_common_ies.v1.Cause cause = 5;
+}
+// -------- messages of E2 Subscription Delete Notification procedure --------
+message E2SubscriptionDeleteNotificationDeleted {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 3;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 4;
+optional e2_related_apis_common_ies.v1.Cause cause = 5;
+}
+6.3.4.1.2.2	E2_Indication_API
+syntax = "proto3";
+package ricapi.e2_indication_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "e2_related_apis_common_ies_ver_1_0_0.proto";
+// top-level PDU
+message E2IndicationApiPayload {
+oneof procedure_type {
+E2IndicationProc e2_indication_proc = 1;
+}
+}
+// ---------------- procedures of E2_Subscription_API ----------------
+message E2IndicationProc {
+oneof type_of_message {
+E2IndicationPush e2_indication_push = 1 ;
+E2IndicationFailure e2_indication_failure = 2 ;
+}
+}
+// ---------------- messages of E2_Indication_API ----------------
+// -------- messages of E2 Indication procedure --------
+message E2IndicationPush {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 1;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.E2ActionId e2_action_id = 4;
+optional e2_related_apis_common_ies.v1.E2IndicationSN e2_indication_sn = 5;
+optional e2_related_apis_common_ies.v1.E2IndicationType e2_indication_type = 6;
+optional e2_related_apis_common_ies.v1.E2IndicationHeader e2_indication_header = 7;
+optional e2_related_apis_common_ies.v1.E2IndicationMessage e2_indication_message = 8;
+optional e2_related_apis_common_ies.v1.E2CallProcessId e2_call_process_id = 9;
+}
+message E2IndicationFailure {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 1;
+optional e2_related_apis_common_ies.v1.E2RequestId e2_request_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.E2ActionId e2_action_id = 4;
+optional e2_related_apis_common_ies.v1.E2IndicationSN e2_indication_sn = 5;
+optional e2_related_apis_common_ies.v1.Cause cause = 6;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 7;
+}
+6.3.4.1.2.3	E2_Control_API
+syntax = "proto3";
+package ricapi.e2_control_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "e2_related_apis_common_ies_ver_1_0_0.proto";
+// top-level PDU
+message E2ControlApiPayload {
+oneof procedure_type {
+E2ControlProc e2_control_proc = 1;
+}
+}
+// ---------------- procedures of E2_Control_API ----------------
+message E2ControlProc {
+oneof type_of_message {
+E2ControlRequest e2_control_request = 1;
+E2ControlSuccess e2_control_success = 2;
+E2ControlReject e2_control_reject = 3;
+E2ControlFailure e2_control_failure = 4;
+}
+}
+// ---------------- messages of E2_Control_API ----------------
+// -------- messages of E2 Control procedure --------
+message E2ControlRequest {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.E2CallProcessId e2_call_process_id = 4;
+optional e2_related_apis_common_ies.v1.E2ControlHeader e2_control_header = 5;
+optional e2_related_apis_common_ies.v1.E2ControlMessage e2_control_message = 6;
+optional e2_related_apis_common_ies.v1.E2ControlAckRequest e2_control_ack_request = 7;
+optional uint32 e2_control_timer = 8;
+}
+message E2ControlSuccess {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.E2CallProcessId e2_call_process_id = 4;
+optional e2_related_apis_common_ies.v1.E2ControlOutcome e2_control_outcome = 5;
+}
+message E2ControlReject {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.Cause cause = 4;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 5;
+}
+message E2ControlFailure {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId global_e2_node_id = 2;
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 3;
+optional e2_related_apis_common_ies.v1.E2CallProcessId e2_call_process_id = 4;
+optional e2_related_apis_common_ies.v1.E2ControlOutcome e2_control_outcome = 5;
+optional e2_related_apis_common_ies.v1.Cause cause = 6;
+optional e2_related_apis_common_ies.v1.CriticalityDiagnostics criticality_diagnostics = 7;
+}
+6.3.4.1.3	Information Element Definitions
+syntax = "proto3";
+package ricapi.e2_related_apis_common_ies.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+// ----------------------------- Information Elements -----------------------------
+// --------------E--------------
+// From E2AP Clause 9.2.11
+enum E2ActionType {
+E2ACTION_TYPE_REPORT = 0;
+E2ACTION_TYPE_INSERT = 1;
+E2ACTION_TYPE_POLICY = 2;
+};
+// From E2AP Clause 9.2.21
+enum E2ControlAckRequest {
+E2_CONTROL_ACK_REQUEST_NO_ACK = 0;
+E2_CONTROL_ACK_REQUEST_ACK = 1;
+}
+// From E2AP Clause 9.2.15
+enum E2IndicationType {
+E2_INDICATION_TYPE_REPORT = 0;
+E2_INDICATION_TYPE_INSERT = 1;
+}
+// --------------C--------------
+message Cause {
+oneof cause_group {
+E2RelatedApiCause e2_related_api_cause = 1;
+E2apCause e2ap_cause = 2;
+}
+message E2apCause {
+oneof cause_group {
+RicRequest ric_request = 1;
+RicService ric_service = 2;
+E2Node e2_node = 3;
+Transport transport = 4;
+Protocol protocol = 5;
+Misc misc = 6;
+}
+enum E2Node {
+E2NODE_COMPONENT_UNKNOWN = 0;
+}
+enum Misc {
+CONTROL_PROCESSING_OVERLOAD = 0;
+HARDWARE_FAILURE = 1;
+OM_INTERVENTION = 2;
+MISC_UNSPECIFIED = 3;
+}
+enum Protocol {
+TRANSFER_SYNTAX_ERROR = 0;
+ABSTRACT_SYNTAX_ERROR_REJECT = 1;
+ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY = 2;
+MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE = 3;
+SEMANTIC_ERROR = 4;
+ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE = 5;
+PROTOCOL_UNSPECIFIED = 6;
+}
+enum RicRequest {
+RAN_FUNCTION_ID_INVALID = 0;
+ACTION_NOT_SUPPORTED = 1;
+EXCESSIVE_ACTIONS = 2;
+DUPLICATE_ACTION = 3;
+DUPLICATE_EVENT_TRIGGER = 4;
+FUNCTION_RESOURCE_LIMIT = 5;
+REQUEST_ID_UNKNOWN = 6;
+INCONSISTENT_ACTION_SUBSEQUENT_ACTION_SEQUENCE = 7;
+CONTROL_MESSAGE_INVALID = 8;
+RIC_CALL_PROCESS_ID_INVALID = 9;
+CONTROL_TIMER_EXPIRED = 10;
+CONTROL_FAILED_TO_EXECUTE = 11;
+SYSTEM_NOT_READY = 12;
+RIC_REQUEST_UNSPECIFIED = 13;
+}
+enum RicService {
+RAN_FUNCTION_NOT_SUPPORTED = 0;
+EXCESSIVE_FUNCTIONS = 1;
+RIC_RESOURCE_LIMIT = 2;
+}
+enum Transport {
+TRANSPORT_UNSPECIFIED = 0;
+TRANSPORT_RESOURCE_UNAVAILABLE = 1;
+}
+}
+message E2RelatedApiCause {
+oneof cause_group {
+ApplicationLayer  application_layer = 1;
+Transport transport = 2;
+Protocol protocol = 3;
+Misc misc = 4;
+}
+enum ApplicationLayer {
+APPLICATION_LAYER_UNSPECIFIED = 0;
+GLOBAL_E2_NODE_ID_INVALID = 1;
+E2_NODE_RESET_OR_DISCONNECTED = 2;
+RAN_FUNCTION_ID_INVALID = 3;
+ACTION_NOT_SUPPORTED = 4;
+EXCESSIVE_ACTIONS = 5;
+DUPLICATE_ACTION = 6;
+E2_REQUEST_ID_UNKNOWN = 7;
+CONTROL_CONFLICT = 8;
+E2_INDICATION_UNKNOWN = 9;
+E2AP_PROCEDURE_TIMEOUT = 10;
+ESSENTIAL_FOR_OPERATION = 11;
+}
+enum Misc {
+MISC_UNSPECIFIED = 0;
+CONTROL_PROCESSING_OVERLOAD = 1;
+HARDWARE_FAILURE = 2;
+OM_INTERVENTION = 3;
+}
+enum Protocol {
+PROTOCOL_UNSPECIFIED = 0;
+TRANSFER_SYNTAX_ERROR = 1;
+ABSTRACT_SYNTAX_ERROR_REJECT = 2;
+ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY = 3;
+MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE = 4;
+SEMANTIC_ERROR = 5;
+ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE = 6;
+}
+enum Transport {
+TRANSPORT_UNSPECIFIED = 0;
+TRANSPORT_RESOURCE_UNAVAILABLE = 1;
+}
+}
+}
+message CriticalityDiagnostics {
+repeated IeCriticalityDiagnosticsItem ie_criticality_diagnostics_list = 1;
+message IeCriticalityDiagnosticsItem {
+optional IeCriticality ie_criticality = 1;
+optional IeId ie_id = 2;
+optional TypeOfError type_of_error = 3;
+}
+enum IeCriticality {
+IE_CRITICALITY_REJECT = 0;
+IE_CRITICALITY_IGNORE = 1;
+IE_CRITICALITY_NOTIFY = 2;
+}
+enum IeId {
+IE_ID_CAUSE = 0;
+IE_ID_CRITICALITY_DIAGNOSTICS = 1;
+IE_ID_E2_ACTION_ID = 2;
+IE_ID_E2_ACTIONS_ADMITTED_LIST = 3;
+IE_ID_E2_ACTIONS_NOT_ADMITTED_LIST = 4;
+IE_ID_E2_CALL_PROCESS_ID = 5;
+IE_ID_E2_CONTROL_ACK_REQUEST = 6;
+IE_ID_E2_CONTROL_HEADER = 7;
+IE_ID_E2_CONTROL_MESSAGE = 8;
+IE_ID_E2_CONTROL_OUTCOME = 9;
+IE_ID_E2_CONTROL_TIMER = 10;
+IE_ID_E2_INDICATION_HEADER = 11;
+IE_ID_E2_INDICATION_MESSAGE = 12;
+IE_ID_E2_INDICATION_SN = 13;
+IE_ID_E2_INDICATION_TYPE = 14;
+IE_ID_E2_REQUEST_ID = 15;
+IE_ID_E2_SUBSCRIPTION_DETAILS = 16;
+IE_ID_GLOBAL_E2_NODE_ID = 17;
+IE_ID_PROCEDURE_TRANSACTION_ID = 18;
+IE_ID_RAN_FUNCTION_ID = 19;
+IE_ID_SEQUENCE_OF_ACTIONS = 20;
+}
+enum TypeOfError {
+TYPE_OF_ERROR_NOT_UNDERSTOOD = 0;
+TYPE_OF_ERROR_MISSING = 1;
+}
+}
+// --------------E--------------
+message E2ActionDefinition {
+optional bytes value = 1;
+};
+message E2ActionId {
+optional uint32 value = 1;
+};
+message E2CallProcessId {
+optional bytes value = 1;
+};
+message E2ControlHeader {
+optional bytes value = 1;
+};
+message E2ControlMessage {
+optional bytes value = 1;
+};
+message E2ControlOutcome {
+optional bytes value = 1;
+};
+message E2EventTriggerDefinition {
+optional bytes value = 1;
+};
+message E2IndicationHeader {
+optional bytes value = 1;
+};
+message E2IndicationMessage {
+optional bytes value = 1;
+};
+message E2IndicationSN {
+optional uint32 value = 1;
+};
+message E2RequestId {
+optional uint32 value = 1;
+};
+// From E2AP Clause 9.2.13
+message E2SubsequentAction {
+optional SubsequentActionType subsequent_action_type = 1;
+optional TimeToWait e2_time_to_wait = 2;
+enum SubsequentActionType {
+SUBSEQUENT_ACTION_TYPE_CONTINUE = 0;
+SUBSEQUENT_ACTION_TYPE_WAIT = 1;
+};
+enum TimeToWait {
+TIME_TO_WAIT_W1MS = 0;
+TIME_TO_WAIT_W2MS = 1;
+TIME_TO_WAIT_W5MS = 2;
+TIME_TO_WAIT_W10MS = 3;
+TIME_TO_WAIT_W20MS = 4;
+TIME_TO_WAIT_W30MS = 5;
+TIME_TO_WAIT_W40MS = 6;
+TIME_TO_WAIT_W50MS = 7;
+TIME_TO_WAIT_W100MS = 8;
+TIME_TO_WAIT_W200MS = 9;
+TIME_TO_WAIT_W500MS = 10;
+TIME_TO_WAIT_W1S = 11;
+TIME_TO_WAIT_W2S = 12;
+TIME_TO_WAIT_W5S = 13;
+TIME_TO_WAIT_W10S = 14;
+TIME_TO_WAIT_W20S = 15;
+TIME_TO_WAIT_W60S = 16;
+}
+};
+6.3.5	Message Transfer Syntax
+6.3.5.1	Solution 1: SCTP with Protocol Buffers
+The message transfer syntax for Solution 1 is serialized Protocol Buffers [4].
+7	SDL API
+7.1	Overview
+7.1.1	Protocol Stack
+In this version of specification, the default protocol stack for the SDL APIs is shown on Figure 7.1.1-1.
+Note: The security protocols are specified in [6].
+Figure 7.1.1-1: Protocol stack for SDL APIs
+The SDL APIs use SCTP with Protocol Buffers [4] as the application layer serialization protocol.
+7.1.2	List of SDL APIs, procedures and messages
+The SDL API procedures introduced in section 9.5 of [2] are categorized under the SDL APIs. These APIs include:
+SDL Information API: enabling storage and retrieval of information by xApps.
+These APIs are summarized in Table 7.1.2-1.
+Table 7.1.2-1: List of SDL APIs
+The table 7.1.2-2 lists the API procedures for each SDL API.
+Table 7.1.2-2: List of enablement API procedures
+The table 7.1.2-3 lists the messages for each SDL API procedure.
+Table 7.1.2-3: List of enablement API messages
+7.2	SDL API Procedures
+7.2.1	SDL Client Registration procedure
+7.2.2	SDL Client Deregistration procedure
+7.2.3	SDL Subscribe Information procedure
+7.2.3.1	General
+This procedure is used by the xApp to subscribe to the SDL for the information that it is interested to obtain. The xApp can optionally define a set of filters to specify the type of the data to be subscribed. The Near-RT RIC platform acknowledges the subscribe results in the response message.
+7.2.3.2	Successful Operation
+@startuml
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "Near-RT RIC Platform" as near
+participant "xApp" as app
+app -> near: SUBSCRIBE INFORMATION REQUEST
+near -> app: SUBSCRIBE INFORMATION RESPONSE
+@enduml
+Figure 7.2.3.2-1: Subscribe Information procedure, successful operation
+The xApp initiates the procedure by sending the SUBSCRIBE INFORMATION REQUEST message containing the Information Type IE to be subscribed and the Delivery Method IE of the information. The xApp can optionally specify the Subscribe Filter List IE to further define the subset of the data to be subscribed within the Information Type.
+When the Near-RT RIC platform receives the request, it searches the local database for the requested information. If the optional filter definition list is specified, the Near-RT RIC platform performs further filter evaluation to find the matching data. The following operation is conducted to evaluate the data filtering:
+A Filter Definition is satisfied when the logical statement “X p Y” is True, where:
+X is the filter type, represented by the Filter Type IE,
+p is the filter operator, represented by the Filter Condition IE,
+Y is the set of the target values, represented by the Filter Condition Value IE,
+Multiple filter conditions can be specified, in which case, a logical AND will be performed across all filters.
+After the Near-RT RIC platform processes the request, it responds to the xApp with the SUBSCRIBE INFORMATION RESPONSE or SUBSCRIBE INFORMATION FAILURE message.
+7.2.3.3	Unsuccessful Operation
+@startuml
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "Near-RT RIC Platform" as near
+participant "xApp" as app
+app -> near: SUBSCRIBE INFORMATION REQUEST
+near -> app: SUBSCRIBE INFORMATION FAILURE
+@enduml
+Figure 7.2.3.3-1: Subscribe Information procedure, unsuccessful operation
+If the Near-RT RIC platform can not accept the request it shall respond with the SUBSCRIBE INFORMATION FAILURE message and the proper cause. If the message contains Time To Wait IE the xApp shall wait at least the indicated time before reinitiating the request to the Near-RT RIC platform.
+7.2.3.4	Abnormal Conditions
+If the Near-RT RIC platform receives a SUBSCRIBE INFORMATION REQUEST message containing Information Type IE that is not supported by the Near-RT RIC platform, or the optional filter definition is invalid, the Near-RT RIC platform shall send the SUBSCRIBE INFORMATION FAILURE message to the xApp with an appropriate cause value.
+7.2.4	SDL Information Push procedure
+7.2.4.1	General
+This procedure is used by the Near-RT RIC platform to send the latest information from the local database to the xApp based on what the xApp has subscribed with the Delivery Method IE set to Push. It will be triggered by subsequent information updates in the local database that impact the subscribed information.
+7.2.4.2	Successful Operation
+@startuml
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "Near-RT RIC Platform" as near
+participant "xApp" as app
+near -> app: INFORMATION PUSH
+@enduml
+Figure 7.2.4.2-1: Information Push procedure, successful operation
+The Near-RT RIC initiates the procedure by sending the INFORMATION PUSH message containing the Information Block IE. Information Block can contain multiple Information Unit IEs due to various updates as indicated by the associated Modification Type IE.
+7.2.4.3	Unsuccessful Operation
+Not applied.
+7.2.4.4	Abnormal Conditions
+Not applied.
+7.2.5	SDL Information Update Notify procedure
+7.2.5.1	General
+This procedure is used by the Near-RT RIC platform to notify the xApp that certain information subscribed by the xApp has been updated and available to be fetched. The information is limited to that with Delivery Method IE set to Notify in the subscribe information request.
+7.2.5.2	Successful Operation
+@startuml
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "Near-RT RIC Platform" as near
+participant "xApp" as app
+near -> app: INFORMATION UPDATE NOTIFY
+@enduml
+Figure 7.2.5.2-1: Information Update Notify procedure, successful operation
+The Near-RT RIC platform initiates the procedure by sending the INFORMATION UPDATE NOTIFY message containing the Notification List IE, which includes the list of the Notification Unit IEs to indicate which E2 Node has updated the information type and the the cause of the update via the Modification Type IE.
+Once the xApp has received the message, xApp can determine to retrieve the updated information through the Information Fetch procedure described in section 7.2.4.
+7.2.5.3	Unsuccessful Operation
+Not applied.
+7.2.5.4	Abnormal Conditions
+Not applied.
+7.2.6	SDL Information Fetch procedure
+7.2.6.1	General
+This procedure is used by the xApp to request certain information from the SDL. The xApp can optionally define a set of filters to further specify the type of the data to be fetched. The Near-RT RIC platform delivers the requested data in the response message.
+7.2.6.2	Successful Operation
+@startuml
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "Near-RT RIC Platform" as near
+participant "xApp" as app
+app -> near: INFORMATION FETCH REQUEST
+near -> app: INFORMATION FETCH RESPONSE
+@enduml
+Figure 7.2.6.2-1: SDL Information Fetch procedure, successful operation
+The xApp initiates the procedure by sending the INFORMATION FETCH REQUEST message containing the Information Type IE, which specifies the information type xApp wishes to fetch. For each information, the xApp can optionally specify a further Fetch Filter List IE to define the subset of the data to be retrieved within the subscribed information. The filtering of data is exactly the same as the filtering mentioned for SDL Subscribe Information procedure [7.2.1].
+When the Near-RT RIC platform receives the request, it searches the local database for the fetched information. If the optional filter condition list is specified, the Near-RT RIC platform performs further filter evaluation to find the matching data.
+If the SDL contains matching data for the fetch request, the Near-RT RIC platform sends the requested data to the xApp in the INFORMATION FETCH RESPONSE message.
+7.2.6.3	Unsuccessful Operation
+If the data corresponding to a fetch request is not found, the Near-RT RIC platform sends an INFORMATION FETCH FAILURE message with an appropriate failure cause.
+7.2.6.4	Abnormal Conditions
+If the Near-RT RIC platform receives a INFORMATION FETCH REQUEST message containing Information Type IE that is not supported by the Near-RT RIC platform, or the optional filter definition is invalid, the Near-RT RIC platform shall send the INFORMATION FETCH FAILURE message to the xApp with an appropriate cause value.
+7.3	Elements for SDL API Communication
+7.3.1	General
+Sub clauses 7.3.2 and 7.3.3 describe the structure of the messages and information elements required for the SDL API in tabular format.
+7.3.2	Message Functional Definition and Content
+7.3.2.1	SDL CLIENT REGISTRATION REQUEST
+7.3.2.2	SDL CLIENT REGISTRATION RESPONSE
+7.3.2.3	SDL CLIENT REGISTRATION FAILURE
+7.3.2.4	SDL CLIENT DE-REGISTRATION REQUEST
+7.3.2.5	SDL CLIENT DE-REGISTRATION RESPONSE
+7.3.2.6	SUBSCRIBE INFORMATION REQUEST
+This message is sent by an xApp to the Near-RT RIC platform to subscribe to the interested information.
+Direction: xApp -> Near-RT RIC platform
+7.3.2.7	SUBSCRIBE INFORMATION RESPONSE
+This message is sent by the Near-RT RIC platform after successful acceptance of an xApp’s request to subscribe to the information in the SDL.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.8	SUBSCRIBE INFORMATION FAILURE
+This message is sent by the Near-RT RIC platform after failure to accept an xApp’s request to subscribe to information in the SDL.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.9	INFORMATION PUSH
+This message is sent by the Near-RT RIC platform to an xApp containing the information subscribed by the xApp.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.10	INFORMATION UPDATE NOTIFY
+This message is sent by the Near-RT RIC platform to inform an xApp that some of the information subscribed by the xApp has been updated.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.11	INFORMATION FETCH REQUEST
+This message is sent by an xApp to the Near-RT RIC platform to request certain information subscribed by the xApp.
+Direction: xApp -> Near-RT RIC platform
+7.3.2.12	INFORMATION FETCH RESPONSE
+This message is sent by the Near-RT RIC platform to an xApp containing the information requested by the xApp.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.13	INFORMATION FETCH FAILURE
+This message is sent by the Near-RT RIC platform to an xApp if the Information fetch request failed.
+Direction: Near-RT RIC platform -> xApp
+7.3.2.14	STORE DATA REQUEST
+7.3.2.15	STORE DATA RESPONSE
+7.3.2.16	STORE DATA FAILURE
+7.3.2.17	MODIFY DATA REQUEST
+7.3.2.18	MODIFY DATA RESPONSE
+7.3.2.19	MODIFY DATA FAILURE
+7.3.3	Information Element Definitions
+7.3.3.1	Message Type
+The Message Type IE identifies the message being sent. It is mandatory for all messages.
+7.3.3.2	xApp Request ID
+The xApp request ID IE uniquely identifies each request made by the xApp. It is mandatory for all requests and needs to be replicated in their corresponding response.
+For SDL subscriptions, the xApp request ID is also used as the “subscription identifier” and is used in all related Information Push and Information Update Notify messages.
+7.3.3.3	Information Type
+The Information Type IE indicates the type of information the xApp wants to subscribe from the database.
+7.3.3.4	Delivery Method
+The Delivery Method IE indicates the delivery method in which the xApp wants the information to be delivered.
+7.3.3.5	Filter Definition
+The Filter Definition IE defnes a filter on the information that the xApp wants to obtain from SDL.
+7.3.3.6	Filter Type
+The Filter Type IE defines the filtering condition type to identify the information the xApp wants to be delivered.
+7.3.3.7	Filter Condition
+The Filter Condition IE defines the filtering condition to identify the information the xApp wants to be delivered.
+7.3.3.8	Filter Condition Value
+The Filter Condition Value IE defines the filtering condition value to identify the information the xApp wants to be delivered.
+7.3.3.9	Subscription Reject Cause
+The Subscription Reject Cause IE indicates the reason the SDL rejected the subscription.
+7.3.3.10	Modification Type
+The Modification Type IE informs the type of modification that the SDL underwent.
+7.3.3.11	Information Unit
+The Information Unit IE contains the information that the SDL sends to the xApp.
+7.3.3.12	Notification Unit
+The Notification Unit IE contains the notification the xApp wants to be delivered.
+7.3.3.13	Time to wait
+This IE defines the minimum allowed waiting times.
+7.3.3.14	E2 Node ID
+Defined in 10.1.6.
+7.3.3.15	E2 Node Component Type
+Follow the definition of E2 Node Component Interface Type defined in E2AP clause 9.2.26.
+7.3.3.16	RAN function Service Model OID
+Follow the definition of RAN function Service model OID defined in E2AP clause 9.2.31.
+7.3.3.17	Last Modified E2Node Version
+SDL maintains version number for state of each E2Node. Increments it whenever any RAN Function IE or E2 Node Component Config IE changes.
+This is the version number when the particular RAN Function IE or E2 Node Component Config IE last changed.
+7.3.3.18	Fetch Failure Cause
+7.3.3.19	E2Node Component Configuration
+Follow the definition of E2 Node Component Configuration Update defined in E2AP clause 9.2.27. However, all the 3GPP content would be configurations, and not configuration updates.
+7.3.3.20	E2Node State
+7.3.4	Message and Information Element Abstract Syntax
+7.3.4.1	Solution 1: SCTP with Protocol Buffers
+7.3.4.1.1	Usage of SCTP with Protocol Buffers
+This solution uses Protocol Buffers as message encoding, and SCTP as the transport protocol.
+The PDU on the SCTP connection uses the structure as defined in Section 10.1.8 where its API Payload IE serves as a container for individual API messages in Section 7.3.4.1.2 which can be SdlInformationApiPayload.
+Table 7.3.4.1.1-1 lists the SDL API specifications included in this document.
+7.3.4.1.2	API Definitions
+7.3.4.1.2.1	SDL_Information_API
+syntax = "proto3";
+package ricapi.sdl_information_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "sdl_apis_common_ies_ver_1_0_0.proto";
+// top-level PDU
+message SdlInformationApiPayload {
+oneof procedure_type {
+SdlSubscribeInformationProc sdl_subscribe_information_proc = 1;
+SdlInformationFetchProc sdl_information_fetch_proc = 2;
+SdlInformationPushProc sdl_information_push_proc = 3;
+SdlInformationUpdateNotifyProc sdl_information_update_notify_proc = 4;
+}
+}
+// ---------------- procedures of SDL_Information_API ----------------
+message SdlSubscribeInformationProc {
+oneof type_of_message {
+SubscribeInformationRequest subscribe_information_request = 1;
+SubscribeInformationResponse subscribe_information_response = 2;
+SubscribeInformationFailure subscribe_information_failure = 3;
+}
+}
+message SdlInformationFetchProc {
+oneof type_of_message {
+InformationFetchRequest information_fetch_request = 1;
+InformationFetchResponse information_fetch_response = 2;
+InformationFetchFailure information_fetch_failure = 3;
+}
+}
+message SdlInformationPushProc {
+oneof type_of_message {
+InformationPush information_push = 1;
+}
+}
+message SdlInformationUpdateNotifyProc {
+oneof type_of_message {
+InformationUpdateNotify information_update_notify = 1;
+}
+}
+// ---------------- messages of SDL_Information_API ----------------
+// -------- messages of SDL Subscribe Information procedure --------
+message SubscribeInformationRequest {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.InformationType information_type = 2;
+optional sdl_apis_common_ies.v1.DeliveryMethod delivery_method = 3;
+repeated SubscribeFilterItem subscribe_filter_list = 4;
+message SubscribeFilterItem {
+optional sdl_apis_common_ies.v1.FilterDefinition filter_definition = 1;
+}
+}
+message SubscribeInformationResponse {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+}
+message SubscribeInformationFailure {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.SubscriptionRejectCause subscription_reject_cause = 2;
+optional uint32 time_to_wait = 3;
+}
+// -------- messages of SDL Information Fetch procedure --------
+message InformationFetchRequest {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.InformationType information_type = 2;
+repeated FetchFilterItem fetch_filter_list = 3;
+message FetchFilterItem {
+optional sdl_apis_common_ies.v1.FilterDefinition filter_definition = 1;
+}
+}
+message InformationFetchResponse {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.InformationType information_type = 2;
+repeated InformationBlockItem information_block = 3;
+message InformationBlockItem {
+optional sdl_apis_common_ies.v1.InformationUnit information_unit = 1;
+}
+}
+message InformationFetchFailure {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.FetchFailureCause fetch_failure_cause = 2;
+}
+// -------- messages of SDL Information Push procedure --------
+message InformationPush {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.InformationType information_type = 2;
+repeated InformationBlockItem information_block = 3;
+message InformationBlockItem {
+optional sdl_apis_common_ies.v1.ModificationType modification_type = 1;
+optional sdl_apis_common_ies.v1.InformationUnit information_unit = 2;
+}
+}
+// -------- messages of SDL Information Update Notify procedure --------
+message InformationUpdateNotify {
+optional sdl_apis_common_ies.v1.XappRequestId xapp_request_id = 1;
+optional sdl_apis_common_ies.v1.InformationType information_type = 2;
+repeated NotificationBlockItem notification_block = 3;
+message NotificationBlockItem {
+optional sdl_apis_common_ies.v1.ModificationType modification_type = 1;
+optional sdl_apis_common_ies.v1.NotificationUnit notification_unit = 2;
+}
+}
+7.3.4.1.3	Information Element Definitions
+syntax = "proto3";
+package ricapi.sdl_apis_common_ies.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+// ----------------------------- Information Elements -----------------------------
+// --------------A--------------
+// From E2AP Clause 9.2.32
+message AmfName {
+optional string value = 1;
+}
+// --------------D--------------
+enum DeliveryMethod {
+DELIVERY_METHOD_NOTIFY = 0;
+DELIVERY_METHOD_PUSH = 1;
+}
+// --------------E--------------
+// From E2AP Clause 9.2.27
+message E2NodeComponentConfiguration {
+optional bytes e2_node_component_request_part = 1;
+optional bytes e2_node_component_response_part = 2;
+}
+// From E2AP Clause 9.2.32
+message E2NodeComponentId {
+oneof e2_node_component_interface_type {
+NgInterfaceType ng = 1;
+XnInterfaceType xn = 2;
+E1InterfaceType e1 = 3;
+F1InterfaceType f1 = 4;
+W1InterfaceType w1 = 5;
+S1InterfaceType s1 = 6;
+X2InterfaceType x2 = 7;
+}
+message NgInterfaceType {
+optional AmfName amf_name = 1;
+}
+message XnInterfaceType {
+optional GlobalNgRanNodeId global_ng_ran_node_id = 1;
+}
+message E1InterfaceType {
+optional near_rt_ric_apis_common_ies.v1.GnbCuUpId gnb_cu_up_id = 1;
+}
+message F1InterfaceType {
+optional near_rt_ric_apis_common_ies.v1.GnbDuId gnb_du_id = 1;
+}
+message W1InterfaceType {
+optional near_rt_ric_apis_common_ies.v1.NgEnbDuId ng_enb_du_id = 1;
+}
+message S1InterfaceType {
+optional MmeName mme_name = 1;
+}
+message X2InterfaceType {
+optional near_rt_ric_apis_common_ies.v1.GlobalEnbId global_enb_id = 1;
+optional near_rt_ric_apis_common_ies.v1.GlobalEnGnbId global_en_gnb_id = 2;
+}
+}
+// From E2AP Clause 9.2.26
+enum E2NodeComponentType {
+E2_NODE_COMPONENT_TYPE_NG = 0;
+E2_NODE_COMPONENT_TYPE_XN = 1;
+E2_NODE_COMPONENT_TYPE_E1 = 2;
+E2_NODE_COMPONENT_TYPE_F1 = 3;
+E2_NODE_COMPONENT_TYPE_W1 = 4;
+E2_NODE_COMPONENT_TYPE_S1 = 5;
+E2_NODE_COMPONENT_TYPE_X2 = 6;
+}
+enum E2NodeState {
+E2_NODE_STATE_CONNECTED = 0;
+E2_NODE_STATE_RESET = 1;
+E2_NODE_STATE_DISCONNECTED = 2;
+}
+// --------------F--------------
+enum FetchFailureCause {
+FETCH_FAILURE_CAUSE_UNSPECIFIED = 0;
+FETCH_FAILURE_CAUSE_INVALID_FILTER = 1;
+FETCH_FAILURE_CAUSE_INFORMATION_TYPE_NOT_SUPPORTED = 2;
+FETCH_FAILURE_CAUSE_NO_INFORMATION_PRESENT = 3;
+}
+enum FilterCondition {
+FILTER_CONDITION_CONTAINTED_IN = 0;
+FILTER_CONDITION_NOT_CONTAINTED_IN = 1;
+FILTER_CONDITION_EQUALS = 2;
+FILTER_CONDITION_GREATER_THAN = 3;
+FILTER_CONDITION_LESS_THAN = 4;
+}
+message FilterConditionValue {
+oneof filter_condition_value_type {
+E2NodeIdList e2_node_id_list = 1;
+E2NodeComponentTypeList e2_node_component_type_list = 2;
+RanFunctionOidList ran_function_oid_list = 3;
+}
+message E2NodeIdList {
+repeated E2NodeIdItem list = 1;
+message E2NodeIdItem {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId e2_node_id = 1;
+optional E2NodeState e2_node_state = 2;
+}
+}
+message E2NodeComponentTypeList {
+repeated E2NodeComponentTypeItem list = 1;
+message E2NodeComponentTypeItem {
+optional E2NodeComponentType e2_node_component_type = 1;
+}
+}
+message RanFunctionOidList {
+repeated RanFunctionOidItem list = 1;
+message RanFunctionOidItem {
+optional RanFunctionOid ran_function_oid = 1;
+}
+}
+}
+message FilterDefinition {
+optional FilterType filter_type = 1;
+optional FilterCondition filter_condition = 2;
+optional FilterConditionValue filter_condition_value = 3;
+}
+enum FilterType {
+FILTER_TYPE_E2_NODE_ID = 0;
+FILTER_TYPE_COMPONENT_TYPE = 1;
+FILTER_TYPE_SERVICE_MODEL = 2;
+}
+// --------------G--------------
+// From E2AP Clause 9.2.32
+message GlobalNgRanNodeId {
+oneof ng_ran_node_choice {
+near_rt_ric_apis_common_ies.v1.GlobalGnbId global_gnb_id = 1;
+near_rt_ric_apis_common_ies.v1.GlobalNgEnbId global_ng_enb_id = 2;
+}
+}
+// --------------I--------------
+enum InformationType {
+INFORMATION_TYPE_E2NODELIST = 0;
+INFORMATION_TYPE_E2NODECOMPONENTCONFIG = 1;
+INFORMATION_TYPE_E2NODERANFUNCTION = 2;
+}
+message InformationUnit {
+oneof information_unit_type {
+E2NodeListUnit e2_node_list_unit = 1;
+E2NodeComponentConfigUnit e2_node_component_config_unit = 2;
+RanFunctionUnit ran_function_unit = 3;
+}
+message E2NodeListUnit {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId e2_node_id = 1;
+optional E2NodeState e2_node_state = 2;
+}
+message E2NodeComponentConfigUnit {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId e2_node_id = 1;
+repeated E2NodeComponentConfigItem e2_node_component_config_list = 2;
+message E2NodeComponentConfigItem {
+optional E2NodeComponentType e2_node_component_type = 1;
+optional E2NodeComponentId e2_node_component_id = 2;
+optional E2NodeComponentConfiguration e2_node_component_configuration = 3;
+optional LastModifiedE2NodeVersion last_modified_e2_node_version = 4;
+}
+}
+message RanFunctionUnit {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId e2_node_id = 1;
+repeated RanFunctionItem ran_function_list = 2;
+message RanFunctionItem {
+optional near_rt_ric_apis_common_ies.v1.RanFunctionId ran_function_id = 1;
+optional RanFunctionDefinition ran_function_definition = 2;
+optional RanFunctionOid ran_function_oid = 3;
+optional LastModifiedE2NodeVersion last_modified_e2_node_version = 4;
+}
+}
+}
+// --------------L--------------
+message LastModifiedE2NodeVersion {
+optional uint32 value = 1;
+}
+// --------------M--------------
+enum ModificationType {
+TYPE_ADDED = 0;
+TYPE_MODIFIED = 1;
+TYPE_REMOVED = 2;
+}
+// From E2AP Clause 9.2.32
+message MmeName {
+optional string value = 1;
+}
+// --------------N--------------
+message NotificationUnit {
+optional near_rt_ric_apis_common_ies.v1.GlobalE2NodeId e2_node_id = 1;
+optional LastModifiedE2NodeVersion current_e2_node_version = 2;
+optional E2NodeState e2_node_state = 3;
+}
+// --------------R--------------
+// From E2AP Clause 9.2.23
+message RanFunctionDefinition {
+optional bytes value = 1;
+}
+// From E2AP Clause 9.2.31
+message RanFunctionOid {
+optional string value = 1;
+}
+// --------------S--------------
+enum SubscriptionRejectCause {
+SUBSCRIPTION_REJECT_CAUSE_UNSPECIFIED = 0;
+SUBSCRIPTION_REJECT_CAUSE_SDL_REACHED_CAPACITY = 1;
+SUBSCRIPTION_REJECT_CAUSE_INFORMATION_TYPE_NOT_SUPPORTED = 2;
+SUBSCRIPTION_REJECT_CAUSE_INVALID_FILTER = 3;
+}
+// --------------T--------------
+message TimeToWait {
+optional uint32 value = 1;
+}
+// --------------X--------------
+message XappRequestId {
+optional uint32 value = 1;
+}
+7.3.5	Message Transfer Syntax
+7.3.5.1	Solution 1: SCTP with Protocol Buffers
+The message transfer syntax for Solution 1 is serialized Protocol Buffers [4].
+8	Management API
+8.1	Overview
+8.1.1	Protocol Stack
+In this version of specification, the default protocol stack for the Management APIs is shown on Figure 8.1.1-1.
+Note: The security protocols are specified in [6].
+Figure 8.1.1-1: Protocol stack for Management APIs
+The Management APIs use gRPC [5] with Protocol Buffers [4] as the application layer serialization protocol.
+8.1.2	List of Management APIs, procedures and messages
+The Management API procedures introduced in section 9.4 of [2] are categorized under the Management APIs. These APIs include:
+xApp Registration API: enabling registration of xApps with the Near-RT RIC platform.
+These APIs are summarized in Table 8.1.2-1.
+Table 8.1.2-1: List of Management APIs
+The table 8.1.2-2 lists the API procedures for each Management API.
+Table 8.1.2-2: List of Management API procedures
+The table 8.1.2-3 lists the messages for each management API procedure.
+Table 8.1.2-3: List of Management API messages
+8.2	Management API Procedures
+8.2.1	xApp Registration Procedure
+8.2.1.1	General
+This procedure is used by an xApp who wants to register in Near-RT RIC platform.
+8.2.1.2	Successful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: xAPP REGISTRATION (Request)
+near -> app: xAPP REGISTRATION (Success)
+@enduml
+Figure 8.2.1.2-1: xApp Registration procedure, successful operation
+The xApp initiates the procedure by sending an xApp Registration (Request) message to the Near-RT-RIC platform. The message contains a unique Procedure Transaction ID IE assigned by the initiating xApp, the optional xApp Description IE, and the Required APIs and Data Types IE that specifies the APIs and data types needed for normal operation of the xApp.
+At reception of the xApp Registration (Request) message, the Near-RT-RIC platform shall:
+-	 Check xApp’s compatibility with the Near-RT RIC platform, using information in the Required APIs and Data Types IE.
+-	Assign an xApp ID and create the profile for the xApp.
+If the registration request is successfully fulfilled, the Near-RT RIC platform shall send an xApp Registration (Success) message back to the xApp.
+In the xApp Registration (Success) message, the Near-RT RIC platform shall include the associated Procedure Transaction ID IE and the xApp ID IE.
+8.2.1.3	Unsuccessful Operation
+@startuml
+Skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam lifelineStrategy solid
+participant "xApp" as app
+participant "Near-RT RIC Platform" as near
+app -> near: xAPP REGISTRATION (Request)
+near -> app: xAPP REGISTRATION (Failure)
+@enduml
+Figure 8.2.1.3-1: xApp Registration procedure, unsuccessful operation
+If the registration request fails, the Near-RT RIC platform shall send an xApp Registration (Failure) message back to the xApp. The message shall include the associated Procedure Transaction ID IE replicated from the corresponding request and appropriate cause.
+8.2.1.4	Abnormal Conditions
+Not applicable.
+8.3	Elements for Management API Communication
+8.3.1	General
+8.3.2	Message Functional Definition and Content
+8.3.2.1	xAPP REGISTRATION REQUEST
+This message is sent by an xApp to the Near-RT RIC platform for xApp Registration.
+Direction: xApp -> Near-RT RIC platform
+8.3.2.2	xAPP REGISTRATION SUCCESS
+This message is sent by the Near-RT RIC platform after the xApp’s registration request is successfully accepted.
+Direction: Near-RT RIC platform -> xApp
+8.3.2.3	xAPP REGISTRATION FAILURE
+This message is sent by the Near-RT RIC platform after the xApp’s registration request is failed.
+Direction: Near-RT RIC platform -> xApp
+8.3.2.4	xAPP CONFIGURATION REQUEST
+8.3.2.5	xAPP CONFIGURATION RESPONSE
+8.3.2.6	xAPP CONFIGURATION FAILURE
+8.3.3	Information Element Definitions
+8.3.3.1	Message Type
+This IE uniquely identifies the message being sent. It is mandatory for all messages.
+8.3.3.2	xApp Description
+This IE provides generic information related to the xApp such as its name, vendor and purpose.
+8.3.3.3	A1 Policy Type ID
+Defined in 10.1.5.
+8.3.3.4	E2 Service Model Name
+This IE specifies the name of E2 Service Model supported by the xApp.
+8.3.3.5	E2 Service Model Version
+This IE is used to indicate the version of E2 Service Model supported by the xApp.
+8.3.3.6	Cause
+This IE is used to indicate the reason for a particular event for the Management APIs.
+8.3.4	Message and Information Element Abstract Syntax
+8.3.4.1	Solution 1: gRPC with Protocol Buffers
+8.3.4.1.1	Usage of gRPC with Protocol Buffers
+This solution uses Protocol Buffers as message encoding, and also as the Interface Definition Language (IDL) for gRPC [5].
+Table 8.3.4.1.1-1 lists the mapping of management APIs and corresponding gRPC services.
+Table 8.3.4.1.1-1: Mapping of management APIs and gRPC services
+A procedure of an Management API is mapped to a gRPC method.
+Table 8.3.4.1.1-2 lists the Management API specifications included in this document.
+Table 8.3.4.1.1-2: Management API specifications
+8.3.4.1.2	API Definitions
+8.3.4.1.2.1	Mgmt_Xapp_Registration_API
+syntax = "proto3";
+package ricapi.mgmt_xapp_registration_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "mgmt_apis_common_ies_ver_1_0_0.proto";
+// gRPC service and rpc definition
+service mgmt_Xapp_Registration_API {
+rpc XappRegistrationProc(XappRegistrationInitMsg) returns (XappRegistrationOutMsg) {};
+}
+message XappRegistrationInitMsg {
+optional XappRegistrationRequest xapp_registration_request = 1;
+}
+message XappRegistrationOutMsg {
+oneof type_of_message {
+XappRegistrationSuccess xapp_registration_success = 1;
+XappRegistrationFailure xapp_registration_failure = 2;
+}
+}
+// ---------------- messages of Mgmt_Xapp_Registration_API ----------------
+// -------- messages of xApp Registration procedure --------
+message XappRegistrationRequest {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional mgmt_apis_common_ies.v1.XappDescription xapp_description = 2;
+optional RequiredApisAndDataTypes required_apis_and_data_types = 3;
+message RequiredApisAndDataTypes {
+repeated RequiredApiItem list_of_required_apis = 1;
+repeated A1PolicyTypeItem list_of_a1_policy_types = 2;
+repeated E2ServiceModelItem list_of_e2_service_models = 3;
+message RequiredApiItem {
+optional near_rt_ric_apis_common_ies.v1.ApiName api_name = 1;
+optional near_rt_ric_apis_common_ies.v1.ApiVersion api_version = 2;
+}
+message A1PolicyTypeItem {
+optional near_rt_ric_apis_common_ies.v1.A1PolicyTypeId a1_policy_type_id = 1;
+}
+message E2ServiceModelItem {
+optional mgmt_apis_common_ies.v1.E2ServiceModelName e2_service_model_name = 1;
+optional mgmt_apis_common_ies.v1.E2ServiceModelVersion e2_service_model_version = 2;
+}
+}
+}
+message XappRegistrationSuccess {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 2;
+}
+message XappRegistrationFailure {
+optional near_rt_ric_apis_common_ies.v1.ProcedureTransactionId procedure_transaction_id = 1;
+optional mgmt_apis_common_ies.v1.Cause cause = 2;
+}
+8.3.4.1.3	Information Element Definitions
+syntax = "proto3";
+package ricapi.mgmt_apis_common_ies.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+// ----------------------------- Information Elements -----------------------------
+// --------------C--------------
+enum Cause {
+UNSPECIFIED = 0;
+API_NOT_SUPPORTED = 1;
+A1_POLICY_TYPE_NOT_SUPPORTED = 2;
+E2_SERVICE_MODEL_NOT_SUPPORTED = 3;
+}
+// --------------E--------------
+message E2ServiceModelName {
+optional string value = 1;
+}
+message E2ServiceModelVersion {
+optional string value = 1;
+}
+// --------------X--------------
+message XappDescription {
+optional string value = 1;
+}
+8.3.5	Message Transfer Syntax
+8.3.5.1	Solution 1: gRPC with Protocol Buffers
+The message transfer syntax for Solution 1 is serialized Protocol Buffers [4].
+9	Enablement API
+9.1	Overview
+9.1.1	Protocol Stack
+In this version of specification, the default protocol stack for the Enablement APIs is shown on Figure 9.1.1-1.
+Note: The security protocols are specified in [6].
+Figure 9.1.1-1: Protocol stack for Enablement APIs
+The Enablement APIs use gRPC [5] with Protocol Buffers [4] as the application layer serialization protocol.
+9.1.2	List of Enablement APIs, procedures and messages
+The enablement API procedures introduced in section 9.5 of [2] are categorized under the enablement APIs. These APIs include:
+Discovery API: enabling discovery of the Near-RT RIC APIs by xApps.
+Events API: enabling subscription/un-subscription to API-related events and event notifications.
+These APIs are summarized in Table 9.1.2-1.
+Table 9.1.2-1: List of Enablement APIs
+The table 9.1.2-2 lists the API procedures for each enablement API.
+Table 9.1.2-2: List of enablement API procedures
+The table 9.1.2-3 lists the messages for each enablement API procedure.
+Table 9.1.2-3: List of enablement API messages
+9.2	Enablement API Procedures
+9.2.1	Enabl_Discovery_API Procedures
+9.2.1.1	General
+The Enabl_Discovery_API allows an xApp to discover service APIs available at the Near-RT RIC platform.
+The API procedure defined for Enabl_Discovery_API is shown in table 9.2.1.1-1.
+Table 9.2.1.1-1: Procedure of the Enabl_Discovery_API
+9.2.1.2	API Discovery procedure
+9.2.1.2.1	Successful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP  : 1. API DISCOVERY REQUEST
+RICP -> xApp  : 2. API DISCOVERY RESPONSE
+@enduml
+Figure 9.2.1.2.1-1: API Discovery procedure, successful operation
+To discover Near-RT RIC APIs available at the API Enablement function, the xApp shall send an API DISCOVERY REQUEST message with the xApp ID IE and the Query Parameters IE to the Near-RT RIC platform.
+Upon receiving the message, the Near-RT RIC platform shall:
+1.	verify the identity of the xApp and check if it is authorized to discover the Near-RT RIC APIs;
+2.	if the xApp is authorized to discover the Near-RT RIC APIs, the Near-RT RIC platform shall:
+a.	search the API registry for APIs matching the query criteria in the Query Parameters IE;
+b.	apply the discovery policy, if any, on the search results and filter the search results to obtain the list of service API description;
+c.	return the filtered search results in the API DISCOVERY RESPONSE message.
+9.2.1.2.2 	Unsuccessful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP  : 1. API DISCOVERY REQUEST
+RICP -> xApp  : 2. API DISCOVERY FAILURE
+@enduml
+Figure 9.2.1.2.2-1: API Discovery procedure, unsuccessful operation
+If the Near-RT RIC platform rejects the request it shall respond with the API DISCOVERY FAILURE message with a proper cause. If the message contains the Time to Wait IE the xApp shall wait at least the indicated time before reinitiating the request to the Near-RT RIC platform.
+9.2.1.2.3	Abnormal Conditions
+Not applied.
+9.2.2	Enabl_Events_API Procedures
+9.2.2.1	General
+The Enabl_Events_API allows an xApp to subscribe to and unsubscribe from events related to Near-RT RIC APIs and to receive notifications of the events.
+Such events includes:
+Availability of Near-RT RIC API: event related to availability of Near-RT RIC APIs (e.g. active, inactive)
+Update of Near-RT RIC API: event related to change in Near-RT RIC API information
+The API procedures defined for the Enabl_Events_API are shown in table 9.2.2.1-1.
+Table 9.2.2.1-1: Operations of the Enabl_Events_API
+9.2.2.2	API Event Subscription procedure
+9.2.2.2.1	Successful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP  : 1. API EVENT SUBSCRIPTION REQUEST
+RICP -> xApp  : 2. API EVENT SUBSCRIPTION RESPONSE
+@enduml
+Figure 9.2.2.2.1-1: API Event Subscription procedure, successful operation
+To subscribe to Near-RT RIC API related events, the xApp shall send an API EVENT SUBSCRIPTION REQUEST message to the Near-RT RIC platform. The message shall include the xApp ID IE, the List of Events IE, the Event Notification Requirements IE and the Notification Destination IE.
+The xApp may also include additional event filter(s) in the List of Event Filters IE. Such event filters include:
+-	API ID(s) in the API ID Filter IE, if the event type is NEAR_RT_RIC_API_AVAILABLE, NEAR_RT_RIC_API_UNAVAILABLE or NEAR_RT_RIC_API_UPDATE;
+Upon receiving the message, the API Enablement function shall:
+1.	verify the identity of the xApp and check if the xApp is authorized to subscribe to the Near-RT RIC API related events specified in the request message;
+2.	if the xApp is authorized to subscribe to the Near-RT RIC API related events, the Near-RT RIC platform shall prepare necessary resource for the subscription and associated notifications, according to the contents in the List of Events IE and the Event Notification Requirements IE, and send an API EVENT SUBSCRIPTION RESPONSE message back to the xApp. The response message shall include the assigned subscription ID in the Subscription ID IE.
+9.2.2.2.2	Unsuccessful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP : 1. API EVENT SUBSCRIPTION REQUEST
+RICP -> xApp  : 2. API EVENT SUBSCRIPTION FAILURE
+@enduml
+Figure 9.2.2.2.2-1: API Event Subscription procedure, unsuccessful operation
+If the Near-RT RIC platform rejects the request it shall respond with the API EVENT SUBSCRIPTION FAILURE message with proper cause. If the message contains Time to Wait IE the xApp shall wait at least the indicated time before reinitiating the request to the Near-RT RIC platform.
+9.2.2.2.3	Abnormal conditions
+If the Near-RT RIC platform receives an API EVENT SUBSCRIPTION REQUEST message containing Event Type  IE that is not supported by the Near-RT RIC platform, or the optional filter definition is invalid, the Near-RT RIC platform shall send the API EVENT SUBSCRIPTION FAILURE message to the xApp with an appropriate cause value.
+9.2.2.3	API Event Subscription Delete procedure
+9.2.2.3.1	Successful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP : 1. API EVENT SUBSCRIPTION DELETE REQUEST
+RICP -> xApp  : 2. API EVENT SUBSCRIPTION DELETE RESPONSE
+@enduml
+Figure 9.2.2.3.1-1: API Event Subscription Delete procedure, successful operation
+To unsubscribe from Near-RT RIC API related events, the xApp shall send an API EVENT SUBSCRIPTION DELETE REQUEST message to the Near-RT RIC platform with the xApp ID IE and the Subscription ID IE.
+Upon receiving the message, the Near-RT RIC platform shall:
+1.	verify the identity of the xApp and check if the xApp is authorized to unsubscribe from the Near-RT RIC API related events associated with the subscription ID; and
+2.	if the xApp is authorized to unsubscribe from the Near-RT RIC API related events, the Near-RT RIC platform shall delete the resource for the subscription and reply API EVENT SUBSCRIPTION DELETE RESPONSE to the xApp.
+9.2.2.3.2	Unsuccessful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+xApp -> RICP : 1. API EVENT SUBSCRIPTION DELETE REQUEST
+RICP -> xApp  : 2. API EVENT SUBSCRIPTION DELETE FAILURE
+@enduml
+Figure 9.2.2.3.2-1: API Event Subscription Delete procedure, unsuccessful operation
+If the Near-RT RIC platform rejects the request it shall respond with the API EVENT SUBSCRIPTION DELETE FAILURE message with proper cause. If the message contains Time To Wait IE the xApp shall wait at least the indicated time before reinitiating the request to the Near-RT RIC platform.
+9.2.2.3.3	Abnormal conditions
+Not applied.
+9.2.2.4	API Event Notification procedure
+9.2.2.4.1	Successful Operation
+@startuml
+skin rose
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+skinparam defaultFontSize 12
+skinparam lifelineStrategy solid
+Participant xApp as "xApp"
+Participant RICP as “Near-RT RIC Platform”
+RICP -> xApp   : 1. API EVENT NOTIFICATION
+RICP <-- xApp  : 2. API EVENT NOTIFICATION ACK
+@enduml
+Figure 9.2.2.4.1-1: API Event Notification procedure, successful operation
+To notify a Near-RT RIC API related event, the Near-RT RIC platform shall send an API EVENT NOTIFICATION  message using the Notification Destination IE received in the API Event Subscription procedure.
+The Near-RT RIC platform may include details of the event in the Event Detail IE. Such details include:
+-	if the event type is Near-RT_RIC_API_AVAILABLE or Near-RT_RIC_API_UNAVAILABLE, the API IDs in the List of API IDs IE;
+-	if the event is Near-RT_RIC_API_UPDATE, the updated API information in the List of API Information IE;
+Upon receiving the message, the xApp may reply an API EVENT NOTIFICATION ACK message.
+9.2.2.4.2	Unsuccessful Operation
+Not applied.
+9.2.2.4.3	Abnormal conditions
+Not applied.
+9.3	Elements for Enablement API Communication
+9.3.1	General
+9.3.2	Message Functional Definition and Content
+9.3.2.1	API DISCOVERY REQUEST
+This message is sent by an xApp to the Near-RT RIC platform to discover the available Near-RT RIC APIs.
+Direction: xApp -> Near-RT RIC platform
+9.3.2.2	API DISCOVERY RESPONSE
+This message is sent by Near-RT RIC platform to the xApp to carry the information of discovered Near-RT RIC APIs.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.3	API DISCOVERY FAILURE
+This message is sent by Near-RT RIC platform to the xApp for the case of failure of the discovery of the available near-RT RIC APIs.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.4	API EVENT SUBSCRIPTION REQUEST
+This message is sent by an xApp to the Near-RT RIC platform to subscribe for events related to Near-RT RIC APIs.
+Direction: xApp -> Near-RT RIC platform
+9.3.2.5	API EVENT SUBSCRIPTION RESPONSE
+This message is sent by Near-RT RIC platform to the xApp as successful response to API event subscription request.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.6	API EVENT SUBSCRIPTION FAILURE
+This message is sent by Near-RT RIC platform to the xApp for the case of failure of the API event subscription request.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.7	API EVENT SUBSCRIPTION DELETE REQUEST
+This message is sent by an xApp to the Near-RT RIC platform to unsubscribe for events related to Near-RT RIC APIs.
+Direction: xApp -> Near-RT RIC platform
+9.3.2.8	API EVENT SUBSCRIPTION DELETE RESPONSE
+This message is sent by Near-RT RIC platform to the xApp as successful response to API event subscription delete request.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.9	API EVENT SUBSCRIPTION DELETE FAILURE
+This message is sent by Near-RT RIC platform to the xApp for the case of failure of the API event subscription delete request.
+Direction: Near-RT RIC platform -> xApp
+9.3.2.10	API EVENT NOTIFICATION
+This message is sent to a subscriber xApp from the Near-RT RIC platform to notify on an API event (based on subscription).
+Direction: Near-RT RIC platform -> xApp
+9.3.2.11	API EVENT NOTIFICATION ACK
+This message is optionally sent by the xApp to Near-RT RIC platform as acknowledgement to an API event notification.
+Direction: xApp -> Near-RT RIC platform
+9.3.3	Information Element Definitions
+9.3.3.1	Message Type
+This IE identifies the message being sent. It is mandatory for all messages.
+9.3.3.2	API Information
+This IE indicates the information of a Near-RT RIC API.
+9.3.3.3	Subscription ID
+The IE uniquely identifies a subscription to API-related event(s).
+9.3.3.4	Cause
+This IE is used to indicate the reason for a particular event for the Enablement APIs.
+9.3.3.5	Time to Wait
+This IE specifies the time that xApp shall wait before reinitiating a request.
+9.3.3.6	API Name
+Defined in 10.1.3.
+9.3.3.7	API Version
+Defined in 10.1.4.
+9.3.3.8	Protocol
+9.3.3.9	Data Format
+9.3.3.10	API Category
+9.3.3.11	API ID
+9.3.3.12	Endpoint Information
+9.3.3.13	Event Type
+Table 9.3.3.13-1: Meaning of Event Types
+9.3.4	Message and Information Element Abstract Syntax
+9.3.4.1	Solution 1: gRPC with Protocol Buffers
+9.3.4.1.1	Usage of gRPC with Protocol Buffers
+This solution uses Protocol Buffers as message encoding, and also as the Interface Definition Language (IDL) for gRPC [5].
+Table 9.3.4.1.1-1 lists the mapping of enablement APIs and corresponding gRPC services.
+Table 9.3.4.1.1-1: Mapping of enablement APIs and gRPC services
+A procedure of an Enablement API is mapped to a gRPC method.
+Table 9.3.4.1.1-2 lists the Enablement API specifications included in this document.
+9.3.4.1.2	API Definitions
+9.3.4.1.2.1	Enabl_Discovery_API
+syntax = "proto3";
+package ricapi.enabl_discovery_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "enabl_apis_common_ies_ver_1_0_0.proto";
+// gRPC service and rpc definition
+service Enabl_Discovery_API {
+rpc ApiDiscoveryProc(ApiDiscoveryInitMsg) returns (ApiDiscoveryOutMsg) {};
+}
+message ApiDiscoveryInitMsg {
+optional ApiDiscoveryRequest api_discovery_request = 1;
+}
+message ApiDiscoveryOutMsg {
+oneof type_of_message {
+ApiDiscoveryResponse api_discovery_response = 1;
+ApiDiscoveryFailure api_discovery_failure = 2;
+}
+}
+// ---------------- messages of Enabl_Discovery_API ----------------
+// -------- messages of API Discovery procedure --------
+message ApiDiscoveryRequest {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional QueryParameters qps = 2;
+message QueryParameters {
+optional near_rt_ric_apis_common_ies.v1.ApiName api_name = 1;
+optional near_rt_ric_apis_common_ies.v1.ApiVersion api_version = 2;
+optional enabl_apis_common_ies.v1.Protocol protocol = 3;
+optional enabl_apis_common_ies.v1.DataFormat data_format = 4;
+optional enabl_apis_common_ies.v1.ApiCategory api_category = 5;
+};
+};
+message ApiDiscoveryResponse {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+repeated enabl_apis_common_ies.v1.ApiInformation list_of_api_information = 2;
+};
+message ApiDiscoveryFailure {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.Cause cause = 2;
+optional uint32 time_to_wait = 3;
+};
+9.3.4.1.2.2	Enabl_Events_API
+syntax = "proto3";
+package ricapi.enabl_events_api.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+import "enabl_apis_common_ies_ver_1_0_0.proto";
+// gRPC service and rpc definition
+service Enabl_Events_API {
+rpc ApiEventSubscriptionProc(ApiEventSubscriptionInitMsg) returns (ApiEventSubscriptionOutMsg) {};
+rpc ApiEventSubscriptionDeleteProc(ApiEventSubscriptionDeleteInitMsg) returns (ApiEventSubscriptionDeleteOutMsg) {};
+}
+message ApiEventSubscriptionInitMsg {
+optional ApiEventSubscriptionRequest api_event_subscription_request = 1;
+}
+message ApiEventSubscriptionOutMsg {
+oneof type_of_message {
+ApiEventSubscriptionResponse api_event_subscription_response = 1;
+ApiEventSubscriptionFailure api_event_subscription_failure = 2;
+}
+}
+message ApiEventSubscriptionDeleteInitMsg {
+optional ApiEventSubscriptionDeleteRequest api_event_subscription_delete_request = 1;
+}
+message ApiEventSubscriptionDeleteOutMsg {
+oneof type_of_message {
+ApiEventSubscriptionDeleteResponse api_event_subscription_delete_response = 1;
+ApiEventSubscriptionDeleteFailure api_event_subscription_delete_failure = 2;
+}
+}
+service Enabl_Events_API_Notification {
+rpc ApiEventNotificationProc(ApiEventNotificationInitMsg) returns (ApiEventNotificationOutMsg) {};
+}
+message ApiEventNotificationInitMsg {
+optional ApiEventNotification api_event_notification = 1;
+}
+message ApiEventNotificationOutMsg {
+oneof type_of_message {
+ApiEventNotificationACK api_event_notification_ack = 1;
+}
+}
+// ---------------- messages of Enabl_Events_API ----------------
+// -------- messages of API Event Subscription procedure --------
+message ApiEventSubscriptionRequest {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+repeated EventItem list_of_events = 2;
+optional EventNotificationRequirements event_notification_requirements = 3;
+optional enabl_apis_common_ies.v1.EndpointInformation notification_destination = 4;
+message EventItem {
+optional enabl_apis_common_ies.v1.EventType event_type = 1;
+repeated ApiIdFilterItem api_id_filter = 2;
+message ApiIdFilterItem {
+optional enabl_apis_common_ies.v1.ApiId api_id = 1;
+}
+}
+message EventNotificationRequirements {
+optional NotificationMethod notification_method = 1;
+optional uint32 notification_period = 2;
+enum NotificationMethod {
+NOTIFICATION_METHOD_ON_EVENT = 0;
+NOTIFICATION_METHOD_PERIODIC = 1;
+}
+}
+};
+message ApiEventSubscriptionResponse {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.SubscriptionId subscription_id = 2;
+}
+message ApiEventSubscriptionFailure {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.Cause cause = 2;
+optional uint32 time_to_wait = 3;
+}
+// -------- messages of API Event Subscription Delete procedure --------
+message ApiEventSubscriptionDeleteRequest {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.SubscriptionId subscription_id = 2;
+};
+message ApiEventSubscriptionDeleteResponse {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.SubscriptionId subscription_id = 2;
+}
+message ApiEventSubscriptionDeleteFailure {
+optional near_rt_ric_apis_common_ies.v1.XappId xapp_id = 1;
+optional enabl_apis_common_ies.v1.Cause cause = 2;
+optional uint32 time_to_wait = 3;
+}
+// -------- messages of API Event Notification procedure --------
+message ApiEventNotification {
+optional enabl_apis_common_ies.v1.SubscriptionId subscription_id = 1;
+optional enabl_apis_common_ies.v1.EventType event_type = 2;
+optional EventDetail event_detail = 3;
+message EventDetail {
+repeated enabl_apis_common_ies.v1.ApiId list_of_api_ids = 1;
+repeated enabl_apis_common_ies.v1.ApiInformation list_of_api_information = 2;
+};
+};
+message ApiEventNotificationACK {
+optional enabl_apis_common_ies.v1.SubscriptionId subscription_id = 1;
+};
+9.3.4.1.3	Information Element Definitions
+syntax = "proto3";
+package ricapi.enabl_apis_common_ies.v1;
+import "near_rt_ric_apis_common_ies_ver_1_0_0.proto";
+// ----------------------------- Information Elements -----------------------------
+// --------------A--------------
+enum ApiCategory {
+APICATEGORY_E2_RELATED = 0;
+APICATEGORY_SDL = 1;
+APICATEGORY_A1_RELATED = 2;
+};
+message ApiId {
+optional string value = 1;
+}
+message ApiInformation {
+optional near_rt_ric_apis_common_ies.v1.ApiName api_name = 1;
+optional ApiId api_id = 2;
+optional ApiCategory api_category = 3;
+optional string description = 4;
+repeated ApiProfile list_of_api_profiles = 5;
+message ApiProfile {
+optional near_rt_ric_apis_common_ies.v1.ApiVersion api_version = 1;
+optional Protocol protocol = 2;
+optional DataFormat data_format = 3;
+optional EndpointInformation endpoint_information = 4;
+};
+};
+// --------------C--------------
+enum Cause {
+UNSPECIFIED = 0;
+}
+// --------------D--------------
+enum DataFormat {
+DATA_FORMAT_PROTO3 = 0;
+DATA_FORMAT_JSON = 1;
+DATA_FORMAT_ASN1 = 2;
+};
+// --------------E--------------
+message EndpointInformation {
+optional string domain_name = 1;
+optional string ipv4_address = 2;
+optional string ipv6_address = 3;
+optional uint32 port = 4;
+};
+enum EventType {
+EVENT_TYPE_NEAR_RT_RIC_API_AVAILABLE = 0;
+EVENT_TYPE_NEAR_RT_RIC_API_UNAVAILABLE = 1;
+EVENT_TYPE_NEAR_RT_RIC_API_UPDATE = 2;
+}
+// --------------P--------------
+enum Protocol {
+PROTOCOL_GRPC = 0;
+PROTOCOL_SCTP = 1;
+PROTOCOL_HTTP = 2;
+};
+// --------------S--------------
+message SubscriptionId {
+optional string value = 1;
+}
+9.3.5	Message Transfer Syntax
+9.3.5.1	Solution 1: gRPC with Protocol Buffers
+The message transfer syntax for Solution 1 is serialized Protocol Buffers [4].
+10	Common definitions across APIs
+10.1	Information element definitions
+10.1.1	PTI
+The Procedure Transaction Identity (PTI) IE allows identifing a procedure among all ongoing parallel procedures of the same type initiated by the same RICAPI peer. The PTI value is assigned to the initiating message by the procedure initiator, and subsequent messages shall include the same PTI value as in the initiating message, if any. PTI is released when the procedure is completed.
+10.1.2	xApp ID
+The xApp ID IE uniquely identifies an xApp..
+10.1.3	API Name
+The API Name IE indicates the Name of each Near-RT RIC API.
+The table 10.1.3-1 lists the API Names.
+Table 10.1.3-1: List of API Names
+10.1.4	API Version
+The API Version IE indicates the Version of each Near-RT RIC API.
+10.1.5	A1 Policy Type ID
+The A1 Policy Type ID IE identifies the type of one A1 policy.
+10.1.6	Global E2 Node ID
+Defined in 9.2.6 of [3].
+10.1.7	RAN Function ID
+Defined in 9.2.8 of [3].
+10.1.8	SCTP API PDU
+The SCTP API PDU IE serves as the outer layer encapsulation for the payload when SCTP is used as the transport protocol.
+10.2	Information element abstract syntax
+10.2.1	Abstact syntax in Protocol Buffers
+syntax = "proto3";
+package ricapi.near_rt_ric_apis_common_ies.v1;
+// Information elements used across different API categories
+// ----------------------------- Information Elements -----------------------------
+// --------------A--------------
+// From A1TD Clause 5.2
+message A1PolicyTypeId {
+optional string value = 1;
+}
+enum ApiName {
+APINAME_E2_SUBSCRIPTION_API = 0;
+APINAME_E2_INDICATION_API = 1;
+APINAME_E2_CONTROL_API = 2;
+APINAME_E2_GUIDANCE_API = 3;
+APINAME_A1_POLICY_API = 4;
+APINAME_A1_EI_API = 5;
+APINAME_SDL_INFORMATION_API = 6;
+};
+message ApiVersion {
+optional string value = 1;
+}
+// --------------B--------------
+// BitString definition
+message BitString {
+optional string value = 1;
+optional uint32 len = 2;
+}
+// --------------G--------------
+// From E2AP Clause 9.2.6, "Global E2 Node ID"
+message GlobalE2NodeId {
+oneof node_type {
+GlobalE2NodeGnbId gnb = 1;
+GlobalE2NodeEnGnbId en_gnb = 2;
+GlobalE2NodeNgEnbId ng_enb = 3;
+GlobalE2NodeEnbId enb = 4;
+}
+message GlobalE2NodeGnbId {
+optional GlobalGnbId global_gnb_id = 1;
+optional GlobalEnGnbId global_en_gnb_id = 2;
+optional GnbCuUpId gnb_cu_up_id = 3;
+optional GnbDuId gnb_du_id = 4;
+}
+message GlobalE2NodeEnGnbId {
+optional GlobalEnGnbId global_en_gnb_id = 1;
+optional GnbCuUpId en_gnb_cu_up_id = 2;
+optional GnbDuId en_gnb_du_id = 3;
+}
+message GlobalE2NodeNgEnbId {
+optional GlobalNgEnbId global_ng_enb_id = 1;
+optional GlobalEnbId global_enb_id = 2;
+optional NgEnbDuId ng_enb_du_id = 3;
+}
+message GlobalE2NodeEnbId {
+optional GlobalEnbId global_enb_id = 1;
+}
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GlobalEnbId {
+optional PlmnIdentity plmn_identity = 1;
+oneof enb_id_choice {
+BitString macro_enb_id = 2;
+BitString home_enb_id = 3;
+BitString short_macro_enb_id = 4;
+BitString long_macro_enb_id = 5;
+}
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GlobalEnGnbId {
+optional PlmnIdentity plmn_identity = 1;
+oneof en_gnb_id_choice {
+BitString en_gnb_id = 2;
+}
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GlobalGnbId {
+optional PlmnIdentity plmn_identity = 1;
+oneof gnb_id_choice {
+BitString gnb_id = 2;
+}
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GlobalNgEnbId {
+optional PlmnIdentity plmn_identity = 1;
+oneof ng_enb_id_choice {
+BitString macro_ng_enb_id = 2;
+BitString short_macro_ng_enb_id = 3;
+BitString long_macro_ng_enb_id = 4;
+}
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GnbCuUpId {
+optional uint64 value = 1;
+}
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message GnbDuId {
+optional uint64 value = 1;
+}
+// --------------N--------------
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message NgEnbDuId {
+optional uint64 value = 1;
+};
+// --------------P--------------
+// From E2AP Clause 9.2.6, as part of "Global E2 Node ID"
+message PlmnIdentity {
+optional bytes value = 1;
+};
+message ProcedureTransactionId {
+optional uint32 value = 1;
+};
+// --------------R--------------
+// From E2AP Clause 9.2.8, "RAN Function ID"
+message RanFunctionId {
+optional uint32 value = 1;
+};
+//---------------S--------------
+// Outer layer encapsulation for SCTP based APIs
+message SctpApiPdu {
+optional ApiName api_name = 1;
+optional ApiVersion api_version = 2;
+optional bytes api_payload = 3;
+}
+// --------------X--------------
+message XappId {
+optional string value = 1;
+}
+Revision history
+History

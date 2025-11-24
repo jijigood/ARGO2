@@ -1,0 +1,838 @@
+O-RAN.WG6.AAL FEC.0-v01.00
+Technical Specification 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+FEC Profiles 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the 
+third party that these conditions apply to them and that they must comply with them.
+
+                         O-RAN.WG6.AAL FEC.0-v01.00 
+Technical Specification 
+ 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+FEC Profiles 
+ 
+ 
+  
+ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving,       
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License 
+Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+   
+  Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                                  1 
+ 
+ 
+ 
+ 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              2 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Revision History 1 
+Date Revision Author Description 
+2021.05.06 00.00.01 Niall Power (Intel) Initial draft of specification - Overview, Configuration 
+and management, profile specifications.  
+2021.07.06 00.00.02 Barry Graham (Accelercom)  
+Niall Power (Intel)  
+Updates to PDSCH FEC Profile to include code block 
+concatenation.  
+    
+  2 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              3 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Contents 1 
+Revision History ................................................................................................................................................. 2 2 
+Chapter 1 Introductory Material ......................................................................................................................... 4 3 
+ Scope 4 4 
+ References ................................................................................................................................................................ .... 4 5 
+ Definitions and Abbreviations ................................................................................................................................ ...... 4 6 
+ Definitions ................................................................................................................................................................ . 4 7 
+ Abbreviations ................................................................................................................................ ............................. 4 8 
+Chapter 2 Overview ............................................................................................................................................ 6 9 
+ Purpose ................................................................................................................................................................ ......... 6 10 
+ Document Structure ................................................................................................................................ ...................... 7 11 
+Chapter 3 AALi Configuraton and Management ............................................................................................... 8 12 
+ AAL Configuration and Management ................................................................................................ .......................... 8 13 
+ Initalization and Configuration ................................................................................................................................ ..... 8 14 
+ Get Number of AAL LPU’s ................................................................................................................................ ....... 8 15 
+ Get AAL-LPU Fine Grained Capabilities ................................................................................................ .................. 8 16 
+ Setup and Allocate AAL LPU Queues ................................................................................................ ...................... 9 17 
+ Configure AAL-LPU Queues ................................................................................................................................ .... 9 18 
+ AAL-LPU Management and AAL-LPU Queue management ................................................................ ...................... 9 19 
+ AAL Statistics ................................................................................................................................ ............................... 9 20 
+Chapter 4 AAL Profile Specifications .............................................................................................................. 10 21 
+ Profile Specifications Overview ................................................................................................................................. 10 22 
+ Operation Representation ........................................................................................................................................ 10 23 
+ Profile Capabaillities................................................................................................................................................ 10 24 
+ Memory Management .............................................................................................................................................. 10 25 
+ O-DU AAL PDSCH FEC Profile Specification ......................................................................................................... 10 26 
+ AAL FEC PDSCH Profile Capabilities ................................................................................................................... 11 27 
+ AAL PDSCH FEC Profile Operations ..................................................................................................................... 12 28 
+ O-DU AAL PUSCH FEC Profile Specification ......................................................................................................... 13 29 
+ AAL FEC PUSCH Profile Capabilities ................................................................................................................... 13 30 
+ AAL PUSCH FEC Profile Operations ..................................................................................................................... 14 31 
+Annex ZZZ : O-RAN Adopter License Agreement ......................................................................................... 17 32 
+Section 1: DEFINITIONS ................................................................................................................................................ 17 33 
+Section 2: COPYRIGHT LICENSE ................................................................................................................................. 17 34 
+Section 3: FRAND LICENSE .......................................................................................................................................... 17 35 
+Section 4: TERM AND TERMINATION ........................................................................................................................ 18 36 
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 18 37 
+Section 6: INDEMNIFICATION ..................................................................................................................................... 18 38 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 19 39 
+Section 8: ASSIGNMENT ............................................................................................................................................... 19 40 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 19 41 
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 19 42 
+Section 11: GENERAL ..................................................................................................................................................... 19 43 
+ 44 
+ 45 
+46 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              4 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Chapter 1 Introductory Material 1 
+ Scope 2 
+This Technical Specification has been produced by the O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O- RAN and may change following formal 4 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re -released by O-5 
+RAN with an identifying change of release date and an increase in version number as follows:  6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in t he document. 11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+The present document focuses on the Acceleration Abstraction Layer for the AAL_PDSCH_FEC and 14 
+AAL_PUSCH_FEC Profiles as defined in [7], including the AALI and the management and orchestration requirements 15 
+of AAL-LPUs providing HW Accelation for the fore mentioned AAL profiles.  16 
+ References 17 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 18 
+document. 3GPP references refer to 3GPP release 16.  19 
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”. 20 
+[2] Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN, 2019. 21 
+[3] WG6 2020 Use Case for BBU Pooling, 2019. 22 
+[4] 3GPP TS 38.211: "NR; Physical channels and modulation". 23 
+[5] 3GPP TS 38.212: "NR; Multiplexing and channel coding". 24 
+[6] 3GPP TR 38.300: "NR; NR and NG-RAN Overall Description". 25 
+[7] O-RAN WG6 Acceleration Abstraction Layer General Aspects and Principles  26 
+ Definitions and Abbreviations 27 
+ Definitions 28 
+For the purposes of the present document, the terms and definitions given in [7] apply.  29 
+ Abbreviations 30 
+For the purposes of the present document, the following abbreviations apply.  31 
+AAL Acceleration Abstraction Layer 32 
+AALi Acceleration Abstraction Layer interface 33 
+AAL-LPU  Accelleration Abstraction Layer Logical Processing Unit  34 
+CB  Code Block  35 
+CNF Containerized Network Function 36 
+NF Network Function 37 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              5 
+O-RAN.WG6.AAL FEC.0-v01.00 
+O-CU O-RAN Centralized Unit 1 
+O-DU O-RAN Distributed Unit 2 
+O-RU O-RAN Radio Unit 3 
+OS Operating System 4 
+TB Transport Block 5 
+  6 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              6 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Chapter 2 Overview 1 
+ Purpose 2 
+The AAL General Aspects and Principles is described in [7] including a high level architecture of the AAL and 3 
+definition of the AAL profiles. This document details the AAL specification consisting of the description of the 4 
+interface, information models and requirements to implement an AALi, for the AAL_PUSCH_FEC and 5 
+AAL_PDSCH_FEC Profiles, shown below in Figure 2.1 and Figure 2.2.  6 
+ 7 
+Figure 2.1 AAL_PDSCH_FEC Profile  8 
+L2+
+TB CRC attachment
+CB segmentation + 
+CB CRC attachment
+LDPC encoding
+Rate matching
+CB concatenation
+Scrambling
+Modulation
+Layer mapping
+Precoding*
+RE mapping
+O-RAN FH (7-2x lower layer split)
+CRC attachment
+Polar encoding
+Rate matching
+Scrambling
+Modulation 
+(QPSK)
+PBCH payload 
+generation
+TB CRC 
+attachment
+Polar encoding
+Rate matching
+Scrambling
+Modulation 
+(QPSK)
+Data 
+scrambling
+Precoding*
+Modulation
+Sequence 
+Generation
+CSI-RS/PT-RS/TRS
+PDSCH TB(s)
+PDCCH (DCI)
+PBCH TB
+Modulation
+IQ compression*
+Precoding* Precoding*
+Sequence 
+generation
+PDSCH DM-RS
+Modulation
+Sequence 
+generation
+PDCCH DM-RS
+Sequence 
+Generation
+Modulation
+PSS/SSS 
+PBCH DM-RS
+RE mapping RE mapping RE mapping
+IQ compression* IQ compression* IQ compression*
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              7 
+O-RAN.WG6.AAL FEC.0-v01.00 
+ 1 
+Figure 2.2 AAL_PUSCH_FEC Profile  2 
+ Document Structure 3 
+This present document is structured as follows: chapter 2 presents the overview and main purpose of this specification. 4 
+Chapter 3 presents the AAL Hardware Acceleration Management specification for the AAL_PUSCH_FEC and 5 
+AAL_PDSCH_FEC Profiles. Chapter 4 presents the common AALi requirements for an AAL-LPU supporting one or 6 
+more AAL_PUSCH_FEC and/or AAL_PDSCH_FEC Profiles. Chapter 5 presents the profile specific interface 7 
+requirements for the AAL_PUSCH_FEC and AAL_PDSCH_FEC Profiles.   8 
+ 9 
+  10 
+L2 +
+TB CRC check
+LDPC decoding
+Rate dematching
+Descrambling
+Demodulation
+Channel 
+equalization
+RE demapping
+O-RAN FH (7-2x lower layer split)
+PUSCH 
+UL data 
+IDFT for DFT-s-
+OFDM
+PUCCH format 1 
+UCI 
+Preamble 
+detection + 
+delay estimation
+IFFT
+Peak search
+Root sequence 
+correlation
+Noise estimation
+Channel 
+estimation
+SRS
+IQ 
+decompression*
+Channel 
+estimation
+Channel 
+estimation
+Channel 
+equalization
+Demodulation
+PUCCH format 0 
+UCI
+Sequence 
+detection
+CRC check
+Polar/Block decoding
+Rate dematching
+Descrambling
+Demodulation
+Channel equalization
+PUCCH format 2/3/4 
+UCI 
+IDFT for DFT-s-OFDM
+Channel estimation
+PRACH
+Sequence 
+detection
+PT-RS
+RE demapping RE demapping RE demapping RE demapping RE demapping RE demapping
+IQ 
+decompression*
+IQ 
+decompression* IQ decompression* IQ 
+decompression*
+IQ 
+decompression*
+IQ 
+decompression*
+CB CRC + CB 
+desegmentation
+CB 
+deconcatentation
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              8 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Chapter 3 AALi Configuraton and Management  1 
+The chapter defines the common configuration and management aspects of the AALi as they relate to the 2 
+AAL_PUSCH_FEC and AAL_PDSCH_FEC profiles. The AALi configuration and management API’s a re the API’s 3 
+that an application (O-DU) executes to configure and manage the AAL-LPU(s) that have been allocated to the 4 
+application by the O-Cloud. The high-level Configuration and Management Principles are presented in [7].  5 
+The below section describes the requirements of the AALi presented to the Application.  6 
+ AAL Configuration and Management   7 
+ Initalization and Configuration  8 
+As per sequence diagram in Chapter 4.1.1.3 in [7] the below list defines the high-level configuration and management 9 
+interfaces  10 
+• Get Number of AAL LPU’s 11 
+• Get AAL LPU Fine Grain capabilities  12 
+• Setup and Allocate AAL LPU Queues 13 
+• Configure AAL LPU Queues  14 
+ Get Number of AAL LPU’s  15 
+The AALi shall provide an interface to retrieve a count of the number of AAL -LPU’s available to be used by the 16 
+application.  17 
+ Get AAL-LPU Fine Grained Capabilities 18 
+The AALi shall provide an interface to retrieve the fine-grained capabilities of an AAL-LPU. The capabilities that shall 19 
+be reported by the AALi are defined in Table 4-1.  20 
+Table 4-1 AAL-LPU Capabilities  21 
+Capability  
+The AAL Profile(s) supported by this instance of the AAL-LPU, AAL_PUSCH_FEC or AAL_PDSCH_FEC.  
+Maximum number of AAL-LPU Queues Supported by this instance of the AAL-LPU 
+Number of AAL-LPU Queues Currently configured by this instance of the AAL-LPU 
+AAL-LPU State (started, stop etc..)   
+AAL-LPU Queue Size restrictions if any.  
+AAL-LPU maximum priority if the AAL-LPU supports Queues Priorities.  
+Whether the AAL-LPU supports per-queue interrupts (If not supported poll mode must be supported)  
+Any memory alignment requirements on input and output buffers to the AAL -LPU 
+External Memory sizes available to the LPU, in the case of HARQ for AAL_PUSCH_FEC profile this would be the 
+size of the HARQ memory available to store HARQ buffers in. This size shall be reported in kB.  
+Any AAL Profile Specific capabalities that are supported as defined in Table 5-1 and Table 5-5 
+ 22 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              9 
+O-RAN.WG6.AAL FEC.0-v01.00 
+ Setup and Allocate AAL LPU Queues 1 
+The AALi shall provide an interface to setup and allocate AAL-LPU Queues.  2 
+ Configure AAL-LPU Queues  3 
+The AALi shall provide an interface to configure the AAL-LPU’s queues setup from section 4.1.3. The AAL-LPU 4 
+Queue configuration shall support the configuration options as defined in Table 4-2.  5 
+Table 4-2 AAL-LPU Queue Configuration Options   6 
+Queue Configuration Options  
+The size of the queue to configure. This is the number of entries a queue can hold.  
+The priority of the queue if priority is supported.  
+AAL Profile that is supported, either AAL_PUSCH_FEC or AAL_PDSCH_FEC  
+ 7 
+ AAL-LPU Management and AAL-LPU Queue management  8 
+As per sequence diagram in Chapter 4.1.1.4 in [7] the below list defines the high-level AAL-LPU and AAL-LPU Queue 9 
+management interfaces required to be supported by an AALi implementation  10 
+• Start AAL-LPU 11 
+• AAL-LPU Queue Start 12 
+• AAL-LPU Queue Stop 13 
+• AAL-LPU Stop 14 
+• Close AAL-LPU 15 
+ AAL Statistics  16 
+The AALi shall provide an interface to retrieve statistics from an AAL-LPU Device and/or AAL-LPU Queue. The 17 
+statistics may include error counts. In addition, the AALi shall provide an interface to reset statistic counters in the 18 
+AAL-LPU.  19 
+ 20 
+ 21 
+ 22 
+ 23 
+ 24 
+ 25 
+ 26 
+ 27 
+ 28 
+ 29 
+ 30 
+ 31 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              10 
+O-RAN.WG6.AAL FEC.0-v01.00 
+ 1 
+Chapter 4 AAL Profile Specifications 2 
+ Profile Specifications Overview   3 
+This section contains information for each AAL profile that is supported. A profile can provide several APIs  for specific 4 
+profile configuration that may be required in addition to the general AAL configuration APIs. Profile specific 5 
+configuration shall be done on a per queue basis and only for functionality that cannot be changed at run time. Each 6 
+profile shall define a capabilities list that will be used to define the operations supported by the AAL-LPU.  7 
+ Operation Representation  8 
+Operations offloaded to the AAL-LPU are represented by a single operation context that shall include all necessary 9 
+information required for the AAL operation to be processed on a particular AAL-LPU.  10 
+The operation context by itself defines the operation type as supported by the AAL Profile. It includes an operation 11 
+status, a reference to the operation specific data, which can vary in size and content depending on the operation/profile  12 
+being provisioned. Application software is responsible for specifying all the operation specific fields in the which are 13 
+then used by the AAL-LPU to process the requested operation.  14 
+Scheduling of AAL operations on application data path is performed using a burst oriented asynchronous API set.  A 15 
+queue on an AAL-LPU accepts a burst of operations (1 to N) using enqueue API. The enqueue API will place the 16 
+operations to be processed on the AAL-LPU’s hardware input. The dequeue API will retrieve any processed operations 17 
+available from the queue on the AAL-LPU.  18 
+The enqueue API uses an AAL-LPU identifier and a queue identifier to specify the AAL-LPU queue to schedule the 19 
+processing on. In addition to the operation context a count of the number of operations to process is also required. The 20 
+enqueue function returns the number of operations it actually enqueued for processing. 21 
+The dequeue API uses the same format as the enqueue API but the operation contexts are now used to specify the max 22 
+processed operations the user wishes to retrieve and the location in which to store them. The API call returns the actual 23 
+number of processed operations returned. 24 
+ Profile Capabaillities  25 
+Each Profile has a set of capabilities which capture the functions support ed by each implementation. This included 26 
+optional features such a interrupts and debug interfaces. These are used by the application to discover the capabillites of 27 
+the underlying AAL implementation as per Section 4.2.2.  28 
+ Memory Management 29 
+The AALi implementation shall provide any profile specific memory management (examples allocate and free memory) 30 
+as required by the AALi implementation.  31 
+ O-DU AAL PDSCH FEC Profile Specification 32 
+As per O-RAN AAL GAnP document [7] the PDSCH FEC Profile supports  33 
+• CRC Generation 34 
+• LDPC Encoding  35 
+• PDSCH Rate Matching 36 
+ 37 
+The encode operations are invoked through enqueue and dequeue functions. The operation context defines the 38 
+parameters used to configure the operation to be accelerated.  39 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              11 
+O-RAN.WG6.AAL FEC.0-v01.00 
+ AAL FEC PDSCH Profile Capabilities  1 
+The AAL FEC PDSCH Profile interface shall work on both a code block (CB) and a transport block (TB) basis.  2 
+An operation can be performed on one CB at a time "CB-mode". An operation can be performed on one or multiple 3 
+CBs that logically belong to a TB "TB-mode".  The input data is the CB or TB input to the encoder. The output data is 4 
+the ratematched CB or TB data.  5 
+The input and output buffers are expected to be allocated by the application with enough room for the output data.  6 
+The input buffer is mandatory input and is the incoming code block or transport block data.  7 
+The output buffer is mandatory and is the encoded CB(s). In CB-mode it contains the encoded CB of size e (E in 3GPP 8 
+TS 38.212 section 6.2.5). In TB-mode it contains multiple contiguous encoded CBs of size ea or eb. The output buffer i s 9 
+allocated by the application with enough room for the output data.  10 
+The valid modes of operation are: 11 
+CB-mode: one CB (attach CRC24B if required) 12 
+CB-mode: one CB making up one TB (attach CRC16 or CRC24A if required) 13 
+TB-mode: one or more CB of a partial TB (attach CRC24B(s) if required) 14 
+TB-mode: one or more CB of a complete TB (attach CRC16, CRC24A and CRC24B(s) if required)  15 
+As there are many combinations the AAL_PDSCH_FEC Profile shall list the CRC’s supported in its  capabilities. The 16 
+AALi implementation of the AAL_PDSCH_FEC Profile shall provide the flexibility to the application to configure the 17 
+operation in CB-mode with application selected CRC type and TB-mode with application selected CRC type.    18 
+As an examble in CB-mode if application can select whether CRC24A is appended to the CB or not. If configured not 19 
+to append CRC24A then the application is responsible for calculating and appending CRC24A before calling AALi. 20 
+The input data length is inclusive of CRC24A/B where present and is equal to the code block size K’. Note that code 21 
+block length will always be a multiple of 8 and it is assumed that there are 8 bits packed i nto each byte. 22 
+As an example, in TB-mode, CRC24A or CRC16 is assumed to be pre-calculated and appended to the inbound TB data 23 
+buffer, unless the application selects CRC24A is to be appended when it is the responsibility of AALi implementation . 24 
+The input data length is total size of the CBs inclusive of any CRC24A and CRC24B in the case they were appended by 25 
+the application.  26 
+The difference between the partial and full-size TB is that AAL AAL-LPU needs the index of the first CB in this group 27 
+and the number of CBs in the group. The first CB index is given by r but the number of the CBs is calculated by AALi 28 
+implementation before signalling to the driver. 29 
+The number of CBs in the group should not be confused with c, the total number of CBs in the full TB (C as per 3GPP 30 
+TS 38.212 section 5.2.2). 31 
+When using CB-mode code block concatenation is not performed in HW and it is the responsibility of the application to 32 
+ensure code block concatenation is implemented correctly. Note that code block concatenation can be implemented by 33 
+virtue of input and output address buffer address management.  34 
+The AAL_PDSCH_FEC Profile capabilities shall be reported to the application as per Table 4-1 AAL-LPU 35 
+Capabilities. The AAL_PDSCH_FEC Profile capabilities are defined in Table 5-1 AAL_PDSCH_FEC Profile 36 
+Capabilities, these capabilities must be reported to the application but may not be implemented by the AALi 37 
+implementation.  38 
+ Summary of AAL_PDSCH_FEC Profile capabilities  39 
+Table 5-1 lists the AAL_PDSCH_FEC profile capabilities that should be reported to the application.  40 
+Note additional capabilities can also be reported by the AALi implementation.  41 
+Table 5-1 AAL_PDSCH_FEC Profile Capabilities  42 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              12 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Capabilities    
+Whether interrupts are supported by this AAL-LPU 
+What CRCs are supported (CRC24A, CRC24B, CRC16) 
+Whether Scatter Gather of input buffers is supported  
+Support for concatenation of non byte aligned output code blocks   
+ 1 
+ AAL PDSCH FEC Profile Operations  2 
+The following parameters are required to be supported by the AALi implementation when offloading operations.  3 
+Table 5-2 AAL_PDSCH_FEC Profile parameters   4 
+Parameters   
+The input TB or CB data.  
+The encoded rate matched TB or CB output buffer.  
+Capabilities selection for CRC Types required to be applied 
+Rate matching redundancy version [3GPP TS38.212, section 5.4.2]  
+LDPC Base graph 1 or LDPC Base graph 2.  [3GPP TS38.212, section 5.2.2] 
+Zc, LDPC lifting size. [3GPP TS38.212, section 5.2.2] 
+Ncb, length of the circular buffer in bits. [3GPP TS38.212, section 5.4.2.1] 
+Qm, modulation order {2,4,6,8}. [3GPP TS38.212, section 5.4.2.2] 
+Number of Filler bits, n_filler = K – K’ [3GPP TS38.212 section 5.2.2] 
+Whether transport block or code block applies to this operation.  
+ 5 
+ CB-Mode Parameters 6 
+The below table defines the additional parameters required to be supported by the AALi implementation when using 7 
+code block mode  8 
+Table 5-3 CB-mode parameters  9 
+Parameters 
+E, length after rate matching in bits. [3GPP TS38.212, section 5.4.2.1] 
+ TB-Mode Parameters 10 
+Table 5-4 TB-mode parameters  11 
+Description  
+Ea, length after rate matching in bits, r < cab. [3GPP TS38.212, section 5.4.2.1]  
+Eb, length after rate matching in bits, r >= cab.  [3GPP TS38.212, section 5.4.2.1] 
+The total number of CBs in the TB or partial TB   
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              13 
+O-RAN.WG6.AAL FEC.0-v01.00 
+The index of the first CB in the inbound mbuf data, default is 0 
+cab, The number of CBs that use Ea before switching to Eb, [0:255] 
+ 1 
+ O-DU AAL PUSCH FEC Profile Specification  2 
+This section defines the AAL PUSCH FEC Profile specification. As per O-RAN AAL GAnP document [7] the 3 
+AAL_PUSCH_FEC Profile supports the following functions  4 
+• PUSCH Rate De-matching 5 
+• LDPC Decoder  6 
+• CRC Check 7 
+ 8 
+Note the AAL_PUSCH_FEC Profile only supports PUSCH Forward Error Correction. It does not include support for 9 
+PUSCH UCI which can be done in Software.  10 
+ AAL FEC PUSCH Profile Capabilities  11 
+The decode operations are invoked through enqueue and dequeue functions. The operation context defines the 12 
+parameters used to configure the operation to be accelerated.  13 
+The output data buffer is expected to be allocated by the application with enough room for the output data.  14 
+The input encoded CB data is mandatory for all AAL PUSCH FEC AAL-LPUs and is the Virtual Circular Buffer data 15 
+stream with null padding. Each byte in the input circular buffer is the LLR v alue of each bit of the original CB. 16 
+The output hard_output is mandatory and is the decoded CBs of size K’ (CRC24A/B or CRC16 is the last 24bit or 17 
+16bits in each decoded CB. The AALi shall give the option to drop the CRC. Where CRC Drop is set then the CRC will 18 
+not be present at the end of the buffer). In transport block mode the hard_output will contain the decoded transport 19 
+block.  20 
+The AALi shall support the optional soft output buffer which is an LLR rate matched output of size e (this is E as per 21 
+3GPP TS 38.212 section 6.2.5). 22 
+The AALi shall support optional harq input buffer which is a buffer with the input to the HARQ combination function 23 
+of the AAL-LPU. If the AAL-LPU supports internal memory capability and is enabled, then the HARQ is stored in 24 
+memory internal to the AAL-LPU and not visible to the application. 25 
+The AALi shall support the optional HARQ Combined output which is a buffer for the output of the HARQ 26 
+combination function of the AAL-LPU. If the AAL-LPU supports internal memory capability and is enabled, then the  27 
+HARQ is stored in memory internal to the AAL-LPU and not visible to application. 28 
+The buffers are expected to be allocated by the application with enough room for the output data. 29 
+As with the AAL PDSCH FEC Profile, the decode interface works on both a code block (CB) and a transport block 30 
+(TB) basis. 31 
+The valid modes of operation are: 32 
+CB-mode: one CB (check CRC24B if required) 33 
+CB-mode: one CB making up one TB (check CRC16 or CRC24A if required)  34 
+TB-mode: one or more CB making up a partial TB (check CRC24B(s) if required)  35 
+TB-mode: one or more CB making up a complete TB (check CRC16, CRC24A and CRC24B(s) if required)  36 
+The buffer length is inclusive of CRC24A/B where present and is equal the code block size K’. 37 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              14 
+O-RAN.WG6.AAL FEC.0-v01.00 
+The first CB Virtual Circular Buffer (VCB) index is given by r but the number of the remaining CB VCBs shall be  1 
+calculated automatically by the AALi implementation. 2 
+The number of remaining CB VCBs should not be confused with c, the total number of CBs in the full TB (C as per 3 
+3GPP TS 38.212 section 5.2.2) 4 
+The length is total size of the CBs inclusive of any CRC24A and CRC24B in case they were appended by the 5 
+application.  6 
+ LLR Compression  7 
+The AAL PUSCH FEC Profile may support compression of the LLR bits used for the HARQ data. This improves PCIE 8 
+memory bandwidth and memory storage. The AALi shall report to the application through the capabilities whether LLR 9 
+compression is supported. Example of compression is when 6bit LLR’s are stored per byte in memory. Compression 10 
+allows the 6bit LLR’s to be packed in 6bits of memory.  11 
+ Summary of AAL_PUSCH_FEC Profile capabilities  12 
+Table 5-5 lists the AAL_PUSCH_FEC profile capabilities that should be reported to the application.  13 
+Note additional capabilities can also be reported by the AALi implementation.  14 
+Table 5-5 AAL_PUSCH_FEC Profile capabilities  15 
+Capabilities  
+LLR size in bits. Each LLR is a two’s complement number. This can be AAL-LPU implementation specific.  
+LLR numbers of decimals bit for arithmetic representation. This can be AAL-LPU implementation specific.  
+Type of CRC Support (CRC24A, CRC24B, CRC16) 
+CRC Dropping supported and configurable  
+HARQ Combine input enabling and disabling  
+HARQ Combine output enabling and disabling  
+Soft Output enabling and disabling 
+LDPC Iteration stop enabling and disabling, that is stopping on successful decode (syndrome check)  
+Whether Scatter Gather of input buffers is supported  
+Support for concatenation of non byte aligned output code blocks   
+If an AAL-LPU supports input/output HARQ compression. Compressed would be packed 6bit LLRs as opposed to 
+6bit LLR per byte 
+If an AAL-LPU supports input LLR compression. Packed 6bit LLR inputs.  
+If an AAL-LPU supports HARQ input to/from AAL-LPU's internal memory. 
+If an AAL-LPU supports HARQ output to/from AAL-LPU's internal memory. 
+If an AAL-LPU includes LLR filler bits in the circular buffer for HARQ memory. If not enabled, it is assumed the 
+filler are not in HARQ memory and handled directory by the LDPC decoder. 
+ 16 
+ AAL PUSCH FEC Profile Operations  17 
+The following parameters are required to be supported by the AALi implementation when offloading operations  18 
+Table 5-6 AAL_PUSCH_FEC Profile Parameters 19 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              15 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Description  
+The input Virtual Circular Buffer for this code block, one LLR per bit of the original CB or TB. See Table 4-15 
+The hard decisions buffer for the decoded output, size K’ for each CB when in code block mode, otherwise TB or 
+partial TB output. See Table 4-15 
+The soft LLR output LLR stream buffer - optional 
+The HARQ combined LLR stream input buffer - optional. See Table 4-15 
+The HARQ combined LLR stream output buffer - optional. See Table 4-15 
+Optional capabilities configuration as per Table 5-5 
+Rate matching redundancy version [3GPP TS38.212, section 5.4.2.1] 
+The maximum number of iterations to perform in decoding CB in this operation - input 
+The number of iterations that were performed in decoding CB in this decode operation - output 
+LDPC Base graph 1 or  2. [3GPP TS38.212, section 5.2.2] 
+Zc, LDPC lifting size. [3GPP TS38.212, section 5.2.2] 
+Ncb, length of the circular buffer in bits. [3GPP TS38.212, section 5.4.2.1] 
+Qm, modulation order {1,2,4,6,8}. [3GPP TS38.212, section 5.4.2.2] 
+Number of Filler bits, n_filler = K-K’ [3GPP TS38.212 section 5.2.2] 
+Code Block or Transport Block 
+ 1 
+ CB-Mode Parameters  2 
+When CB-Mode is used the following additional parameters are required.  3 
+Table 5-7 AAL_PUSCH_FEC Profile CB-Mode Parameters 4 
+Description  
+Rate matching output sequence length in bits or LLRs. 
+[3GPP TS38.212, section 5.4.2.1] 
+ 5 
+ TB-Mode Parameters 6 
+When TB-Mode is used the following additional parameters are required.  7 
+Table 5-8 AAL_PUSCH_FEC Profile TB-Mode Parameters  8 
+Description  
+Ea, length after rate matching in bits, r < cab. [3GPP TS38.212, section 5.4.2.1]  
+Eb, length after rate matching in bits, r >= cab. [3GPP TS38.212, section 5.4.2.1]  
+The total number of CBs in the TB or partial TB 
+The index of the first CB in the inbound mbuf data, default is 0 
+cab, The number of CBs that use Ea before switching to Eb, [0:255] 
+ 9 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              16 
+O-RAN.WG6.AAL FEC.0-v01.00 
+ 1 
+  2 
+  3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              17 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Annex ZZZ : O-RAN Adopter License Agreement 1 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 2 
+AGREES TO THE TERMS OF THIS AGREEMENT. 3 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 4 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 5 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 6 
+Section 1: DEFINITIONS 7 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 8 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 9 
+fifty (50%) percent or more of the voting stock or equity in an entity. 10 
+1.2 “Compliant Implementation” means any system, AAL-LPU, method or operation (whether implemented in 11 
+hardware, software or combinations thereof) that fully conforms to a Final Specification. 12 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 13 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 14 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 15 
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 16 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 17 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 18 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 19 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 20 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 21 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 22 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 23 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 24 
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 25 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 26 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 27 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all suc h patent 28 
+claims shall be considered Necessary Claims. 29 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 30 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to i nclude in their license a term 31 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 32 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  33 
+Section 2: COPYRIGHT LICENSE 34 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 35 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 36 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 37 
+furtherance of implementations of an ORAN 38 
+Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a sepa rate written 40 
+agreement with O-RAN Alliance. 41 
+Section 3: FRAND LICENSE 42 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 43 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 44 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 45 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 46 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              18 
+O-RAN.WG6.AAL FEC.0-v01.00 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 1 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated 2 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 3 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 4 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 5 
+customers of such licensed Compliant Implementations. 6 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates  has 7 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 8 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 9 
+its Affiliates for its license of Necessary Claims to its licensees. 10 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 11 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affil iates under Fair 12 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 13 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 14 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 15 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 16 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 17 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 18 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 19 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 20 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 21 
+licensed Compliant Implementations. 22 
+Section 4: TERM AND TERMINATION 23 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.  24 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 25 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 26 
+(30) days after being given notice specifying the breach. 27 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 28 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 29 
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 30 
+version that was current as of the date of termination. 31 
+Section 5: CONFIDENTIALITY 32 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dis semination of O-RAN 33 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 34 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 35 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 36 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 37 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 38 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 39 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 40 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 41 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 42 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 43 
+Alliance’s prior written approval. 44 
+Section 6: INDEMNIFICATION 45 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 46 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 47 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 48 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 49 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 50 
+products that comply with O-RAN Specifications. 51 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              19 
+O-RAN.WG6.AAL FEC.0-v01.00 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 1 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 2 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 3 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 4 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 5 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 6 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 7 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 8 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 9 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 10 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 11 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 12 
+CONDITION FOR O-RAN SPECIFICATIONS. 13 
+Section 8: ASSIGNMENT 14 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 15 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 16 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 17 
+Alliance may freely assign this Agreement. 18 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 19 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 20 
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 21 
+including as licensees under Section 3. 22 
+Section 10: BINDING ON AFFILIATES 23 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 24 
+association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunde r 25 
+and are also entitled to the benefits of the rights of Adopter hereunder. 26 
+Section 11: GENERAL 27 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  28 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 29 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 30 
+to the subject matter of this Agreement.  31 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 32 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 33 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 34 
+prohibits any communication that would violate the antitrust laws. 35 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopt er, 36 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 37 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 38 
+Contributors or Academic Contributors. 39 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 40 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 41 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in 42 
+full force and effect. 43 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 44 
+provisions of this Agreement or to exercise any rights or remedies under this  Agreement or otherwise by law shall not 45 
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 46 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.              20 
+O-RAN.WG6.AAL FEC.0-v01.00 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full 1 
+force and effect. 2 

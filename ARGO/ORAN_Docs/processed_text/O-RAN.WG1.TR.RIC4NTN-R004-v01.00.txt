@@ -1,0 +1,1072 @@
+Technical Report 
+  
+ 
+ 
+ 
+Copyright © 2025 by the O-RAN ALLIANCE e.V. 
+The copying or incorporation into any other work of part or all of the material available in this document in any form withou t 
+the prior written permission of O -RAN ALLIANCE e.V. is prohibited, save that you may print or download extracts of the 
+material of this document for your personal use, or copy the material of this document for the purpose of sending to individual 
+third parties for their information provided that you acknowledge O -RAN ALLIANCE as the source of the material and that 
+you inform the third party that these conditions apply to them and that they must comply with them. 
+ 
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238, VAT ID DE321720189 
+ 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+O-RAN Work Group 1 (Use Cases and Overall Architecture) 
+ 
+RIC Enabling NTN Deployments 
+ 
+
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 2 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+Contents 
+List of figures...................................................................................................................................................... 3 
+List of tables ....................................................................................................................................................... 3 
+Foreword ............................................................................................................................................................. 4 
+Modal verbs terminology .................................................................................................................................... 4 
+Introduction ........................................................................................................................................................ 4 
+1 Scope ........................................................................................................................................................ 6 
+2 References ................................................................................................................................................ 6 
+2.1 Normative references ......................................................................................................................................... 6 
+2.2 Informative references ........................................................................................................................................ 6 
+3 Definition of terms, symbols and abbreviations ....................................................................................... 6 
+3.1 Terms .................................................................................................................................................................. 6 
+3.2 Symbols .............................................................................................................................................................. 6 
+3.3 Abbreviations ..................................................................................................................................................... 6 
+4 NTN development status in standard organizations ................................................................................. 7 
+4.1 3GPP .................................................................................................................................................................. 7 
+4.1.1  Overview ...................................................................................................................................................... 7 
+4.1.2  R17/R18/R19 work items for NTN ............................................................................................................... 8 
+4.2 O-RAN ............................................................................................................................................................... 8 
+4.2.1  Overview ...................................................................................................................................................... 8 
+4.2.2  Study and work items for NTN ..................................................................................................................... 8 
+5  Key NTN use cases analysis in O-RAN enabled by RIC ......................................................................... 9 
+5.1 Use Case Group 1: TN and NTN interworking and cooperation ........................................................................ 9 
+5.1.1  Overview ...................................................................................................................................................... 9 
+5.1.2  Use Case 1-1: TN-NTN Coverage Information Sharing ............................................................................... 9 
+5.1.3  Use Case 1-2: TN-NTN Mobility and Service Continuity .......................................................................... 10 
+5.1.4  Use Case 1-3: Request of NTN coverage for Disaster Response................................................................ 12 
+5.1.5  Use Case Group 1: Summary, Proposed Solution, Benefits and Impact to the O -RAN Architecture ........ 13 
+5.2 Use Case Group 2: Intra-NTN Mobility Use Cases ......................................................................................... 16 
+5.2.1  Overview .................................................................................................................................................... 16 
+5.2.2  Use Case 2-1: Connected mode NTN inter-gNB handover (HO) due to Satellite mobility........................ 17 
+5.2.3 Use Case 2-2: NTN QoS-based inter-cell traffic steering and load balancing ............................................ 22 
+5.2.4  Use Case 2-3: NTN Time-based and Distance-based Conditional Handover (CHO) ................................. 23 
+5.2.5  Use Case 2-4: NTN Idle mode cell re-selection.......................................................................................... 23 
+5.2.6  Use Case 2-5: NTN UE Location-aware Connected Mode Handover and Inter-cell Traffic Steering and 
+Load-balancing ........................................................................................................................................... 24 
+6 Summary and Conclusion ...................................................................................................................... 24 
+Annex: Change history/Change request (history) ............................................................................................. 25 
+ 
+  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 3 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+List of figures 
+Figure 5.1.5.3-1: Topology of inter-operator scenario .......................................................................................................... 15 
+Figure 5.1.5.3-2: Topology of single operator scenario ....................................................................................................... 16 
+Figure 5.2.2.1-1: Example network scenario with 4 satellites from a Walker Delta formation (left) and snapshot of 
+the moment where HO opportunity is available with 4 satellites in view (right) ................................................................ 17 
+Figure 5.2.2.3-1: UML chart of NTN handover management.............................................................................................. 22 
+ 
+List of tables 
+Table 5.2.2.3-1: NTN handover management ....................................................................................................................... 20 
+ 
+  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 4 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+Foreword 
+This Technical Report (TR) has been produced by WG1 of the O-RAN ALLIANCE. 
+The content of the present document is subject to continuing work within O -RAN and may change following formal O-RAN 
+approval. Should the O-RAN ALLIANCE modify the contents of the present document, it will be re-released by O-RAN with 
+an identifying change of version date and an increase in version number as follows: 
+version xx.yy.zz 
+where: 
+xx: the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. 
+(the initial approved document will have xx=01). Always 2 digits with leading zero if needed.  
+yy: the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 
+digits with leading zero if needed. 
+zz: the third digit-group included only in working versions of the document indicating incremental changes during the 
+editing process. External versions never include the third digit-group. Always 2 digits with leading zero if needed. 
+Modal verbs terminology 
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and 
+"cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of 
+provisions). 
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation. 
+Introduction 
+Support for Non-Terrestrial Networks (NTN) has been introduced in the 3GPP specifications starting from Release 17. Release 
+18 has been recently completed, with further enhancements in development as part of Release 19 and expected in the 
+upcoming Release 20. 
+NTN has gained substantial momentum in the telecommunication industry, with the first services in support of IoT and direct -
+to-device messaging launched, and more deployments including NR-NTN upcoming. NTN presents an emerging opportunity 
+for Open RAN and there are multiple research/development projects and evaluations in progress focusing on NTN 
+implementation leveraging Open RAN technologies. Non-Terrestrial Networks, in particular NGSO constellations, dynamic 
+GSO, as well as hybrid multi-orbit constellations, present complex architectural, control, radio resource management, mobility 
+and orchestration challenges which could be addressed by Open RAN technologies.  
+The O-RAN ALLIANCE is currently developing specifications for O-RAN RIC-enabled optimization and autonomous 
+management of terrestrial networks. Standardization of O-RAN RIC-enabled optimization and autonomous management for 
+NTN and converged NTN+TN interworking deployment scenarios is essential for the NTN operator constellation planning and 
+architectural phases, as a key enabler for their commercial success. 
+This intelligent management of the RAN and its operation is naturally addressed by the Non - and Near-RT RICs. However, 
+while there are many use cases documented for their employment in terrestrial 5G networks, moving the network functions 
+into space brings in a whole new set of challenges and constraints, and opens up completely different novel implementation 
+approaches for the existing O-RAN use cases (such as TS and QoS optimization), as well as a new host of use cases that are 
+specific to NTN. For example to account for the new control signaling features introduced for NTN in 3GPP Releases 17 and 
+18 (such as SIB19 and timer/distance-based CHO), as well as to address challenges unique to NTNs.  
+This technical report investigates use cases applicable to NTN and presents a gap analysis on possible impacts to WG2 and 
+WG3 specifications of the O-RAN ALLIANCE, in preparation for normative work in WG2 and WG3. Two main groups of use 
+cases are identified:  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 5 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+• Use Case Group #1: How the TN and NTN segments will intelligently cooperate and provide a seamless experience 
+to the users as they traverse between TN and NTN, and vice-versa, while making sure that the available spectral 
+resources are optimally utilized. 
+• Use Case Group #2: Once in the NTN segment, how are the users and their traffic flows going to be intelligently 
+managed by the SNOs such that they are assuring the types of services being sold while accounting for temporospatial 
+variations in motion of the space and aerial assets, weather, spectrum availability, onboard power and hardware 
+constraints, different terminal classes, fast mobility, Line of Sight (LoS), QoS, etc.   
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 6 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+1 Scope 
+The present document specifies a technical report on RIC enabling NTN deployments use cases. 
+2 References 
+2.1 Normative references 
+Not applicable.  
+2.2 Informative references 
+References are either specific (identified by date of publication and/or edition number or version number) or non -specific. For 
+specific references, only the cited version applies. For non-specific references, the latest version of the referenced document 
+(including any amendments) applies. In the case of a reference to a 3GPP document, a non -specific reference implicitly refers 
+to the latest version of that document in Release 18, or the latest 3GPP release prior to Release 18 that includes that docum ent. 
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O -RAN cannot guarantee their 
+long-term validity. 
+The following referenced documents are not necessary for the application of the present document, but they assist the user wi th 
+regard to a particular subject area. 
+[i.1]    Non-Terrestrial Networks (NTN) 
+NOTE: Available at: https://www.3gpp.org/technologies/ntn-overview 
+[i.2]    3GPP TR 38.821: “Solutions for NR to support Non-Terrestrial Networks (NTN)” 
+3 Definition of terms, symbols and abbreviations 
+3.1 Terms 
+Void 
+3.2 Symbols 
+Void 
+3.3 Abbreviations 
+For the purposes of the present document, the abbreviations [given in [i.1] and the following] apply:  
+ CHO    Conditional Handover 
+EFC    Earth Fixed Cell 
+EMC    Earth Moving Cell 
+ FDD    Frequency Division Duplex  
+FR1    Frequency Range 1 
+GSO    Non-Geostationary Orbit 
+HO    Handover 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 7 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+IoT-NTN   Internet of Things Non-Terrestrial Networking 
+ISL    Inter-Satellite Link 
+KPI    Key Performance Indicator 
+LEO       Low Earth Orbit 
+LoS    Line of Sight 
+NB-IoT   Narrow Band Internet of Things 
+NR-NTN   New Radio Non-Terrestrial Networking 
+NTN    Non-Terrestrial Network 
+NGSO    Non-Geostationary Orbit 
+OTA    Over-The-Air 
+PCI    Physical Cell Identity 
+QEFC    Quasi-Earth-Fixed Cell 
+RIC    Radio Intelligent Controller 
+SMTC    SSB Measurement Timing Configuration 
+SNO    Satellite Network Operator 
+SSB    Synchronization Signal Block 
+TDD    Time Division Duplex 
+TN     Terrestrial Network 
+UAV    Unmanned Aerial Vehicle 
+UE     User Equipment 
+UML    Unified Modeling Language 
+ 
+4 NTN development status in standard organizations 
+4.1 3GPP 
+4.1.1  Overview 
+Non-Terrestrial Networks (NTN) are a significant focus within the 3GPP standards, particularly for integrating satellite  into 5G 
+and beyond. Here's a summary of the current development status: 
+1. Release 15 and 16: Study phase on scenarios, use cases, channel models and impact of NTN to the 5G System, as well 
+as solutions for 5G New Radio (NR) support for Non-Terrestrial Networks. 
+2. Release 17 and 18: These releases introduced NTN with a transparent (bent -pipe) architecture, where satellites act as 
+radio repeaters without on-board processing capabilities. This approach was chosen for its simplicity and early 
+deployment potential. Both NR-NTN and IoT-NTN are supported. Release 18 introduced support for NR NTN above 
+10 GHz, such as broadband in Ka band. 
+3. Release 19: This release marks a major milestone with the introduction of a regenerative payload architecture. In this 
+scenario, a complete gNB (Next Generation Node B) is placed on the satellite, allowing for greater integration and 
+flexibility, and opening up new constellation topologies and use cases). This architecture supports packet processing 
+directly on the satellite, enabling features like improved mobility management.  
+4. Release 20: The next release is currently in the planning phase and a 3GPP RAN workshop in RAN#106 (12/2024) 
+discussed potential NTN features for Rel-20. The initial work plan for Rel-20 was decided in RAN#108 (06/2025).  
+ 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 8 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+Technological Challenges: The development of NTN involves unique challenges such as high Doppler shifts, longer 
+propagation delays, and larger cell sizes due to the high altitudes of satellites. Enhanced beam management and regulatory 
+considerations are also crucial. Most of these challenges are already covered by Rel-17 and 18.  
+Future Prospects: The ongoing work aims to further integrate NTN with terrestrial networks, enhancing global coverage 
+and resilience. The regenerative payload architecture is expected to support advanced functionalities like "store and 
+forward," which allows satellites to store data temporarily and forward it when connectivity is restored, and also UE-
+satellite-UE communication with reduced latency. 
+4.1.2  R17/R18/R19 work items for NTN 
+Release 17: 
+1. Transparent payload architecture with FDD systems. 
+2. Adaptation to physical and access layer aspects, radio access network, system architecture, radio resource 
+management, and RF requirements. 
+3. Support for NTN-NR (5G New Radio (NR)) based satellite access in FR1 bands for handheld devices. 
+4. Support for NTN-IoT (NB-IoT and eMTC) based satellite access for massive IoT and handheld messaging use cases. 
+Release 18: 
+1. Enhancements for NR-NTN and IoT-NTN, especially the time and location based conditional handover (CHO) for 
+mobility enhancements. 
+2. Enablers for NR based satellite access in bands above 10 GHz (including introduction of Ka-band, see 3GPP TS 
+38.108 and 38.101-5). 
+3. Support for fixed and moving platforms (e.g., aircraft, vessels, UAVs) and building -mounted devices. 
+Release 19 
+1. Downlink Coverage Enhancements with CD-SSB periodicity relaxation and enhanced beam-hopping support 
+2. Uplink capacity enhancements. 
+3. Support for a non-terrestrial network architecture with 5G system functions on board the NTN vehicle (regenerative 
+payloads), including the possibility for inter-satellite links (ISL). 
+4. Use of RedCap devices within FR1 NTN. 
+5. Store & Forward (S&F) operation based on regenerative payload to support non-complete constellations. 
+6. Specification of Ku-band for NTN operations 
+7. Support for half duplex operation in TDD and FDD scenarios for IoT-NTN   
+8. New L- and S- frequency band definitions 
+9. Over-The-Air (OTA) antenna requirements and performance framework for NTN 
+4.2 O-RAN 
+4.2.1  Overview 
+To the group’s best knowledge, no approved contributions or normative work on NTN exist so far in O-RAN ALLIANCE, but 
+there have been some requests for the definition of new WIs and research areas in nGRG. 
+4.2.2  Study and work items for NTN 
+The following proposals have been submitted so far: 
+1. New feature work for NTN deployments enabled by RIC. 
+2. Study on open TN-NTN architecture based on O-RAN 
+3. Research for requirements on O-RAN based satellite clustering for NTN in nGRG 
+4. Work for regenerative NTN support in O-RAN in WG1 UCTG  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 9 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+5  Key NTN use cases analysis in O-RAN enabled by RIC 
+5.1 Use Case Group 1: TN and NTN interworking and cooperation 
+5.1.1  Overview 
+In most cases, these NTN networks and services are not anticipated to be completely standalone offerings, but rather intended  
+at least in part as a complement to Terrestrial Networks, for example to provide coverage extension in white spots and hard t o 
+reach areas, 3D coverage at altitude, or a layer of resiliency.  In fact, the ability for NTN to eliminate or alleviate coverage  gaps 
+in the Terrestrial Network was one of the key motivations for the introduction of NTN in 3GPP since the beginning.  
+Based on the current market trends, it appears NTN deployment motivations will in most cases fall into one of the following 
+categories: 
+- Existing Satellite Network Operators (SNOs) who are looking to serve the NTN market in addition to or in evolution 
+of their existing non-3GPP satellite services. 
+- New entrant SNOs who are seeking to uniquely provide NTN services. 
+- Mobile Network Operators (MNOs) who are seeking to extend their network via NTN.  
+- New entrant MNOs who are seeking provide homogenous TN and NTN coverage  
+Therefore, it is expected that many MNOs may seek to extend their own Terrestrial Network services via NTN, however the 
+current market trends indicate that they will likely not seek to deploy and operate their own satellites, but rather form 
+agreements with one or multiple NTN SNOs, who will provide coverage over areas of interest on behalf of their partner 
+MNOs. 
+For this to be achieved, the MNO’s and SNO’s networks will need to interact and coordinate with one another at some level. 
+The required degree of interaction and information sharing required between the two operator domains will depend on the 
+requirements of the specific use case and on the depth of integration between the two segments.  This interaction is essential in 
+order to for example make the NTN network aware of where the boundaries of the terrestrial network exist, share handover 
+preparation information, reselection targets, etc. and conversely make the terrestrial network aware of when an NTN is 
+available to its users.  
+The following clauses describe some of the use cases that fall within the category of TN and NTN interworking and 
+cooperation and that have been grouped under Use Case Group 1 (UCG#1).  
+5.1.2  Use Case 1-1: TN-NTN Coverage Information Sharing 
+5.1.2.1  Use Case Description 
+In order for an MNO and their partner SNO(s) to be able to support efficient complementary coverage via NTN, the TN 
+network may need to be aware of the available NTN coverage footprint, and vice versa.  This can include current coverage (i.e . 
+already active) as well as potential coverage (i.e. not yet active, but possible), and will need to include some details of the 
+coverage to be provided (e.g. applicable NTN cells, their configuration and corresponding serving satellite ephemeris).  
+Depending on a number of operational factors and system constraints, such as feeder link availability, power and radio 
+resource availability of the satellites forming the NTN constellation, the active cells, allocated resources (and thus capaci ty), as 
+well as the specific coverage areas that an NTN operator chooses to serve or not serve may change over time.  In addition, due 
+to orbital precession, the specific satellite(s) serving a given cell coverage area on the ground at any point of time (e.g. in a 
+scenario with Earth-fixed or quasi-Earth-fixed Cells) also change over time. Thus there is a need for the NTN segment to be 
+able to communicate this information to the TN segment, such that the TN segment can be aware of which NTN cells are 
+available or might become available in the future, as well as update the information being broadcast in SIB19/SIB31 messages 
+in terrestrial edge cells.  
+Likewise, in the reverse direction, an NTN operator may normally not be aware of the footprint, topology, configuration or 
+even presence of terrestrial networks within the coverage of an NTN, unless this information has been separately sourced or 
+disclosed by the MNO.  Whilst some of this information can be shared at network planning by the TN MNO to the NTN SNO, 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 10 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+the TN MNO network is expected to evolve over time, potentially also dynamically via the introduction of network energy 
+saving (NES) techniques, and thus may need to be updated at runtime. 
+In scenarios where the NTN coverage may totally or partially overlap with the TN coverage or its edge, by having awareness 
+of the TN footprint or of its edge, the NTN operator may be able to selectively deactivate NTN coverage in overlapping areas,  
+in order to save system power, capacity, or to enable coverage in other locations. In scenarios with no overlap (e.g. due to TN 
+spectrum reuse in space), the NTN operator may need to adjust the NTN coverage edge to match as closely as possible the TN 
+coverage edge, at least for certain frequencies.  
+5.1.2.2  Problem statement and challenges 
+In order to fulfil the requirements of these scenarios, the TN and NTN segments would need to have a method of exchanging at 
+least the minimum necessary information on their respective coverage footprints, required to fulfil complementary coverage 
+functionalities. The current 3GPP- and O-RAN-specified interfaces between operator domains, such as the roaming interfaces 
+and other interfaces at the Core network and RAN level (e.g. Xn), do not support sharing of this type of information.  
+Sharing of neighbor cell information, including neighbor relationships, and other coverage related information within a singl e 
+network domain (e.g. within a TN or an NTN) is typically expected at least in part to be addressed by interfaces such as 
+X2/Xn. However, in the interaction between TN and NTN this is either not sufficient (e.g. due to lack of the necessary 
+primitives), or outright not possible, such as in the scenario where SNO and MNO, with both networks assumed to be aligned 
+with 3GPP and O-RAN architecture, are two distinct operator domains, where inter-operator Xn is currently not contemplated 
+(or implemented) and presents potential feasibility issues.  In addition, both the TN footprint, topology and configuration, as 
+well as the NTN footprint, topology and configuration, are expected to be continuously evolving and dynamic in nature, 
+especially as operators (MNOs and SNOs alike) increasingly target maximization of energy and deployment efficiencies. 
+Therefore, traditional manual or static mechanisms of sharing this information are not going to be fit for purpose, and there is 
+instead a need for automated mechanisms that can dynamically provide updates on the changes to the coverage in a timely 
+manner (order of seconds at least), as soon as they happen. It is also important that this sharing of information is performed 
+securely and with a fine-grained level of control on the type and amount of information that is respectively shared, at any given 
+instant of time. 
+Therefore, there is a gap and an identified need for a secure, programmatic and reactive mechanism for TN and NTN networks 
+in different operator domains to interface and interact, for the purpose of selectively sharing coverage related information.   
+5.1.3  Use Case 1-2: TN-NTN Mobility and Service Continuity 
+5.1.3.1  Use Case Description 
+This use case covers the support for mobility and service continuity between a terrestrial network (TN) and a Non -Terrestrial 
+Network (NTN). One of the key value propositions for Non-Terrestrial Networks is to enable complementary coverage for 
+terrestrial networks, and to help MNOs fulfil coverage gaps. As such, enabling or facilitating mobility and service continuity 
+between the TN and the NTN and vice-versa is a key requirement. 
+Whilst 3GPP defines the procedures at RAN level for TN-NTN idle and connected mode mobility and stipulates the need for 
+sharing of coverage and satellite assistance information (e.g. Ephemeris), the 3GPP specifications do not explicitly address 
+how this information is shared, and further how these procedures are coordinated when the TN and NTN are in different 
+operator domains. This use case thus describes the requirements, expected procedure and possible solution to address these 
+remaining aspects in respect to TN-NTN mobility and service continuity.  
+In order to be able to support TN-NTN mobility, the TN RAN needs to be aware of the NTN coverage footprint, and 
+specifically which satellite(s) are or will be serving a given coverage area at any point in time, and which are or may be th e 
+applicable neighbor NTN cells, with their respective configurations.  In 3GPP NTN Rel-17+ systems, some of this 
+information, alongside other details such as Ephemeris of the satellites, is expected as per the 3GPP specifications to be 
+delivered via SIB19 or SIB31 into the TN cells bordering or overlapping with the NTN coverage area. However, in order for 
+the information to be delivered to the TN cells, the terrestrial network has to first be aware of the information in the firs t place.  
+This information may in many cases need to come from an external source to the MNO network (e.g. an SNO network). In 
+addition, there may be another scenario in which an MNO may wish to provide  
+Additionally, when it comes to evaluating the candidate handover or reselection opportunities to an NTN cell from a TN cell, 
+there may be a subset of satellites which are better suited as target candidates, and there is a need to study how  the O -RAN 
+RIC/SMO architecture might be leveraged in optimizing the selection, for example by tailoring the SMTC list and the NTN-
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 11 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+NeighCellConfigList provided in SIB19 to include only the satellite candidates that actually make for good handover or 
+reselection targets, in some cases based on the specific UE service requirements on RAN and line -of-sight (LoS) conditions. 
+5.1.3. 2  Problem statement and challenges 
+Whilst 3GPP specifies mechanisms for TN-NTN mobility and service continuity, many of the capabilities and information 
+exchanges required to implement said mobility, and to more in general facilitate the seamless interworking between TN and 
+NTN are currently not addressed by 3GPP specifications, and could on the other hand be effectively addressed by O -RAN. 
+In order to support mobility from TN to NTN, the TN network must be aware at least of the following information, and their 
+applicability in time: 
+● Satellite assistance information (e.g. Ephemeris) of the target NTN systems, satellites and cells available for handover 
+or reselection 
+● Cell topology and availability of the NTN cells neighboring or overlapping the TN coverage edge, that could be 
+candidate target cells for measurement, reselection or handover 
+● Cell configuration of the NTN cells neighboring or overlapping the TN coverage edge, necessary for measurement 
+configurations, reselection policy configuration and handover triggering 
+In addition, the network-initiated Connected Mode handovers must also be explicitly triggered by the network, which must be 
+able to: 
+● Request measurements to the target NTN network, to identify HO cell candidates  
+● Request HO triggering to the target gNB 
+In a terrestrial network scenario or an intra-operator TN-NTN scenario, many of these capabilities are or can be enabled by the 
+X2/Xn interface. However, X2/Xn may not be feasible in an inter-domain/inter-operator environment.  
+In addition, given that between two operators, the network topology might be partially or completely obfuscated, there is no 
+way for the Source gNB to even identify which target gNB endpoint (e.g. gNB -CU) to address the measurement and handover 
+requests, as the X2/Xn interface exists between individual eNBs/gNBs. 
+Thus, there would be no mechanisms for signaling of neighbour relationships, including for measurement configurations. 
+Furthermore, the TN may not even be aware of the neighbour NTN cells (esp. for candidate cells that are not active, in system s 
+deploying selective coverage and/or beam hopping). 
+Therefore, these challenges arise with this scenario and the lack of a suitable interface, for example:  
+● No awareness by the TN of the target NTN cell configuration (e.g. frequencies, PCI, etc) required to configure 
+measurements, HO triggers, Reselection policies. 
+● No awareness of the gNB topology in the target network (either TN or NTN), and thus no awareness of which gNB to 
+even establish an Xn connection or trigger an HO request or measurement request.  
+● With 3GPP NTN R17+, the TN might not be aware of Satellite Ephemeris (SIB19/SIB31 content), required by the UE 
+to perform UL pre-compensation 
+● The NTN coverage may not be active (or may be configured with insufficient duty cycle/capacity) in the target area 
+that the UEs are about to move to (satellite coverage is limited and must be selective)  
+● The NTN may not have any awareness of incoming load, QoS requirements or UE capabilities  
+● In 3GPP R19 NTN, SSB Periodicity could be relaxed (e.g. up to 160ms). This can impact UE sync 
+performance/reliability and may need specific SMTC configuration for measurement before TN to NTN handover  
+● UE capability signaling is very heavy. Forcing the NTN to perform UE capability exchange from scratch may have 
+adverse impact on NTN capacity  
+● Letting the UE/network declare RLF and Detach the UE, would lead to a network selection/access from scratch, 
+which creates service interruption and unnecessary signalling load. 
+● The NTN network may not be aware of which (or any) UE in TN are about to be handed over (or reselect to) NTN  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 12 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+● In the reverse direction (NTN to TN), no awareness by the NTN of the target TN cell configuration (e.g. frequencies, 
+PCI, etc) required to configure measurements, HO triggers, Reselection policies  
+5.1.4  Use Case 1-3: Request of NTN coverage for Disaster Response 
+5.1.4.1  Use Case Description 
+In some cases a Terrestrial MNO might wish to explicitly request NTN coverage in a given area, either to fulfil a coverage ga p, 
+or to respond to a total or partial outage of the terrestrial network, such as in a disaster scenario.  This same capability could 
+also be used simply to request the NTN to allocate additional capacity in a given area, in order to respond to an expected or  
+witnessed increase in demand.  
+Scenario 1) TN MNO1 identifies a coverage gap in its coverage, or is interested in providing additional coverage overlay, and  
+thus requests NTN coverage to specific target geographical area to NTN SNO1.  
+Scenario 2) TN MNO1 already has active NTN coverage by NTN SNO1 in a given target geographical area, but identifies a 
+need to allocate additional capacity (e.g. due to an upcoming event). 
+Scenario 3) During a disaster scenario (e.g. a hurricane), cell towers of TN MNO1 in a given area are affected by an outage 
+(e.g. power outage) and are thus unavailable. TN MNO1 requests NTN coverage (in dedicated or shared spectrum) to the 
+affected target geographical area to NTN SNO1. 
+The scenarios from 1 to 3 are applicable also when an MNO has a commercial relationship or wishes to establish a commercial 
+relationship with more than one NTN SNO partner. 
+In addition to the basic coverage or capacity request, a TN MNO may wish to communicate additional information to their 
+NTN SNO partner, for example: 
+• Expected load or last-known load 
+• Required capacity 
+• QoS information and/or Slice policies for specific services that may be required (e.g. public safety, emergency 
+messaging and/or calling) 
+• List of UEs for prioritization/QoS policy 
+• Pre-sharing of UE capabilities mapped to explicit list of UEs 
+• Interference thresholds and coverage edge contours or other constraints (e.g. to prevent interference, in case of 
+terrestrial spectrum reuse) 
+• Desired cell configuration parameters 
+• In case of terrestrial spectrum reuse or other form of spectrum lease, information on the spectrum available for 
+deployment and any configuration requirements. 
+5.1.4.1 Problem Statement 
+Current methods for an MNO to request NTN coverage from an SNO are entirely reliant on traditional office IT 
+communication (e.g. emails, meetings), and require extensive discussions and pre -agreements not only at the commercial level, 
+but also at the technical level, as a pre-requisite.  
+With current methods, derivation of technical parameters for requests of either complementary coverage or capacity rely on 
+extensive offline simulations performed by both parties respectively. These simulations are usually based on abstracted 
+knowledge of the network, and relatively limited advance knowledge of the respective systems, also due to confidentiality 
+constraints.  From these simulations and plans, a notional NTN network plan is usually derived and agreed by both parties, vi a 
+extensive discussion.  In some cases, the simulations used to derive the plan may not even be fully reflective of the up -to-date 
+conditions of the network (mostly because they are generated not from the live network, but from offline system -level 
+simulator toolsets), nor of the real-world practical conditions in which the system will operate. 
+In addition, any subsequent update usually needs to go through a similar formal cycle of discussions, simulations, agreements  
+and formal approvals, de-facto preventing the enactment of any reactivity to changing requirements or events in responsive 
+timeframes.  In some cases, due to the relatively “static” nature of the plan and of the need to pre -plan in advance, often with a 
+high level of detail, this can also lead to inflexibility in any regulatory filings submitted, where exact static values may be 
+specified or filed for, and thus require an update to the regulatory filings in case some parameters are altered or optimized.  
+As a consequence, the resulting plan exhibits a few unfortunate byproducts: 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 13 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+1) Staleness: The NTN network plan derived is relatively static and represents a snapshot of the respective systems at a 
+given moment of time, which may become stale over time, due to being unable to automatically reflect any 
+subsequent changes or optimizations in either the MNO terrestrial network coverage, or the SNO’s NTN coverage.  
+2) Immutability and lack of reactivity: Changes in the NTN network plan are difficult and slow to introduce, and not 
+only it cannot easily accommodate either changes in the actual respective network topologies, capabilities and plans, 
+but it is also unable to be adapted in responsive time frames, to react to changing or unforeseen needs by either SNO 
+or MNO, such as need to provide Disaster Coverage in response to an outage, spikes in demand or other time -
+sensitive events.  
+3) Poor accuracy: Due to the simulation environments used to derive the technical parameters of the plan, and due to 
+issues with confidentiality, the plan may not reflect the accurate and up-to-date state, capabilities or parameters of the 
+live network, reducing the accuracy of representation.  Its accuracy also to the physical live environment and its 
+interaction with terrain, weather and other factors is also very limited. 
+4) Conservativeness and sub-optimality: Due to the above issues, the plans are usually defined with relatively 
+(sometimes extremely) conservative margins, in order to avoid, or at least reduce, any risks of disruption to user 
+experience.  Inevitably, this also results in significant sub-optimality.  
+These issues could be resolved via a form of automated and programmatic mechanism, enabling the exchange of requests (as 
+well as advertisements of availability) for coverage and capacity between different entities, such as for example between one  
+MNO and one or more SNOs to provide NTN coverage and capacity in reaction to changing demand or to an unforeseen even, 
+such as a disaster scenario. 
+There are currently no existing interfaces, APIs or otherwise programmatic and/or automated mechanisms to support either 
+static, semi-static or let alone dynamic requests for coverage and/or capacity between different operator entities within either 
+the 3GPP or the O-RAN specifications. Such requirements and concepts have been raised and discussed from time to time, at 
+least within 3GPP in the context of NTN, but have never so far been introduced. In particular, there is currently no satisfac tory 
+mechanism to satisfy certain mission-critical use cases for the public good, such as respond to the need to supply Disaster 
+Coverage via NTN in response to total or partial outages to parts or totality of an MNO’s terrestrial network within 
+meaningfully responsive timeframes from the occurrence of an event (e.g. seconds or at most minutes). 
+5.1.5  Use Case Group 1: Summary, Proposed Solution, Benefits and Impact to 
+the O-RAN Architecture 
+5.1.5.1  Summary of Gap Analysis 
+The previous clauses describe a number of use cases that involve interaction between the TN and NTN networks and 
+summarize the current gaps and required interactions. Due to the commonalities between the different use cases, it was decide d 
+to address possible solutions in a single, common clause. The following clause thus analyzes possible common solutions to 
+address the aforementioned use cases. From analyzing the different use cases in Group 1, we can also summarize a list of 
+requirements that a possible solution must be able to fulfil.   
+In all the previously discussed use cases of Group 1, it is assumed that the TN and NTN segments could be either part of the 
+same operator domain or, more typically, part of two different and independent operator domains.  It is also possible that, 
+within a single operator domain, the operator may choose to maintain domain separation between the TN and NTN segments. 
+Any new solution(s) must be capable of addressing all such cases.    
+In addition, the solution should not be limited to a one-to-one relationship between TN and NTN segments, but should also 
+enable one-to-many relationships, for example to support the case where an MNO may have multiple SNO partners, and vice -
+versa the case where an SNO may have multiple MNO partners/customers, but also the case where multiple separate TN and 
+NTN segments exist within a single operator, as separate administrative domains.  
+The key requirements for the solution can thus be summarized as follows:  
+1) Allow interaction between TN and NTN segments in the same operator, assigned to a single administrative domain  
+2) Allow interaction between TN and NTN segments in the same operator, assigned to multiple separate administrative 
+domains 
+3) Allow interaction between TN and NTN segments in different operators and independent operator administrative 
+domains 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 14 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+4) Allow interaction between one TN segment and multiple NTN segments (in the same or different operator domains)  
+5) Allow interaction between one NTN segment and multiple TN segments (in the same or different operator domains)  
+6) Allow sharing of NTN radio cell coverage information from the NTN to the TN  
+7) Allow sharing of TN radio cell coverage information from the TN to the NTN  
+8) Allow sharing of cell configuration between the TN and NTN 
+9) Allow sharing of NTN satellite assistance information with the TN (e.g. in the form of satellite Ephemeris for 
+SIB19/SIB31) 
+10) Allow secure sharing of information between different operator trust domains  
+11) Allow dynamically-selective sharing of information across TN and NTN based on respective operator’s control  
+12) Allow advertisement of network capabilities  
+13) Allow requesting of NTN coverage to one or more target locations in 3D space and time  
+14) Allow requesting of NTN capacity to one or more existing target NTN coverage areas  
+15) Allow sharing of load information between networks 
+16) Allow sharing of UE capability information between networks 
+17) Allow sharing of QoS and Slice policy information between networks, including for specific UE to be prioritized (e.g. 
+list of UEs) 
+18) Allow sharing of information necessary to configuration of measurements for mobility between TN and NTN (in both 
+directions) 
+19) Allow triggering of measurements from the partner network (TN or NTN), e.g. in preparation for a mobility event  
+20) Allow triggering of mobility events for Idle and Connected mode mobility between TN and NTN (in both directions)  
+21) Allow sharing of acknowledgements and status information for previously advertised or requested capabilities  
+The requirements described above cannot be presently satisfied by any existing interface, architectural element or procedure in 
+the current 3GPP or O-RAN Architecture, at least for the case where the TN and NTN segment are operated by different 
+entities (e.g. different operators) or part of different administrative domains.   
+The O-RAN architecture and RIC/SMO complex, however, do offer a unique framework for management of radio coverage in 
+an operator domain, to complement the 3GPP specification and address challenges not addressed by 3GPP, and are either 
+already capable, or are expected to be capable (e.g. in the case of NTN) of accessing the required information in the respective 
+operator networks.  They therefore offer a unique opportunity to introduce a viable solution for TN -NTN radio network 
+coverage level inter-working and cooperation, if a suitable mechanism to enable communication between the TN and NTN 
+domains can be identified. 
+5.1.5.2  Proposed Solution: New TN-NTN Interface 
+In order to satisfy the requirements outlined above, for the scenario in which the TN and NTN segments are operated by 
+different operators, an MNO and an SNO respectively, or under otherwise different administrative domains, a potential 
+proposed solution is the introduction of a new and novel O-RAN interface or API between the two operator domains that is 
+suitably designed to cross the inter-operator domain trust boundary. 
+If we assume that both the TN and NTN are respectively adopting the O -RAN architecture and thus both have their own 
+respective Near/Non-RT RIC and SMO deployments, the new interface could be designed to exist between the MNO’s and 
+SNO’s respective Near/Non-RT RICs or SMOs, facilitating different levels of information sharing.  Such capability and 
+interface are not currently specified or contemplated by the O-RAN Architecture and Specifications, and therefore it is 
+identified as a gap.  Overall, this cross-operator mode of operation and interaction was not envisaged by 3GPP or the O -RAN 
+Alliance previously and would require investigation into how the O -RAN architecture may need to evolve, potentially with the 
+specification of one or more new interfaces. 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 15 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+After several discussions on at which layer should this new interface exist, and considerations for various candidate options , it 
+seems  that the most likely suitable approach may be to specify this interface between the Non-RT RICs or SMOs. However, 
+the possibility of supporting a new interface between the Near-RT RICs could also be considered and should be further studied 
+if the requirements for use cases demand it. 
+5.1.5.3  Impact to the O-RAN Architecture 
+This clause of the Technical Report outlines different architecture options for TN -NTN interworking depending on whether the 
+two segments are operated by the same or a different operator (or different administrative entities within the same operator) , 
+and considers as a solution the specification of at least a new interface between an NTN Non -RT RIC or SMO and a TN Non-
+RT RIC or SMO, at least for the case where TN and NTN segment are operated by different entities.  
+The impact can thus be summarized as follows: 
+- Case 1 (TN and NTN operated by different entities): Introduction of a new East/West API interface or service 
+between Non-RT RICs or SMOs of the two operators. 
+- Case 2 (TN and NTN operated by the same entity): Reuse of the existing A1 interface reference point and 
+augmentation of the A1 and the RIC/SMO layer with procedures and information relating to TN -NTN information 
+sharing. 
+For the scenario in which the TN and NTN segment are operated by different operators, an MNO and an SNO respectively, or 
+part of different administrative domains, a potential proposed solution is to introduce a new East/West API interface or serv ice 
+between the SNO’s NTN Non-RT RIC and the MNO’s TN Non-RT RIC. Via such interface, the TN Non-RT RIC and the 
+NTN Non-RT RIC could exchange information regarding the respective coverage areas as well as other information as 
+required for mobility and service continuity procedures.  
+Figure 5.1.5.3-1, below, depicts the aforementioned topology in an inter-operator scenario, which sees separate TN and NTN 
+network segments operated by different operators (e.g. an MNO and an SNO respectively), and highlights the potential new 
+interface reference point between Non-RT RICs of the two operators. It is important to note that today some control and 
+management functions may still be supported outside of the O-RAN architecture framework as they are not currently covered 
+by any O-RAN function and are opaque to the O-RAN architecture.  These have been represented in the figure below as “Non -
+O-RAN NTN Functions” and are currently outside of the scope of O-RAN and of this Technical Report.  Similarly then, the 
+interface between the Non-O-RAN NTN Functions and NTN gNB is currently a bespoke interface, which is also outside of the 
+scope of O-RAN and of this Technical Report.   
+ 
+Figure 5.1.5.3-1: Topology of inter-operator scenario 
+For the case in which the TN and NTN segment are operated by the same operating entity, the existing architecture and 
+interfaces could be reused, whereby a single Non-RT RIC and SMO may exist and assume the responsibility of managing both 
+the TN and NTN segments of the network.   
+
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 16 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+The existing mechanisms of interaction between the Non-RT RIC and the Near-RT RIC via the A1 interface could in principle 
+thus be reused, with the assumption that the operator’s Non-RT RIC would have multiple A1 interface associations with one or 
+more TN Near-RT RICs, as well as one or more NTN Near-RT RICs. The common Non-RT RIC could then supply 
+information to both the TN and NTN Near-RT RICs in the shape of A1 policies or enrichment information, with appropriate 
+extensions to the standardized data types, yet to be determined. 
+Figure 5.1.5.3-2, below, depicts the aforementioned topology where both TN and NTN segments are operated by the same 
+operator (e.g. either an MNO with an NTN component, or an SNO with a TN component). The topology of both TN and NTN 
+segments follows the existing O-RAN architecture and reuses the existing O-RAN interfaces, such as the A1 reference point. 
+Similarly to the inter-operator case, it is expected that today some control and management functions may still be supported 
+outside of the O-RAN architecture framework as they are not currently covered by any O-RAN function and are opaque to the 
+O-RAN architecture. These have been represented in the figure below as “Non-O-RAN NTN Functions” and are currently 
+outside of the scope of O-RAN and of this Technical Report. Similarly then, the interface between the Non-O-RAN NTN 
+Functions and NTN gNB is currently a bespoke interface, which is also outside of the scope of O -RAN and of this Technical 
+Report. 
+ 
+Figure 5.1.5.3-2: Topology of single operator scenario 
+5.1.5.4  Benefits 
+There are several benefits to this new proposed interaction, some of which have been captured in the Use Cases of the Use 
+Case Group 1, and include the enablement of TN to NTN and NTN to TN mobility and service continuity scenarios, such as 
+reselection and handover between the TN and the NTN and vice-versa, the enablement of the ability to request NTN coverage 
+in a number of operator scenarios, as well as opportunities for higher levels of optimization, for example in how coverage is  
+provided between the TN and NTN segment, and in ensuring truly complementary and mutually-beneficial and optimal 
+coverage between the TN and NTN segments. 
+5.2 Use Case Group 2: Intra-NTN Mobility Use Cases 
+5.2.1  Overview 
+This clause describes use cases applicable within the NTN, in particular, use cases related to aspects of mobility and intra-system 
+service continuity. Mobility events in an NTN constellation may be driven by a number of factors and impairments that are 
+specific to NTNs, in addition to typical UE mobility requirements, such as satellite (i.e. network node) mobility as well as delay 
+and Doppler, spectrum and power constraints and others such as line -of-sight.   
+The following are some examples of key mobility scenarios that can be expected in an NTN system: 
+
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 17 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+• Feeder link management (e.g. switching, load balancing, etc) 
+• Satellite mobility 
+• Satellite load balancing and selection  
+• UE Mobility 
+• Inter-satellite Link (ISL) mobility 
+3GPP Releases 17, 18 and 19 introduced new procedures specifically to address NR -NTN and IoT NTN mobility management, 
+that are designed to take into account such NTN -specific impairments and influencing factors.  However, whilst the procedures 
+are specified in detail in the 3GPP specification, their actual implementation and the full implications from a network architecture 
+and implementation are not stipulated and are instead left up to operator and/or vendor implementation choice.   
+This chapter analyses a number of mobility use cases that fall in the categories listed above and that leverage existing 3GPP  
+procedures as of Release 18, within the context of the O -RAN architecture as a possible implementation, in a bid to efficiently 
+allocate the limited resources of the NTN system whilst maintaining and maximizing fulfilment of user service requirements.  
+Lastly, an initial assessment of the possible impact of the introduction of such use cases to the O -RAN architecture and 
+specifications is made. 
+5.2.2  Use Case 2-1: Connected mode NTN inter-gNB handover (HO) due to 
+Satellite mobility 
+5.2.2.1  Use Case Description 
+This use case covers the use of an NTN near -RT RIC and xApps to optimize the implementation of inter -satellite inter-gNB 
+Connected Mode Handover (HO) within an NTN Non -Geostationary Orbit (NGSO) constellation, exemplified by a Low Earth 
+Orbit (LEO) constellation, driven by satellite mobility. This use case is in principle formulated in a way that is largely ag nostic 
+of the NTN gNB architecture (e.g. Transparent vs Regenerative).  In this scenario, users are assumed to be practically stationary 
+or slow moving (e.g. handheld), and the mobility events are driven by satellite motion.  This scenario use case description 
+assumes Earth-fixed cells (EFC) or quasi-Earth-fixed cells (QEFC), but is applicable also to Earth-moving cells (EMC).  
+Many upcoming 5G NTN constellations will be deployed in Low Earth Orbit, where a significant number of satellites are needed 
+in order to achieve ubiquitous global coverage. LEO constellations are highly-mobile, and as such UEs may experience frequent 
+handovers from one satellite to the next.  
+In addition, in dense constellations, multiple candidate satellites may be able to serve a given coverage area, introducing the need 
+for the network to select the appropriate target satellite to serve the incoming users. This could be influenced by a numbe r of 
+factors, such as feeder link availability, expected satellite visibility period, maximum number of concurrent beams, on -board 
+power limitations, UE TX power and antenna gain, line of sight, spectrum constraints and more.  
+ 
+Figure 5.2.2.1-1: Example network scenario with 4 satellites from a Walker Delta formation (left) and 
+snapshot of the moment where HO opportunity is available with 4 satellites in view (right) 
+The example scenario in Figure 5.2.2.1-1 shows part of an NTN LEO Walker Delta constellation with four satellites in view, 
+two of which co -planar and two cross -planar. The projected satellite orbital trajectories are shown in cyan. As a simplifying 
+
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 18 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+assumption, each satellite is associated with a single feeder link (shown in dotted green) to a given gateway (represented by  red 
+dots associated to the green dotted lines) and a single gNB broadcasting a single PCI.  Feeder link mobility is thus not considered 
+for the sake of simplicity. This allows this use case to focus on user link mobility, and makes the scenario applicable to bo th 
+Transparent and Regenerative architectures. 
+Co-planar satellites are numbered with the same most -significant digit, whereas cross -planar satellites are assigned a different 
+most-significant digit. 
+A UE located in Spain is currently served by satellite 11, which forms the user link to the UE (in yellow) and is supported b y a 
+feeder link (in green) to a ground station in central Italy. As shown by the orbital trajectory, in some time, satellite 11 w ill be 
+approaching the end of its viable service time for the target UE (e.g. due to low elevation, scan angle or link budget). 
+Simultaneously, the remaining three satellites 12, 21 and 31 will approach the UE coverage area and become eligible to place a 
+beam (and a cell) in the UE’s location, and they therefore offer potentially viable candidate handover opportunities. Figure 
+5.2.2.1-1 shows the possible candidate satellites and UE service links at the instant in which all satellites are in principle eligible 
+to serve the coverage area. 
+An NTN Near-RT RIC and an associated NTN xApp could be tasked with taking all the various factors into account and driving 
+the decision of which of the 3 available candidate handover satellites should start serving the UE once its currently serving  
+satellite becomes unsuitable. 
+In addition, the previously mentioned power and spectrum constraints present a further optimization opportunity to the networ k 
+and xApp: for example one of the available satellites could deliver the requested level of service to the UE while consuming 
+fewer resources than another satellite. Lastly, in a scenario with several UEs in a given coverage area, the RIC and xApp must 
+make a handover decision that accounts for the requirements and conditions of all the users in the coverage area, which may 
+create the need for trade-off decisions. 
+5.2.2.2  Problem statement and challenges 
+The first part of the problem statement is relatively trivial.  In order to support NR NTN scenarios aligned with 3GPP Releas e 
+17 and above, the Near-RT RIC and xApp must be able to configure the required NTN-specific measurement configurations, as 
+well as the necessary handover triggers. 
+In Release 17, a new SSB Measurement Timing Configuration (SMTC) specific to NR NTN, namely SMTC4 ( SSB-MTC4List-
+r17), has been introduced.  In addition, the NTN cells must be able to broadcast Satellite Assistance information, in particular  
+Satellite Ephemeris, in the form of SIB19, containing serving and neighbor satellite and cell information.  Furthermore, in order 
+to trigger a HO, the gNB must be able to include specific SIB19 content in the HO triggers.  
+This implicitly requires the NTN Near -RT RIC and xApp(s) to be aware of the constellation Ephemeris, the serving and target 
+satellite timing information, as well have the ability to deliver the necessary configurations to the O -CU/DU. 
+The second aspect of the problem is related to coordination of the HO across multiple satellites (and cells, potentially gNBs ), in 
+order to hand the UE over to the best satellite.   
+Several criteria and KPIs may be taken into account to select the best target satellite, and, depending on the service requirements 
+set by the SNO, the NTN RIC may have to either privilege one or more specific KPIs at the expense of others, or to perform a  
+multi-constraint evaluation by ensuring adequate and balanced satisfaction of several different KPIs at once.  
+In terrestrial networks, assessment of handover opportunities is almost entirely focused on KPIs affecting the user link, and  
+would typically be driven by UE measuring the SSBs of relevant neighbour cells, and then the gNB or Near-RT RIC monitoring 
+for SMTC-configured measurement events where the quality on a neighbour cell signal would exceed a given threshold, while 
+that of the serving cell would drop below another threshold, such as is the case in the A3 event. Measurement reporting, base d 
+on SSBs but also CSI-RS, is also very important for channel estimation in terrestrial networks to aid link adaptation, primarily 
+due to urban deployments where the various channel state and effects of multi-path propagation are highly and frequently variable 
+and difficult to predict, except perhaps at the cell edge. In NTN deployments, on the other hand, limited multipath effects due to 
+focus on outdoor environments, and the predictable movement of the satellite in the sky coupled with accurate weather forecas t 
+data make it such that the user link channel state by itself is much more steady and predictable, driven mostly by satellite motion, 
+and can thus be quite reliably modelled and estimated. The overall link and HO candidate selection is, however, on the other 
+hand, affected by a number of other factors, many of which are completely opaque to the gNB and cannot be addressed with 
+measurements.  
+Some examples include:  
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 19 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+● Ability to sustain the link vector for the duration of the satellite pass (or UE call flow) - influenced by a number of 
+factors including feeder link availability 
+● Available on-board battery power  
+● Overall network load balancing goals 
+● Cleanest channel, and thus best achievable MCS 
+● Feeder link availability - e.g. due to weather or other system constraints such as antenna field of regard and LoS to the 
+satellite. 
+● Line of sight (LoS) on the user link (but not only) 
+Feeder link availability is a particularly interesting example as it is chiefly important in transparent NTN deployments wher e, 
+even in FR1 user link systems, the NR -Uu waveform has to traverse also the feeder link between the satellite and the ground 
+station, which often utilises higher frequencies (e.g Ku, Ka -, Q- or V-band) that are notably susceptible to weather attenuation, 
+and which makes it such that the feeder link directly impacts the NR-Uu user link radio interface. The feeder link behavior is not 
+specified in 3GPP, this effectively makes it opaque to the gNB. In addition, due to the dynamic nature of the system and of t he 
+external effects (e.g. weather) that might intervene, the impact to the NR-Uu user link introduced by the feeder link might not be 
+completely known in advance by any of the individual gNBs at the moment of handover, due to the fact that a feeder link might  
+not even have been established yet.    
+ Continuous satellite movement also makes it such that the channel quality is, albeit predictably, always continually and steadily 
+changing, driven effectively by gNB motion, unlike in terrestrial networks where, if the UE is stationary, the base station i s in 
+most cases static. 
+Not only might the different satellites and their respective feeder and user link vectors, propagating through variable weath er 
+and atmospheric conditions, result in varying channel qualities and therefore attainable MCS regimes, but they can also result in 
+varying viable service times before either the user link or the service link becomes unsustainable, due to factors such as Line-of-
+Sight (LoS) or minimum elevation angles due to field-of-view (FoV) and obstructions.  
+Thus, serving or neighbour cell signal measurements prior to the handover can by themselves be at least partially misleading in 
+NTN, since they do not indicate much about either the end-to-end channel quality including the feeder link and the satellite itself 
+(e.g. on transparent systems), channel state evolution throughout the satellite pass, or future vectors between each satellit e and 
+the UEs being served, or expected to be served in the future (e.g. impacted by LoS effects, such as mountain ranges which might 
+block LoS from a given area and UEs or feeder links to a given satellite at any future point of the service pass).  For examp le, 
+for Satellite 31 in Figure 5.2.2.1-1, a feeder link is formed with a ground station in the Azores. As the satellite propagates due 
+North-East, it may witness its current ground station fall out of view before the UE does, thus requiring a feeder link handover.  
+While feeder link is not a 3GP P-specified element of the network, mobility procedures associated with it may still  require 
+intervention from the RAN, and, depending on network implementation, may potentially result in an L3 Handover as well for 
+the UE, leading to potential service discontinuity and signaling overhead.  
+Furthermore, since the NTN link is often more constrained compared to a terrestrial link, an excessive reliance on user link 
+signalling and UE measurement reports may create significant overhead on the link, negatively affecting user throughput and 
+system capacity. 
+This introduces the need for intervention, and opportunity for optimization, from an external control plane that has awareness of 
+the satellite constellation, its sub-components and its evolution, and is thus capable of predicting the behaviour of both the  user 
+links and their channel state across multiple satellites throughout their motion, as well as the impact of components of the system 
+that are outside of the scope of any individual gNB, such, in this example, other gNBs, other satellites or NTN servic e nodes, or 
+any of the gateway feeder links. In addition, to account for events in the future impacting links that have not come into existence 
+yet, there might be a need for the NTN control plane to be able to be spatially -aware, in addition to it being t emporally-aware, 
+to propagate predict where the NTN service nodes (e.g. satellites, but not only) might be at any future point in time and whi ch 
+links they might be able to form. 
+5.2.2.3  Proposed Solution 
+A possible solution could be leveraging the NTN RIC, either as a combination of the Near -RT and the Non-RT RIC, or via the 
+Near-RT RIC alone, with the introduction of a new control loop provided by one or more NTN xApp(s). Such xApps would 
+leverage the holistic view of the satellite network provided by the NTN RIC, combined with predictive capabilities, to produce 
+handover decisions which take into account multiple concurring factors, as well as reducing the reliance on signal measurements 
+and reporting.  
+The NTN RIC and xApp(s)/rApps are configured with a digital twin of the NTN network, including, not only the 3GPP RAN 
+segment, but also the NTN ground  and space segments (e.g. the gateways, the feeder links, the satellites, etc) via which the NTN 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 20 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+service is delivered, even though some of these elements are presently not within the scope or control of the existing O -RAN 
+reference framework.  
+It is assumed that the NTN RIC may be capable of predicting NTN network node state, motion, trajectory (e.g. orbit) and 
+behaviour in time and space. It is also assumed that the NTN RIC may be able to ingest external data sources, such as, but no t 
+limited to, weather data, to predict impact of external events on the active or candidate links, in order to aid the control loop 
+affecting handover decisions.   
+By knowing the predictable orbital movement of the candidate satellites , their association with ground stations and feeder links, 
+the relatively static position (compared to the satellites) of UE or groups of UE in a given target coverage area (e.g. cell or cell 
+portion) and the impact of weather effects, an NTN xApp could drive the decision of which satellite to hand over the UE to by  
+modelling the candidate link vectors which could be formed and sustained until the need for the next handover, and aiming to 
+choose the one that satisfies the appropriate combination of constraints. The use of prediction can be considered a supplemen t 
+to, not a replacement of the evaluation of UE measurement reports. 
+ 
+Table 5.2.2.3-1: NTN handover management 
+Use Case Stage Detailed Information 
+Goal 
+Find best handover candidate satellites/cells for a UE to address impact of satellite motion and 
+constellation evolution, while considering a number of diverse constraints and dependencies 
+not directly visible through measurments, and trigger a Connedted Mode Handover (HO). 
+Actors and Roles NTN xApp, Near-RT RIC, E2 Nodes, UE. 
+Assumptions All relevant functions and components are instantiated. The NTN RIC is aware of the sate and 
+motion of the constellation and is capable of predicting its evolution in time and space. 
+Pre-conditions E2 interface connectivity is established, UE is in active RRC Connected Mode state to a given 
+serving satellite (e.g. Satellite 11) 
+Step 1 (M) 
+NTN Handover Optimization xApp/Near -RT RIC subscribes to UE information change and 
+message copy of UE mobility from E2 Nodes to understand the state of the network and the 
+UEs within it. 
+Step 2 (M) 
+NTN Handover Optimization xApp/Near -RT RIC requests to the E2 Nodes for the UEs to 
+perform measurements of both serving and visible candidate target cells across satellites, and 
+configure in the E2 Nodes UE information change and message copy of UE mobilit y to be 
+reported back to the NTN Handover Optimization xApp /Near-RT RIC. 
+Step 3 (M) 
+E2 Nodes configure target measurements to UEs and UEs perform measurements and monitor 
+for configured measurement events, upon which they signal a measurement report to the 
+serving NTN E2 Node 
+Step 4 (M) NTN E2 Nodes forward the measurement report to NTN Handover Optimization xApp/Near-RT 
+RIC 
+Step 5 (M) 
+xApp with digital twin analyses the currently employed Ground Station and transparent LEO 
+satellite to derive the remaining service time before a handover must occur. It also evaluates 
+the candidate handover opportunities via available neighbouring satelli tes and feeder links to 
+model the link performances attainable during the service times that they could respectively 
+offer to the UE, and compares them with the results of the measurement reports.   
+Its output is a selection of the neighbour satellite/cell which is best positioned to serve the UEs 
+in the target coverage area. 
+Step 6 (M) 
+NTN Handover Optimization xApp/Near -RT RIC signals to NTN E2 Node to establish the 
+correct handover control to the target UEs, to the selected target satellites, including the correct 
+SIB19 contents (e.g. Ephemeris) for the respective target satellites to be included in the HO 
+request message by the E2 Node. 
+Step 7 (M) NTN E2 Node implements RRC Connected Mode handover as specified by NTN Handover 
+Optimization xApp/Near-RT RIC 
+ 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 21 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+@startuml handover optimization  
+title NTN Handover Optimization Use Case  
+Skin rose  
+skinparam sequenceMessageAlign left  
+skinparam ParticipantPadding 5  
+skinparam BoxPadding 10  
+skinparam defaultFontSize 12  
+  
+box "NTN Segment" #cyan  
+participant "NTN HO Optimization xApp/Near-RT RIC" as xappnearrtric  
+participant "NTN E2 Nodes" as e2nodes  
+end box  
+  
+autonumber  
+  
+group #White NTN Handover Optimization xApp/Near-RT RIC collect RAN metrics  
+xappnearrtric -> e2nodes: <E2> Subscribe to UE information change and message copy of measurement 
+reports 
+e2nodes -> xappnearrtric: <E2> Report UE information change and message copy of measurements 
+events  
+end group  
+ 
+group #White NTN Handover Optimization xApp/Near -RT RIC establish signal measurement and 
+reporting config for candidate handover opportunities 
+xappnearrtric -> e2nodes: <E2> Set up signal measurement and reporting configuration per-UE/per-
+cell  
+note over e2nodes: Configure measurement control for candidate serving satellites/cells and\nUE 
+report measurement result of candidate serving satellites/cells to E2 nodes 
+e2nodes -> xappnearrtric: <E2> Report the measurement result  
+end group  
+ 
+note over xappnearrtric  
+xApp with digital twin analyses the currently employed  
+Ground Station and transparent LEO satellite to derive  
+the remaining service time before a handover must occur.  
+It also evaluates the candidate handover opportunities  
+via available neighbouring satellites and feeder links  
+to model the link performances attainable during the service  
+times that they could respectively offer to the UE, and  
+compares them with the results of the measurement reports.   
+Its output is a selection of the neighbour satellite/cell  
+which is best positioned to serve the UEs in the  
+target coverage area. 
+end note  
+ 
+note over xappnearrtric : xApp derives decision to handover\nUE to Neighboring X LEO, served\nby 
+Neighboring X gNB/NTN GW 
+ 
+xappnearrtric -> e2nodes: <E2> Per -UE network-initiated HO configuration, inclusive of SIB19 
+satellite assistance information 
+note over e2nodes: Network initiated handover 
+  
+@enduml 
+ 
+ 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 22 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+ 
+Figure 5.2.2.3-1: UML chart of NTN handover management 
+5.2.2.4  Benefits 
+The first and main benefit is the introduction of support of Release 17+ NR NTN network-controlled Handover (HO) from RRC 
+Connected Mode, including support for NTN -specific satellite assistance information in the HO request/trigger, which is 
+presently not supported by the O-RAN specifications. 
+The second benefit, achieved by the introduction of an NTN RIC (Near/Non -RT RIC) that is aware of the dynamic topology, 
+physics and evolution of the constellation, and is capable of predicting its behaviour, is a potentially significant reductio n of 
+the signalling overhead, as well as a reduction of the potential for handover failures or sub -optimal handovers, leading to an 
+improved service experience, as well as overall improved efficiency of the network by reduction of the resources consumed to 
+support a mobility event. 
+5.2.2.5  Impact on O-RAN WGs 
+The use case brings an intelligent NTN handover management approach to O -RAN, which also utilizes information that is not 
+natively exposed by the O -RAN interfaces (information owing to the non -3GPP components of an NTN constellation, and the 
+constellation’s own dynamic evolution.  
+There is a need to support the configuration of the previously described new measurement configurations specific to NR NTN 
+introduced in Release 17, such as the new SSB Measurement Timing Configuration (SMTC) or SMTC4 ( SSB-MTC4List-r17).  
+In addition, the NTN cells must be able to broadcast Satellite Assistance information, in particular Satellite Ephemeris, in the 
+form of SIB19, containing serving and neighbor satellite and cell information.  Furthermore, in order to trigger a HO, the gNB 
+must be able to include specific SIB19 content in the HO triggers. 
+These could be implemented by extending the existing support for measConfig and configuration of HO that is found in E2 
+Service Model RAN Control, as well as investigating new mechanisms either via E2 or O1 to deliver SIB19 information to 
+gNB from the RIC/SMO. 
+5.2.3 Use Case 2-2: NTN QoS-based inter-cell traffic steering and load balancing 
+5.2.3.1  Use Case description 
+Void. 
+
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 23 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+5.2.3.2 Problem statement and challenges 
+Void. 
+5.2.3.3 Proposed Solution 
+Void. 
+5.2.3.4 Benefits 
+Void. 
+5.2.3.5 Impact on O-RAN WGs 
+Void. 
+5.2.4 Use Case 2-3: NTN Time-based and Distance-based Conditional Handover 
+(CHO) 
+ 
+5.2.4.1 Use Case Description 
+Void. 
+5.2.4.3 Problem Statement and challenges 
+Void. 
+5.2.4.4 Proposed Solution 
+Void. 
+5.2.4.5 Benefits 
+Void. 
+5.2.4.6 Impact on O-RAN WGs 
+Void. 
+5.2.5 Use Case 2-4: NTN Idle mode cell re-selection  
+5.2.5.1 Use Case Description 
+Void. 
+5.2.5.3 Problem Statement and challenges 
+Void. 
+5.2.5.4 Proposed Solution 
+Void. 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 24 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+5.2.5.5 Benefits 
+Void. 
+5.2.5.6 Impact on O-RAN WGs 
+Void. 
+5.2.6 Use Case 2-5: NTN UE Location-aware Connected Mode Handover and Inter-
+cell Traffic Steering and Load-balancing 
+5.2.6.1 Use Case description 
+Void. 
+5.2.6.2 Problem statement and challenges 
+Void. 
+5.2.6.3 Proposed Solution 
+Void. 
+5.2.6.4 Benefits 
+Void. 
+5.2.6.5 Impact on O-RAN WGs 
+Void. 
+6 Summary and Conclusion 
+Void 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this document. 25 
+ 
+O-RAN.WG1.TR.RIC4NTN-R004-v01.00 
+Annex: 
+Change history/Change request (history) 
+Date Revision Description 
+2024.12.12 00.00.03 Initial TR skeleton 
+2025.02.24 00.00.04 • Add introduction and NTN development status in standard organizations 
+• The following CRs have been implemented: 
+1) KEY, AAL - CR 0001 – Introduction - v2 
+2) KEY, AAL, FRN – CR 0002 - NTN development status in standard organizations 
+- v3 
+2025.06.17 00.00.05 • Introduction of initial Use Case Group 2 set 
+• The following CRs have been implemented:  
+1) AAL, KEY, RAD – CR 0004 - Introduction of Use Case Group 2 - 
+v0.6_NOK_AAL 
+2025.06.18 00.00.06 • Update clause 1-3 and change history 
+• introduction of Use Case Group 1, the following CRs have been implemented: 
+1) KEY, AAL – CR 0005 - fix clause 1-3 and change history - v3 
+2) AAL, KEY, RMI, MTR – CR 0003 - Introduction of Use Case Group 1-
+v0.12_AtMeeting 
+2025.06.30 00.00.08 • Updates to the overall TR 
+• Corrections to image references after first round of comments. 
+2025.07.09 00.00.09 Editorial and formatting for first release 
+2025.07.21 00.00.10 • Implementation of voting round editorial comments 
+• Addition of CR references to the Change history/Change request (history)  
+2025.07.22 01.00 First formal release 
+ 

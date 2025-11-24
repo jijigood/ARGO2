@@ -5,6 +5,7 @@ import argparse
 import logging
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence
+import zipfile
 
 from pypdf import PdfReader
 from docx import Document  # type: ignore
@@ -12,7 +13,7 @@ from docx import Document  # type: ignore
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_SOURCE_EXTS = {".pdf", ".docx"}
+SUPPORTED_SOURCE_EXTS = {".pdf", ".docx", ".yang", ".zip"}
 TEXT_SUFFIX = ".txt"
 
 
@@ -46,12 +47,36 @@ def _extract_docx_text(path: Path) -> str:
     return "\n".join(p for p in paragraphs if p)
 
 
+def _extract_yang_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8", errors="ignore")
+
+
+def _extract_zip_text(path: Path) -> str:
+    texts: List[str] = []
+    with zipfile.ZipFile(path) as archive:
+        for member in archive.namelist():
+            member_lower = member.lower()
+            if member_lower.endswith(".yang") or member_lower.endswith(".txt"):
+                with archive.open(member) as file_obj:
+                    try:
+                        data = file_obj.read().decode("utf-8", errors="ignore")
+                    except Exception:
+                        data = ""
+                if data.strip():
+                    texts.append(f"// File: {member}\n{data}")
+    return "\n\n".join(texts)
+
+
 def extract_text(path: Path) -> str:
     suffix = path.suffix.lower()
     if suffix == ".pdf":
         return _extract_pdf_text(path)
     if suffix == ".docx":
         return _extract_docx_text(path)
+    if suffix == ".yang":
+        return _extract_yang_text(path)
+    if suffix == ".zip":
+        return _extract_zip_text(path)
     raise ValueError(f"Unsupported file extension for extraction: {suffix}")
 
 
@@ -107,7 +132,7 @@ def convert_documents_to_text(
             skipped.append(entry.name)
             continue
 
-        target_path.write_text(text, encoding="utf-8")
+        target_path.write_bytes(text.encode("utf-8", errors="ignore"))
         converted.append(target_path)
 
     if skipped:

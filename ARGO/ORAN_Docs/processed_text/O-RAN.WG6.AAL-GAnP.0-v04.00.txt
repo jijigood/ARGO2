@@ -1,0 +1,751 @@
+O-RAN.WG6.AAL-GAnP.0-v04.00
+Technical Specification
+O-RAN Working Group 6
+(Cloudification and Orchestration Work Group)
+O-RAN Acceleration Abstraction Layer
+General Aspects and Principles
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+Contents
+Table of Figures
+Figure 2.1 Example illustration of the effect of hardware acceleration on functional compute performance	10
+Figure 2.2 High Level AAL Architecture Diagram	11
+Figure 2.3 AAL Component Relationship and Cardinality	12
+Figure 2.4 Accelerator APIs/Libraries in Container and Virtual Machine Implementations	12
+Figure 2.5 AAL Specification Scope	13
+Figure 2.6. Logical Representation of AAL application interface support for multiple AAL-LPUs	14
+Figure 2.7. AAL application interface look-aside acceleration model	15
+Figure 2.8. AAL application interface inline acceleration model	15
+Figure 2.9. User plane dataflow paths in look-aside and inline acceleration architectures.	16
+Figure 3.1 AAL Interface categories	19
+Figure 3.2 AAL Application Common and profile APIs	20
+Figure 4.1 Basic mapping of AAL-LPU to O-RAN Cloudified NF	21
+Figure 4.2 multiple application support by a single HW accelerator	22
+Figure 4.3 multiple HW accelerators assigned to a single application	23
+Figure 4.4 AAL-LPU mapping showing multiple AAL Queue support	23
+Figure 4.5 AAL-LPU Mapping example showing multi-function support	24
+Figure 4.6 Example AAL-LPU and profile supported	25
+Figure 4.7 Example HW Accelerator configuration	26
+Figure 4.8 Example assignment of AAL-LPUs and supported profiles to POD	26
+Figure 4.9 Example Application configured AAL-Profile-Instances	27
+Figure 5.1 O-DU PHY processing blocks for 5G NR Downlink	28
+Figure 5.2 O-DU PHY processing blocks for 5G NR Uplink	30
+Figure 5.3 O-DU PHY processing blocks for mMTC Downlink	33
+Figure 5.4 O-DU PHY processing blocks for mMTC Uplink	35
+Figure 5.5 AAL_MU-MIMO_PRECODER_WEIGHTS_CALC	37
+Figure 5.6 Example AAL_MU-MIMO_PRECODER_WEIGHTS_CALC use	37
+Figure 5.7 AAL_PDSCH_FEC Profile	38
+Figure 5.8 AAL_PDSCH_HIGH-PHY Profile	39
+Figure 5.9 AAL_PDCCH_HIGH-PHY Profile	40
+Figure 5.10 AAL_PBCH_HIGH-PHY Profile	41
+Figure 5.11 AAL_CSI-RS_HIGH-PHY Profile	42
+Figure 5.12 AAL_PT-RS-DL_HIGH-PHY Profile	43
+Figure 5.13 AAL_DOWNLINK_ HIGH-PHY Profile	44
+Figure 5.14 AAL_PUSCH_FEC Profile	45
+Figure 5.15 AAL_PUSCH_HIGH-PHY Profile	46
+Figure 5.16 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 0)	47
+Figure 5.17 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 1)	48
+Figure 5.18 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 2/3/4)	49
+Figure 5.19 AAL_PRACH_HIGH-PHY Profile	50
+Figure 5.20 AAL_SRS_HIGH-PHY Profile	51
+Figure 5.21 AAL_PT-RS-UL_HIGH-PHY profile	52
+Figure 5.22 AAL_UPLINK_ HIGH-PHY Profile	53
+Figure 5.23 AAL_NPDSCH_FEC Profile	54
+Figure 5.24 AAL_NPDCCH_FEC Profile	55
+Figure 5.25 AAL_NPBCH_FEC Profile	56
+Figure 5.26 AAL_NPUSCH_FEC Profile	57
+Introduction
+Scope of this document
+This Technical Specification has been produced by the O-RAN.org.
+The contents of the present document are subject to continuing work within O-RAN WG6 and may change following formal O-RAN approval. Should the O-RAN.org modify the contents of the present document, it will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version number as follows:
+Release x.y.z
+where:
+x	the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+This document defines O-RAN O-Cloud hardware accelerator interface functions and protocols for the O-RAN AAL interface. The document studies the functions conveyed over the interface, including configuration and management functions, procedures, operations and corresponding solutions, and identifies existing standards and industry work that can serve as a basis for O-RAN work.
+References
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+-	References are either specific (identified by date of publication, edition number, version number, etc.) or non-specific.
+-	For a specific reference, subsequent revisions do not apply.
+-	For a non-specific reference, the latest version applies.
+For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including a GSM document), a non-specific reference implicitly refers to the latest version of that document in Release 15.
+O-RAN WG1 Architecture Description
+O-RAN WG1 OAM Architecture
+O-RAN WG6 Cloud Architecture and Deployment Scenarios
+ETSI GS NFV-IFA 002 v2.4.1 NFV Acceleration Technologies; VNF Interfaces Specification
+ETSI GS NFV-IFA 019 NFV Acceleration Technologies; Acceleration Resource Management Interface Specification
+5G; NR; Physical Channels and Modulation 3GPP TS 38.211 v15.2.0 Release 15
+5G; NR; Multiplexing and Channel Coding 3GPP TS 38.212 v15.2.0 Release 15
+LTE; E-UTRA Physical Channels and Modulation 3GPP TS 36.211 v15.2.0 Release 15
+LTE; E-UTRA Multiplexing and Channel Coding 3GPP TS36.212 v15.2.1 Release 15
+ETSI_GS_NFV-IFA_004 NFV Acceleration Technologies; Management Aspects Specification
+Vocabulary for 3GPP Specifications (TR21.905)
+O-RAN WG6 O2 General Aspects and Principles
+O-RAN WG6 Cloudification and Orchestration Use Cases and Requirements for O-RAN Virtualized RAN
+Definitions and Abbreviations
+Definitions
+For the purpose of this document the terms and definitions given in O-RAN WG6 Cloudification and Orchestration Use Cases and Requirements for O-RAN Virtualized RAN [13], ETSI GS NFV-IFA 002 [4], ETSI GS NFV-IFA 004 [10] and the following apply:
+Hardware (HW) Accelerator is a specialized HW implementation that can offloaded processing from application(s) running on General-Purpose Processor. The Hardware (HW) Accelerator is a physical Managed Element as defined in [13].
+NOTE 1: Examples of Hardware Accelerators include ASIC, FPGA, DSP and GPU.
+NOTE 2: Throughout this document, the term “Accelerator” and “Hardware (HW) accelerator” are used interchangeably.
+Acceleration Abstraction Layer (AAL) specifies a common and consistent set of interfaces used by different types of HW accelerators within an O-Cloud instance.
+AAL Implementation is a realization of an AAL including but not limited to the software libraries, drivers and Hardware Accelerator
+NOTE: The O-RAN AAL specifications do not preclude AAL implementations to be fully or partially SW based.
+Accelerated Function (AF) is a representation of a workload building block that an accelerator processes on behalf of an application within an O-RAN Cloudified Network Function
+AAL Profile specifies a set of Accelerated Functions that an accelerator processes on behalf of an application within an O-RAN Cloudified Network Function.
+AAL Operations Actions supported by the AAL interface.
+AAL Profile Instance is an executing instance of an AAL profile that can be used by an application via the AAL interface. The AAL-Profile-Instance executes within an AAL-LPU execution environment.
+AAL Logical Processing Unit (AAL-LPU) is a logical representation of resources within an instance of a HW Accelerator (example: there can be multiple processing units or subsystems on a hardware accelerator, or resource partitioning (hard – dedicated resources, soft – soft resources) and these can be logically represented as a AAL Logical Processing Unit)
+An AAL-LPU maps to a single HW Accelerator. An AAL-LPU can be identified uniquely within a HW Accelerator.
+A HW Accelerator may support 1 to N AAL-LPU’s
+Each AAL-LPU shares the resources of the associated HW Accelerator with other AAL-LPU(s) mapped to the same HW Accelerator. AAL-LPU can also represent a hard partition of the HW accelerator where resources are dedicated to the partition.
+Mapping of HW Accelerator resources to AAL-LPU shall be configurable from O2 interface
+An AAL-LPU may support more than one AAL profile. For each supported AAL profile, an AAL-LPU may execute 0 to N AAL-Profile-Instances.
+An AAL-LPU can provide service to 0 or more Application. (For the first release we are assuming that AAL-LPU cannot span multiple applications).
+AAL-LPU is a virtual Managed Element as defined in [13].
+AAL Queue is part of specific AAL profile API’s and is defined as an abstract construct that is used by the application to group operations together and may access specific resources (compute, I/O) of an AAL-LPU supporting specific AAL profile(s).
+From the application point of view, each AAL-LPU supporting specific AAL profiles(s) consists of one or more AAL queues
+While an AAL-LPU may support multiple AAL profiles, an AAL queue supports only one type of AAL profile
+AAL Queue optionally also supports priority, allowing the application/network function to schedule jobs of different priorities to the AAL-LPU
+NOTE:
+An AAL queue can be used by an application/network function to share AAL-LPU resources between threads/cores belonging to the same process address space
+An application/network function may use multiple AAL queues to access different AAL profiles supported by an AAL-LPU
+AAL Queue ID is a unique index used to designate the AAL Queue in function exported by the specific AAL profile API’s.
+NOTE: An AAL Queue or an AAL Queue ID does not reflect a HW design or an AAL implementation specification
+HW Accelerator Manager is an acceleration management function, that provides management capabilities for the HW Accelerator(s) in the O-Cloud Node. Management capabilities include but not limited to lifecycle management, configuration, updates/upgrades and failure handling. The HW Accelerator Manager is O-Cloud Platform Software.
+AAL Managed Elements and Managed Functions are managed by SMO via the O2 interface exposed by the IMS and DMS using the AALI-C-MGMT interface terminated by the HW Accelerator Manager. Specifically, AAL Managed Elements and Managed Functions do not utilize the O1 interface for management of AAL Managed Elements and Managed Functions.
+The HW Accelerator, the HW Accelerator Manager, AAL-LPU and AAL drivers are defined as O-Cloud Platform Software for the purposes of managment and orchestration [13]. The O-Cloud Infrastructure and O-Cloud Platform Software use case flows in [13] are applicable for these AAL elements.
+Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [11] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [11].
+AF					Accelerated Function
+AAL 				Acceleration Abstraction Layer
+AALI-C			Acceleration Abstraction Layer Interface-Common
+AALI-C-Mgmt	Acceleration Abstraction Layer Interface-Common-Management
+AALI-C-App		Acceleration Abstraction Layer Interface-Common-Application
+AALI-P			Acceleration Abstraction Layer Interface-Profile
+BF                        Beam-forming
+CNF				Cloudified Network Function
+FCAPS	Fault, Configuration, Accounting, Performance, Security
+FEC 				Forward Error Correction
+MANO	Management and Orchestration
+MnS	Management Service
+MOC	Managed Object Class
+MOI	Managed Object Instance
+ONAP	Open Network Automation Platform
+O-RAN	Open Radio Access Network
+OSM	Open Source Mano
+RAN				Radio Access Network
+SMO				Service Management and Orchestration
+TR					Technical Report
+TS					Technical Specification
+VNF				Virtual Network Function
+General Aspects
+Hardware Acceleration
+In the design of digital computing systems, ranging from general-purpose processors to fully customized hardware, there is a tradeoff between flexibility and efficiency, with efficiency increasing by orders of magnitude when any given application is implemented in hardware. The range of implementation options includes general-purpose processors such as CPUs, more specialized processors such as GPUs, functions implemented on field-programmable gate arrays (FPGAs), and fixed-functions implemented on application-specific integrated circuits (ASICs). Hardware accelerator is a specialized HW implementation that can offload processing from application(s) running on the General-Purpose Processor. Any transformation of data or computation can be implemented purely in software running on a generic CPU, or purely in a specialized hardware accelerator, or using a combination of both. The implementation of computing tasks in hardware to improve performance is known as hardware acceleration. The hardware acceleration can be implemented in the form of lookaside or inline mode where in the former case, the host CPU invokes an accelerator for data processing and receives the result after processing is complete, while in the latter case, the accelerator, after being invoked by the host CPU with the request for data processing, completes the processing request of data received from a source node and directly transfers the post-processed data to a destination node, where the source or destination node can be different than host CPU (e.g., an Ethernet Interface). The principle of hardware acceleration and functional offloading in lookaside mode is illustrated in Figure 2.1, allowing the application to offload workload to a hardware accelerator and to continue performing other work in parallel- this could be to continue to execute other software tasks in parallel or to sleep and wait for the accelerator hardware to complete. The hardware acceleration boosts application performance in environments with compute-intensive, deeply pipelined, massively parallel operations as shown in Figure 2.1. This model requires the API to support two operations, one for initiating the offload and another for retrieving the operation once complete.
+Figure 2.1 Example illustration of the effect of hardware acceleration on functional compute performance
+AAL Architecture
+The goal of the acceleration abstraction layer (AAL) is to specify a common and consistent interface for HW accelerators to the applications which facilitates decoupling of an application, e.g. O-RAN Cloudified Network Function, from a specific HW implementation. In order to accommodate the many different combinations of HW and SW implementation and also many different network deployment scenarios, the AAL introduces the concept of an AAL profile which is used to distinguish between the different combinations of accelerated functions to be offloaded. The end to end high-level AAL architecture block diagram is shown in Figure 2.2.
+Figure 2.2 High Level AAL Architecture Diagram
+Figure 2.3 shows the relationship and cardinality between the components that constitute the AAL architecture.
+@startuml oran_aal
+skinparam component {
+FontSize 10
+BorderColor black
+BackgroundColor lightgrey
+ArrowFontName Ariel
+ArrowColor black
+ArrowFontColor #777777
+}
+component "AAL Logical Processing Unit" as lpu
+component “AAL Queue” as queue
+component "AAL Profile Instance" as profileI
+component "Application" as app
+component "Hardware Accelerator" as hw
+component “HW Accelerator Manager” as hwm
+component “Accelerated Function” as af
+component “AAL Profile” as profile
+profileI “N1” -up--o app
+lpu “N4” --o  hw
+lpu o--up- “N2” profileI
+profile o--left- “N6” profileI
+hwm o--right- “N7” hw
+queue “N3” --right--o lpu
+af “N5” --left--o profile
+@enduml
+Figure 2.3 AAL Component Relationship and Cardinality
+AAL Deployed in Cloud environments
+Figure 2.4 Accelerator APIs/Libraries in Container and Virtual Machine Implementations
+The AAL specifications define the AAL interface and the AAL profiles that may be supported by that interface. The AAL-C-Application interface is used by O-RAN Cloudified Network Functions to access the AAL implementation encompassing HW accelerator and associated SW libraries, drivers etc. In Figure 2.4 two deployment scenarios are shown, one with Containers and the other with Virtual Machines.
+Figure 2.4 also shows the O-Cloud Infrastructure Management Services and Accelerator management. The orchestration of the HW Accelerator Manager is outside the scope of the AAL and shall be specified in the O-RAN WG6 O2 specification [12].
+AAL Specification Objectives
+The AAL specification facilitates the following:
+A “cloudified” RAN is one that provides the flexibility of deploying multiple software implementations from different software vendors on a common CPU-based (e.g., x86/ARM) platform with hardware accelerators (e.g., FPGA/DSP/ASIC/GPU) for specific functions, and conversely, also allows multiple physical deployment scenarios in terms of centralizing or distributing each network element with the same software implementation.
+A disaggregated and cloudified multi-vendor RAN requires a common vendor-neutral APIs for managed element discovery, lifecycle management, FM/PM, and orchestration across both PNFs and VNFs in order to function as a cohesive unit that supports key lifecycle use cases such as scale-out, slice management, fault tolerance, and hitless software upgrades.
+Scope of the AAL
+The AAL specifications shall define the AAL interface between the application and AAL implementation in the O-Cloud instance. This includes the APIs, information models, operations and input/outputs used by the application to interface with the AAL implementation. In addition, the AAL Specification shall define the requirements for managing the hardware accelerator in the O-Cloud instance. The AAL implementation itself shall not be defined by the AAL GAnP specification. ETSI GS NFV-IFA 002 [5] defines several abstraction models including pass through and abstracted models that can be used to realize an AAL implementation.
+Figure 2.5 AAL Specification Scope
+General Interface Principles
+The set of generic and profile-specific features of the AAL interface described in the following subsections are defined from an application (i.e., AAL-C-Application ) point of view.
+Generic Principles
+Extensibility
+O-RAN has defined the functions that can be accelerated by the cloud platform based on 3GPP specifications and O-RAN deployment scenarios. However, the AAL should not limit innovation of future implementations and should evolve as the specification requires. To that end, the AAL application interface shall be extensible to accommodate future revisions of the specification.
+HW Independence
+AAL application interface shall be independent of the underlying AAL implementation.
+Interrupt and Poll Mode
+The AAL application interface shall support multiple design choices for application vendors and shall not preclude an application/HW accelerator vendor from adopting/supporting an interrupt-driven design or poll-mode design or any combination of both. As such, the AAL application interface shall support both interrupt mode, poll mode and any combination of interrupt and poll modes for the data-path application interface.
+Discovery and Configuration
+The AAL application interface shall enable application to discover and configure AAL-LPU(s). The AAL application interface shall allow an application to discover what physical resources have been assigned to it from the upper layers and then to configure said resources for offload operations.
+Multiple AAL-LPU Support
+There may be scenarios where multiple AAL-LPUs (either implementing the same or different AAL profile(s) are assigned to a single application, which uses one or more of these AAL-LPU(s) as needed. The AAL application interface shall support an application using one or more AAL-LPU(s) at the same time, as shown in Figure 2.6
+Figure 2.6. Logical Representation of AAL application interface support for multiple AAL-LPUs
+AAL offload capabilities
+The AAL application interface in supporting different AAL profiles and AAL implementations shall support different offload architectures including look-aside, inline, and any combination of both. An AAL implementation shall support one or more of these offload architectures depending on the supported AAL profile(s).
+Look-aside Acceleration Model
+The AAL application interface shall support look-aside acceleration model where the host CPU invokes a HW accelerator for data processing and receives the result after processing is complete. A look-aside architecture, illustrated in Figure 2.7, allows the application to offload AAL profiles(s) work to a HW accelerator and continue to perform other work in parallel—this could be to continue to execute other software tasks in parallel or to sleep and wait for the HW accelerator to complete. This model requires the AAL application interface to support two operations, one for initiating the offload and another for retrieving the output data once complete.
+Figure 2.7. AAL application interface look-aside acceleration model
+Inline Acceleration Model
+The AAL application interface shall support inline acceleration model where the host CPU, after invoking a HW accelerator for offloading AAL profile(s), does not necessarily retrieve the post processed data. Unlike the look-aside acceleration model where data source/sink is always the host CPU (i.e., the HW accelerator always receives the data to be processed from the host CPU and returns the post processed data to the same), a HW accelerator operating in inline acceleration mode receives/returns data from/to a different source/destination node than the host CPU, depending on the direction of data flow (e.g., in downlink (DL) direction versus uplink (UL) direction). Figure 2.8  shows one possible implementation of an inline acceleration model.
+Figure 2.8. AAL application interface inline acceleration model
+In Figure 2.8. AAL inline acceleration model, “Tx” refers to the transmission of the data from the HW accelerator through an egress port (e.g., an Ethernet interface) to a destination node (e.g., O-RU), while “Rx” refers to the reception of data through an ingress port (e.g., Ethernet interface) to the HW accelerator from a source node (e.g O-RU).
+While the look-aside architecture (in DL) shall support dataflow from the CPU to the HW accelerator and back to the CPU before being sent to the egress port (front-haul interface), the inline architecture (in DL) shall support data flow from the CPU to the HW accelerator and directly from the HW accelerator to the egress port (front-haul interface), instead of being sent back to the CPU. The typical user plane data flows for accelerating the O-DU high-PHY functions for the look-aside and inline architectures are as follows.
+Look-aside architecture user plane dataflow
+CPU ↔ HW accelerator ↔ CPU ↔ front-haul: for a set of consecutive PHY functions offload (e.g., FEC)
+CPU ↔ HW accelerator ↔ CPU ↔ HW accelerator ↔…↔ CPU ↔ front-haul: for a set of non-consecutive PHY functions offload
+Inline architecture user plane dataflow
+CPU ↔ HW accelerator ↔ front-haul: for a set of consecutive PHY functions offload (up to the end of the PHY pipeline)
+Figure 2.9 illustrates one possible implementation of the look-aside and inline architectures. While a set of PHY-layer functions are offloaded to the HW accelerator for look-aside acceleration, the entire end-to-end high PHY pipeline is offloaded to the accelerator for inline acceleration.
+Figure 2.9. User plane dataflow paths in look-aside and inline acceleration architectures.
+AAL application interface Concurrency and Parallelism
+To enable greater flexibility and design choice by application vendors, the AAL application inteface shall support multi-threading environment allowing an application to offload acceleration requests in parallel from several threads.
+Separation of Control and User Plane AAL application inteface APIs
+For efficiency and flexibility of AAL implementation, AAL application inteface shall support separation of control and user plane APIs with appropriate identifiers, as required by different AAL profiles.
+Support of Versatile Acceleration Payload
+Range of payload sizes can vary widely, depending on the specific layer of the RAN protocol stack from which the workload for AAL profile(s) is offloaded to a HW accelerator. AAL application inteface API shall be flexible to support various ranges of payload sizes as required by different AAL profiles.
+Support of Different Transport Mechanisms
+The transport between an application and an AAL implementation can be of different types (e.g., based on shared memory, PCIe interconnect, over ethernet etc.). AAL application inteface shall support abstraction of these various transport mechanisms between the ‘Application’ and the ‘AAL implementation’.
+AAL API namespace
+For convenience of AAL implementation, the AAL shall follow a unique name space for all AAL API functions.
+High-PHY Profile Specific Principles
+The set of features of AAL described in the following subsections are relevant for inline high-PHY AAL profiles (profile names with suffix ‘_HIGH-PHY’) defined in Chapter 5
+Separation of Cell and Slot Level Parameter Configurations
+In general, “cell-specific” (typically static or semi-static in nature) parameters change less frequently than “slot-specific” (typically dynamic in nature, specific to PHY channels/signals) parameters associated with inline, high-PHY AAL profiles. Hence, for optimizing signalling overhead, the AAL application inteface shall support configuration of “cell-specific” and “slot-specific” parameters to the AAL implementation using separate AAL application inteface API functions. It is noteworthy that the cell/slot specific configurations can include both control and user planes.
+SFN/slot-based Synchronization
+The AAL application inteface shall support system frame number (SFN) based or slot-based synchronization between the application and the AAL implementation supporting inline, high-PHY AAL profiles.
+Compatibility with O-RAN FH interface
+The AAL application inteface API shall be compatible with O-RAN FH interface (7.2-x split) to enable communication between the O-DU application and O-RU via AAL implementation as required by inline, high-PHY AAL profile(s).
+Relationship with Standards
+The O-RAN AAL interface shall leverage existing standards wherever possible.
+Relationship with ETSI
+In [4,5,10], ETSI has specified a generic acceleration and abstraction model as well as acceleration resource management that have served as the basis of this specification. This specification consistently complements the aforementioned ETSI specifications and provides guidance on practical implementation of the concepts introduced in ETSI specifications on NFV acceleration interfaces.
+HW Accelerator Manager and AAL Interface definition General Principles and Requirements
+Role of HW Accelerator Manager
+The HW Accelerator Manager is responsible for exposing a consistent mechanism to the O-Cloud platform for the discovery, lifecycle management, fault, state/status, performance, configuration, updates/upgrades, and error handling of the HW Accelerator(s) that are part of the O-Cloud Platform Hardware. The HW Accelerator Manager terminates the AALI-C-Mgmt interface.
+Discovery and Life Cycle Management:
+The HW Accelerator Management shall provide a mechanism to expose inventory information and capabilities of the physical and logical partitioning of the hardware and software.
+The HW Accelerator Manager shall provide the ability to discover the capabilities of the accelerator.
+Software/ Firmware upgrade services
+The HW Accelerator Manager shall allow the update and/or upgrade of a HW Accelerator on the O-Cloud node. An example of this may include the programming or re-programming of a downloadable FW or driver upgrades. Updates/Upgrades can be done locally or remotely.
+Configuration
+The HW Accelerator Manager shall allow the configuration of the HW Accelerator as prescribed by the SMO through the AALI-C-Mgmt interface. The configuration of the HW Accelerator Manager may include HW Accelerator resource assignment to AAL-LPUs.
+Fault and Performance Monitoring:
+HW Accelerator Manager shall allow exposure of faults, alarms, logs and performance measurements toward the SMO.
+AAL definition
+The figure below highlights the various AAL interfaces and functionality supported:
+Figure 3.1 AAL Interface categories
+The AAL interface API has two distinct parts, the first part corresponds to a set of common APIs (AALI-C) to address all the profile independent aspects of the underlying AAL Implementation(s) within an O-Cloud platform.
+There are two categories of AALI-C interface:
+AALI-C-Mgmt: Common adminstrative operations/actions/events from the Accelerator Manager toward the O-Cloud Infrastructure Management Service.
+AALI-C-App: Common operations/actions/events toward RAN Application
+A candidate set of functionalities supported by AAL common API(s) potentially includes (but not limited to) the following:
+Inventory Management, Fault, Alarms, Performance, Configuration Management
+Software/ Firmware upgrade services
+Operations (Query status, Reset/Restart e.g., AAL-LPU etc)
+Life Cycle Management
+Configuration of the state of these AAL-LPU(s) (for example, start, stop, or reset of an AAL-LPU).
+Configuration of various counters and resources associated with AAL-LPU(s) (for example, performance measurements/indicators, performance monitoring metrics, events, faults etc.).
+Discovery of AAL-profile(s) supported by these AAL-LPU(s) and associated configurations etc.
+Abstraction of transport mechanism between the application and AAL implementation
+Information model and an exact list of operations and actions applicable across AAL-C-Mgmt and AAL-C-App will be defined in the Stage 2 specification.
+The second part of AAL interface corresponds to a set of AAL profile specific APIs (AALI-P) which is specific to each defined AAL profile. The AAL profile shall be common across the AAL implementation accelerating the same set of AFs. It enables the applications to efficiently offload AAL profile workload to AAL implementation in a consistent way without requiring the HW implementations to expose every single detail of the underlying HW implementation to the applications. Figure 3.2 shows examples of the AAL APIs presented to an application in three different scenarios.
+Figure 3.2 AAL Application Common and profile APIs
+AAL-LPU Principles
+Overview
+This section discusses about AAL-LPU(s) presented to applications using the AAL application interface. An AAL-LPU should not be confused with a physical HW accelerator. Within a process address space each AAL-LPU shall abstract the application from underlying HW accelerator.
+Depending on HW design and implementation choice, a HW Accelerator may accelerate multiple profiles or offer support for sharing HW Accelerator resources between multiple threads, processes, VMs, PODs. For this reason, a second abstract construct known as AAL Profile Queue can optionally be used to
+distinguish between multiple supported AAL profiles per AAL-LPU
+prioritize access to AAL-LPU resources
+group operation requests
+allow parallel access through AAL application inteface for multiple threads
+As an abstract construct, an AAL Queue does not reflect a HW design specification or requirement.
+Example AAL-LPU Mapping
+The following Section contains example deployments mapping AAL-LPUs to Applications / O-RAN Cloudified Network Functions. The labels ‘profile-instanceID’ and ‘queueID’ in the following diagrams denote AAL Profile Instance object handle and identifier of an AAL queue respectively.
+Scenario 1: Basic implementation: A HW Accelerator supports a single AAL-LPU which exposes a single AAL-Profile- Instance for one application to use
+Figure 4.1 Basic mapping of AAL-LPU to O-RAN Cloudified NF
+Scenario 2: Basic Multi Apllication Support: A HW Accelerator supports multiple AAL LPUs for multiple applications
+Figure 4.2 multiple application support by a single HW accelerator
+Scenario 3: Multiple Accelerator Support: Mapping example showing multiple HW accelerators assigned to a single application
+Figure 4.3 multiple HW accelerators assigned to a single application
+Scenario 4: Multi Queue Support: AAL LPU mapping showing multiple AAL Queue support
+Figure 4.4 AAL-LPU mapping showing multiple AAL Queue support
+Scenario 5: Multi Profile Support: Mapping example showing multi-function support
+Figure 4.5 AAL-LPU Mapping example showing multi-function support
+Statistics
+The AAL application inteface shall provide an O-RAN Cloudified NF with general statistics upon request. Statistics may include but not limited to operation counts and error counts.
+Memory Management
+O-RAN network functions (O-DU, O-CU, etc.) will be responsible for input, output and operation structure memory allocation and freeing, using AAL defined memory management functions. All other application memory is not required to use the AAL memory management functions.
+Device Drivers are free to manage their own internal memory, DMA implementation as needed, the AAL specification does not add any memory requirements to device driver.
+Each AAL implementation shall define its own memory requirements and implement its own memory backing if needed.
+Each AAL implementation may define its own operation memory structure and allocation if needed.
+Run Time Configurations
+Operations are requested to the AAL-LPU to perform specific HW Accelerated Function(s). Each operation shall be represented by an operation struct that shall define all necessary metadata, configurations and information required for the operation to be processed on an AAL-LPU. The operation structs shall define the operation type to be performed, including an operation status and reference to the AAL profile specific operation data which can vary in size and content depending on the AAL profile. Each AAL profile shall define its own operation structure for its specific functions.
+AAL Profile(s) offload, processing status query and processed data retrieval
+An application aggregates one or more AAL profile(s) and offload to the AAL implementation using a single AAL application inteface API invocation. As one example, for high-PHY AAL profiles defined in Chapter 5, multiple AAL profiles (where an AAL profile refers to a PHY channel/signal for one or more than one cell(s) and one or more than one UE(s)) scheduled within a slot can be aggregated and offloaded to an AAL-LPU by the application using a single AAL application API invocation.
+The processing status of offloaded/enqueued AAL profile(s) can be queried by the application in an ‘asynchronous’ manner, i.e., not necessarily in the same order in which the AAL profile(s) are offloaded. In case the application retrieves the post-processed data from the AAL implementation, a ‘processing status query’ request can be bundled with a ‘processed data retrieval/dequeue’ request. In general, status query and dequeue request corresponding to multiple enqueue requests can be bundled together by the application and invoked through a single AAL application inteface API function.
+AAL-LPU Exposure
+After using the HW Accelerator Manager to create the AAL-LPU(s) and the profiles supported, we can then expose it to the application (e.g. in KubernetesⓇ it will be part of the POD environment variables). The goal of this section is to abstract the way the AAL-LPU and its supported profiles are exposed to the application in order to achieve application portability. Hence, the AAL-LPU and its profile(s) shall be exposed the application in an abstracted descriptor.
+As of today many implementations refer to the AAL-LPU by its PCI address and describe a single profile for the entire HW Accelerator, meaning exposure of one single profile for all LPUs supported. This section provides step-by-step example that shows how the AAL-LPU could be exposed to abstract the PCIe address and the profile(s) supported by the AAL-LPU. Although the below example is a KubernetesⓇ example, the outcome of it is independent of orchestration technology supported.
+Example
+AAL-LPU Configuration
+A given HW accelerator can support 16 AAL-LPUs and FEC, LDPC, PHY profiles but the default setup of the AAL-LPUs is FEC:
+Figure 4.6 Example AAL-LPU and profile supported
+Now assume HW Accelerator Manager configured the HW accelerator as follow:
+LPU-1 supports FEC version 01, PHY and LDPC version 01 profiles
+LPU-2 supports LDPC version 02 profile
+LPU-3 supports LDPC version 02 profile
+LPU-4 supports LDPC version 02 profile
+Figure 4.7 Example HW Accelerator configuration
+Assigning it to a the a vDU POD and exposing the two LPU/Profiles needed by vDU (in green):
+Figure 4.8 Example assignment of AAL-LPUs and supported profiles to POD
+We can see that the AAL-LPU resources requested in the manifest is translated in the POD environment to three AAL-LPU addresses plus the strings that describe the profiles supported by the LPU. Please note that the application will be able to query the AAL-LPUs and their supported profiles via the AAL-C-App API.
+AAL-LPU Application Control
+The above below shows how the application (e.g vDU) can create few PHY profiles on LPU-1, for example, PHY Profile-1 handles cell-1 and PHY Profile-2 handles cell-2, as well as running different LDPC profiles on different LPUs. As mentioned before the application can query what profiles supported by reading the POD environment variables or by querying it using the AAL-C-App API.
+Figure 4.9 Example Application configured AAL-Profile-Instances
+AAL-LPU resource tracking
+It is a key to be able to track the AAL-LPU as a resource for providing the application with acceleration resources it needs otherwise the attempt to create the NF will fail due to insufficient resources available.
+There are few notes related to the tracking of the AAL-LPU resources in relation to the example’s above in :
+If another POD needs to use the LDPC profile, Kubernetes will allow it as 2 out of 3 were used (LPU-4 supports it).
+If another POD needs to use FEC and PHY profiles (FEC&PHY), Kubernetes will reject it as only one LPU is configured this way.
+We need to consider if a logic is needed to track the AAL-LPU availability from the SMO. For example, a total of ten AAL-LPU/FEC profiles available in a cluster, three is being used by a deployment, seven left for a new deployment. The seven available could be revealed to the user or automation at the SMO level when considering additional deployments.
+The conclusion is that the SMO shall be able to track the AAL-LPU as a resource and its availability.
+AAL Profiles
+An AAL profile specifies a set of Accelerated Functions that a Hardware Accelerator processes on behalf of an application within an O-RAN Cloudified Network Function (e.g. O-DU, O-CU etc.). Accordingly, AAL profiles can be categorized as O-DU AAL profiles, O-CU AAL profiles and so on. The following sections describe these different AAL profile categories in further details.
+O-DU AAL Profiles
+An O-DU AAL profile can specify a set of Accelerated Functions within the O-DU protocol stack. These functions may belong to a single layer (e.g., PHY) or span across multiple layers (e.g., PHY and MAC) within O-DU. The current O-DU AAL profiles being studied by O-RAN WG6 are focusing on Accelerated Functions from PHY layer of O-DU.
+O-DU Protocol Stack Reference
+Figure 5.1 illustrates the building blocks for processing various O-DU PHY layer Downlink (DL) channels and signals (with 7.2-x functional split between O-DU and O-RU) defined by 3GPP in [6] & [7] as part of 5G NR specification.
+Figure 5.1 O-DU PHY processing blocks for 5G NR Downlink
+The O-DU PHY layer in downlink consists of the following physical channels and reference signals:
+•	Physical Downlink Shared Channel (PDSCH) and associated Demodulation Reference Signal (PDSCH DM-RS).
+•	Physical Downlink Control Channel (PDCCH) and associated Demodulation Reference Signal (PDCCH DM-RS).
+•	Synchronization Signal Block (SSB) consisting of
+o	Physical Broadcast Channel (PBCH) and associated DMRS (PBCH DM-RS).
+o	Primary Synchronization Signal (PSS).
+o	Secondary Synchronization Signal (SSS).
+•	Channel State Information-Reference Signal (CSI-RS) and Tracking Reference Signal (TRS).
+•	Phase Tracking Reference Signal (PT-RS) for DL.
+The downlink physical channels (PDSCH, PDCCH, PBCH) carry information originating from higher layers (i.e. layer 2 and above).
+The downlink physical layer processing of data channel (PDSCH) carrying transport blocks consists of the following steps:
+TB CRC attachment: Error detection is provided on each transport block (TB) through a Cyclic Redundancy Check (CRC). Refer to Subclause 7.2.1 in [7] for details.
+CB segmentation and CRC attachment: The transport block is segmented when it exceeds the code block (CB) size specified by 3GPP [7]. Code block segmentation and code block CRC attachment are performed according to Subclauses 7.2.3 and 5.2.2 of [7].
+LDPC encoding: Refer to Subclauses 7.2.4 and 5.3.2 in [7] for details.
+Rate matching: Refer to Subclauses 7.2.5 and 5.4.2 in [7] for details.
+CB concatenation: Refer to Subclauses 7.2.6 and 5.5 in [7] for details.
+Scrambling: Refer to Subclause 7.3.1.1 in [6] for details.
+Modulation: Refer to Subclause 7.3.1.2 in [6] for details.
+Layer mapping: Refer to Subclause 7.3.1.3 in [6] for details.
+RE mapping: Refer to Subclause 7.3.1.5 and 7.3.1.6 in [6] for details on Resource Element (RE) mapping.
+The downlink physical layer processing of control channel (PDCCH) carrying Downlink Control Information (DCI) consists of the following steps:
+CRC attachment: Error detection is provided on DCI transmissions through a Cyclic Redundancy Check (CRC). Refer to Subclause 7.3.2 in [7] for details.
+Polar encoding: Refer to Subclauses 7.3.3 and 5.3.1 in [7] for details.
+Rate matching: Refer to Subclauses 7.3.4 and 5.4.1 in [7] for details.
+Scrambling: Refer to Subclause 7.3.2.3 in [6] for details.
+Modulation: Refer to Subclause 7.3.2.4 in [6] for details.
+RE mapping: Refer to Subclause 7.3.2.5 in [6] for details.
+The downlink physical layer processing of broadcast channel (PBCH) carrying maximum one transport block consists of the following steps:
+PBCH payload generation: Refer to Subclause 7.1.1 in [7] for details.
+Scrambling: Refer to Subclause 7.1.2 in [7] for details.
+TB CRC attachment: Refer to Subclause 7.1.3 in [7] for details.
+Polar encoding: Refer to Subclauses 7.1.4 and 5.3.1 in [7] for details.
+Rate matching: Refer to Subclauses 7.1.5 and 5.4.1 in [7] for details.
+Data scrambling: Refer to Subclause 7.3.3.1 in [6] for details.
+Modulation: Refer to Subclause 7.3.3.2 in [6] for details.
+RE mapping: Refer to Subclause 7.3.3.3 in [6] for details.
+The downlink physical signals (DM-RS, PSS, SSS, CSI-RS/TRS, PT-RS) correspond to a set of resource elements used by the physical layer but does not carry information originated from higher layers (i.e. layer 2 and above).
+Reference Signals (DM-RS, CSI-RS/TRS, PT-RS) and Synchronization Signals (PSS/SSS) are generated using the following steps:
+Sequence Generation and Modulation: Refer to Subclauses 7.4.1.1.1 (PDSCH DM-RS), 7.4.1.3.1 (PDCCH DM-RS), 7.4.1.4.1 (PBCH DM-RS), 7.4.1.5.2 (CSI-RS/TRS), 7.4.1.2.1 (PT-RS), 7.4.2.2.1 (PSS) and 7.4.2.3.1 (SSS) in [6] for details.
+RE mapping: Refer to Subclauses 7.4.1.1.2 (PDSCH DM-RS), 7.4.1.3.2 (PDCCH DM-RS), 7.4.1.4.2 (PBCH DM-RS), 7.4.1.5.3 (CSI-RS/TRS), 7.4.1.2.2 (PT-RS), 7.4.2.2.2 (PSS) and 7.4.2.3.2 (SSS) in [6] for details.
+An O-DU AAL profile for 5G NR downlink shall specify a set of accelerated functions corresponding to one or more than one physical downlink channel(s) and/or physical downlink signal(s).
+In addition to the processing blocks mentioned above, each of these downlink physical channels/signals may include some additional functional blocks (e.g. precoding, IQ compression) which are implementation specific and may also depend on system configurations/capabilities (for example, whether a O-DU is connected to a CAT-A/CAT-B O-RU). Each of these physical channels/signals can be implemented with/without these optional functional blocks. The AAL application interface shall expose to the application whether these functional blocks are supported or not within the AAL implementation.
+Figure 5.2 illustrates the building blocks for processing various O-DU PHY layer Uplink (UL) channels and signals (with 7.2-x functional split between O-DU and O-RU) defined by 3GPP [6] as part of 5G NR specification.
+Figure 5.2 O-DU PHY processing blocks for 5G NR Uplink
+The O-DU PHY layer in uplink consists of the following physical channels and reference signals:
+•	Physical Uplink Shared Channel (PUSCH).
+•	Physical Uplink Control Channels (PUCCH) with formats 0/1/2/3/4.
+•	Physical Random-Access Channel (PRACH).
+•	Sounding Reference Signal (SRS).
+•	Phase Tracking Reference Signal (PT-RS) for UL.
+The uplink physical channels (PUSCH, PUCCH, PRACH) carry information originating from higher layers (i.e. layer 2 and above).
+The uplink physical layer processing of shared channel (PUSCH) carrying uplink data with or without Uplink Control Information (UCI) consists of the following steps at the receiver (O-DU):
+RE de-mapping: Refer to Subclauses 6.3.1.6, 6.3.1.7 and 6.4.1.1.3 of [6] for details on RE mapping at the transmitter.
+Channel estimation and equalization: up to O-DU implementation.
+Transform precoding (IDFT): optional, only required for DFT-s-OFDM waveform. Refer to Subclause 6.3.1.4 of [6] for details on transform precoding (if applicable) applied at the transmitter.
+Demodulation: Refer to Subclause 6.3.1.2 in [6] for details on modulation applied at the transmitter.
+Descrambling: Refer to Subclause 6.3.1.1 in [6] for details on scrambling applied at the transmitter.
+CB de-concatenation: Refer to Subclause 6.2.6 in [7] for details on CB concatenation applied at the transmitter.
+Rate de-matching: Refer to Subclause 6.2.5 in [7] for details on rate matching applied at the transmitter.
+LDPC decoding: Refer to Subclause 6.2.4 in [7] for details on LDPC encoding applied at the transmitter.
+CB de-segmentation and CB CRC check: Refer to Subclause 6.2.3 in [7] for details on CB segmentation and CB CRC attachment applied at the transmitter.
+TB CRC check: Refer to Subclause 6.2.1 in [7] for details on TB level CRC attachments applied at the transmitter.
+The uplink physical layer processing for control channel (PUCCH) carrying UCI depends on PUCCH formats.
+PUCCH format 0 processing consists of the following steps at the receiver (O-DU):
+RE de-mapping: Refer to subclause 6.3.2.3.2 of [6] for details on RE mapping applied at the transmitter.
+Sequence detection: The transmitted sequence (refer to Subclause 6.3.2.3 in [6] for details) is detected at O-DU using a non-coherent detector, since PUCCH format 0 does not carry any DM-RS. The detailed design is up to O-DU implementation.
+PUCCH format 1 processing consists of the following steps at the receiver (O-DU):
+RE de-mapping: Refer to Subclauses 6.3.2.4.2 and 6.4.1.3.1.2 of [6] for details on RE mapping applied at the transmitter.
+Channel estimation and equalization: up to O-DU implementation.
+Demodulation: Refer to Subclause 6.3.2.4.1 in [6] for details on modulation applied at the transmitter.
+PUCCH formats 2/3/4 processing consists of the following steps at the receiver (O-DU):
+RE de-mapping: Refer to Subclauses 6.3.2.5.3 and 6.4.1.3.2.2 (format 2); 6.3.2.6.5 and 6.4.1.3.3.2 (formats 3/4) of [6] for details on RE mapping applied at the transmitter.
+Channel estimation and equalization: up to O-DU implementation.
+Transform precoding (IDFT): optional, only required for DFT-s-OFDM waveform. Refer to Subclause 6.3.2.6.4 of [6] for details on transform precoding (applicable for formats 3/4) applied at the transmitter.
+Demodulation: Refer to Subclause 6.3.2.5.2 (format 2) and 6.3.2.6.2 (formats 3/4) in [6] for details on modulation applied at the transmitter.
+Descrambling: Refer to Subclause 6.3.2.5.1 (format 2) and 6.3.2.6.1 (formats 3/4) in [6] for details on scrambling applied at the transmitter.
+Rate de-matching: Refer to Subclause 6.3.1.4 in [7] for details on rate matching applied at the transmitter.
+Polar/Block decoding: Refer to Subclause 6.3.1.3 in [7] for details on Polar/Block encoding applied at the transmitter.
+CRC check: Refer to Subclause 6.3.1.2 in [7] for details on CRC attachment applied at the transmitter.
+The uplink physical layer processing for random access channel (PRACH) carrying preamble consists of the following steps at the receiver (O-DU):
+RE de-mapping: Refer to Subclause 6.3.3.2 in [6] for details on RE mapping applied at the transmitter.
+Root sequence correlation: Perform correlation operation between root sequence and received signals. Refer to Subclause 6.3.3.1 in [6] for details on root sequence generation.
+IFFT: perform the inverse Fast Fourier Transform (iFFT) operation on the received signal(s).
+Noise estimation: perform the noise estimation operation.
+Peak search: detect the peak for different root sequences.
+Preamble detection and Timing Advance (TA) or delay estimation: determine the preamble sequence(s) received and the corresponding timing advance estimate(s).
+The uplink physical signals (SRS, PT-RS) do not carry any information from the higher layers (i.e. layer 2 and above).
+The Sounding Reference Signal (SRS) in uplink is received at O-DU using the following steps:
+RE de-mapping: Refer to Subclauses 6.4.1.4.3 and 6.4.1.4.4 in [6] for details on RE mapping applied at the transmitter.
+Sequence detection and Channel estimation: Up to O-DU implementation. Refer to 6.4.1.4.2 in [6] for details on SRS sequence generation at the transmitter. Channel condition in uplink is estimated at the O-DU based on the processing of received SRS.
+The Phase-Tracking Reference Signal (PT-RS) in uplink is received at the O-DU using the following steps:
+RE de-mapping: Refer to Subclause 6.4.1.2.2 in [6] for details on RE mapping applied at the transmitter.
+Sequence detection: Up to O-DU implementation. Refer to Subclause 6.4.1.2.1 in [6] for details on sequence generation at the transmitter.
+An O-DU AAL profile for 5G NR uplink shall specify a set of accelerated functions corresponding to one or more than one physical uplink channel(s) and/or physical uplink signal(s).
+In addition to the processing blocks mentioned above, each of these uplink physical channels/signals may include an additional functional block, viz. IQ decompression, which is implementation specific and may depend on system configuration/capability. Each of these physical channels/signals can be implemented with/without this optional functional block. The AAL application inteface shall expose to the application whether these functional blocks are supported or not within the AAL implementation.
+O-DU Protocol Stack Reference for mMTC
+Figure 5.3 illustrates the building blocks for processing various O-DU PHY layer Downlink (DL) channels and signals (with 7.2-x functional split between O-DU and O-RU) defined by 3GPP in [8] & [9] as part of 4G/5G NR specification.
+Figure 5.3 O-DU PHY processing blocks for mMTC Downlink
+The O-DU PHY layer in downlink consists of the following physical channels and reference signals:
+•	Narrow-band Physical Downlink Shared Channel (NPDSCH).
+•	Narrow-band Physical Downlink Control Channel (NPDCCH).
+•	Narrow-band Physical Broadcast Channel (NPBCH).
+•	Narrow-band Primary Synchronization Signal (NPSS).
+•	Narrow-band Secondary Synchronization Signal (NSSS).
+•	Narrow-band Reference Signal (NRS) and Narrow-band Position Reference Signal (NPRS).
+•	Narrow-band Wake-Up Signal (NWUS)
+The Narrow-band downlink physical channels (NPDSCH, NPDCCH, NPBCH) carry information originating from higher layers (i.e. layer 2 and above).
+The Narrow-band downlink physical layer processing of data channel (NPDSCH) carrying transport blocks consists of the following steps:
+TB CRC attachment: Error detection is provided on each transport block (TB) through a Cyclic Redundancy Check (CRC). Refer to Subclause 6.4 in [9] for details.
+CRC attachment: CRC attachment is performed according to Subclauses 6.4 of [9]
+Tail-biting Convolutional coding: Refer to Subclauses 6.2 and 5.1.3.1 in [9] for details.
+Rate matching: Refer to Subclauses 6.4 in [9] for details.
+Scrambling: Refer to Subclause  10.2.5.2 in [8] for details.
+Modulation: Refer to Subclause 10.2.5.3 in [8] for details.
+Layer mapping: Refer to Subclause 10.2.5.3in [8] for details.
+RE mapping: Refer to Subclause 10.2.5.5in [8] for details on Resource Element (RE) mapping.
+The downlink physical layer processing of control channel (PDCCH) carrying Downlink Control Information (DCI) consists of the following steps:
+CRC attachment: Error detection is provided on DCI transmissions through a Cyclic Redundancy Check (CRC). Refer to Subclause 6.4 in [9] for details.
+Tail-biting Convolutional coding: Refer to Subclauses 6.2 and 5.1.3.1 in [9] for details.
+Scrambling: Refer to Subclause 10.2.5.2 in [8] for details.
+Modulation: Refer to Subclause 10.2.5.3 in [8] for details.
+Layer mapping: Refer to Subclause 10.2.5.3 in [8] for details.
+RE mapping: Refer to Subclause 10.2.5.5 in [8] for details on Resource Element (RE) mapping.
+The downlink physical layer processing of broadcast channel (NPBCH) carrying maximum one transport block consists of the following steps:
+NPBCH payload generation: Refer to Subclause 6.4.1 in [9] for details.
+TB CRC attachment: Error detection is provided on each transport block (TB) through a Cyclic Redundancy Check (CRC). Refer to Subclause 6.4 in [9] for details.
+Scrambling: Refer to Subclause 10.2.5.2 in [8] for details.
+Modulation: Refer to Subclause 10.2.5.3 in [8] for details.
+Layer mapping: Refer to Subclause 10.2.5.3 in [8] for details.
+RE mapping: Refer to Subclause 10.2.5.5 in [8] for details on Resource Element (RE) mapping.
+The downlink physical signals (NRS, NPSS, NSSS, NPRS, NWUS) correspond to a set of resource elements used by the physical layer but does not carry information originated from higher layers (i.e. layer 2 and above).
+Reference Signals and Synchronization signals (NPSS/NSSS) are generated using the following steps:
+Sequence Generation and Modulation and RE mapping : Refer to Subclauses, 10.2.6B (NWUS), 10.2.7.1 (NPSS) and 10.2.7.2 (NSSS) , 10.2.6  (NRS), 10.2.6A (NPRS) in [8] for details.
+An O-DU AAL profile for 4G NR downlink shall specify a set of accelerated functions corresponding to one or more than one physical downlink channel(s) and/or physical downlink signal(s).
+In addition to the processing blocks mentioned above, each of these downlink physical channels/signals may include some additional functional blocks (e.g. precoding, IQ compression) which are implementation specific and may also depend on system configurations/capabilities (for example, whether a O-DU is connected to a CAT-A/CAT-B O-RU). Each of these physical channels/signals can be implemented with/without these optional functional blocks. The AAL application interface shall expose to the application whether these functional blocks are supported or not within the AAL implementation.
+Figure 5.4 illustrates the building blocks for processing various O-DU PHY layer Uplink (UL) channels and signals (with 7.2-x functional split between O-DU and O-RU) defined by 3GPP in [8] & [9] as part of 4G/5G NR specification.
+Figure 5.4 O-DU PHY processing blocks for mMTC Uplink
+The O-DU PHY layer in uplink consists of the following physical channels and reference signals:
+•	Narrow-band Physical Uplink Shared Channel (NPUSCH).
+•	Narrow-band Physical Random-Access Channel (NPRACH).
+The uplink physical channels (NPUSCH, NPRACH) carry information originating from higher layers (i.e. layer 2 and above).
+The uplink physical layer processing of shared channel (NPUSCH) carrying uplink data with or without Uplink Control Information (UCI) consists of the following steps at the receiver (O-DU):
+RE (de)mapping: Refer to Subclauses 5.3.4 of [8] for details on RE mapping at the transmitter/receiver.
+Channel estimation and equalization: up to O-DU implementation.
+Transform precoding (IDFT): optional, only required for DFT-s-OFDM waveform. Refer to Subclause 5.3.3A of [8] for details on transform precoding (if applicable) applied at the transmitter.
+Demodulation: Refer to Subclause 5.3.2 in [8] for details on modulation applied at the transmitter.
+Descrambling: Refer to Subclause 5.3.1 in [8] for details on scrambling applied at the transmitter.
+Rate de-matching: Refer to Subclause 5.1.4.1 in [9] for details on rate matching applied at the transmitter.
+Turbo decoding: Refer to Subclause 5.1.3.2 in [9] for details on Turbo decoding applied at the transmitter.
+CRC check: Refer to Subclauses 5.1.1 in [9] for details on TB and CB level CRC attachments applied at the transmitter.
+The uplink physical layer processing for shared channel (NPUSCH) carrying UCI depends on NPUSCH formats.
+An O-DU AAL profile for 4G/5G NR uplink shall specify a set of accelerated functions corresponding to one or more than one physical uplink channel(s) and/or physical uplink signal(s).
+In addition to the processing blocks mentioned above, each of these uplink physical channels/signals may include an additional functional block, viz. IQ decompression, which is implementation specific and may depend on system configuration/capability. Each of these physical channels/signals can be implemented with/without this optional functional block. The AAL application inteface shall expose to the application whether these functional blocks are supported or not within the AAL implementation.
+O-DU AAL Profile Definitions
+O-DU AAL profiles are defined below with future specification(s) to define the AAL application inteface for each profile.
+Profile Definitions General Guidelines
+Naming
+As discussed above O-DU AAL profiles are specific to one or more physical channel(s) or signal(s) as such should follow the naming guidelines
+O-DU AAL profiles shall be prefixed with “AAL_”
+O-DU AAL profiles when specific to a single channel or signal shall include the channel or signal in the name e.g. “AAL_PUSCH”
+O-DU AAL profiles when common across multiple channels or signals shall not include the channel or signal name, instead just reference the Accelerated Function(s), e.g. AAL_RE-MAPPING
+O-DU AAL profiles that include a subset of the functional blocks within a channel or signal shall include a functional description after the channel name e.g. AAL_PUSCH_CHANNEL_ESTIMATION
+Data Flow
+O-DU AAL profiles shall specify the data flow supported by the profile as discussed in section 2.5.1.7 and 2.5.1.8 above e.g. Look aside, Inline or other.
+Look aside data flow implies the remaining functions not included in the Profile that comprise the channel or signal are implemented in SW on the host CPU and not implemented in the HW Accelerator.
+Inline data flow implies that the set of accelerated functions is constituted of the entire U-plane processing of high-PHY channel or signal (with 7-2x PHY functional split) and the IQ data (in DL) or decoded bits (in UL) (post processing) are transferred directly from the accelerator to the Fronthaul interface. (in DL) or Layer 2 (in UL).
+The profile shall specify if the data flow includes only user plane, or only control plane, or both.
+O-DU AAL Profiles
+AAL_MU-MIMO_PRECODER_WEIGHTS_CALC
+Figure 5.5 AAL_MU-MIMO_PRECODER_WEIGHTS_CALC
+The AAL_MU-MIMO_PRECODER_WEIGHTS_CALC is used by application to offload beamforming (precoding) weight calculation to the hardware accelerator (HWA) in look-aside acceleration mode. The application shall provide HWA with all the information required to calculate precoding weights.
+This profile is implemented as a look aside accelerator.
+The below figure shows an example use of the AAL_MU-MIMO_PRECODER_WEIGHTS_CALC in an O-DU with AAL_DOWNLINK_HIGH-PHY and AAL_UPLINK_HIGH-PHY
+Figure 5.6 Example AAL_MU-MIMO_PRECODER_WEIGHTS_CALC use
+O-DU AAL Profiles for Downlink
+AAL_PDSCH_FEC
+Figure 5.5 highlights the set of accelerated functions that define the AAL_PDSCH_FEC Profile. These include
+CRC Generation
+LDPC Encoding
+PDSCH Rate Matching
+The AAL_PDSCH_FEC Profile is implemented as a look aside accelerator. The AAL_PDSCH_FEC Profile will support both Transport Block and Code Block operations.
+Figure 5.7 AAL_PDSCH_FEC Profile
+AAL_PDSCH_HIGH-PHY
+Figure 5.6 highlights the set of accelerated functions that defines the AAL_PDSCH_HIGH-PHY Profile, which includes the processing of PDSCH TB(s) and associated DM-RS.
+The set of accelerated functions associated with the processing of PDSCH TB(s) is as follows:
+•	TB CRC attachment
+•	CB segmentation and CRC attachment
+•	LDPC encoding
+•	Rate matching
+•	CB concatenation
+•	Scrambling
+•	Modulation
+•	Layer mapping
+•	Precoding
+•	RE mapping
+•	IQ compression1
+The set of accelerated functions associated with the processing of PDSCH DM-RS is as follows:
+•	PDSCH DM-RS sequence generation
+•	Modulation
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The AAL_PDSCH_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.8 AAL_PDSCH_HIGH-PHY Profile
+AAL_PDCCH_HIGH-PHY
+Figure 5.7 highlights the set of accelerated functions that defines the AAL_PDCCH_HIGH-PHY Profile, which includes the processing of PDCCH DCI and associated DM-RS.
+The set of accelerated functions associated with the processing of PDCCH TB(s) is as follows:
+•	CRC attachment
+•	Polar encoding
+•	Rate matching
+•	Scrambling
+•	Modulation (QPSK)
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The set of accelerated functions associated with the processing of PDCCH DM-RS is as follows:
+•	PDCCH DM-RS sequence generation
+•	Modulation
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The AAL_PDCCH_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.9 AAL_PDCCH_HIGH-PHY Profile
+AAL_PBCH_HIGH-PHY
+Figure 5.8 highlights the set of accelerated functions that defines the AAL_PBCH_HIGH-PHY Profile, which includes the processing of PBCH TB and associated DM-RS, PSS and SSS, or in other words, the processing of SSB.
+The set of accelerated functions associated with the processing of PBCH TB is as follows:
+•	PBCH payload generation
+•	Scrambling
+•	TB CRC attachment
+•	Polar encoding
+•	Rate matching
+•	Data scrambling
+•	Modulation (QPSK)
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The set of accelerated functions associated with the processing of PBCH DM-RS/PSS/SSS is as follows:
+•	PDCCH DM-RS/PSS/SSS sequence generation
+•	Modulation
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The AAL_PBCH_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.10 AAL_PBCH_HIGH-PHY Profile
+AAL_CSI-RS_HIGH-PHY
+Figure 5.9 highlights the set of accelerated functions that defines the AAL_CSI-RS_HIGH-PHY Profile, which includes the following:
+•	CSI-RS sequence generation
+•	Modulation
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The AAL_CSI-RS_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.11 AAL_CSI-RS_HIGH-PHY Profile
+AAL_PT-RS-DL_HIGH-PHY
+Figure 5.10 highlights the set of accelerated functions that defines the AAL_PT-RS-DL_HIGH-PHY Profile, which includes the following:
+•	PT-RS sequence generation
+•	Modulation
+•	Precoding1
+•	RE mapping
+•	IQ compression1
+The AAL_PT-RS-DL_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.12 AAL_PT-RS-DL_HIGH-PHY Profile
+AAL_DOWNLINK_HIGH-PHY
+Figure 5.11 highlights the set of accelerated functions that defines the AAL_DOWNLINK_HIGH-PHY Profile. This profile includes the aggregation of all the individual downlink channel profiles as follows:
+PDSCH
+Data: see list of accelerated functions associated with the processing of PDSCH TB(s), per section 5.1.3.2.2
+DM-RS: see list of accelerated functions associated with the processing of PDSCH DM-RS, per section 5.1.3.2.2.
+PT-RS: see list of accelerated functions listed in section 5.1.3.2.6.
+PDCCH:
+Data: see list of accelerated functions associated with the processing of PDCCH TB(s), per section 5.1.3.2.3
+DM-RS: see list of accelerated functions associated with the processing of PDCCH DM-RS, per section 5.1.3.2.3
+SSB:
+PSS + SSS: see list of accelerated functions associated with the processing of PSS/SSS, per section 5.1.3.2.4
+PBCH DM-RS: see list of accelerated functions associated with the processing of PBCH DM-RS, per section 5.1.3.2.4
+PBCH: see list of accelerated functions associated with the processing of PBCH TB(s), per section 5.1.3.2.4
+CSI-RS:
+see list of accelerated functions listed in section 5.1.3.2.5
+The AAL_DOWNLINK_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.13 AAL_DOWNLINK_ HIGH-PHY Profile
+O-DU AAL Profiles for Uplink
+AAL_PUSCH_FEC
+Figure 5.11 highlights the set of accelerated functions that define the AAL_PUSCH_FEC Profile. These include
+PUSCH Rate De-matching
+LDPC Decoder
+CRC Check
+The AAL_PUSCH_FEC Profile is implemented as a look aside accelerator. The AAL_PUSCH_FEC Profile will support both Transport Block and Code Block operations.
+Figure 5.14 AAL_PUSCH_FEC Profile
+AAL_PUSCH_HIGH-PHY
+Figure 5.12 highlights the set of accelerated functions that defines the AAL_PUSCH_HIGH-PHY Profile, which includes the processing of PUSCH data (with or without UCI).
+The set of accelerated functions associated with the processing of PUSCH data is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Channel estimation
+•	Channel equalization
+•	Transform precoding (optional- only required for DFT-s-OFDM waveform)
+•	Demodulation
+•	Descrambling
+•	Rate de-matching
+•	LDPC decoding
+•	CRC check
+The AAL_PUSCH_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.15 AAL_PUSCH_HIGH-PHY Profile
+AAL_PUCCH_HIGH-PHY
+Figure 5.13, Figure 5.14 and Figure 5.15 highlight the set of accelerated functions that defines the AAL_PUCCH_HIGH-PHY Profile, which includes the processing of UCI.
+The set of accelerated functions associated with the processing of PUCCH UCI depends on the PUCCH format being configured by the application.
+PUCCH format 0
+The set of accelerated functions associated with the processing of PUCCH UCI using PUCCH format 0 is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Sequence detection
+Figure 5.16 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 0)
+PUCCH format 1
+The set of accelerated functions associated with the processing of PUCCH UCI using PUCCH format 1 is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Channel estimation
+•	Channel equalization
+•	Demodulation
+Figure 5.17 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 1)
+PUCCH format 2/3/4
+The set of accelerated functions associated with the processing of PUCCH UCI using PUCCH format 2/3/4 is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Channel estimation
+•	Channel equalization
+•	Transform precoding (optional- only required for DFT-s-OFDM waveform)
+•	Demodulation
+•	Descrambling
+•	Rate de-matching
+•	Polar/Block decoding
+•	CRC check
+Figure 5.18 AAL_PUCCH_HIGH-PHY Profile (PUCCH format 2/3/4)
+The AAL_ PUCCH_ HIGH -PHY profile is executed in inline acceleration mode.
+AAL_PRACH_HIGH-PHY
+Figure 5.16 highlights the set of accelerated functions that defines the AAL_PRACH_HIGH-PHY Profile.
+The set of accelerated functions associated with the processing of PRACH preamble is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Root sequence generation and correlation
+•	IFFT
+•	Noise estimation
+•	Peak search for power delay profile
+•	Preamble detection and delay/timing advance estimation
+Figure 5.19 AAL_PRACH_HIGH-PHY Profile
+The AAL_PRACH_HIGH-PHY Profile is executed in inline acceleration mode.
+AAL_SRS_HIGH-PHY
+Figure 5.17 highlights the set of accelerated functions that defines the AAL_SRS_HIGH-PHY Profile.
+The set of accelerated functions associated with the processing of SRS is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Channel estimation
+Figure 5.20 AAL_SRS_HIGH-PHY Profile
+The AAL_SRS_ HIGH-PHY Profile is executed in inline acceleration mode.
+AAL_PT-RS-UL_HIGH-PHY
+Figure 5.18 highlights the set of accelerated functions that defines the AAL_PT-RS-UL_HIGH-PHY Profile.
+The set of accelerated functions associated with the processing of PT-RS-UL sequence is as follows:
+•	IQ decompression1
+•	RE de-mapping
+•	Sequence detection
+Figure 5.21 AAL_PT-RS-UL_HIGH-PHY profile
+The AAL_PT-RS-UL_HIGH-PHY profile is executed in inline acceleration mode.
+AAL_UPLINK_HIGH-PHY
+Figure 5.20 highlights the set of accelerated functions that defines the AAL_UPLINK_HIGH-PHY Profile, this profile includes the aggregation of all the individual uplink channel profiles as follows:
+PUSCH:
+Data: see list of accelerated functions associated with the processing of PUSCH data, per section 5.1.3.3.2
+DM-RS:  see list of accelerated functions listed in section 5.1.3.3.6, implemented to process DM-RS IQ samples.
+PT-RS: see list of accelerated functions listed in section 5.1.3.3.6
+PUCCH:
+Format 0: see list of accelerated functions listed in section 5.1.3.3.3.1
+Format 1:
+UCI: see list of accelerated functions listed in section 5.1.3.3.3.2
+DM-RS: see list of accelerated functions listed in section 5.1.3.3.6, implemented to process DM-RS IQ samples.
+Formats 2/3/4:
+UCI: see list of accelerated functions listed in section 5.1.3.3.3.3
+DM-RS: see list of accelerated functions listed in section 5.1.3.3.6, implemented to process DM-RS IQ samples.
+PRACH:
+see list of accelerated functions listed in section 5.1.3.3.4
+SRS:
+see list of accelerated functions listed in section 5.1.3.3.5
+The AAL_UPLINK_HIGH-PHY Profile is executed in inline acceleration mode.
+Figure 5.22 AAL_UPLINK_ HIGH-PHY Profile
+O-DU AAL Profiles for mMTC
+AAL_NPDSCH_FEC
+Figure 5.19 highlights the set of accelerated functions that define the AAL_NPDSCH_FEC Profile. These include
+•	CRC Generation
+•	Tail-Biting Convolutional Coding
+•	Rate Matching
+The AAL_NPDSCH_FEC Profile is implemented as a look aside accelerator.
+Figure 5.23 AAL_NPDSCH_FEC Profile
+AAL_NPDCCH_FEC
+Figure 5.20 highlights the set of accelerated functions that define the AAL_NPDCCH_FEC Profile. These include
+•	CRC Generation
+•	Tail-Biting Convolutional Coding
+•	Rate Matching
+The AAL_NPDCCH_FEC Profile is implemented as a look aside accelerator.
+Figure 5.24 AAL_NPDCCH_FEC Profile
+AAL_NPBCH_FEC
+Figure 5.21 highlights the set of accelerated functions that define the AAL_NPBCH_FEC Profile. These include
+•	CRC Generation
+•	Tail-Biting Convolutional Coding
+•	Rate Matching
+The AAL_NPBCH_FEC Profile is implemented as a look aside accelerator.
+Figure 5.25 AAL_NPBCH_FEC Profile
+AAL_NPUSCH_FEC
+Figure 5.22 highlights the set of accelerated functions that define the AAL_NPUSCH_FEC Profile. These include
+•	CRC Generation
+•	Turbo Decoding
+•	Rate Matching
+The AAL_NPUSCH_FEC Profile is implemented as a look aside accelerator.
+Figure 5.26 AAL_NPUSCH_FEC Profile
+O-CU AAL Profiles
+The O-CU AAL profiles shall be part of further study for O-RAN WG6.

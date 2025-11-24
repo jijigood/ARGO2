@@ -41,41 +41,55 @@ class ChromaVectorStore:
             metadata={"hnsw:space": "cosine"},
         )
 
-    def add_documents(self, documents: List[Dict], embeddings: np.ndarray) -> None:
+    def add_documents(
+        self,
+        documents: List[Dict],
+        embeddings: np.ndarray,
+        batch_size: int = 4096,
+    ) -> None:
         if len(documents) == 0:
             return
 
-        ids: List[str] = []
-        metadatas: List[Dict] = []
-        texts: List[str] = []
-        vectors: List[List[float]] = []
+        total = len(documents)
+        for start in range(0, total, batch_size):
+            end = min(start + batch_size, total)
+            batch_docs = documents[start:end]
+            batch_vectors = embeddings[start:end]
 
-        for doc, vector in zip(documents, embeddings, strict=True):
-            chunk_id = doc.get("chunk_id") or doc.get("doc_id")
-            if not chunk_id:
-                raise ValueError("Each document must define a chunk_id or doc_id.")
+            ids: List[str] = []
+            metadatas: List[Dict] = []
+            texts: List[str] = []
+            vectors: List[List[float]] = []
 
-            ids.append(str(chunk_id))
-            metadatas.append(
-                {
-                    "doc_id": doc.get("doc_id"),
-                    "title": doc.get("title"),
-                    "category": doc.get("category"),
-                    "complexity": doc.get("complexity"),
-                    "chunk_index": doc.get("chunk_index"),
-                    "total_chunks": doc.get("total_chunks"),
-                    "source_path": doc.get("source_path"),
-                }
+            for doc, vector in zip(batch_docs, batch_vectors, strict=True):
+                chunk_id = doc.get("chunk_id") or doc.get("doc_id")
+                if not chunk_id:
+                    raise ValueError("Each document must define a chunk_id or doc_id.")
+
+                ids.append(str(chunk_id))
+                metadatas.append(
+                    {
+                        "doc_id": doc.get("doc_id"),
+                        "title": doc.get("title"),
+                        "category": doc.get("category"),
+                        "complexity": doc.get("complexity"),
+                        "chunk_index": doc.get("chunk_index"),
+                        "total_chunks": doc.get("total_chunks"),
+                        "source_path": doc.get("source_path"),
+                        "section_id": doc.get("section_id"),
+                        "section_title": doc.get("section_title"),
+                        "work_group": doc.get("work_group"),
+                    }
+                )
+                texts.append(doc.get("content", ""))
+                vectors.append(vector.tolist())
+
+            self._collection.upsert(
+                ids=ids,
+                metadatas=metadatas,
+                documents=texts,
+                embeddings=vectors,
             )
-            texts.append(doc.get("content", ""))
-            vectors.append(vector.tolist())
-
-        self._collection.upsert(
-            ids=ids,
-            metadatas=metadatas,
-            documents=texts,
-            embeddings=vectors,
-        )
 
     def search(self, query_embedding: np.ndarray, top_k: int = 5) -> List[Tuple[Dict, float]]:
         if query_embedding.ndim != 1:
@@ -109,6 +123,9 @@ class ChromaVectorStore:
                 "chunk_index": metadata.get("chunk_index"),
                 "total_chunks": metadata.get("total_chunks"),
                 "source_path": metadata.get("source_path"),
+                "section_id": metadata.get("section_id"),
+                "section_title": metadata.get("section_title"),
+                "work_group": metadata.get("work_group"),
                 "content": contents[idx],
             }
             docs.append((doc, float(similarity)))

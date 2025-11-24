@@ -1,0 +1,397 @@
+O-RAN.WG11.Security-Protocols-Specifications-v04.00
+Technical Specification
+O-RAN Working Group 11 (Security Working Group)
+Security Protocols Specifications
+Copyright © 2022 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+Contents
+Contents	2
+Foreword	4
+Modal verbs terminology	4
+1	Scope	5
+2	References	5
+2.1	Normative references	5
+2.2	Informative references	8
+3	Definition of terms, symbols and abbreviations	8
+3.1	Abbreviations	8
+4	Security protocols specifications for O-RAN compliant implementation	9
+4.1	SSH	9
+4.1.1	General requirements	9
+4.1.2	Required ciphers	9
+4.2	TLS	11
+4.2.1	General requirements	11
+4.2.2	TLS Protocol profiles specifications	11
+4.3	Support NETCONF over secure Transport	14
+4.4	DTLS	14
+4.4.1	General requirements	14
+4.4.2	DTLS 1.2 profiling	14
+4.4.3	Certificate profiling	15
+4.5	IPSec	15
+4.5.1	Overview	15
+4.5.2	Parallel usage of IPsec and other secure transport protocols	17
+4.5.3	Responder mode and Initiator/Responder mode support	17
+4.6	CMPv2	17
+4.7	OAuth 2.0	18
+4.7.1	Overview	18
+4.7.2	Basic Parametrization	18
+5	Cryptographic operations	21
+5.1	O-Cloud NFs/Apps packages protection	21
+Revision history	24
+History	24
+List of Figures
+Figure 4.7-1: Access Token request	18
+Figure 4.7-2: Service request	19
+List of Tables
+Table 5-1	20
+Foreword
+This Technical Specification (TS) has been produced by O-RAN Alliance.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+Scope
+The contents of the present document are subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+The present document specifies security protocols as to be used for O-RAN compliant implementation.
+References
+Normative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are necessary for the application of the present document.
+3GPP TR 21.905: “Vocabulary for 3GPP Specifications”
+The Secure Shell (SSH) Authentication Protocol, RFC 4252. https://tools.ietf.org/html/rfc4252.
+OpenSSH. https://www.openssh.com/. September 2020.
+moz://a, https://infosec.mozilla.org/guidelines/openssh.html.
+“Secure Shell (SSH) Protocol Parameters.” https://www.iana.org/assignments/ssh-parameters/ssh-parameters.xhtml.
+ORAN-WG4.MP.0-v06.00: “O-RAN Alliance Working Group 4; Management Plane Specification v06.00”.
+Security/Server Side TLS, Mozilla Wiki. https://wiki.mozilla.org/Security/Server_Side_TLS#Cipher_names_correspondence_table. 2. January 2020
+Transport Layer Security (TLS) Parameters. https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml Retrieved 2021-01-21
+TLS Cipher String Cheat Sheet, OWASP Cheat Sheet Series. https://cheatsheetseries.owasp.org/cheatsheets/TLS_Cipher_String_Cheat_Sheet.html 2020
+O-RAN-WG1.O1-Interface-v04.00: “O-RAN Operations and Maintenance Interface Specification v04.00”.
+SHA-2 Data Integrity Verification for the Secure Shell (SSH) Transport Layer Protocol, IETF RFC 6668. https://tools.ietf.org/html/rfc6668. July 2012.
+More Modular Exponentiation (MODP) Diffie-Hellman (DH) Key Exchange (KEX) Groups for Secure Shell (SSH), IETF RFC 8268. https://tools.ietf.org/html/rfc8268. December 2017.
+Extension Negotiation in the Secure Shell (SSH) Protocol, IETF RFC 8308. https://tools.ietf.org/html/rfc8308. March 2018.
+Use of RSA Keys with SHA-256 and SHA-512 in the Secure Shell (SSH) Protocol, IETF RFC 8332. https://tools.ietf.org/html/rfc8332. March 2018.
+Ed25519 and Ed448 Public Key Algorithms for the Secure Shell (SSH) Protocol, IETF RFC 8709, https://tools.ietf.org/html/rfc8709. February 2020.
+Deprecating RC4 in Secure Shell (SSH), IETF RFC 8758, https://tools.ietf.org/html/rfc8758. April 2020.
+The Transport Layer Security Protocol (TLS) v1.2, RFC 5246. https://tools.ietf.org/html/rfc5246
+The Transport Layer Security Protocol (TLS) v1.3, RFC 8446. https://tools.ietf.org/html/rfc8446
+Guidelines for the Selection, Configuration, and Use of Transport Layer Security (TLS) Implementations, Kerry McKay (NIST), David Cooper (NIST), NIST Special Publication 800-52.2 https://csrc.nist.gov/publications/detail/sp/800-52/rev-2/final August 2019
+3GPP TS 33.210 V16.4.0: “Network Domain Security (NDS); IP network layer security (Release 16)”
+Elliptic Curve Cryptography (ECC) Cipher Suites for Transport Layer Security (TLS) Versions 1.2 and Earlier, IETF RFC 8422, https://datatracker.ietf.org/doc/html/rfc8422
+Transport Layer Security (TLS) Extensions: Extension Definitions, IETF RFC 6066. https://datatracker.ietf.org/doc/html/rfc6066
+Datagram Transport Layer Security Version 1.2 , RFC6347, https://datatracker.ietf.org/doc/html/rfc6347
+Datagram Transport Layer Security (DTLS) for Stream Control Transmission Protocol (SCTP), RFC6083, https://datatracker.ietf.org/doc/html/rfc6083
+Datagram Transport Layer Security (DTLS) over Stream Control Transmission Protocol (SCTP) draft-westerlund-tsvwg-dtls-over-sctp-bis-01, Internet-Draft, https://datatracker.ietf.org/doc/html/draft-westerlund-tsvwg-dtls-over-sctp-bis-01
+3GPP TS 33.310 V16.2.0: “Network Domain Security (NDS); Authentication Framework (AF) (Release 16)”
+Security Architecture for the Internet Protocol, IETF RFC 4301, https://datatracker.ietf.org/doc/html/rfc4301
+3GPP TS 33.401 V16.0.0: “3GPP System Architecture Evolution (SAE); Security architecture (Release 15)”
+3GPP TS 33.501 V16.6.0: “Security architecture and procedures for 5G system (Release 16)”
+3GPP TR 33.821 V9.0.0: “Rationale and track of security decisions in Long Term Evolved (LTE) RAN / 3GPP System Architecture Evolution (SAE) (Release 9)”
+IP Encapsulating Security Payload (ESP), IETF RFC 4303, https://datatracker.ietf.org/doc/html/rfc4303
+Cryptographic Algorithm Implementation Requirements and Usage Guidancefor Encapsulating Security Payload (ESP) and Authentication Header (AH), IETF RFC 8221, https://datatracker.ietf.org/doc/html/rfc8221
+Internet Key Exchange (IKEv2) Protocol, IETF RFC 4306, https://datatracker.ietf.org/doc/html/rfc4306
+Internet Key Exchange Protocol Version 2 (IKEv2), IETF RFC 7296, https://datatracker.ietf.org/doc/html/rfc7296
+RFC 6749: The OAuth 2.0 Authorization framework. https://datatracker.ietf.org/doc/html/rfc6749
+RFC 7519: JSON Web Token (JWT). https://datatracker.ietf.org/doc/html/rfc7519
+RFC 7515: JSON Web Signature (JWS). https://datatracker.ietf.org/doc/html/rfc7515
+RFC 4210, Internet X.509 Public Key Infrastructure Certificate Management Protocol (CMP).
+RFC 4211, Internet X.509 Public Key Infrastructure Certificate Request Message Format.
+[NIST Cryptographic Standards and Guidelines
+BSI Technical Guideline - Designation: Cryptographic Mechanisms: Recommendations and Key Lengths, BSI TR-02102-1, 2022-01
+FIPS 186 series: National Institute of Standards and Technology, Digital Signature Standard (DSS)
+SP 800-186: NIST Recommendation for Discrete Logarithm-based Cryptography: Elliptic Curve Domain Parameters
+FIPS 197: National Institute of Standards and Technology, Advanced Encryption Standard (AES)
+SP 800-38 series: NIST Recommendation for Block Cipher Modes of Operation.
+FIPS 180-4: NIST Secure Hash Standard (SHS)
+FIPS 202: NIST Permutation-Based Hash and Extendable-Output Function.
+SP 800-131A: NIST Transitioning the Use of Cryptographic Algorithms and Key Lengths
+SP 800- 57: NIST Recommendation cryptographic key-management guidance
+RFC 8017: PKCS #1: RSA Cryptography Specifications Version 2.2
+Recommendation ITU-T X.509: "Information technology - Open Systems Interconnection - The Directory: Public-key and attribute certificate frameworks".
+Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long term validity.
+The following referenced documents are not necessary for the application of the present document but they assist the user with regard to a particular subject area.
+Definition of terms, symbols and abbreviations
+Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+CA	Certification Authority
+CMP	Certificate Management Protocol
+DTLS	Datagram Transport Layer Security
+DH	Diffie–Hellman
+DPD	Dead Peer Detection
+ESP	Encapsulating Security Payload
+IKE	Internet Key Exchange
+IPsec	Internet Protocol Security
+NAT	Network Address Translation
+NE	Network Element
+NETCONF	Network Configuration Protocol
+PKI	Public Key Infrastructure
+RA	Registration Authority
+SA	Security Association
+SPD	Security Policy Database
+SSH	Secure Shell
+TLS	Transport Layer Security
+Security protocols specifications for O-RAN compliant implementation
+SSH
+General requirements
+O-RAN and 3GPP interfaces that implement authentication, confidentiality and integrity using SSH shall:
+Support SSHv2 [2];
+Disable by default cryptographically insecure ciphers as specified in sections 2.1.2.1, 2.1.2.3, 2.1.2.4;
+Enable an O-RAN deployer to configure SSH to offer less secure ciphers using standard SSH configurations to enable backward compatibility with older SSH implementations.
+Entities providing O-RAN components that support SSH for authentication, confidentiality or integrity shall:
+Stay current with SSH [5];
+Provide an upgrade path for changes to the SSH protocol and ciphers [5].
+Required ciphers
+As of the first release of this document, O-RAN specifies the use of the following ciphers when using SSH. For more information see [2][5] [11][12][13][14][15]. See the Security chapter of the O-RAN Working Group 4 Management Plane Specification for the M-plane mandated SSH ciphers [6].
+Key agreeement
+Note that this document uses the IANA cipher naming convention [5].
+Required
+ecdsa-sha2-nistp256
+ecdsa-sha2-nistp384
+ecdsa-sha2-nistp521
+ssh-ed25519 (support began in OpenSSH 6.5)
+ssh-ed448
+Cryptographically Insecure
+ssh-rsa
+ssh-dss
+Symmetric algorithms for encrypting transferred data
+Required
+aes256-gcm
+aes128-gcm
+aes256-ctr
+aes192-ctr
+aes128-ctr
+Key exchange algorithms (KexAlgorithms)
+Required
+ecdh-sha2-nistp521
+ecdh-sha2-nistp384
+ecdh-sha2-nistp256
+diffie-hellman-group-exchange-sha256
+curve25519-sha256
+Cryptographically Insecure
+Diffie-hellman-group1-sha1
+Message authentication codes (MACs)
+Required
+hmac-sha2-512-etm
+hmac-sha2-512
+hmac-sha2-256-etm
+hmac-sha2-256
+umac-128
+Cryptographically Insecure
+hmac-sha1
+TLS
+General requirements
+O-RAN interfaces that implement authentication, confidentiality and integrity using Transport Layer Security (TLS) shall:
+Support TLS 1.2 [17];
+Configure the TLS 1.2 Intermediate server ciphers as specified in [7] [8];
+Support TLS 1.3 [18][19].
+Enable an O-RAN deployer to configure TLS 1.2 to offer less secure ciphers using standard TLS configurations to enable backward compatibility with weaker TLS ciphers.
+Disable by default cryptographically insecure ciphers identified in [8] [9];
+Entities providing O-RAN components that support TLS for authentication, confidentiality or integrity shall:
+Stay current with the latest release of the TLS software used to implement the protocol, such as OpenSSL;
+Provide an upgrade path for new software releases.
+Any version of SSL and any version of TLS below 1.2, shall not be supported.
+Entities providing O-RAN components that support TLS shall support mutual certificate-based authentication, i.e., client authentication shall be supported in TLS communications, also referred as mutual TLS authentication.
+A TLS server supporting TLS1.2 shall request a certificate from the client as specified in [17] clause 7.4.4 and validate the certificate that is being returned from the client using the structure defined in [17] clause 7.4.2.
+A TLS server supporting TLS1.3 shall request a certificate from the client as specified in [18] clause 4.3.2 and validate the certificate that is being returned from the client.
+See the Security chapter of the O-RAN Working Group 4 Management Plane Specification for the M-plane mandated TLS ciphers [6].
+TLS Protocol profiles specifications
+The Mozilla Operations Security and Enterprise Information Security teams maintains a web page [7] that serves as a reference guide for navigating the TLS landscape. Mozilla divides the TLS ciphers into three classifications: Modern, Intermediate and Old.
+Modern: Modern clients that support TLS 1.3, with no need for backwards compatibility
+Intermediate: Recommended configuration for a general-purpose server
+Old: Services accessed by very old clients or libraries, such as Internet Explorer 8 (Windows XP), Java 6, or OpenSSL 0.9.8
+O-RAN shall support all Intermediate ciphers, and should support all Modern ciphers. O-RAN implementations that use TLS 1.3 shall use Modern ciphers.
+Intermediate classification allows the simultaneous support of TLS 1.2 and TLS 1.3.
+Note that TLS1.3 will be made mandatory in O-RAN future specifications. (as per NIST guidelines [19])
+Intermediate Ciphers for TLS 1.2
+This is the required set of ciphers, protocols, TLS curves, supported certificate types, Diffie-Hellman parameter size, etc. The Intermediate ciphers and configuration parameters are highly secure and compatible with nearly every client released in the last five (or more) years. Note that this document uses the IANA cipher naming conventions [5]
+Cipher suites (TLS 1.2):
+TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+TLS_DHE_PSK_WITH_AES_128_GCM_SHA256
+TLS_DHE_PSK_WITH_AES_256_GCM_SHA384
+Only cipher suites with AEAD (e.g. GCM) and PFS (e.g. ECDHE, DHE) shall be supported
+TLS curves: X25519, prime256v1 (also called secp256r1), secp384r1 [21]
+Certificate type: ECDSA (P-256) (recommended), or RSA (2048 bits)
+Diffie-Hellman groups (see [20]):
+DH parameter size: 2048 (ffdhe2048, RFC 7919)
+Except curve25519, ed25519, and W-25519, elliptic curve groups of less than 256 bits shall not be supported.
+For DHE, Diffie-Hellman groups of at least 4096 bits should be supported. Diffie-Hellman groups smaller than 2048 bits shall not be supported.
+TLS hash algorithms and signature algorithms (see [20]):
+Hash algorithms: SHA-256 shall be supported. SHA-384 should be supported. MD5 and SHA-1 shall not be supported.
+Signature algorithms: ecdsa, rsa_pss_rsae, and rsa_pkcs1 shall be supported. Usage of rsa_pkcs1 is not recommended.
+ecdsa_secp384r1_sha384 should be supported.
+The “null” compression method as specified in TLS 1.2 RFC 5246 [17] is mandatory to support. All other compression methods shall not be supported.
+HTTP Strict Transport Security (HSTS): max-age=63072000 (two years)
+Maximum certificate lifespan: 90 days (recommended) to 2 years
+Cipher preference: client chooses
+Intermediate Ciphers for TLS 1.3
+The following ciphers are considered Intermediate for TLS 1.3.
+Cipher suites (TLS 1.3):
+TLS_AES_128_GCM_SHA256
+TLS_AES_256_GCM_SHA384
+TLS_CHACHA20_POLY1305_SHA256
+TLS curves: X25519, prime256v1, secp384r1
+Certificate type: ECDSA (P-256) (recommended), or RSA (2048 bits)
+DH parameter size: 2048 (ffdhe2048, RFC 7919)
+The requirements given in section 9.1 of TLS 1.3 RFC 8446 [18] shall be followed. In addition:
+Key exchange with secp384r1 should be supported.
+TLS signature schemes: ecdsa_secp384r1_sha384 should be supported.
+TLS extensions:
+The requirements given in section 9.2 of TLS 1.3 RCF 8446 [18] shall be followed. In addition:
+The OCSP Status extension (a.k.a. certificate status request), as defined in RFC 6066 [22] and RFC 8446 [18] should be supported.
+HTTP Strict Transport Security (HSTS): max-age=63072000 (two years)
+Maximum certificate lifespan: 90 days (recommended) to 2 years
+Cipher preference: client chooses
+Modern Ciphers for TLS 1.3
+For services with clients that support TLS 1.3 and do not need backward compatibility, the Modern configuration provides an extremely high level of security.
+Cipher suites (TLS 1.3):
+TLS_AES_128_GCM_SHA256
+TLS_AES_256_GCM_SHA384
+TLS_CHACHA20_POLY1305_SHA256
+Certificate type: ECDSA (P-256)
+TLS curves: X25519, prime256v1, secp384r1
+The requirements given in section 9.1 of TLS 1.3 RFC 8446 [18] shall be followed. In addition:
+Key exchange with secp384r1 should be supported.
+TLS signature schemes: ecdsa_secp384r1_sha384 should be supported.
+TLS extensions:
+The requirements given in section 9.2 of TLS 1.3 RFC 8446 [18] shall be followed. In addition:
+The OCSP Status extension (a.k.a. certificate status request), as defined in RFC 6066 [22] and RFC 8446 [18] should be supported.
+HSTS: max-age=63072000 (two years)
+Maximum certificate lifespan: 90 days
+Cipher preference: client chooses
+Support NETCONF over secure Transport
+NETCONF Service management service providers and consumers [10] that use TLS SHALL follow the cipher requirements defined in section 2.2 (TLS) of this document.
+As exception, see the Security chapter of the O-RAN Working Group 4 Management Plane Specification for the M-plane mandated TLS ciphers [6] to be used with NETCONF.
+DTLS
+General requirements
+O-RAN and 3GPP interfaces that implement mutual authentication, integrity protection, replay protection and confidentiality protection using DatagramTransport Layer Security (DTLS) shall:
+Support DTLS 1.2 [23]
+Support DTLS for Stream Control Transmission Protocol [24]
+DTLS 1.0 shall not be supported.
+NOTE 1. RFC 6083 specifies a user message limit of approximately 16k bytes, which shall be compared to the unlimited user message size that exists when SCTP is used without DTLS. There could be applications messages exceeding the limit, preventing the use of DTLS over SCTP, so enforcing unsecured SCTP.
+NOTE 2. The Internet-Draft (ID) ‘draft-westerlund-tsvwg-dtls-over-sctp-bis-01’ [25] intends to obsolete RFC 6083 and removes the 16k bytes limitation on user message size by defining a security user message fragmentation so that multiple DTLS records can be used to protect a single user message. Once the ID becomes RFC, the referenced document, and the text pieces referring to that RFC, will be updated accordingly.
+Entities providing O-RAN components that support TLS for authentication, confidentiality or integrity shall:
+Stay current with the latest release of the DTLS software used to implement the protocol, such as OpenSSL.
+Provide an upgrade path for new software releases.
+The use of pre-shared keys in the authentication mechanisms is not recommended.
+DTLS 1.2 profiling
+DTLS 1.2 is based on TLS 1.2, so all requirements defined in section 2.2 in this document for TLS 1.2 apply to DTLS as well.
+3GPP control plane interfaces in O-RAN system implementing DTLS 1.2 shall support all requirements defined in the profiling for TLS 1.2 specified in TS 33.210 (6.2.3) [20].
+Certificate profiling
+Certificate requirements defined in section 2.2 in this document for TLS 1.2 apply to DTLS as well.
+3GPP control plane interfaces in O-RAN system implementing DTLS 1.2 shall support certificate profiling as given in clause 6.1.3a of TS 33.310 [26].
+TLS client certificates shall be directly signed by the TLS client CA in the operator domain that the TLS client belongs to. TLS server certificates shall be directly signed by the TLS server CA in the operator domain that the TLS server belongs to.
+IPSec
+Overview
+O-RAN and 3GPP interfaces that implement authentication, confidentiality and integrity using IPsec shall support IPsec according to [27]. The supported IPsec capabilities follow [20] for interworking purposes and further appliance rules given in [26], [28], [29] and [30]. Since IPsec standards include a high number of selectable security parameters options, 3GPP has recommended to cut down the number of these options in order to guarantee interoperability between different security domains.
+Supported IPsec capabilities
+Services that SHALL be supported (see also [29], section 9.8.2):
+Confidentiality, can be enabled/disabled (via ENCR_NULL)
+integrity protection, always enabled
+data origin authentication, always enabled
+anti-replay protection, can be enabled/disabled
+extended sequence numbers, can be enabled/disabled
+Protocol that SHALL be supported: ESP ([31], as profiled by [20])
+IPsec mode: Tunnel mode
+for encrypted packets the DSCP value of the inner packet will be copied to the outer packet
+NAT traversal
+ESP encryption transforms that SHALL be supported (including authenticated encryption transforms, see also [20], section 5.3.3):
+as defined in [30] (the ones marked with ‘MUST’)
+ESP authentication transforms that SHALL be supported according to [20], subsection 5.3.4.
+IKE endpoint Identification that SHALL be supported, according to [26], subsection 6.2.1b:
+IP address
+Fully Qualified domain name (FQDN) (if DNS is supported)
+Authentication that SHALL be supported:
+X.509v3 digital certificates provided by a Certificate Authority solution
+Editors note: O-RAN IPsec profile will be defined in future releases
+Authentication that MAY be supported:
+Pre-shared Keys
+Note: use of pre-shared keys is generally discouraged.
+Key exchange that SHALL be supported:
+IKEv2 [33]
+profile as described in [26]
+certificate-based authentication according to [26]
+certificates according to the profile described by [26]
+DH group 19
+(Optional) DH group 20
+Security Association multiplicity that SHALL be supported:
+multiple IKE SAs (multiple IPsec tunnels)
+multiple IPsec SAs
+multiple IPsec SAs per IPsec tunnel
+IKE SA(s) and IPSEC SA(s) SHALL be regularly re-established.
+When the full sequence number space of an IPSEC SA(s) is used, the transmission for that SA SHALL stop.
+Dead-Peer-Detection (DPD) SHALL be supported as defined in [34].
+[R42]:	 Each node SHALL support a traffic narrowing function for the traffic selector ([34]): If the traffic selector notified from the peer (e.g. Security GW or neighboring node) is wider than the Local/Remote Address range in the SPD information set on the node side, the peers set the traffic selector values to the narrower range.
+Parallel usage of IPsec and other secure transport protocols
+The equipment SHALL support configuration of IPsec (one or more dedicated connections) in parallel with other secure transport protocols like SSH or TLS.
+For instance, it SHALL be possible to run SSH or TLS connections within an IPsec tunnel or in parallel to IPsec tunnel(s).
+Responder mode and Initiator/Responder mode support
+The equipment SHALL support a configurable option per IKE Security Association to use "Responder mode" instead of "Responder/Initiator mode".
+The mode is related to IKE SA establishment only. The introduction of "Responder mode" does not change the IKE SA rekeying behavior: Each node operates as initiator and responder in IKE_SA rekeying.
+CMPv2
+Certificate Management Protocol version 2 (CMPv2) is based on Internet X.509 Public Key Infrastructure (PKI) Certificate Management Protocol (CMP) specified in IETF RFC 4210 [38] and 4211 [39].
+3GPP TS 33.310 [26] specifies the use of CMPv2 used by base stations to obtain an operator-signed certificate using a secured communication based on the vendor-signed certificate in the base station and a vendor root certificate pre-installed in the CA/RA server. The approach is defined for provisioning certificates for use with IPsec or TLS.  The TLS client CA is responsible for issuing certificates to NETCONF clients and the TLS server CA is responsible for issuing certificates to NETCONF servers.
+Certificates may be installed at initial system initialization or obtained through certificate enrolment with the operator’s PKI. Certificate enrolment may be supported with the CMPv2 protocol as defined in 3GPP TS 33.310 [26] between the Network Element (NE) and the operator’s CA. The handling of certificates, including certificate profiles, may follow the rules defined in 3GPP TS 33.310 [26] for TLS CA certificates. The CA/RA server may include the trust anchor for the operator issued certificate and the appropriate certificate chains in the initialization response message.
+OAuth 2.0
+Overview
+The authorization framework described in clause 4.7 of the present document uses the OAuth 2.0 framework as specified in RFC 6749 [35]. It allows the service producers to authorize the requests from service consumers, and the service consumers to obtain authorization credentials (“token endpoint”).
+Interfaces requiring the use of OAuth 2.0 for authorization purposes shall support the functionality according to clause 4.7 of the present document.
+Since the OAuth 2.0 framework includes a high number of selectable parameters and options, in order to guarantee interoperability and align with the existing OAuth 2.0 authorization framework in 3GPP [29] (i.e., Service Based Architecture), a set of parameters and options have been selected.
+Basic Parametrization
+General
+The authorization grants, which the client uses to request the access token, shall be of the type Client Credentials Grant, as described in 4.4 of RFC 6749 [35]. I.e., client authentication is required by the authorization server to be valid to issue an access token. Mutual TLS authentication, as specified in the present document (clause 4.2.1), is the mechanism selected by O-RAN for this security procedure.
+Access token shall be JSON Web Tokens (JWT) as described in RFC 7519 [36], secured with digital signatures based on JSON Web Signature (JWS) as described in RFC 7515 [37].
+The ‘scope’ attribute as described in clause 3.3 of RFC 6749 [35] shall be used to specify the allowed services per type of service producer. A more granular level of authorization can be defined by adding additional scope information with the token (e.g., to authorize specific operations, or access to particular resources or datasets), which requires to be verified by the service producer.
+OAuth 2.0 roles, as defined in clause 1.1 of RFC 6749 [35], are as follows:
+OAuth 2.0 Authorization server: new security function in O-RAN architecture; or provided by existing OAuth 2.0 infrastructure in the network.
+OAuth 2.0 client: every API service consumer in O-RAN system (e.g., rApp, xApps)
+OAuth 2.0 resource owner/server: every API service producer in O-RAN system (e.g., Near-RT RIC platform)
+Registration process
+OAuth 2.0 resource servers (API service producers) shall be registered with the OAuth 2.0 Authorization server. Those service producers, as part of their profiles, may include additional scope information related to specific allowed service operations and resources per client type.
+Before initiating the authorization protocol, OAuth 2.0 clients shall be registered with the OAuth 2.0 Authorization server. To achieve that, information about the service consumer instance and its type shall be made available in the OAuth 2.0 Authorization server. The registration process is subject to implementation procedures of the operator, with the following consideration on authentication procedure:
+OAuth 2.0 clients shall be capable to authenticate securely with the authorization server, i.e., client type as specified in RFC 6749 [35] shall be “confidential”.
+Strong authentication mechanisms based on digital certificates shall be used. Weak authentication schemas, such as password-based authentication, are not allowed.
+Access Token request process
+After TLS mutual authentication procedure between the OAuth 2.0 client and OAuth 2.0 Authorization server, the latter exposes a ‘Token Endpoint’ where the Access Token request service can be requested by OAuth 2.0 client.
+The following procedure depicts the procedure of the OAuth 2.0 client to obtain an access token from the OAuth 2.0 authorization server.
+Figure 4.7-1: Access Token request
+The OAuth 2.0 Client shall request an access token from the OAuth 2.0 Authorization server. For this operation the client shall send a HTTP POST request to the authorization server (‘Token endpoint’), as described in RFC 6749 [35], clause 3.2. The message, i.e., the body of the HTTP POST request, shall include the identifier of the client instance making the request, the ‘scope’ parameter indicating the expected services, and optionally additional scope information with more granular information about resources and operations on the resources, and optionally the type of client (‘confidential’) and the expected OAuth 2.0 resource owner/server. The message may include as well information referring to instance(s) of specific resource owner(s)/server(s) if required.
+The OAuth 2.0 Authorization server shall verify that the input parameters in the access token (e.g., client type) match with the corresponding ones in the public certificate of the client, or those in the client profile previously registered. If the client is authorized, the Authorization server shall generate an access token with appropriate claims included. The Authorization server shall digitally sign the generated access token based on a private key as described in RFC 7515 [37]. If the client is not authorized, the Authorization server shall not issue an access token to that client.
+If the authorization is successful, the Authorization server shall send the access token to the client (‘200 OK’), otherwise it shall reply based on OAuth 2.0 error response defined in RFC 6749 [35]. The success response should include in addition the expiration time for the token as indicated in RFC 6749 [35], unless this is made available by other deployment specific means. The response shall include information to identify the resource owner(s)/server(s) if they differ from the related information included in the token request.
+Service access request based on token verification
+Once the client is in possession of a valid access token, it can proceed with the request of service access towards the service producer (OAuth 2.0 resource owner/server).
+Figure -: Service request
+The OAuth 2.0 client requests service from the OAuth 2.0 resource owner/server. The OAuth 2.0 client shall include the access token in the request. The OAuth 2.0 client and OAuth 2.0 resource owner/server shall authenticate each other via mutual TLS, as defined in the present document (clause 2.2.1)
+The OAuth 2.0 resource owner/server shall verify the token:
+It ensures the integrity of the token by verifying the signature using the OAuth 2.0 Authorization server’s public key. If the integrity check is successful, the OAuth 2.0 resource owner/server shall verify the claims.
+If the verification is successful, the OAuth 2.0 resource owner/server shall execute the requested service and respond back to the OAuth 2.0 client. Otherwise, it shall send a proper error response. If the HTTP protocol is used, that error response shall be based on the OAuth 2.0 error response defined in RFC 6749 [35].
+Cryptographic operations
+O-Cloud NFs/Apps packages protection
+The following table outlines the main cryptographic operations involved in the protection of App/VNF/CNF packages It contains the allowed list of algorithms, key sizes and standards according to BSI [41] and NIST [40], [48], [49] Cryptographic Standards and Guidelines. App/VNF/CNF Providers and Service Providers (Telco Operator, Cloud Service Provider) shall choose among the following allowed cryptographic list for protecting App/VNF/CNF packages.
+Table 5-1
+The signature operation must involve X.509-based PKI certificates [51]. An X.509v3 certificate should be included in the App/VNF/CNF package by the App/VNF/CNF provider.
+The following recommendations should be considered:
+For the protection of cryptographic keys, Hardware Security Modules, or HSMs, should be used. An HSM is a specialized, highly trusted physical device. It is a network computer which performs all the major cryptographic operations including encryption, decryption, authentication, key management, key exchange, etc. They are tamper-resistant and use extremely secure cryptographic operations.
+Along with HSMs, the principle of least privilege should be used with keys, to ensure only users who need the key have access to it.
+In case a legacy system doesn't support ECDSA, RSA signing algorithms should be used instead. Otherwise, the use of the Elliptic curve signing algorithms is recommended.
+If older libraries or frameworks are in use that don't support PSS padding scheme, one of the RSA PKCS1 algorithms should be used instead. Otherwise, the use of one of the RSA PSS algorithms is recommended.
+In general, the largest key size available for an algorithm family should be used:
+For RSA, the largest supported key size is 4096 bits.
+For ECDSA, the largest supported key size is 512 bits.
+For AES, the largest supported key size is 256 bits.
+Revision history
+History

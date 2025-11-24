@@ -1,0 +1,1296 @@
+O-RAN.WG2.A1AP-v01.01
+O-RAN.WG2.A1AP-v01.01
+Technical Specification
+O-RAN Working Group 2
+A1 interface: Application Protocol
+Prepared by the O-RAN Alliance e.V. Copyright © 2020 by the O-RAN Alliance e.V. By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in Annex Z of this specification. All other rights reserved.
+1
+Revision History
+Contents
+Revision History	2
+Chapter 1 Introduction	5
+1.1 Scope	5
+1.2 References	5
+1.3 Definitions and Abbreviations	6
+1.3.1 Definitions	6
+1.3.2 Abbreviations	7
+Chapter 2 A1 application protocol	8
+Chapter 3 A1 Services	8
+3.1	Introduction	8
+3.2	Policy Management Service	9
+3.2.1	Service Description	9
+3.2.2	Service Operations	10
+3.3	ML Model Management Service	16
+3.4	Enrichment Information Service	16
+Chapter 4 API Definitions	16
+4.1	Introduction	16
+4.2	A1-P (policy management)	16
+4.2.1	Introduction	16
+4.2.2	Usage of HTTP	17
+4.2.3	Resources	17
+4.2.4	Custom Operations without associated resources	21
+4.2.5	Notifications	21
+4.2.6	Data Model	22
+4.2.7	Error Handling	29
+Annex A: OpenAPI specification	30
+A.1	General	30
+A.2	Policy Management API	30
+Annex B: JSON objects	36
+B.1	JSON schemas	36
+B.1.1	QoS Target	36
+B.1.2	QoE Target	37
+B.1.3	Traffic Steering Preferences	39
+B.1.4	QoS optimization with resource directive	40
+B.1.5	QoE optimization with resource directive	41
+B.1.6	Policy Status Object	43
+B.2	Policy examples in JSON format	44
+B.2.1	QoS	44
+B.2.2	QoE	44
+B.2.3	TSP	45
+B.2.4	QoS optimization with resource directive	46
+B.2.5	QoE optimization with resource directive	47
+B.2.6	Status object for notification	47
+Annex Z	48
+Introduction
+1.1 Scope
+This Technical Specification has been produced by O-RAN Alliance.
+The contents of the present document are subject to continuing work within O-RAN WG2 and may change following formal O-RAN approval. In the event that O-RAN Alliance decides to modify the contents of the present document, it will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version number as follows:
+Release x.y.z
+where:
+x	the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+The present document is part of a TS-family covering the O-RAN WG2: A1 interface as identified below: “General Aspects and Principles”. “Transport Protocol”. “Application Protocol”.
+1.2 References
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+-	References are either specific (identified by date of publication, edition number, version number, etc.) or non-specific.
+-	For a specific reference, subsequent revisions do not apply.
+-	For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including a GSM document), a non-specific reference implicitly refers to the latest version of that document in the same Release as the present document.
+[1]	3GPP TR 21.905: “3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; Vocabulary for 3GPP Specifications”
+[2]		O-RAN WG2: “Non-RT RIC and A1 interface (Use Case Requirements)”
+[3]	O-RAN WG2: “A1 interface: General Aspects and Principles”
+[4]	O-RAN WG2: “A1 interface: Transport Protocol”
+[5]	3GPP TS 23.501: “3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; System Architecture for the 5G System; Stage 2”
+[6]	3GPP TS 29.501: “3rd Generation Partnership Project; Technical Specification Group Core Network and Terminals; 5G System; Principles and Guidelines for Services Definition; Stage 3”
+[7]	3GPP TS 29.cde: “3rd Generation Partnership Project; Technical Specification Group Core Network and Terminals; 5G System; <template> Services Stage 3”
+[8] 	3GPP TS 32.158: “3rd Generation Partnership Project; Technical Specification Group Management and orchestration; Design rules for REpresentational State Transfer (REST) Solution Sets (SS)
+[9]	3GPP TS 32.866: “3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; Telecommunication management; Study on a REST(REpresentational State Transfer)-ful HTTP-based Solution Set (SS)
+[10]				IETF RFC8259: “The JavaScript Object Notation (JSON) Data Interchange Format”
+[11]				(void)
+[12]	3GPP TS 38.463: “3rd Generation Partnership Project; Technical Specification Group Radio Access Network;  NG-RAN; E1 application protocol (E1AP)”
+[13]	3GPP TS 38.473: “3rd Generation Partnership Project; Technical Specification Group Radio Access Network;  NG-RAN; F1 application protocol (F1AP)”
+[14]	3GPP TS 23.401: “3rd Generation Partnership Project; Technical Specification Group Radio Access Network; UTRAN overall description”
+[15]	3GPP TS 23.003: “3rd Generation Partnership Project; Technical Specification Group Core Network and Terminals; Numbering, addressing and identification”
+[16]	ITU-T P.1203.3: “SERIES P: TELEPHONE TRANSMISSION QUALITY, TELEPHONE INSTALLATIONS, LOCAL LINE NETWORKS; Models and tools for quality assessment of streamed media; Parametric bitstream-based quality assessment of progressive download and adaptive audiovisual streaming services over reliable transport – Quality integration module”
+[17]	3GPP TS 38.300: “3rd Generation Partnership Project; Technical Specification Group Radio Access Network; NR; NR and NG-RAN Overall Description; Stage 2”
+[18]	IETF RFC 3986: “Uniform Resource Identifier (URI): Generic Syntax”
+[19]				IETF RFC7807: “Problem Details for HTTP APIs”
+[20]	3GPP TS 29.500: “3rd Generation Partnership Project; Technical Specification Group Core etwork and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 3”
+[21]	3GPP TS 21.900: “3rd Generation Partnership Project; Technical Specification Group Core Network and Terminals; 5G System; Technical Realization of Service Based Architecture; Stage 3”
+1.3 Definitions and Abbreviations
+1.3.1 Definitions
+A1 policy	Declarative policy that is identified by its PolicyID and contains a scope identifier and one or more policy statements.
+Policy identifer	Identifier of an A1 policy that is used in policy operations.
+Scope identifier	Identifier of what the statements in the policy applies to (UE, group of UEs, slice, QoS flow, network resource or combinations thereof).
+Policy statement	Expression of a directive in an A1 policy that is related to policy objectives and/or policy resources and are to be applied to/for the entities identified by the scope identifier.
+Policy object	Representation of an A1 policy in JSON format used as payload in HTTP based policy procedures.
+1.3.2 Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1], O-RAN [2,3] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+Id				Identifier
+JSON			JavaScript Object Notation
+KPI			Key Performance Indicator
+KQI			Key Quality Indicator
+ML			Machine Learning
+QoS			Quality of Service
+QoE			Quality of Experience
+REST			REpresentational State Transfer
+RAN			Radio Access Netework
+RT				Real Time
+RIC			RAN Intelligent Controller
+RRM			Radio Resouirce Management
+S-NSSAI		Single Network Slice Selection Assistance Information
+SMO			Service Management and Orchestration
+SPID			Subscriber Profile IDentity
+UE				User Equipment
+UEId			UE Identity
+URI			Uniform Resource Identifier
+A1 application protocol
+This document contains a REST method realization of the interface architecture and policy procedures defined in [3]. It is based on HTTP transport as defined in [4].
+This definition of the A1 Application Protocol (A1AP) is based on the 3GPP service framework for network functions [5]. It corresponds to a REST-based Solution Set and is based on the structure in the 3GPP specification 29.501 [6] and the related template [7]. The design patterns for HTTP procedures are based on [8] and the design patterns for JSON objects are based on [9].
+A1 Services
+3.1	Introduction
+The A1AP contains APIs for the services defined in [3]:
+A1-P – Policy Management Service
+A1-ML – ML Model Management Service
+A1-EI – Enrichment Information Service
+The A1AP is based on signaling between an A1 service consumer and an A1 service producer residing in the non-RT RIC or in the near-RT RIC.
+Figure 3.1-1 Service framework for the A1 services.
+The interactions between Service Consumer and Service Producer is based on the service framework used for 3GPP Network Functions [5] section 7.1.2 where requests are sent from the Consumer and responses and notifications are sent from the from the Producer. It is the Producer that handles the resources on which the Consumer performs operations. The terms consumer and producer does, thus, not refer to the direction of the data transfer over the A1 interface.
+3.2	Policy Management Service
+Definitions of A1 policy, policy statements, policy procedures and A1 policy life cycle aspects are found in [3]. This document defines a REST based solution set for how to realize A1 policies and perform operations on them over the A1 interface [4].
+3.2.1	Service Description
+3.2.1.1	Functional elements
+The A1AP is based on signaling between the A1-P Consumer residing in the non-RT RIC and the A1-P Producer residing in the near-RT RIC. Both the A1-P Consumer and the A1-P Producer contains a HTTP Client and a HTTP Server.
+Figure 3.2-1 HTTP roles in service framework.
+The A1AP realizes the A1 policy procedures defined in [3] using HTTP [4] operations where a policy is represented as a JSON object [10].
+3.2.1.2	Policy representation
+The following principles are used for A1 policies when JSON is used as resource representation format:
+A policy corresponds to a resource (in the REST sense);
+A policy is represented as a JSON object referred to as a policy object;
+A policy object contains a scope identifier and at least one policy statement (e.g. one or more policy objective statements and/or one or more policy resource statements);
+A policy is identified by a policyId that is included in the URI when operation is for a single policy;
+The policyId is assigned by the A1-P Consumer when the policy is created;
+The A1-P Producer cannot modify or delete a policy;
+Policy feedback for a specifc policy is subscribed to when the policy is created by providing a callback URI in the create policy operation;
+A policy object does not contain any information related to which internal function in the near-RIC that is to evaluate the policy.
+3.2.1.3	Representation objects
+The following JSON objects are used within the service operations of the A1-P service:
+PolicyObject
+The policy object is the JSON representation of a complete A1 policy.
+PolicyStatusObject
+The policy status object is the JSON representation of the enforcement status of an A1 policy.
+ProblemDetails
+The problem details object is the JSON representation of the content in a response message with other HTTP error response codes (4xx/5xx).
+3.2.1.4	Resource identifiers
+The main URI for A1 policies is:
+…/policies
+A single policy can be operated upon by adding the value of the policy identifier to the URI:
+…/policies/{policyId}
+The main URI for status of a single policy is:
+…/policies/{policyId}/status
+The URI for policy notification is referred to as the notificationDestination and is based on a callback URI provided when creating a policy.
+3.2.2	Service Operations
+The following table describes the mapping between the A1 policy procedures and the HTTP methods used to realise them.
+Table 3.2-1 A1 procedures to HTTP methods mapping.
+3.2.2.1	Introduction
+The following sections describe the policy operations. For details on the policy objects (in JSON format) transferred in the HTTP message bodies, see Annex B.
+The policy scope in a policy object contains a scope identifier that can be e.g. a ueId, a groupId or a cellId. The A1-P Consumer needs to map policyIds to scope identifiers in order to manage e.g. all policies applicable to a specific individual ueId. If there are several polices related to a single scope identifier, then several policy requests need to be made to manage that specific individualin a sequence of single policy operations.
+3.2.2.2	Create policy
+3.2.2.2.1	General
+An A1 policy is created using a HTTP PUT request containing a policy object in the payload. The format of the policy object is checked, and the request is either accepted or rejected. If accepted, the policy is to be enforced.
+3.2.2.2.2	Create single policy
+The operation to create a single policy is based on HTTP PUT and a policyId created by the the A1-P Consumer.
+Figure 3.2.2.2-1 Create single policy procedure.
+The procedure is as follows:
+The A1-P Consumer generates the policyId and sends a HTTP PUT request to the A1-P Producer. The target URI identifies the resource (policyId) under which the new policy shall be created. The message body carries a complete policy object.
+The A1-P Producer returns the HTTP PUT response. On success, “201” is returned. The location header is present and carries the URI of the new policy and the message body the complete policy object. On failure, the appropriate error code is returned and the message body may contain additional error information.
+3.2.2.2.3	Create multiple policies
+The operation to create multiple policies is a sequence of operations to create a single policy.
+3.2.2.3	Query policy
+3.2.2.3.1	General
+A1-P Consumer can use the query policy procedure to read a single policy or to check which policies that exist.
+3.2.2.3.2	Query single policy
+The operation to query a single policy is based on HTTP GET. The policy to be read is identified with a URI that includes the policyId while the message body is empty and the response returns the complete policy object.
+Figure 3.2.2.3-1 Query single policy procedure.
+The procedure is as follows:
+The A1-P Consumer sends a HTTP GET request to the A1-P Producer. The target URI identifies the policy to be read based on the policyId under the parent resource “/policies”. The message body is empty.
+The A1-P Producer returns the HTTP GET response. On success, “200 OK” is returned. The message body carries a complete policy object representing the read policy. On failure, the appropriate error code is returned and the message response body may contain additional error information.
+3.2.2.3.3	Query multiple policies
+The operation to query multiple policies is a sequence of operations to query a single policy.
+NOTE: to query all policies applicable to e.g. a dynamically defined group of UEs, a slice or a cell, the A1-P Consumer need to map the scope identifier to the applicable policyId(s) and make a sequence of requests.
+3.2.2.3.4	Query all policies
+See operation for query multiple policies.
+3.2.2.3.5	Query all policy identities
+The operation to query all policy identities is based on HTTP GET. The collection of policy identities to be read is identified within the URI while the message body is empty and the response returns an array of identities representing all policies in the collection.
+Figure 3.2.2.3-3 Query all policy identities procedure.
+3.2.2.3.6	Query policy status
+The operation to query status for a single policy is based on HTTP GET. The policy for which status is to be read is identified with a URI that includes the policyId while the message body is empty and the response returns a policy status object.
+Figure 3.2.2.3-4 Query policy status procedure.
+3.2.2.4	Update policy
+3.2.2.4.1	General
+A1-P Consumer can use the update policy procedure to completely replace one policy.
+3.2.2.4.2	Update single policy
+The operation to completely update a single policy is based on HTTP PUT. The policy to be updated is identified with a URI that includes the policyId and the message body contains the complete policy object for the updated policy.
+Figure 3.2.2.4-1 Update completely single policy procedure.
+The procedure is as follows:
+The A1-P Consumer sends a HTTP PUT request to the A1-P Producer. The target URI identifies the policy to be updated based on the policyId under the parent resource “/policies”. The message body contains a complete policy object.
+The A1-P Producer returns the HTTP PUT response. On success, “200 OK” is returned. The message body carries a complete policy object representing the updated policy. On failure, the appropriate error code is returned and the message response body may contain additional error information.
+NOTE:	In case the policy does not exist, the PUT request is handled as a create policy request and “201 Created” is returned.
+3.2.2.4.3	Update multiple policies
+The operation to update multiple policies is a sequence of operations to update a single policy.
+3.2.2.4.4	(Void)
+3.2.2.4.5	(Void)
+3.2.2.5	Delete policy
+3.2.2.5.1	General
+A1-P Consumer can use the delete policy procedure to delete a single policy or to delete multiple policies.
+3.2.2.5.2	Delete single policy
+The operation to delete a single policy is based on HTTP DELETE. The policy to be deleted is identified with a URI that includes the PolicyId. Neither request nor response contain any policy object in the message body.
+Figure 3.2.2.5-1 Delete single policy procedure.
+The procedure is as follows:
+The A1-P Consumer sends a HTTP DELETE request to the A1-P Producer. The target URI identifies the policy to be deleted based on the PolicyId under the parent resource “/policies”. The message body is empty.
+The A1-P Producer returns the HTTP DELETE response. On success, “204 No Content” is returned. The message body is empty. On failure, the appropriate error code is returned and the message response body may contain additional error information.
+3.2.2.5.3	Delete multiple policies
+The operation to delete multiple policies is a sequence of operations to delete a single policy.
+3.2.2.6	Policy feedback
+3.2.2.6.1	General
+Policy feedback is an operation that requires the A1-P Producer to have a reduced feature HTTP Client for sending HTTP POST requests and receiving HTTP POST responses. Correspondingly, the A1-P Consumer is required to have a reduced feature HTTP Server for receiving HTTP POST requests and sending HTTP POST responses.
+The A1-P Producer uses the policy feedback operation to notify the A1-P Consumer about:
+Changes in the policy enforcement status for an A1 policy;
+All notifications are sent to the URI for notification handling and the PolicyStatusObject contains the information about changes and causes.
+3.2.2.6.2	Policy status update
+The operation to provide policy feedback is based on HTTP POST. The URI contains the target resource for policy notification handling. The notification content is represented in a policy status object that is included in the message body and can contain one notification.
+The procedure is used to notify about an enforcement status change of a policy between ‘enforced’ and ‘not enforced’.
+Figure 3.2.2.6-1 Policy enforcement feedback procedure.
+The procedure is as follows:
+The A1-P Producer sends a HTTP POST request to the A1-P Consumer. The target URI (notificationDestination) identifies the sink for policy notifications. The message body contains a policy status object.
+The A1-P Consumer returns the HTTP POST response with “204 No Content”. The message body is empty.
+3.3	ML Model Management Service
+No explicit ML Model service operations are defined in this version of the specification.
+3.4	Enrichment Information Service
+No explicit Enrichment Information service operations are defined in this version of the specification.
+API Definitions
+4.1	Introduction
+4.2	A1-P (policy management)
+This section contains the definition of the REST based API for the Policy Management Service referred to as A1-P.
+4.2.1	Introduction
+The A1-P service shall use the A1-P API.
+The request URI used in HTTP request from the A1-P consumer towards the A1-P producer shall have the structure defined in subclause 4.4.1 of 3GPP TS 29.501 [6], i.e.:
+{apiRoot}/<apiName>/{apiVersion}/<apiSpecificResourceUriPart>
+"apiRoot" shall be a concatenation of the following parts:
+-	scheme ("https")
+NOTE:	In this release of the specification, https scheme URIs are mandated.
+-	the fixed string "://"
+-	authority (host and optional port) as defined in IETF RFC 3986 [9].
+"apiName" shall be “A1-P”.
+"apiVersion" shall be “v1”.
+"apiSpecificResourceUriPart" shall be as be defined in subclause 4.2.3.
+4.2.2	Usage of HTTP
+4.2.2.1	General
+The A1 Transport, HTTP protocol and security requirements, is described in [4].
+4.2.2.2	HTTP standard headers
+Note: the encodings and applicable MIME media type for the related Content-Type header are not specified in the current version.
+4.2.2.3	HTTP custom headers
+No HTTP custom headers are introduced in this version of the specification.
+4.2.3	Resources
+4.2.3.1	Overview
+The resource URI structure for the A1-P API is illustrated in figure 4.2.3-1.
+Figure 4.2.3-1: Resource URI structure of the A1-P API
+Table 4.2.3-1 provides an overview of the resources and applicable HTTP methods.
+Table 4.2.3-1: Resources and methods overview
+4.2.3.2	Individual Policy Object
+The name of resource is the PolicyId assigned by the A1-P Consumer when the policy is created.
+4.2.3.2.1	Description
+The resource represents an A1 policy.
+4.2.3.2.2	Resource Definition
+The Resource URI and the supported resource variables are as defined in previous sections.
+4.2.3.2.3	Resource Standard Methods
+The following subclauses specifies the standard methods supported by the resource.
+4.2.3.2.3.1	HTTP PUT
+This method shall support the request data structures specified in table 4.2.3.2.3.1-1 and the response data structures and response codes specified in table 4.2.3.2.3.1-2.
+Table 4.2.3.2.3.1-1: Data structures supported by the HTTP PUT Request Body on this resource
+Table 4.2.3.2.3.1-2: Data structures supported by the HTTP PUT Response Body on this resource
+This method shall support the URI query parameters specified in table 4.2.3.2.3.1-3.
+Table 4.2.3.2.3.1-3: URI query parameters supported by the HTTP PUT method on this resource
+4.2.3.2.3.2	HTTP GET
+This method shall support the request data structures specified in table 4.2.3.2.3.2-1 and the response data structures and response codes specified in table 4.2.3.2.3.2-2.
+Table 4.2.3.2.3.2-1: Data structures supported by the HTTP GET Request Body on this resource
+Table 4.2.3.2.3.2-2: Data structures supported by the HTTP GET Response Body on this resource
+4.2.3.2.3.3	(Void)
+4.2.3.2.3.4	HTTP DELETE
+This method shall support the request data structures specified in table 4.2.3.2.3.4-1 and the response data structures and response codes specified in table 4.2.3.2.3.4-2.
+Table 4.2.3.2.3.4-1: Data structures supported by the HTTP DELETE Request Body on this resource
+Table 4.2.3.2.3.4-2: Data structures supported by the HTTP DELETE Response Body on this resource
+4.2.3.2.3.5	HTTP POST
+This method is not supported on the resource.
+4.2.3.2.4	Resource Custom Operations
+No custom operations are defined.
+4.2.3.3	Individual Policy Status Object
+4.2.3.3.1	Description
+The resource represents the status of an A1 policy.
+4.2.3.3.2	Resource Definition
+The Resource URI and the supported resource variables are as defined in previous sections.
+4.2.3.3.3	Resource Standard Methods
+The following subclauses specifies the standard methods supported by the resource.
+Note: URI query parameters are not specified in the current version.
+4.2.3.3.3.1	HTTP PUT
+Method is not supported on this resource.
+4.2.3.3.3.2	HTTP GET
+This method shall support the request data structures specified in table 4.2.3.3.3.2-1 and the response data structures and response codes specified in table 4.2.3.3.3.2-2.
+Table 4.2.3.3.3.2-1: Data structures supported by the HTTP GET Request Body on this resource
+Table 4.2.3.3.3.2-2: Data structures supported by the HTTP GET Response Body on this resource
+4.2.3.3.3.3	HTTP DELETE
+Method is not supported on this resource.
+4.2.3.3.3.4	HTTP POST
+Method is not supported on this resource.
+4.2.3.3.4	Resource Custom Operations
+No custom operations are defined.
+4.2.3.4	All Policy Identities
+4.2.3.4.1	Description
+The resource represents A1 policy identities.
+4.2.3.4.2	Resource Definition
+The Resource URI and the supported resource variables are as defined in previous sections.
+4.2.3.4.3	Resource Standard Methods
+The following subclauses specifies the standard methods supported by the resource.
+Note: URI query parameters are not specified in the current version.
+4.2.3.4.3.1	HTTP PUT
+Method is not supported on this resource.
+4.2.3.4.3.2	HTTP GET
+This method shall support the request data structures specified in table 4.2.3.6.3.2-1 and the response data structures and response codes specified in table 4.2.3.6.3.2-2.
+Table 4.2.3.4.3.2-1: Data structures supported by the HTTP GET Request Body on this resource
+Table 4.2.3.4.3.2-2: Data structures supported by the HTTP GET Response Body on this resource
+4.2.3.4.3.3	HTTP DELETE
+Method is not supported on this resource.
+4.2.3.4.3.4	HTTP POST
+Method is not supported on this resource.
+4.2.3.4.4	Resource Custom Operations
+No custom operations are defined.
+4.2.4	Custom Operations without associated resources
+No custom operations are defined.
+4.2.5	Notifications
+4.2.5.1	Notify Policy Status
+4.2.5.1.1	Description
+The resource represents the destination for policy status notifications.
+4.2.5.1.2	Resource Definition
+The Resource URI is a callback URI provided as a query parameter in URL when creating a policy.
+4.2.5.1.3	Resource Standard Methods
+The following subclauses specifies the standard methods supported by the resource.
+Note: URI query parameters are not specified in the current version.
+4.2.5.1.3.1	HTTP PUT
+Method is not supported on this resource.
+4.2.5.1.3.2	HTTP GET
+Method is not supported on this resource.
+4.2.5.1.3.3	HTTP DELETE
+Method is not supported on this resource.
+4.2.5.1.3.4	HTTP POST
+This method shall support the request data structures specified in table 4.2.5.1.3.4-1 and the response data structures and response codes specified in table 4.2.5.1.3.4-2.
+Table 4.2.5.1.3.4-1: Data structures supported by the HTTP POST Request Body on this resource
+Table 4.2.5.1.3.4-2: Data structures supported by the HTTP POST Response Body on this resource
+4.2.6	Data Model
+This subclause specifies the application data model supported by the A1-P API. The data model is based on policy statements that include attributes and are combined with a scope identifier into policy objects.
+For policy objectives, policy statements for the following characteristics are defined:
+-	QoS targets;
+-	QoE targets.
+For policy resources, policy statements for the following characteristics are defined:
+- 	Traffic steering optimization.
+4.2.6.1	Scope identifier (Structured data type)
+A1 polices are in [3] defined as containing a scope identifier and one or more policy statements where policy statements contain policy objectives and/or policy resources. This section defines the structured data type and attributes to be used as scope identifier.
+The ScopeIdentifier contains the following attributes:
+Table 4.2.6.1-1: Definition of statement type ScopeIdentifier
+Note: Presence condition "C" means that least one attribute shall be included when the scope is defined. The allowed combinations of attributes depend on the policy statement that is combined with the scope identifier, see section 4.2.6.4.
+4.2.6.2	Policy statements (Structured data types)
+A1 polices are in [3] defined as containing a scope identifier and one or more policy statements where policy statements contain policy objectives and/or policy resources. This section defines the structured data types and attributes to be used for policy statements.
+4.2.6.2.1	Introduction
+Table 4.2.6.2.1-1 specifies the data types defined for policy objectives in the A1-P interface protocol. The possible combinations of these are defined in section 4.2.6.4.
+Table 4.2.6.2.1-1: policy statements (Data Types) for policy objectives
+Table 4.2.6.2.2-2 specifies the data types defined for policy resources in the A1-P interface protocol. The usage of these are defined in section 4.2.6.4.
+Table 4.2.6.2.1-2: policy statements (Data Types) for policy resources
+4.2.6.2.2	QoS target
+The QosObjectives statement contains the following attributes:
+Table 4.2.6.2.2-1: Definition of statement type QosObjectives
+Note: Presence condition "C" means that least one attribute shall be included when this statement is used.
+4.2.6.2.3	QoE target
+The QoeObjectives statement contains the following attributes:
+Table 4.2.6.2.3-1: Definition of statement type QoeObjectives
+Note 1: Presence condition "C" means that least one attribute shall be included when this statement is used.
+Note 2: In this version of the specification, the QoE target is applicable to video streaming services.
+Application server will measure the QoE related attributes (e.g. MOS, initial buffering, reBuffFreq, stallRatio) for a specific service based on application info. However, it’s too late for network to optimize the radio resource when the application server find the QoE is too bad. Near-RT RIC could predict the QoE related attributes based on the network side info (e.g. QoS parameters, radio conditions, Packet measure report etc.) e.g. by performing model inference for a specific ML model received from non-RT RIC. The predict value is approximately the QoE related attribute which will be measured at application server later, but it’s estimated at Near-RT RIC in real time. So Near-RT RIC could decide to optimize the radio resource based on the predict value and the QoE target contained in the A1 policy.
+4.2.6.2.4	Traffic steering preference
+The TspResources statement contains the following attributes:
+Table 4.2.6.2.4-1: Definition of statement type TspResources
+Note: Presence condition "M" means that the attribute shall be included when this statement is used while "O" means that it is optional to include.
+When the value of the preference attribute is set to PREFER or AVOID, the cellIdList contains cells in descending order of importance for how they should be preferred or avoided, e.g. the first entry is most preferred or most avoided.  When the preference value is set to SHALL or FORBID, the cellIdList contains cells that are of equal importance.
+When the value of the primary attribute is set to true, and the value of the preference attribute is set to SHALL, then only a cell in the cellIdList is to be used as primary cell. When the value of the primary attribute is set to true, and the value of the preference attribute is set to PREFER, then a cell in the cellIdList may be used as primary cell. When the value of the primary attribute is set to true, and the preference value is set to AVOID or FORBID, then no cell in the cellIdList is to be used as primary cell.
+When the value of the primary attribute is set to false, and the value of the preference attribute is set to SHALL, then only one or more cells in the cellIdList are to be used as secondary cell. When the value of the primary attribute is set to false, and the value of the preference attribute is set to PREFER, then one or more cells in the cellIdList may be used as secondary cell. When the value of the primary attribute is set to false, and the preference value is set to AVOID or FORBID, then no cell in the cellIdList is to be used as secondary cell.
+When the primary attribute is not included, the statement shall be handled in the same way as when the primary attribute is set to false.
+4.2.6.2.5	(Void)
+4.2.6.2.6	Problem details
+In case a policy request is not accepted, additional information can be provided in the response in addition to the normal HTTP status code.
+The ProblemDetails statement contains the following attributes:
+Table 4.2.6.2.6-1: Definition of statement type ProblemDetails
+NOTE: attribute names are as defined in IETF RFC 7807 [19].
+4.2.6.3	Attributes (Simple data types and enumerations)
+This subsection defines attributes to be used for scope information and attributes that are not defined as part of the statements in the previous sections.
+4.2.6.3.1	Introduction
+This subclause defines simple data types and enumerations that can be referenced from data structures defined in the previous subclauses.
+4.2.6.3.2	Simple data types
+The URI for policy operations containing a policy object contains a PolicyId attribute.
+Table 4.2.6.3.2-1: General definition of simple data types
+4.2.6.3.3	Enumerations
+4.2.6.3.3.1	(Void)
+4.2.6.3.3.2	PreferenceType
+The enumeration PreferenceType represents the preference of a specific network resource (e.g. cell usage). It shall comply with the provisions defined in table 4.2.6.3.3.2-1.
+Table 4.2.6.3.3.2-1: Enumeration PreferenceType
+4.2.6.3.3.4	EnforcementStatusType
+The enumeration EnforcementStatusType represents if a policy is enforced or not. It shall comply with the provisions defined in table 4.2.6.3.3.4-1.
+Table 4.2.6.3.3.4-1: Enumeration EnforcementStatusType
+4.2.6.3.3.5	EnforcementReasonType
+The enumeration EnforcementReasonType represents the reason why notification is sent (e.g. why enforcement status has changed). It shall comply with the provisions defined in table 4.2.6.3.3.5-1.
+Table 4.2.6.3.3.5-1: Enumeration EnforcementRreasonType
+4.2.6.3.3.6	(Void)
+4.2.6.4	Policy representations objects
+This section contains the formal representation definitions of the policy representation object types defined in 3.2.1.4.
+4.2.6.4.1	Policy object
+4.2.6.4.1.1	General
+A policy object is based on IETF RFC 8259 [10] (JSON) and it always contains one set of:
+one scope identifier;
+and
+one or more policy statements.
+The scope identifier can be either:
+an identifier for a single UE (ueId);
+an identifier for a group of UEs (groupId);
+an identifier for a slice (sliceId);
+an identifier for QoS (qosId);
+an identifier for a cell (cellId).
+Table 4.2.6.4.1.1-1: General definition of PolicyObject
+Note: Presence condition "M" means that the data type shall be included in a policy object. Allowed combinations are listed in table 4.2.6.4.1.2-1. Presence condition "C" means that at least one statement (objectives and/or resources) shall be included.
+4.2.6.4.1.2	Allowed combinations
+A policy statement can be applied together with scope identifiers containing different combinations of identifiers. Not all combinations are relevant. The following table indicates combinations that are allowed.
+Table 4.2.6.4.1.2-1: Allowed combinations of scope identifiers and policy statements
+Note: on each row is listed a combination of identifiers that is allowed for the indicated statement. Notation is the same as for caridinality: "0" means the identifier shall not occur, "0..1" means the identifier may occur and "1" means the identifier shall occur. Only at most one occurance of an identifier is allowed in the present version.
+4.2.6.4.4.1	General
+A policy status object is based on IETF RFC 8259 [10] (JSON) and always contains:
+one enforcement status statement.
+4.2.6.4.2	(Void)
+4.2.6.4.3	(Void)
+4.2.6.4.4	Policy status object
+4.2.6.4.4.2	Policy status object
+Table 4.2.6.4.4.2-1: General definition of PolicyStatusObject
+Note: Presence condition "M" means that the data type shall be included in a policy status object. Presence condition "C" means that the enforceReason shall be included when the policy status object is used in the Policy Status Update procedure.
+4.2.6.4.5	(Void)
+4.2.6.5	Binary data
+Binary data is not applicable in this version of the specification.
+4.2.7	Error Handling
+4.2.7.1	General
+HTTP error handling shall be supported as specified in subclause 5.2.4 of 3GPP TS 29.500 [20] and according to the principles in 3GPP TS 29.501 [6].
+4.2.7.2	Protocol Errors
+No protocol errors are described in this version of the specification.
+4.2.7.3	Application Errors
+The application errors defined for the A1-P service are listed in Table 4.2.7.3-1.
+Table 4.2.7.3-1: Application errors
+Annex A: OpenAPI specification
+A.1	General
+This Annex specifies the formal definition of the A1-P API(s). It consists of OpenAPI 3.0.0 specifications in YAML format.
+Informative copies of the OpenAPI specification files contained in this O-RAN Technical Specification may be available at a later stage.
+A.2	Policy Management API
+openapi: 3.0.0
+info:
+title: 'A1-P Policy Management Service'
+version: 1.1
+description: |
+API for Policy Management Service.
+© 2019, O-RAN Alliance.
+All rights reserved.
+externalDocs:
+description: 'ORAN-WG2.A1.AP-v01.01 A1 interface: Application protocol'
+url: 'https://www.o-ran.org/specifications'
+servers:
+- url: '{apiRoot}/A1-P/v1'
+variables:
+apiRoot:
+default: 'https://example.com'
+description: 'apiRoot as defined in clause 4.2.1 in ORAN-WG2.A1.AP'
+paths:
+'/policies':
+get:
+description: 'Get all policy identities'
+tags:
+- All Policy Identities
+responses:
+200:
+description: 'Array of all policy identities'
+content:
+application/json:
+schema:
+type: array
+items:
+"$ref": "#/components/schemas/PolicyId"
+minItems: 0
+429:
+"$ref": "#/components/responses/429-TooManyRequests"
+503:
+"$ref": "#/components/responses/503-ServiceUnavailable"
+'/policies/{policyId}':
+parameters:
+- name: policyId
+in: path
+required: true
+schema:
+"$ref": "#/components/schemas/PolicyId"
+put:
+description: 'Create, or update, a policy'
+tags:
+- Individual Policy Object
+parameters:
+- name: notificationDestination
+in: query
+required: false
+schema:
+"$ref": "#/components/schemas/NotificationDestination"
+requestBody:
+required: true
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyObject"
+responses:
+200:
+description: 'The policy was updated'
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyObject"
+201:
+description: 'The policy was created'
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyObject"
+headers:
+Location:
+description: 'Contains the URI of the created policy'
+required: true
+schema:
+type: string
+400:
+"$ref": "#/components/responses/400-BadRequest"
+409:
+"$ref": "#/components/responses/409-Conflict"
+429:
+"$ref": "#/components/responses/429-TooManyRequests"
+503:
+"$ref": "#/components/responses/503-ServiceUnavailable"
+507:
+"$ref": "#/components/responses/507-InsufficientStorage"
+callbacks:
+policyStatusNotification:
+'{$request.query.notificationDestination}':
+post:
+description: 'Notify about status changes for this policy'
+requestBody:
+required: true
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyStatusObject"
+responses:
+204:
+description: 'Notification received'
+get:
+description: 'Query a policy'
+tags:
+- Individual Policy Object
+responses:
+200:
+description: 'The requested policy'
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyObject"
+404:
+"$ref": "#/components/responses/404-NotFound"
+409:
+"$ref": "#/components/responses/409-Conflict"
+429:
+"$ref": "#/components/responses/429-TooManyRequests"
+503:
+"$ref": "#/components/responses/503-ServiceUnavailable"
+delete:
+description: 'Delete a policy'
+tags:
+- Individual Policy Object
+responses:
+204:
+description: 'The policy was deleted'
+404:
+"$ref": "#/components/responses/404-NotFound"
+429:
+"$ref": "#/components/responses/429-TooManyRequests"
+503:
+"$ref": "#/components/responses/503-ServiceUnavailable"
+'/policies/{policyId}/status':
+parameters:
+- name: policyId
+in: path
+required: true
+schema:
+"$ref": "#/components/schemas/PolicyId"
+get:
+description: 'Query a policy status'
+tags:
+- Individual Policy Status Object
+responses:
+200:
+description: 'The requested policy status'
+content:
+application/json:
+schema:
+"$ref": "#/components/schemas/PolicyStatusObject"
+404:
+"$ref": "#/components/responses/404-NotFound"
+409:
+"$ref": "#/components/responses/409-Conflict"
+429:
+"$ref": "#/components/responses/429-TooManyRequests"
+503:
+"$ref": "#/components/responses/503-ServiceUnavailable"
+components:
+schemas:
+#
+# Representation objects
+#
+PolicyObject:
+description: 'A generic policy object that can be used to transport any policy. Additionally, a policy shall be valid according to the schema of its specific policy type.'
+type: object
+PolicyStatusObject:
+description: 'A generic policy status object that can be used to transport any policy status. Additionally, a policy status shall be valid according to the schema of its specific policy type.'
+type: object
+ProblemDetails:
+description: 'A problem detail to carry details in a HTTP response according to RFC 7807'
+type: object
+properties:
+type:
+type: string
+title:
+type: string
+status:
+type: number
+detail:
+type: string
+instance:
+type: string
+#
+# Simple data types
+#
+NotificationDestination:
+description: 'A complete callback URI defined according to IETF RFC 3986 where to send notifications'
+type: string
+PolicyId:
+description: 'Policy identifier assigned by the A1-P Consumer when a policy is created'
+type: string
+responses:
+400-BadRequest:
+description: 'Object in payload not properly formulated or not related to the method'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+404-NotFound:
+description: 'No resource found at the URI'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+405-MethodNotAllowed:
+description: 'Method not allowed for the URI'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+409-Conflict:
+description: 'Request could not be processed in the current state of the resource'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+429-TooManyRequests:
+description: 'Too many requests have been sent in a given amount of time'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+503-ServiceUnavailable:
+description: 'The provider is currently unable to handle the request due to a temporary overload'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+507-InsufficientStorage:
+description: 'The method could not be performed on the resource because the provider is unable to store the representation needed to successfully complete the request'
+content:
+application/problem+json:
+schema:
+"$ref": "#/components/schemas/ProblemDetails"
+Annex B: JSON objects
+B.1	JSON schemas
+B.1.1	QoS Target
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_QoSTarget_1.0.0",
+"description": "O-RAN standard QoS Target policy",
+"type": "object",
+"properties": {
+"scope": {
+"anyOf": [
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"groupId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"groupId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["groupId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["sliceId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["qosId"]
+}
+]
+},
+"qosObjectives": {
+"type": "object",
+"properties": {
+"gfbr": {"type": "number"},
+"mfbr": {"type": "number"},
+"priorityLevel": {"type": "number"},
+"pdb": {"type": "number"}
+},
+"minProperties": 1,
+"additionalProperties": false
+}
+},
+"additionalProperties": false,
+"required": ["scope", "qosObjectives"]
+}
+B.1.2	QoE Target
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_QoETarget_1.0.0",
+"description": "O-RAN standard QoE Target policy",
+"type": "object",
+"properties": {
+"scope": {
+"anyOf": [
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "sliceId"]
+},
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["sliceId"]
+},
+{
+"type": "object",
+"properties": {
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["qosId"]
+}
+]
+},
+"qoeObjectives": {
+"type": "object",
+"properties": {
+"qoeScore": {"type": "number"},
+"initialBuffering": {"type": "number"},
+"reBuffFreq": {"type": "number"},
+"stallRatio": {"type": "number"}
+},
+"minProperties": 1,
+"additionalProperties": false
+}
+},
+"additionalProperties": false,
+"required": ["scope", "qoeObjectives"]
+}
+B.1.3	Traffic Steering Preferences
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_TrafficSteeringPreference_1.0.0",
+"description": "O-RAN standard Traffic Steering Preference policy",
+"type": "object",
+"properties": {
+"scope": {
+"anyOf": [
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId"]
+},
+{
+"type": "object",
+"properties": {
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["sliceId"]
+}
+]
+},
+"tspResources": {
+"type": "array",
+"items": {
+"type": "object",
+"properties": {
+"cellIdList": {
+"type": "array",
+"minItems": 1,
+"uniqueItems": true,
+"items": {
+"type": "string"
+}
+},
+"preference": {
+"type": "string",
+"enum": [
+"SHALL",
+"PREFER",
+"AVOID",
+"FORBID"
+]
+},
+"primary": {"type": "boolean"}
+},
+"required": ["cellIdList", "preference"],
+"additionalProperties": false
+},
+"minItems": 1
+}
+},
+"additionalProperties": false,
+"required": ["scope", "tspResources"]
+}
+B.1.4	QoS optimization with resource directive
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_QoSandTSP_1.0.0",
+"description": "O-RAN standard QoS Target and Traffic Steering Preference policy",
+"type": "object",
+"properties": {
+"scope": {
+"anyOf": [
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["sliceId", "qosId"]
+}
+]
+},
+"qosObjectives": {
+"type": "object",
+"properties": {
+"gfbr": {"type": "number"},
+"mfbr": {"type": "number"},
+"priorityLevel": {"type": "number"},
+"pdb": {"type": "number"}
+},
+"minProperties": 1,
+"additionalProperties": false
+},
+"tspResources": {
+"type": "array",
+"items": {
+"type": "object",
+"properties": {
+"cellIdList": {
+"type": "array",
+"minItems": 1,
+"uniqueItems": true,
+"items": {
+"type": "string"
+}
+},
+"preference": {
+"type": "string",
+"enum": [
+"SHALL",
+"PREFER",
+"AVOID",
+"FORBID"
+]
+},
+"primary": {"type": "boolean"}
+},
+"required": ["cellIdList", "preference"],
+"additionalProperties": false
+},
+"minItems": 1
+}
+},
+"additionalProperties": false,
+"required": ["scope", "qosObjectives", "tspResources"]
+}
+B.1.5	QoE optimization with resource directive
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_QoEandTSP_1.0.0",
+"description": "O-RAN standard QoE Target and Traffic Steering Preference policy",
+"type": "object",
+"properties": {
+"scope": {
+"anyOf": [
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "sliceId"]
+},
+{
+"type": "object",
+"properties": {
+"ueId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["ueId", "qosId"]
+},
+{
+"type": "object",
+"properties": {
+"sliceId": {"type": "string"},
+"qosId": {"type": "string"},
+"cellId": {"type": "string"}
+},
+"additionalProperties": false,
+"required": ["sliceId"]
+}
+]
+},
+"qoeObjectives": {
+"type": "object",
+"properties": {
+"qoeScore": {"type": "number"},
+"initialBuffering": {"type": "number"},
+"reBuffFreq": {"type": "number"},
+"stallRatio": {"type": "number"}
+},
+"minProperties": 1,
+"additionalProperties": false
+},
+"tspResources": {
+"type": "array",
+"items": {
+"type": "object",
+"properties": {
+"cellIdList": {
+"type": "array",
+"minItems": 1,
+"uniqueItems": true,
+"items": {
+"type": "string"
+}
+},
+"preference": {
+"type": "string",
+"enum": [
+"SHALL",
+"PREFER",
+"AVOID",
+"FORBID"
+]
+},
+"primary": {"type": "boolean"}
+},
+"required": ["cellIdList", "preference"],
+"additionalProperties": false
+},
+"minItems": 1
+}
+},
+"additionalProperties": false,
+"required": ["scope", "qoeObjectives", "tspResources"]
+}
+B.1.6	Policy Status Object
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+"title": "ORAN_PolicyStatus_1.0.0",
+"description": "O-RAN standard policy status",
+"type": "object",
+"properties": {
+"enforceStatus": {
+"type": "string",
+"enum": [
+"ENFORCED",
+"NOT_ENFORCED",
+"UNDEFINED"
+]
+},
+"enforceReason": {
+"type": "string",
+"enum": [
+"SCOPE_NOT_APPLICABLE",
+"STATEMENT_NOT_APPLICABLE",
+"OTHER_REASON"
+]
+}
+},
+"additionalProperties": false,
+"required": ["enforceStatus"]
+}
+B.2	Policy examples in JSON format
+B.2.1	QoS
+B.2.1.1	QoS based resource optimization per-UE
+{
+"scope": {
+"ueId": "855",
+"qosId": "67"
+},
+"qosObjectives": {
+"priorityLevel": 50
+}
+}
+B.2.1.2	QoS based resource optimization per-slice
+{
+"scope": {
+"sliceId": "B",
+"qosId": "67",
+"cellId": "dc24"
+},
+"qosObjectives": {
+"gfbr": 1000,
+"mfbr": 500,
+"pdb": 120
+}
+}
+B.2.2	QoE
+B.2.2.1	QoE based resource optimization per-UE
+{
+"scope": {
+"ueId": "855",
+"qosId": "67"
+},
+"qoeObjectives": {
+"initialBuffering": 30,
+"reBuffFreq": 5,
+"stallRatio": 2
+}
+}
+B.2.2.2	QoE based resource optimization per-slice
+{
+"scope": {
+"sliceId": "B"
+},
+"qoeObjectives": {
+"qoeScore": 4.25
+}
+}
+B.2.3	TSP
+B.2.3.1	Traffic steering per-UE
+{
+"scope": {
+"ueId": "855"
+},
+"tspResources": [
+{
+"cellIdList": [
+"ac39",
+"ac40"
+],
+"preference": "PREFER"
+},
+{
+"cellIdList": [
+"bf81",
+"bf82",
+"bf83"
+],
+"preference": "FORBID"
+}
+]
+}
+B.2.3.2	Traffic steering per-slice
+{
+"scope": {
+"sliceId": "B",
+"qosId": "67"
+},
+"tspResources": [
+{
+"cellIdList": [
+"be55",
+"be65"
+],
+"preference": "SHALL"
+},
+{
+"cellIdList": [
+"ax01",
+"ax02",
+"ax03"
+],
+"preference": "AVOID"
+}
+]
+}
+B.2.4	QoS optimization with resource directive
+{
+"scope": {
+"ueId": "855",
+"qosId": "67"
+},
+"qosObjectives": {
+"priorityLevel": 50
+},
+"tspResources": [
+{
+"cellIdList": [
+"ac39",
+"ac40"
+],
+"preference": "PREFER"
+},
+{
+"cellIdList": [
+"bf81",
+"bf82",
+"bf83"
+],
+"preference": "AVOID"
+}
+]
+}
+B.2.5	QoE optimization with resource directive
+{
+"scope": {
+"sliceId": "B"
+},
+"qoeObjectives": {
+"qoeScore": 4.25
+},
+"tspResources": [
+{
+"cellIdList": [
+"be55",
+"be65"
+],
+"preference": "SHALL"
+},
+{
+"cellIdList": [
+"ax01",
+"ax02",
+"ax03"
+],
+"preference": "AVOID"
+}
+]
+}
+B.2.6	Status object for notification
+{
+"enforceStatus": "NOT_ENFORCED",
+"enforceReason": "SCOPE_NOT_APPLICABLE"
+}
+Annex Z
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT.
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”).
+This is a license agreement for entities who wish to adopt any O-RAN Specification.
+SECTION 1:  DEFINITIONS
+1.1		“Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with another entity, so long as such control exists.  For the purpose of this Section, “Control” means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity.
+1.2		“Compliant Portion” means only those specific portions of products (hardware, software or combinations thereof) that implement any O-RAN Specification.
+1.3	 	“Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications.
+1.4		“Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN Specification.  The term “O-RAN Specifications” includes Minor Updates.
+1.5		“Necessary Claims” means those claims of all present and future patents and patent applications, other than design patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a third party; and (iii) are necessarily infringed by implementation of a Final Specification (without considering any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate an implementation which complies with a Final Specification without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary Claims.
+1.6		“Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.
+SECTION 2: COPYRIGHT LICENSE
+2.1		Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in furtherance of implementations of an O-RAN Specification.
+2.2		Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written agreement with O-RAN Alliance.
+SECTION 3: FRAND LICENSE
+3.1		Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate Patent License Agreement to each Adopter under Fair, Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable,  worldwide license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Portions; provided, however, that such license shall not extend: (a) to any part or function of a product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3.  For the avoidance of doubt, the foregoing license includes the distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant Portions.
+3.2 	Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees.
+3.3		Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under FRAND terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable,  worldwide license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Portions; provided, however, that such license will not extend: (a) to any part or function of a product in which a Compliant Portion is incorporated that is not itself part of the Compliant Portion; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3.1.  For the avoidance of doubt, the foregoing license includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Portions.
+SECTION 4:  TERM AND TERMINATION
+4.1		This Agreement shall remain in force, unless early terminated according to this Section 4.
+4.2		O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) days after being given notice specifying the breach.
+4.3		Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement.  Under surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the date of termination; and (b) for future versions of O-RAN Specifications that are backwards compatible with the version that was current as of the date of termination.
+SECTION 5: CONFIDENTIALITY
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care.  Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of confidentiality at least as restrictive as those contained in this Section.  The foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval.
+SECTION 6:  INDEMNIFICATION
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications.
+SECTION 7:  LIMITATIONS ON LIABILITY; NO WARRANTY
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES.
+O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.  THE O-RAN ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS.
+SECTION 8:  ASSIGNMENT
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion.  O-RAN Alliance may freely assign this Agreement.
+SECTION 9:  THIRD-PARTY BENEFICIARY RIGHTS
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, including as licensees under Section 3.
+SECTION 10:  BINDING ON AFFILIATES
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder.
+SECTION 11:  GENERAL
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating to the subject matter of this Agreement.
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and antitrust laws.  Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any communication that would violate the antitrust laws.
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.  Except as expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full force and effect.
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full force and effect.

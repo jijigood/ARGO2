@@ -126,3 +126,57 @@ class ProgressTracker:
         
         return filtered
 
+
+class FastProgressTracker:
+    """Lightweight heuristic tracker that avoids expensive tokenization."""
+
+    def __init__(
+        self,
+        question: str,
+        base_retrieval_gain: float = 0.25,
+        base_reason_gain: float = 0.1,
+    ) -> None:
+        self.question = question
+        self.question_length = len(question)
+        self.base_retrieval_gain = max(0.01, base_retrieval_gain)
+        self.base_reason_gain = max(0.01, base_reason_gain)
+
+        self.current_progress = 0.0
+        self.step_count = 0
+        self.retrieval_count = 0
+        self.accumulated_length = 0
+
+    def update(self, action: str, step_data: Dict) -> float:
+        self.step_count += 1
+
+        if action == 'retrieve' and not step_data.get('retrieval_success', True):
+            return self.current_progress
+
+        answer = step_data.get('intermediate_answer') or ''
+        docs = step_data.get('retrieved_docs') or []
+
+        new_length = len(answer)
+        if isinstance(docs, Iterable):
+            new_length += sum(len(doc) for doc in docs)
+        self.accumulated_length += new_length
+
+        gain = self.base_retrieval_gain if action == 'retrieve' else self.base_reason_gain
+        confidence = float(step_data.get('confidence', 0.5))
+        confidence = max(0.0, min(1.0, confidence))
+        gain *= 0.5 + confidence
+
+        if action == 'retrieve':
+            self.retrieval_count += 1
+            if self.retrieval_count > 3:
+                gain *= 0.9
+
+        if self.step_count > 5:
+            gain *= 0.8
+
+        info_budget = max(2000, self.question_length * 5)
+        if self.accumulated_length > info_budget:
+            gain *= 0.9
+
+        self.current_progress = min(1.0, self.current_progress + gain)
+        return self.current_progress
+

@@ -1,0 +1,3568 @@
+O-RAN.WG6.AAL-HI_PHY.0-v01.00
+Technical Specification 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+High-PHY Profiles 
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the 
+third party that these conditions apply to them and that they must comply with them.
+
+                  O-RAN.WG6.AAL-HI_PHY.0-v01.00 
+Technical Specification 
+ 
+O-RAN Working Group 6 
+Acceleration Abstraction Layer 
+High-PHY Profiles 
+ 
+ 
+  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O -RAN specification document, including by copying, saving,       
+distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License 
+Agreement contained in the Annex ZZZ of this specification. All other rights reserved. 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+   
+  Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+  Your use is subject to the terms of the O-RAN Adopter License Agreement in the Annex ZZZ.                                                  1 
+ 
+ 
+ 
+ 
+
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             2 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Revision History 1 
+Date Revision Author Description 
+2021.10.28 00.00.01 Qualcomm Initial draft of specification - Overview, profile 
+specifications.  
+2021.11.02 00.00.02 Qualcomm Removed Rel-16 parameters  
+2021.11.02 00.00.03 Qualcomm Added beamforming AALI 
+2021.11.03 00.00.04 Qualcomm Edits to beamforming sections to include additional 
+requirement. Additional profile capabilities. 
+2021.11.03 00.00.05 Qualcomm Integration of technical and editorial comments from 
+Nokia and Ericsson; fixing typos. 
+2021.11.09 00.00.06 Qualcomm Integration of technical and editorial comments from 
+Nokia (mostly UL). Part of this: provided scrambling 
+init sequences (c_init) as alterantive to scrambling 
+identifiers in the relevant channels and RS. 
+Removed unneccessary scrambling identifier 
+superscripts (PDSCH DM-RS, PODCCH DM-RS} 
+Corrected subsection title (PUCCH Foramt 2/3/4) for 
+table 4-17 
+PUCCH F1: bits are for HARQ or SR; added section 
+references for SR presence and number of bits 
+2021.11.11 00.00.07 Qualcomm Removed FFS and related Notes, and moved open items 
+to wiki 
+Added section 4.1.2 on parameter naming convention 
+Changed “AF” to “AAL DL/UL Hight-PHY profile” in 
+the first paragraph of sections 4.2.7.2 and 4.3.7.2 
+Typos, editorials 
+2021.11.12 00.00.08 Qualcomm resolving TBD in table Table 4-16 (PUCCH Format-1) 
+2021.11.15 00.00.09 Qualcomm Addressing Nvidia’s comments, including separating 
+out DM-RS parameters for PUCCH Format 1 and 
+Formats 2/3/4 in section 4.3.4.2 (per Nvidia request). 
+  2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             3 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+2021.11.15 00.00.10 Qualcomm Adopting online comments fron Nov 15: 
+- AALi -> AALI 
+- Ch3: Removed first sentence in stub section 3. 
+- 4.1: Accelerator -> AAL_LPU 
+- 4.2: Removed all figures showing functional blocks. 
+- 4.[2m3].2: Added per-UE max #layers capability 
+- 4.[2,3].1: removed "one slot at a time" phrase.  
+      - accelerator -> AAL LPI 
+      - removed mention of Application buffer handling 
+      - replaced mention of output bufer with "buffers 
+exchange of information with OFH" 
+- 4.[2,3].[3-6]: simplified phrasing about scope of 
+DL/UL High-PHY profile for each channel 
+- 4.2.[3,6].1: Removed reference to CP/UP separation, 
+as it appears to duplicate GAnP wording. 
+- 4.3.5.2: Ädditonal PER-USAGE report types ...". 
+Removed self-evident phrasing "base don WG6/vendor 
+interest" 
+- 4.[2,3].7.[2,4]: simplified wording describing the AF 
+Role in the AF --> Application API 
+-Typos 
+2021.11.15 00.00.11 Qualcomm Fixed cover page reference FEC  High-PHY 
+2021.11.15 00.00.12 Qualcomm Baseline Candidate 
+2021.11.15 01.00.01 Qualcomm Application of NVD-2021.11.19-ORAN.WG6-CR 001-
+AAL HIGH-PHY.0-v01.00 - Online feedback.docx 
+  1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             4 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Contents 1 
+Revision History ................................................................................................................................................. 2 2 
+Chapter 1 Introductory Material ......................................................................................................................... 5 3 
+ Scope 5 4 
+ References ................................ ................................................................................................................................ .... 5 5 
+ Definitions and Abbreviations ................................ ................................................................................................ ...... 5 6 
+ Definitions ................................ ................................................................................................................................ . 5 7 
+ Abbreviations ................................ ................................................................................................ ............................. 5 8 
+Chapter 2 Overview ............................................................................................................................................ 7 9 
+ Purpose ................................ ................................................................................................................................ ......... 7 10 
+ Document Structure ................................ ................................................................................................ ...................... 8 11 
+Chapter 3 AALI Configuration and Management .............................................................................................. 9 12 
+Chapter 4 AAL Profile Specifications ................................................................................................................ 9 13 
+ Profile Specifications Overview ................................ ................................................................................................ ... 9 14 
+ Naming 9 15 
+ O-DU AAL_DOWNLINK_High-PHY Profile Specification ................................ ................................ ...................... 9 16 
+ Profile Operation ................................ ................................................................................................ ....................... 9 17 
+ Summary of Capabilities ................................ ................................................................................................ ........... 9 18 
+ PDSCH Channel Model ........................................................................................................................................... 11 19 
+ PDCCH Channel Model .......................................................................................................................................... 18 20 
+ CSI-RS Channel Model ........................................................................................................................................... 23 21 
+ SSB Model ............................................................................................................................................................... 25 22 
+ Beamforming ........................................................................................................................................................... 29 23 
+ O-DU AAL_UPLINK_High-PHY Profile Specification ............................................................................................ 31 24 
+ Profile Operation ..................................................................................................................................................... 31 25 
+ Summary of Capabilities ......................................................................................................................................... 31 26 
+ PUSCH Channel Model ........................................................................................................................................... 33 27 
+ PUCCH Channel Model .......................................................................................................................................... 39 28 
+ SRS Channel Model ................................................................................................................................................ 47 29 
+ PRACH Channel Model .......................................................................................................................................... 49 30 
+ Beamforming ........................................................................................................................................................... 51 31 
+Annex ZZZ : O-RAN Adopter License Agreement ......................................................................................... 52 32 
+Section 1: DEFINITIONS ................................................................................................................................................ 52 33 
+Section 2: COPYRIGHT LICENSE ................................................................................................................................. 53 34 
+Section 3: FRAND LICENSE .......................................................................................................................................... 53 35 
+Section 4: TERM AND TERMINATION ........................................................................................................................ 54 36 
+Section 5: CONFIDENTIALITY ..................................................................................................................................... 54 37 
+Section 6: INDEMNIFICATION ..................................................................................................................................... 54 38 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................................... 54 39 
+Section 8: ASSIGNMENT ............................................................................................................................................... 54 40 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS .................................................................................................... 55 41 
+Section 10: BINDING ON AFFILIATES ........................................................................................................................ 55 42 
+Section 11: GENERAL ..................................................................................................................................................... 55 43 
+ 44 
+ 45 
+46 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             5 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Chapter 1 Introductory Material 1 
+ Scope 2 
+This Technical Specification has been produced by the O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O -RAN and may change following formal 4 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re -released by O-5 
+RAN with an identifying change of release date and an increase in version number as follows:  6 
+Release x.y.z 7 
+where: 8 
+x the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+The present document focuses on the Acceleration Abstraction Layer for the AAL_DOWNLINK_High -PHY and 14 
+AAL_UPLINK_High-PHY Profiles.  15 
+ References 16 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 17 
+document. 3GPP references refer to 3GPP release 16.  18 
+[1] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”. 19 
+[2] Cloud Architecture and Deployment Scenarios for O-RAN Virtualized RAN, 2019. 20 
+[3] WG6 2020 Use Case for BBU Pooling, 2019. 21 
+[4] 3GPP TS 38.211: "NR; Physical channels and modulation". 22 
+[5] 3GPP TS 38.212: "NR; Multiplexing and channel coding". 23 
+[6] 3GPP TR 38.300: "NR; NR and NG-RAN Overall Description". 24 
+[7] O-RAN WG6 Acceleration Abstraction Layer General Aspects and Principles  25 
+[8] O-RAN WG4 Control, User and Synchronization Plane Specification 26 
+ Definitions and Abbreviations 27 
+ Definitions 28 
+For the purposes of the present document, the terms and definitions given in [7] apply.  29 
+ Abbreviations 30 
+For the purposes of the present document, the following abbreviations apply.  31 
+AAL Acceleration Abstraction Layer 32 
+AALI Acceleration Abstraction Layer interface 33 
+AAL-LPU  Acceleration Abstraction Layer Logical Processing Unit  34 
+CB  Code Block  35 
+CNF Containerized Network Function 36 
+NF Network Function 37 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             6 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+O-CU O-RAN Centralized Unit 1 
+O-DU O-RAN Distributed Unit 2 
+O-RU O-RAN Radio Unit 3 
+OS Operating System 4 
+TB Transport Block 5 
+  6 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             7 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Chapter 2 Overview 1 
+ Purpose 2 
+The AAL General Aspects and Principles is described in [7] including a high level architecture of the AAL and 3 
+definition of the AAL profiles. This document details the AAL specification consisting of the description of the 4 
+interface, information models and requirements to implement an AALI, for the AAL_DOWNLINK_High-PHY and 5 
+AAL_UPLINK_High-PHY profiles. 6 
+This release requires inline accelerators supporting High-PHY profiles in inline acceleration mode to implement both 7 
+AAL_DOWNLINK_High-PHY and AAL_UPLINK_High-PHY profiles. Support for partial profiles is for future study. 8 
+These profiles are illustrated below in Figure 2.1 and Figure 2.2. 9 
+L2+
+TB CRC attachment
+CB segmentation + 
+CRC attachment
+LDPC encoding
+Rate matching
+CB concatenation
+Scrambling
+Modulation
+Layer mapping
+Precoding*
+O-RAN FH (7-2x lower layer split)
+CRC attachment
+Polar encoding
+Rate matching
+Scrambling
+Modulation 
+(QPSK)
+PBCH payload 
+generation
+TB CRC 
+attachment
+Polar encoding
+Rate matching
+Scrambling
+Modulation 
+(QPSK)
+Data 
+scrambling
+Precoding*
+Modulation
+CSI-RS/TRS
+PDSCH TB(s)
+PDCCH (DCI)
+PBCH TB
+IQ compression*
+Precoding* Precoding*
+Sequence 
+generation
+PDSCH DM-RS
+/PT-RS
+Modulation
+Sequence 
+generation
+PDCCH DM-RS
+Sequence 
+Generation
+Modulation
+PSS/SSS 
+PBCH DM-RS
+IQ compression* IQ compression* IQ compression*
+RE mapping RE mapping RE mapping
+Sequence 
+Generation
+Modulation
+RE mapping
+ 10 
+Figure 2.1 AAL_DOWNLINK_High-PHY Profile 11 
+ 12 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             8 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+L2+
+TB CRC check
+CB CRC + CB 
+desegmentation
+LDPC decoding
+Rate 
+dematching
+CB de-
+concatenation
+Descrambling
+Demodulation
+O-RAN FH (7-2x lower layer split)
+PUSCH Data
+PUCCH 
+Format 0 
+UCI
+IQ decompression*
+Sequence 
+detection
+PUSCH 
+DM-RS/
+PT-RS
+De-
+modulation
+PUCCH 
+Format 1 
+UCI
+RE demapping RE demapping
+Channel 
+equalization
+IDFT for DFT-s 
+OFDM
+Channel 
+estimation
+Sequence 
+detection
+RE demapping
+Channel 
+Estimation
+Channel 
+equalization
+IQ 
+decompression* IQ decompression*
+De-
+modulation
+PUCCH 
+Format 2/3/4 
+UCI
+RE demapping
+Channel 
+Estimation
+Channel 
+equalization
+IQ decompression*
+IDFT for 
+DFT-s OFDM
+CRC Check
+Polar/Block 
+decoding
+Rate 
+dematching
+De-
+scrambling
+Peak search
+RE demapping
+Root Sequence 
+correlation
+IFFT
+IQ 
+decompression*
+Noise 
+estimation
+Preamble 
+detection & 
+delay 
+estimation
+SRS
+RE demapping
+Sequence 
+detection
+IQ 
+decompression*
+PRACH
+Sequence 
+detection
+PUCCH 
+Format 1 
+DM-RS
+Sequence 
+detection
+PUCCH 
+Format 
+2/3/4 
+DM-RS
+ 1 
+Figure 2.2 AAL_UPLINK_High-PHY Profile  2 
+ Document Structure 3 
+This present document is structured as follows: chapter 2 presents the overview and main purpose of this specification. 4 
+Chapter 3 will present the high level AALI configuration and management principles for the AAL_DOWNLINK_High-5 
+PHY and AAL_UPLINK_High-PHY Profiles. Chapter 4 presents the Profile Overview for these two profiles, sample 6 
+capabilities, inputs, and outputs as well as AF parameters for the channels constituting the profiles.   7 
+ 8 
+  9 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             9 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Chapter 3 AALI Configuration and Management  1 
+The AALI configuration and management APIs are the APIs that an application (O-DU) executes to configure and 2 
+manage the AAL-LPU(s) that have been allocated to the application by the O-Cloud. The high-level Configuration and 3 
+Management Principles are presented in [7].  4 
+Chapter 4 AAL Profile Specifications 5 
+ Profile Specifications Overview   6 
+This section contains information for each AAL profile that is supported. A profile can provide several APIs for specific 7 
+profile configuration that may be required in addition to the general AAL configuration APIs. Profile specific 8 
+configuration shall be done on a per AAL-LPU basis. Each profile shall define a list of capabilities that will be used to 9 
+define the operations supported by the AAL-LPU.  10 
+ Naming  11 
+Parameters and capabilities based on this stage-2 specification should follow the following naming guidelines: 12 
+• Parameter and capability names shall start with a lowercase letter; 13 
+• No spaces may be used in the names; 14 
+• The names shall consist only of letters and digits; 15 
+• The first letter of each non-initial word in a name shall be capitalized. 16 
+ 17 
+ O-DU AAL_DOWNLINK_High-PHY Profile Specification 18 
+This profile provides acceleration functionality for the following channels and signals:  19 
+- PDSCH (including Data, DM-RS and PT-RS) 20 
+- PDCCH (including Data and DM-RS) 21 
+- CSI-RS 22 
+- SSB (Including PSS, SSS and PBCH) 23 
+This section presents parametrization for each of these channels and signals. 24 
+ Profile Operation 25 
+The AAL_DOWNLINK_High-PHY Profile interface shall work on a slot basis, where the slot, numerology and SFN 26 
+are signaled for the API. 27 
+The input data is specific to each downlink channel composing the profile. The output data is a set of C/U-Plane O-28 
+RAN Fronthaul (OFH) packets [8]. 29 
+The AAL-LPU interfaces directly with the OFH and is responsible for handling its exchange of information with OFH .  30 
+ Summary of Capabilities  31 
+The AAL_DOWNLINK_High-PHY Profile capabilities shall be reported to the application.  32 
+Table 4-1 lists a subset of the AAL_DOWNLINK_High-PHY profile capabilities that should be reported to the 33 
+application with respect to the acceleration of the various channel functionality and interaction.  34 
+Note additional capabilities can also be reported by the AALI implementation.  35 
+Table 4-1 Sample AAL_DOWNLINK_High-PHY Profile Capabilities  36 
+ 37 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             10 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Capability Short summary 3GPP Spec Reference 
+3GPP Release Rel-15, Rel-16, … https://www.3gpp.org/specifications/work-
+plan 
+PDSCH TB(s) / slot Number of PDSCH TB(s) per slot Outside the scope of 3GPP  
+PDSCH TB CRC caching Supported, or not supported Outside the scope of 3GPP 
+PDSCH CB CRC caching Supported, or not supported Outside the scope of 3GPP 
+Cyclic Prefix  Normal or Extended 3GPP TS 38.211, sec 4.2 
+Subcarrier Spacing 15, 30, 60, 120, 240 kHz; can be 
+channel-specific. 
+3GPP TS 38.211, sec 4.2 
+Bandwidth Support 5, 10, 15, … MHz 3GPP TS 38.104, sec 5.3 
+PDSCH Mapping Type(s) A or B or both 3GPP TS 38.211, sec 7.4.1.1.2 
+PDSCH Allocation Type(s) 0 or 1 or both 3GPP TS 38.214, sec 5.1.2.2 
+PDSCH VRB to PRB Mapping 
+Type 
+interleaved or non-interleaved or 
+both 
+3GPP TS 38.211, sec 7.3.1.6 
+PDSCH DM-RS Configuration 
+Type 
+1 or 2 or both 3GPP TS 38.211, sec 7.4.1.1.2 
+PDSCH DM-RS additional 
+positions 
+pos0-pos3 3GPP TS 38.211, sec 6.4.1.1.3 
+PDSCH DM-RS max length 1 or 2 3GPP TS 38.211, sec 7.4.1.1.2 
+PDSCH CBG ReTx Supported or not 3GPP TS 38.212, sec 5.4.2.1, 7.3.1.2.2 
+PDSCH Max Modulation QPSK, 16-QAM, etc. 3GPP TS 38.214, sec 5.14.3 
+PDSCH PT-RS support Support for PT-RS 3GPP TS 38.211, sec 7.4.1.2 
+PDCCH CORESETs / Slot Number of CORESETs per slot Outside the scope of 3GPP 
+CORESET CCE Mapping Type Interleaved or not 3GPP TS 38.211, sec 7.3.2.2 
+CORESET Precoder 
+Granularity 
+Wideband (all contiguous RBs) or 
+same as REG bundle 
+3GPP TS 38.211, sec 7.3.2.2 
+CORESET Placement Any symbol restriction (e.g. first 
+three) 
+3GPP TS 38.213, sec 13 
+PDCCH Precoder support Short Cyclic Delay Diversity, 
+Precoder Cycling, None, etc. 
+Outside the scope of 3GPP 
+PDSCH Rate Matching 
+capabilities (around CSI-RS, 
+SSB, etc.) 
+Support for the rate matching, as well 
+as any support of overlaps between 
+channels: 
+- PDSCH and SSB 
+- PDSCH and CSI-RS 
+- PDSCH and PDCCH 
+ 
+And overlaps between PDSCH and 
+structures: 
+- PDSCH and LTE-CRS 
+3GPP TS 38.214, sec 5.1.4 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             11 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+- PDSCH and 
+PrbSymbPattern (bitmap or 
+CORESET) 
+ 
+Capabilities for this would also list 
+limitations on number and scope of 
+overlaps / patterns. 
+DL MIMO: SDM & Bandwidth 
+joint support 
+Support for forming joint precoders 
+across bandwidth, and across 
+baseband antenna ports. Includes the 
+option of “no support” 
+Outside the scope of 3GPP 
+DL MIMO: Cross Channel 
+MUX 
+Ability to spatially multiplex same or 
+different channel types (PDSCH, 
+PDCCH, etc.). Includes the option of 
+“no support” 
+Outside the scope of 3GPP 
+DL MIMO: Maximum number 
+of layers 
+The maximum number of layers that 
+can be multiplexed (can be channel 
+specific). 
+Outside the scope of 3GPP 
+DL: MIMO Maximum number 
+of layers per UE 
+The maximum number of layers that 
+can be allocated to a UE 
+3GPP TS 38.211, sec 7.3.1.3 
+Expected PBCH payload Full payload (32 bits) or portion of 
+payload originating form higher-
+layers (24 bits), or either  
+3GPP TS 38.212, sec 7.1.1 
+… … … 
+ 1 
+ PDSCH Channel Model 2 
+Per section 5.1.3.2.7 of the O-RAN AAL GAnP document [7] for the PDSCH High PHY Profile, the PDSCH Channel 3 
+model of the AAL_DOWNLINK_High-PHY Profile supports acceleration of PDSCH Data, DM-RS and PT-RS 4 
+functionalities. 5 
+The set of accelerated functions associated with the processing of PDSCH TB(s) is as follows:  6 
+• TB CRC attachment 7 
+• CB segmentation and CRC attachment 8 
+• LDPC encoding 9 
+• Rate matching 10 
+• CB concatenation 11 
+• Scrambling 12 
+• Modulation 13 
+• Layer mapping 14 
+• Precoding 1 15 
+• RE mapping  16 
+• Power Offset 17 
+• IQ compression1 18 
+ 19 
+The set of accelerated functions associated with the processing of PDSCH DM- RS is as follows: 20 
+• PDSCH DM-RS sequence generation 21 
+ 
+1 Configurable functional block, depends on implementation and/or system configuration  
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             12 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+• Modulation 1 
+• Precoding1 2 
+• RE mapping 3 
+• Power Offset 4 
+• IQ compression1 5 
+ 6 
+The set of accelerated functions associated with the processing of PDSCH PT-RS is as follows: 7 
+• Sequence Generation 8 
+• Layer Mapping 9 
+• Modulation 10 
+• Precoding1 11 
+• RE Mapping 12 
+• Power Offset 13 
+• IQ compression1 14 
+ 15 
+ PDSCH input for AAL_DOWNLINK_High-PHY Profile  16 
+The AAL_DOWNLINK_High-PHY profile shall signal PDSCH allocation(s) per slot. The input consists of the TB(s), 17 
+and the associated parameters for the PDSCH allocation. 18 
+ PDSCH Parameters 19 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 20 
+Application shall supply all relevant parameters; for ease of reading, the parameters are organized per signal type: Data, 21 
+DM-RS, PT-RS. 22 
+PDSCH Data Parameters 23 
+Table 4-2: PDSCH Data Parameters 24 
+AF parameters Short summary 3GPP Spec Reference 
+MAC PDU for TB(s) 
+NrOfCodewords number of codewords in the 
+PDSCH transmission (CW index q 
+= 0,1) 
+In case of single-codeword 
+transmission, q = 0. 
+3GPP TS 38.214, sec 5.1.3.2 (max #CW) 
+3GPP TS 38.211, sec 7.3.1.1 (q index) 
+MAC PDU[q] Initial transmission/non-CBG-
+based Re-tx: full TB to transmit 
+CBG-based Re-tx: CBs to re-
+transmit 
+3GPP TS 38.214, sec 5.1.3.2 (non-CBG 
+ReTx/initial Tx) 
+3GPP TS 38.214, sec 5.1.7 (CBG-based 
+Tx) 
+TBS[q] Transport block size. Computed at 
+L2. 
+3GPP TS 38.214, sec 5.1.3.2 
+TB CRC 
+TB CRC caching[q] Compute CRC once, reuse in case 
+of re-transmission (CBG case: 
+must be appended if last CB is 
+retransmitted). 
+3GPP TS 38.212, sec 7.2.1  
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             13 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Note: support for CRC caching is 
+up to implementation, and may be 
+subject to capabilities. 
+CB Segmentation + CRC 
+last CB Re-tx[q] In case of CBG-based Re-tx, and 
+last CBG is re-tx (CBGTI in 
+38.212), TB CRC is appended to 
+the last CRC in the MAC Payload. 
+Separate per CW 
+ 
+CB CRC is computed in L1 
+accelerator from MAC PDU (no 
+special controls needed for initial 
+tx; see CB Concatenation section 
+for handling options in case of 
+CBG Re-tx) 
+Note: cached CRC provisioning is 
+up to implementation, and may be 
+subject to capabilities. 
+3GPP TS 38.214, sec 5.1.3.2 
+3GPP TS 38.212, sec 7.3.1.2.2 
+LDPC Encoding 
+rv_{id}[q] redundancy version, per CW. 
+Determines starting position k_0 
+in the circular buffer. In DCI, or 
+from aggregation, or from first 
+TB. 
+3GPP TS 38.212, Table 5.4.2.1-2,  
+3GPP TS 38.214, Table 5.1.2.1-2 
+R[q] or (MCS Table and MCS 
+index[q]). 
+R[q]: target code rate (per CW) 
+Explicit, for initial transmission. 
+Implicit from TBSize and 
+allocation, for retransmissions. 
+MCS Table and MCS index[q]: 
+target code rate can be extracted 
+from the index (first transmission), 
+or as above for retransmissions. 
+3GPP TS 38.212, sec 5.4.2.1 
+3GPP TS 38.214, sec 5.1.3.1 
+new Data Indication[q] Signals whether there is a new 
+transmission, or a retransmission 
+(per CW) 
+3GPP TS 38.212, sec 7.3.1.2.1/2 
+LDPC base graph[q] LDPC base graph to use (can be 
+explicit, or derived from TB size 
+and initial target rate) (per CW) 
+3GPP TS 38.212, sec 7.2.2 
+TBS_{LBRM} or N_{CB} TBS_{LBRM}: Reference TBS 
+for allocations subject to  
+rateMatching = limitedBufferRM; 
+impacts circular buffer length 
+N_{CB} = circular buffer length, 
+after account for any 
+FBRM/LBRM considerations. 
+3GPP TS 38.212, sec 5.4.2.1, 7.2.5 
+Rate Matching references (determining unavailable REs) 
+SS/PBCH Blocks for Rate 
+Matching 
+Set of SSBs, where PDSCH 
+mapping is not possible. 
+3GPP TS 38.214, sec 5.1.4 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             14 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PrbSymbol Bitmap Patterns Bitmap-based set of RBs and 
+symbols not available for 
+allocation 
+3GPP TS 38.214, sec 5.1.4.1 
+3GPP TS 38.331, sec 6.3.2 
+CORESET & SearchSpace 
+Patterns 
+CORESET-based set of RBs and 
+symbols not available for 
+allocation 
+3GPP TS 38.214, sec 5.1.4.1 
+3GPP TS 38.331, sec 6.3.2 
+PDCCH indication Rate Matching around the PDCCH 
+grant for the allocation (+ special 
+consideration for AL16 
+candidates).  
+See the ‘same-index CCE 
+Candidate’ currently part of 
+PDCCH Profile. Alternatively, 
+that field can be signaled as a part 
+of the PDSCH Profile, as it is 
+applicable to PDSCH Rate 
+Matching. 
+3GPP TS 38.214, sec 5.1.4.1 
+CRS Rate Match Patterns LTE-CRS REs not available for 
+allocation (+MBSFN awareness, 
+for LTE-CRS RE mapping to 
+symbols) 
+Note: in 3GPP, this is an RRC 
+parameter 
+3GPP TS 38.214, sec 5.1.4.2 
+3GPP TS 38.331, sec 6.3.2 
+CSI-RS Rate Match Patterns CSI-RS REs not available for 
+allocation 
+3GPP TS 38.214, sec 5.1.4.2 
+3GPP TS 38.331, sec 6.3.2 
+CB Concatenation 
+Presence of last CB[q] CBG-based Re-tx: presence of last 
+CB requires TB CRC to be re-
+appended. 
+3GPP TS 38.214, sec 5.1.3.2 
+3GPP TS 38.212, sec 7.3.1.2.2 
+see section on MAC PDU for 
+TB(s) 
+CB concatenation is handled in 
+L2, in case of CBG-retx. CB CRC 
+attachment in L1 Accelerator. 
+ 
+Alternatively, CB concatenation 
+can be handled exclusively in L1 
+accelerator, based on CBGTI 
+signaling from L2 
+see section on MAC PDU for TB(s) 
+Scrambling 
+n_{ID} or c_{init}[q] n_{UD}: data scrambling identity 
+(PCI by default) 
+c_{init}[q]: scrambling 
+initialization for codeword q. 
+ 
+3GPP TS 38.211, sec 7.3.1.1 
+3GPP TS 38.300, sec 3.1 
+n_{RNTI} RNTI associated with the PDSCH 
+transmission  
+3GPP TS 38.211, sec 7.3.1.1 
+q index of the codeword being 
+scrambled 
+3GPP TS 38.211, sec 7.3.1.1 
+Modulation 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             15 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Q_m[q] or (MCS Table and MCS 
+index[q]). 
+Q_m[q]: Signaled via MCS in 
+DCI; also impacts bit interleaving 
+MCS Table and MCS index[q]: 
+modulation can be extracted from 
+the MCS table and index. 
+3GPP TS 38.214, sec 5.1.3.1 
+3GPP TS 38.212, sec 5.4.2.2 
+Layer Mapping 
+ν total number of layers (when > 4, 
+assignment to codewords 
+described in 38.211. 
+3GPP TS 38.211, sec 7.3.1.3 
+3GPP TS 38.214, sec 5.1 
+Precoding 
+See section 4.2.7 Conceptually similar to FH 
+signaling when precoding for Cat-
+B. 3GPP leaves DL precoding to 
+implementation. 
+Per layer (which also implies per 
+CW) 
+ 
+RE Mapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative to 
+the Bandwidth part for the 
+PDSCH allocation  
+ 3GPP TS 38.211, sec 7.3.1.6 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PDSCH 
+allocation  
+3GGP TS 38.211, sec 7.3.1.6 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+number of DMRS 
+CDM groups without 
+data 
+No PDSCH mapping on DMRS 
+CDM groups marked as having no 
+data. 
+3GPP TS 38.214, sec 5.1.3.2  
+3GPP TS 38.212, sec 7.3.1.2.2 
+3GPP TS 38.214, Table 4.1-1 
+resource allocation 
+type 
+Mapping to VRBs: bitmap-based 
+(type 0) or offset & length (type 1) 
+3GPP TS 38.214, sec 5.1.2.2 
+RB bitmap type 0: allocation is based on this 
+bitmap. In 3GPP, it is signaled at 
+RB group resolution 
+3GPP TS 38.214, sec 5.1.2.2.1 
+3GPP TS 38.212, sec 7.3.1.2.2 
+RB_{start} type 1: start of allocation derived 
+from DCI RIV 
+3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.2.2  
+L_{RBs} type1: number of contiguously 
+allocated VRBs derived from DCI 
+RIV 
+3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.2.2  
+VRB-to-PRB 
+mapping 
+virtual resource blocks are mapped 
+to physical resource blocks: 
+interleaved or non-interleaved 
+3GPP TS 38.211, sec 7.3.1.6 
+3GPP TS 38.212, sec 7.3.1.2.1/2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             16 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+CORESET Type RB bundling for VRB mapping 
+depends on CORESET Type (DCI 
+format not relevant, if BWP is 
+consistent with CORESET Type) 
+3GPP TS 38.211, sec 7.3.1.6 
+Time 
+Domain 
+S Start symbol index, for the 
+allocation 
+3GPP TS 38.214, Table 5.1.2.1-1 
+L Number of symbols, for the 
+allocation 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation.  
+Note: applies only to µ=2. 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Rate 
+Matching 
+see the rate matching 
+section 
+Rate Matching determines which 
+(RE x Symbol) resources are / are 
+not available for RE mapping. 
+3GPP TS 38.214, sec 5.1.4 
+Power Offset 
+ 
+<acceleration based 
+on hard-coded 
+values> 
+Derived based on table 3GPP TS 
+38.214 table 4.1-1, DMRS Config 
+Type and number of DMRS CDM 
+groups without data 
+3GPP TS 38.214, sec 4.1, Table 4.1-1 
+ 1 
+PDSCH DM-RS Parameters 2 
+Table 4-3 PDSCH DM-RS Parameters 3 
+AF parameters Short summary 3GPP Spec Reference 
+Sequence Generation 
+N_{ID} or c_{init}[l] N_{ID}: scrambling identifier 
+for n_{SCID} 
+c_{init}[l]: scrambling 
+initialization for DMRS symb l.  
+3GPP TS 38.211, sec 7.4.1.1.1 
+n_{SCID} sequence index (from DCI; 
+defaults to 0) 
+3GPP TS 38.211, sec 7.4.1.1.1 
+Modulation 
+<acceleration based on hard-coded 
+values> 
+PDSCH DM-RS uses QPSK 
+modulation 
+3GPP TS 38.211, sec 7.4.1.1.1 
+Precoding 
+[see PDSCH data precoding] DMRS follows PDSCH-data 
+precoding 
+ 
+RE Mapping 
+Frequency Domain N_{BWP}^{start} see PDSCH data tab 3GPP TS 38.211, section 7.3.1.6 
+N_{BWP}^{size} see PDSCH data tab 3GGP TS 38.211, section 7.3.1.6 
+µ, µ_{0} see PDSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+resource allocation type see PDSCH data tab 3GPP TS 38.214, sec 5.1.2.2 
+RB bitmap see PDSCH data tab 3GPP TS 38.214, sec 5.1.2.2.1 
+3GPP TS 38.212, sec 7.3.1.2.2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             17 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+RB_{start} see PDSCH data tab 3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.2.2  
+L_{RBs} see PDSCH data tab 3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.2.2  
+VRB-to-PRB mapping see PDSCH data tab 3GPP TS 38.211, sec 7.3.1.6 
+3GPP TS 38.212, sec 7.3.1.2.1/2 
+DMRS location referenced 
+from CRB0 
+Notes:  
+- reference point for RE 
+mapping depends on 
+CORESET Type for 
+grant. 
+- This parameter can also 
+be derived from the 
+CORESET Type 
+3GPP TS 38.211, sec 7.4.1.1.2 
+DMRS ports (per layer) OC weights applied to DM-RS 
+REs, based on DM-RS CDM 
+group and identifier for each 
+DM-RS port. 
+3GPP TS 38.211, sec 7.4.1.1.2 
+configuration  type  DMRS configuration type 
+controls port to CDM group 
+correspondence and frequency 
+density (type 1: 8 ports, type 
+2:12 ports) 
+3GPP TS 38.211, sec 7.4.1.1.2 
+Time Domain 
+symbol Positions location of DMRS in slot 
+sufficiently captures the impact 
+of upper layer parameters, e.g., 
+mapping type, additional pos 
+3GPP TS 38.211, sec 
+7.4.1.1.2 and Tables 7.4.1.1.2-3 and 
+7.4.1.1.2-4 
+DMRS ports (per layer) OC weights applied to DM-RS 
+REs, based on DM-RS CDM 
+group and identifier for each 
+DM-RS port. 
+3GPP TS 38.211, sec 7.4.1.1.2 
+Cyclic Prefix see PDSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset 
+[Power offset w.r.t. SSS] power offset with respect to SSS 3GPP TS 38.214, sec 5.2.2.3.1 
+3GPP TS 38.214, sec 4.1 
+3GPP TS 38.213, sec 4.1 
+ 1 
+PDSCH PT-RS Parameters 2 
+Table 4-4 PDSCH PR-RS Parameters 3 
+AF parameters Short summary 3GPP Spec Reference 
+Sequence Generation 
+dmrs Port(s) DMRS port associated with 
+the PT-RS port according to 
+clause  
+5.1.6.3 in [6, TS 38.214]. 
+3GPP TS 38.211, sec 7.4.1.2.1 
+Layer Mapping 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             18 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+dmrs Port(s) DMRS port associated with 
+the PT-RS port according to 
+clause  
+5.1.6.3 in [6, TS 38.214]. 
+3GPP TS 38.211, sec 7.4.1.2.2 
+3GPP TS 38.214, sec 5.1.6.3 
+Modulation 
+<acceleration based on hard-
+coded values> 
+PDSCH PTRS uses QPSK 
+modulation, like PDSCH 
+DMRS 
+3GPP TS 38.211, sec 7.4.1.1.1 
+Precoding 
+same as the associated dmrs 
+Port(s) 
+  
+RE Mapping 
+Frequency Domain 
+N_{BWP}^{start} see PDSCH data tab 3GPP TS 38.211, section 7.3.1.6 
+N_{BWP}^{size} see PDSCH data tab 3GGP TS 38.211, section 7.3.1.6 
+µ, µ_{0} see PDSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+K_{PT-RS} frequency density (includes 
+the case where there is no 
+PT-RS) 
+3GPP TS 38.214, sec 5.1.6.3, Table 5.1.6.3-2 
+k_{ref}^{RE} re offset (can depend on 
+DMRS association and RRC 
+signaling of 
+resourceElementOffset) 
+3GPP TS 38.211, sec 7.4.1.2.2 , table 7.4.1.2.2-1 
+3GPP TS 38.331, sec 6.3.1 
+n_{RNTI} RNTI associated with the 
+PDSCH transmission  
+3GPP TS 38.211, sec 7.4.1.2.2 
+Time Domain 
+L_{PT-RS} time density (includes the 
+case where there is no PT-
+RS) 
+3GPP TS 38.214, sec 5.1.6.3Table 5.1.6.3-1 
+symbol Positions see PDSCH DMRS tab 
+symbols used for DMRS 
+(PT-RS skips over these) 
+3GPP TS 38.211, sec 
+7.4.1.1.2 and Tables 7.4.1.1.2-3 and 7.4.1.1.2-4 
+Cyclic Prefix see PDSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset 
+epre-Ratio Derived based on table 
+3GPP TS 38.214 table 4.1-2, 
+epre-Ratio and number of 
+associated DMRS ports 
+3GPP TS 38.214, sec 4.1, Table 4.1-2 
+ 1 
+ 2 
+ PDCCH Channel Model 3 
+Per section 5.1.3.2.7 of the O-RAN AAL GAnP document [7] for the PDCCH High-PHY Profile, the PDCCH Channel 4 
+model of the AAL_DOWNLINK_High-PHY Profile supports acceleration of PDCCH Data and DM-RS functionality. 5 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             19 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+The set of accelerated functions associated with the processing of PDCCH DCIs is as follows:  1 
+• CRC attachment 2 
+• Polar encoding 3 
+• Rate matching 4 
+• Scrambling 5 
+• Modulation (QPSK) 6 
+• Precoding1 7 
+• RE mapping  8 
+• IQ compression1 9 
+• Power Offset 10 
+ 11 
+The set of accelerated functions associated with the processing of PDCCH DM-RS is as follows: 12 
+• Sequence generation 13 
+• Modulation 14 
+• Precoding1 15 
+• RE mapping 16 
+• IQ compression1 17 
+ 18 
+ PDCCH input for AAL_DOWNLINK_High-PHY Profile  19 
+The AAL_DOWNLINK_High-PHY profile shall signal PDCCH CORESET allocation(s) per slot. The input data 20 
+consists of the DCI payloads and the associated parameters for the PDCCH CORESET and DCI mapping.  21 
+ PDCCH Parameters 22 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 23 
+Application shall supply all relevant parameters; for ease of reading, the parameters are organized per signal type: Data, 24 
+DM-RS. 25 
+PDCCH Data Parameters  26 
+Table 4-5 PDCCH Data Parameters 27 
+AF parameters Summary 3GPP Spec Reference 
+MAC PDU(s) – DCI payloads 
+NrOfDCIs number of DCIs in the CORESET 3GPP TS 38.213, section 10.1 
+per- 
+DCI 
+DCI Payload DCI payload generated by L2 3GPP TS 38.212, sec 7.3, 7.3.1 
+DCI Payload Size Transport block size. Computed at 
+L2. 
+3GPP TS 38.212, sec 7.3, 7.3.1 
+PDU CRC 
+per-DCI 
+n_RNTI CRC computation detailed in 38.212 
+# payload size A from MAC 
+# parity size L hardcoded to 24 bits 
+# generator polynomial hard-coded 
+to g_{CRC24C}(D) 
+# CRC scrambled with RNTI 
+3GPP TS 38.212, sec 7.3.2 
+Polar Encoding 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             20 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Aggregation Level (AL) Encoding detailed in 38.212: 
+# input sequence (payload with 
+CRC)  has K=A + 24 bits 
+# n_{max} is hardcoded to 9 
+# I_{IL} is hardcoded to 1 
+# n_{PC} is hardcoded to 0 
+# n_{PC}^{wm} is hardcoded to 0 
+ 
+========= 
+ 
+N: encoded bit length is a direct 
+function of K (A+24) and E (#no-
+DMRS PDCCH symbols based on 
+AL * 2) and a set of hardcoded 
+parameters. 
+ 
+Interleaving: function of I_IL 
+(hardcoded for PDCCH) and a set of 
+additional hardcoded table and 
+parameters, operates on the payload 
+ 
+Encoding: function of n_{PC} 
+(hardcoded for PDCCH), 
+n_{PC}^{wm} (hardcoded for 
+PDCCH), + additional spec hard-
+coded tables and parameters, 
+operates on the interleaved payload 
+3GPP TS 38.212, sec 7.3.3 
+Rate Matching 
+Aggregation Level (AL) Rate matching detailed in 38.212 
+# out size E = 2*#non-DMRS REs 
+(function of Aggregation Level)  
+# rate match algorithm uses this E, 
+the size of the original sequence + 
+CRC (K), n_{PC} (hardcoded to 0) 
+and n_{BIL} (hardcoded to 0) to 
+operate on the polar-coded payload 
+3GPP TS 38.214, sec 7.3.4 
+Scrambling 
+per-DCI 
+n_{ID} or c_{init} n_{ID}: data scrambling identity 
+(PCI by default, can be UE-specific) 
+c_{init}: scrambling initialization 
+3GPP TS 38.211, sec  7.3.2.3 
+n_{RNTI} RNTI-based scrambling associated 
+with the DCI transmission (0 for 
+CSS) 
+3GPP TS 38.211, sec  7.3.2.3 
+Modulation 
+<acceleration based on hard-
+coded values> 
+PDCCH uses QPSK modulation 3GPP TS 38.211, sec 7.3.2.4 
+3GPP TS 38.211, sec 5.1.3 
+Precoding 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             21 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+per-DCI See section 4.2.7 Conceptually similar to FH 
+signaling when precoding for Cat-B. 
+3GPP leaves DL precoding to 
+implementation. 
+ 
+RE Mapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth part: 
+RBs indexing for the frequency 
+domain allocation is relative to the 
+Bandwidth part for the PDCCH 
+allocation  
+3GPP TS 38.211, sec 7.3.2.2 
+3GPP TS 38.331, sec 6.3.2 
+N_{BWP}^{size} Size of bandwidth part: RBs 
+indexing for the frequency domain 
+allocation is relative to the 
+Bandwidth part for the PDCCH 
+allocation  
+3GGP TS 38.211, section 7.3.1.6 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+L Number of REGs in an REG Bundle 3GPP TS 38.211, sec 7.3.2.2 
+3GPP TS 38.331, sec 6.3.2 
+R Interleaver size 3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.2.2  
+cce-REG-
+MappingType 
+Mapping of Control Channel 
+Elements (CCE) to Resource 
+Element Groups (REG)  
+3GPP TS 38.211, sec 7.3.2.2 
+3GPP TS 38.211, sec 7.4.1.3.2 
+3GPP TS 38.331, sec 6.3.2 
+Frequency Domain 
+Resources 
+Frequency domain resources for the 
+CORESET. Each bit corresponds a 
+group of 6 RBs, with grouping 
+starting from the first RB group in 
+the BWP. Validity and bit mapping 
+per the RRC parameter 
+frequencyDomainResources in 
+38.331 
+ 
+This parameter applies to both 
+regular CORESETs, as well as 
+CORESET0. For the interpretation 
+regarding CORESET0, see section 
+13 of 38.213. 
+3GPP TS 38.211, sec. 7.3.2.2 
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.213, sec 13 
+n_{shift} offset used in the computation of the 
+interleaver function for CCE-to-
+REG mapping 
+3GPP TS 38.211, sec 7.3.2.2 
+[precoder Granularity] Precoder granularity in frequency 
+domain (for data, this is strictly not 
+needed, as it will be accounted for in 
+the precoding) 
+3GPP TS 38.211, sec 7.3.2.2 
+3GPP TS 38.211, sec 7.4.1.3.2 
+Freq 
+Domain 
+ per DCI cce Index cce Index for sending the DCI 3GPP TS 38.213, sec 10.1 
+same-index CCE 
+Candidate 
+indicates presence of an AL-16 
+candidate existing at the same CCE 
+3GPP TS 38.214, sec 5.1.4.1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             22 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Index, for PDSCH rate matching 
+purposes 
+Note: this information is relevant to 
+PDSCH rate matching, and could be 
+signaled in PDSCH for rate 
+matching purposes, instead. See the 
+Rate Matching section of the 
+PDSCH Profile 
+aggregation level aggregation level for the DCI 3GPP TS 38.211, sec 7.3.2.1 
+3GPP TS 38.213, sec 10.1 
+Time  
+Domain 
+first OFDM symbol Start symbol index, for the 
+allocation 
+3GPP TS 38.211, sec. 7.3.2.2 
+N_{symb}^{CORESE
+T} 
+Number of symbols, for the 
+allocation 
+3GPP TS 38.211, sec. 7.3.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset 
+[Power offset w.r.t. SSS] can be 
+hardcoded, for MVP. 
+see PDCCH DMRS tab. Can be set 
+to the same value. 
+3GPP TS 38.214, sec 5.2.2.3.1 
+3GPP TS 38.214, sec 4.1 
+3GPP TS 38.213, sec 4.1 
+ 1 
+PDCCH DM-RS Parameters 2 
+Table 4-6 PDCCH DM-RS Parameters 3 
+AF parameters Summary 3GPP Spec Reference 
+ 
+per DCI N_{ID} or 
+c_{init}[l] 
+N_{ID}: scrambling identifier  
+c_{init}[l]: scrambling initialization 
+for DMRS symb l. 
+3GPP TS 38.211, sec 7.4.1.3.1  
+Modulation 
+<acceleration based on hard-
+coded values> 
+PDCCH DM-RS uses QPSK 
+modulation 
+3GPP TS 38.211, sec 7.4.1.3.1 
+Precoding 
+per DCI [see PDCCH 
+data 
+precoding] 
+DMRS follows PDCCH-data 
+precoding 
+ 
+RE Mapping 
+Frequency Domain N_{BWP}^ 
+{start} 
+see PDCCH data tab 3GPP TS 38.211, section 7.3.2.2 
+N_{BWP}^ 
+{size} 
+see PDCCH data tab 3GGP TS 38.211, section 7.3.2.2 
+µ, µ_{0} see PDCCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             23 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+DMRS 
+Reference 
+Point 
+reference point for RE mapping 
+physical resources of DMRS  
+depends on CORESET type (#0 or 
+not) 
+3GPP TS 38.211, sec 7.4.1.3.2 
+Precoder 
+Granularity 
+Precoder granularity in frequency 
+domain (impacts whether DMRS 
+should be generated for all RBs or 
+only allocated RBs) 
+3GPP TS 38.211, sec 7.3.2.2 
+3GPP TS 38.211, sec 7.4.1.3.2 
+Freq 
+Domain 
+ per DCI cce Index see PDCCH data tab 3GPP TS 38.213, sec 10.1 
+aggregation 
+level 
+see PDCCH data tab 3GPP TS 38.211, sec 7.3.2.1 
+3GPP TS 38.213, sec 10.1 
+Time Domain 
+first OFDM 
+symbol 
+see PDCCH data tab 3GPP TS 38.211, sec. 7.3.2.2 
+N_{symb}^ 
+{CORESET} 
+see PDCCH data tab 3GPP TS 38.211, sec. 7.3.2.2 
+Cyclic Prefix see PDCCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset 
+Power offset w.r.t. SSS power offset with respect to SSS 3GPP TS 38.214, sec 5.2.2.3.1 
+3GPP TS 38.214, sec 4.1 
+3GPP TS 38.213, sec 4.1 
+ 1 
+ CSI-RS Channel Model 2 
+Per section 5.1.3.2.7 of the O-RAN AAL GAnP document [7] for the CSI-RS High PHY Profile, the CSI-RS Channel 3 
+model of the AAL_DOWNLINK_High-PHY Profile supports acceleration of CSI-RS functionality. 4 
+The set of accelerated functions associated with the processing of CSI-RS is as follows: 5 
+• CSI-RS sequence generation 6 
+• Modulation 7 
+• Precoding1 8 
+• RE mapping 9 
+• IQ compression1 10 
+• Power Offset 11 
+ 12 
+ CSI-RS input for AAL_DOWNLINK_High-PHY Profile  13 
+The AAL_DOWNLINK_High-PHY profile shall signal CSI-RS Resource(s) per slot. The input consists of the CSI-RS 14 
+resource parameters.  15 
+ CSI-RS Parameters 16 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 17 
+Application shall supply all relevant parameters. 18 
+CSI-RS Parameters 19 
+Table 4-7 CSI-RS Parameters 20 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             24 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+AF Parameters Summary 3GPP Spec Reference 
+Sequence Generation 
+n_{ID} or c_{init}[l] n_{ID}: scrambling id 
+c_{init}[l]: scrambling initialization 
+for symb [l] 
+3GPP TS 38.211, sec 7.4.1.5.2  
+Modulation 
+<acceleration based on hard-
+coded values> 
+CSI-RS uses QPSK modulation 3GPP TS 38.211, sec 7.4.1.5.2 
+Precoding 
+See section 4.2.7 Conceptually similar to FH signaling 
+when precoding for Cat-B. 3GPP 
+leaves DL precoding to 
+implementation. 
+ 
+RE Mapping 
+Frequency Domain 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+startingRB PRB where this CSI resource starts 
+in relation to CRB#0 
+3GPP TS 38.331, sec 6.3.2 
+nrofRBs Number of PRBs across which this 
+CSI resource spans. 
+3GPP TS 38.331, sec 6.3.2 
+Frequency Domain 
+Allocation  
+Bitmap defining the 
+frequencyDomainAllocation, with 
+interpretation subject to the Row 
+selection for table 7.4.1.5.3-1 
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3  
+CSI-RS locations Row row indicating the CSI-RS location 
+in table 7.4.1.5.3-1. Can be used to 
+derive; 
+- density ρ (see also 
+Frequency Density) 
+- cdmType 
+- ports 
+- \bar{k} in the (\bar{k}, 
+\bar{l})-tuple 
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3   
+ Density Dot5 Prb Location Indicates whether even or odd PRBs 
+are occupied by CSI-RS. 
+Applicable when density = dot5 
+(0.5) 
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3 
+ 
+Time Domain 
+CSI-RS locations Row row indicating the CSI-RS location 
+in table 7.4.1.5.3-1. Can be used to 
+derive; 
+- \bar{l} in the (\bar{k}, 
+\bar{l})-tuple  
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3  
+ 
+l_0 value of l_0 for the interpretation of 
+table 7.4.1.5.3-1. Signaled by RRC 
+parameter 
+firstOFDMSymbolInTimeDomain  
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3  
+l_1 value of l_1 for the interpretation of 
+table 7.4.1.5.3-1. Signaled by RRC 
+parameter 
+firstOFDMSymbolInTimeDomain2  
+3GPP TS 38.331, sec 6.3.2 
+3GPP TS 38.211, sec 7.4.1.5.3  
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             25 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset 
+[Power offset w.r.t. SSS] power offset with respect to SSS 3GPP TS 38.214, sec 5.2.2.3.1 
+ 1 
+ SSB Model 2 
+Per section 5.1.3.2.7 of the O-RAN AAL GAnP document [7] for the PBCH High-PHY Profile, the SSB Channel model 3 
+of the AAL_DOWNLINK_High-PHY Profile supports acceleration of PSS+SSS and PBCH Data and PBCH DM-RS 4 
+functionality. 5 
+The set of accelerated functions associated with the processing of PSS+SSS is as follows: 6 
+• Sequence generation 7 
+• Modulation 8 
+• Precoding1 9 
+• RE mapping 10 
+• IQ compression1 11 
+• Power Offset 12 
+ 13 
+The set of accelerated functions associated with the processing of PBCH Data is as follows:  14 
+• PBCH payload generation 15 
+• Scrambling 16 
+• TB CRC attachment 17 
+• Polar encoding 18 
+• Rate matching 19 
+• Data scrambling 20 
+• Modulation (QPSK) 21 
+• Precoding1 22 
+• RE mapping 23 
+• IQ compression1 24 
+ 25 
+The set of accelerated functions associated with the processing of PBCH DM-RS is as follows: 26 
+• Sequence generation 27 
+• Modulation 28 
+• Precoding1 29 
+• RE mapping 30 
+• IQ compression1 31 
+• Power Offset 32 
+ 33 
+ SSB input for AAL_DOWNLINK_High-PHY Profile  34 
+The AAL_DOWNLINK_High-PHY profile shall signal SSB allocation(s), per slot (up to two per slot and SSB 35 
+configuration, at the SSB slot numerology). The input consists of the PBCH payload and the associated SSB resource 36 
+allocation parameters.  37 
+ SSB Parameters 38 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 39 
+Application shall supply all relevant parameters; for ease of reading, the parameters are organized per signal type: 40 
+PBCH Data, PBCH DM-RS, PSS&SSS. 41 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             26 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PBCH Data Parameters 1 
+Table 4-8 PBCH DM-RS Parameters 2 
+AF Parameters Summary 3GPP Spec Reference 
+MAC PDU(s) 
+Payload PBCH payload (generated by 
+L2, or in AF) - may be the full 
+payload (32 bits) or only the 
+portion supplied from higher 
+layers (24 bits). 
+3GPP TS 38.212, sec 7.1, 7.1.1 
+Payload Scrambling 
+N_{ID}^{cell} or c_{init} N_{ID}^{cell}: Physical layer 
+cell ID, as defined in as defined 
+in 3GPP TS 38.211, section 
+7.4.2.1 
+c_{init}: scrambling 
+initialization  
+3GPP TS 38.211, sec 7.4.1.4.1, 7.1.2 
+L_{max} Maximum number of candidate 
+SS/PBCH blocks in a half frame 
+3GPP TS 38.211, sec 7.3.3.1, 7.1.2 
+CRC 
+<acceleration based on hard-coded 
+values> 
+CRC computation detailed in 
+38.212: 
+# (scrambled) payload size A 
+from MAC: 24+8=32 bits (Rel-
+15,16) 
+# parity size L hardcoded to 24 
+bits 
+# generator polynomial hard-
+coded to g_{CRC24C}(D) 
+3GPP TS 38.212, sec 7.1.3 
+Polar Coding 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             27 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+<acceleration based on hard-coded 
+values> 
+Encoding detailed in 38.212: 
+# input sequence (scrambled 
+payload with CRC)  has K = B = 
+32 + 24 = 56 bits (result of 
+adding up two hardcoded 
+numbers) 
+# n_{max} is hardcoded to 9 
+# I_{IL} is hardcoded to 1 
+# n_{PC} is hardcoded to 0 
+# n_{PC}^{wm} is hardcoded to 
+0 
+ 
+========= 
+ 
+N: encoded bit length is a direct 
+function of K (56) and E (rate 
+match output 864, spelled out in 
+spec) and a set of hard-coded 
+parameters = 512 
+ 
+Interleaving: function of I_IL 
+(hardcoded for PBCH) and a set 
+of additional hardcoded table 
+and parameters, operates on the 
+payload 
+ 
+Encoding: function of n_{PC} 
+(hardcoded for PBCH), 
+n_{PC}^{wm} (hardcoded for 
+PBCH), + additional spec hard-
+coded tables and parameters, 
+operates on the interleaved 
+payload 
+3GPP TS 38.212, sec 7.1.4 
+Rate Matching 
+<acceleration based on hard-coded 
+values> 
+Rate matching detailed in 38.212 
+# out size E = 864, explicit in the 
+spec, but can be derived as  
+(#non-DMRS REs * 2) 
+# rate match algorithm uses this 
+E, the size of the original 
+sequence + CRC (K = 56), 
+n_{PC} (hardcoded to 0) and 
+n_{BIL} (hardcoded to 0) to 
+operate on the polar-coded 
+payload 
+3GPP TS 38.212, sec 7.1.5 
+Scrambling 
+L_{max} Maximum number of candidate 
+SS/PBCH blocks in a half frame 
+3GPP TS 38.211, sec 7.3.3.1 
+\nu candidate SS/PBCH block index 3GPP TS 38.211, sec 7.3.3.1 
+Modulation 
+<acceleration based on hard-coded 
+values> 
+PBCH data uses QPSK 
+modulation 
+3GPP TS 38.211, sec 7.3.3.2  
+3GPP TS 38.211, sec 5.1.3 
+Precoding 
+See section 4.2.7 Conceptually similar to FH 
+signaling when precoding for 
+Cat-B. 3GPP leaves DL 
+precoding to implementation. 
+ 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             28 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+RE Mapping 
+Frequency Domain 
+offsetToPointA Frequency offset between point 
+A and the lowest subcarrier of 
+the lowest resource block, which 
+has the subcarrier spacing 
+provided by the higher-layer 
+parameter 
+subCarrierSpacingCommon and 
+overlaps with the SS/PBCH 
+block" 
+ 3GPP TS 38.211, sec 4.4.4.2 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+k_{SSB} subcarrier offset 3GPP TS 38.211, sec 7.4.3.1 
+Time 
+Domai
+n 
+Case Case determines first symbol 
+mapping 
+3GPP TS 38.213, sec 4.1 
+ssb index in slot  Index of SSB in slot 3GPP TS 38.213, sec 4.1 
+Power Offset 
+<acceleration based on hard-coded 
+values> 
+The UE assumes that SSS, 
+PBCH DM-RS, and PBCH data 
+have same EPRE 
+3GPP TS 38.213, sec 4.1 
+ 1 
+PBCH DM-RS Parameters 2 
+Table 4-9 PBCH DM-RS Parameters 3 
+AF Parameters Summary 3GPP Spec Reference 
+Sequence Generation 
+N_{ID}^{cell} Physical cell ID 3GPP TS 38.211, sec 7.4.1.4.1, 7.4.2.1 
+L_{max} Maximum number of 
+candidate SS/PBCH blocks 
+in a half frame 
+3GPP TS 38.211, sec 7.4.1.4.1 
+i_{SSB} candidate SSB SS/PBCH 
+block index 
+3GPP TS 38.211, sec 7.4.1.4.1 
+Modulation 
+<acceleration based on hard-coded 
+values> 
+PBCH DM-RS uses QPSK 
+modulation 
+3GPP TS 38.211, sec 7.4.1.4.1  
+Precoding 
+[see PBCH data precoding] DMRS follows PDCCH-data 
+precoding 
+ 
+RE Mapping 
+Frequen
+cy 
+Domain offsetToPointA see PBCH data 3GPP TS 38.211, sec 4.4.4.2 
+µ, µ_{0} see PBCH data 3GPP TS 38.211, sec 4.2, 5.3.1 
+k_{SSB}  see PBCH data 3GPP TS 38.211, sec 7.4.3.1 
+Time 
+Domain Case see PBCH data 3GPP TS 38.213, sec 4.1 
+ssb index in slot 
+ 
+  
+see PBCH data 3GPP TS 38.213, sec 4.1 
+Power Offset 
+<acceleration based on hard-coded 
+values> 
+The UE assumes that SSS, 
+PBCH DM-RS, and PBCH 
+data have same EPRE 
+3GPP TS 38.213, sec 4.1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             29 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+ 1 
+PSS & SSS Parameters 2 
+Table 4-10 PSS & SSS Parameters 3 
+AF Parameters Summary 3GPP Spec Reference 
+Sequence Generation 
+N_{ID}^{cell} Physical cell ID - used to derive 
+N_ID(1) for SSS and N_ID(2) for 
+PSS 
+3GPP TS 38.211, sec 7.4.2.1, 7.4.2.2.1, 
+7.4.2.3.1  
+Modulation 
+<acceleration based on hard-coded 
+values> 
+PSS and SSS use BPSK modulation 3GPP TS 38.211, sec 7.4.2.2.1, 
+7.4.2.3.1  
+Precoding 
+See section 4.2.7 Conceptually similar to FH signaling 
+when precoding for Cat-B. 3GPP 
+leaves DL precoding to 
+implementation. 
+ 
+RE Mapping 
+Freq 
+Domai
+n 
+offsetToPointA see PBCH data tab 3GPP TS 38.211, sec 4.4.4.2 
+µ, µ_{0} see PBCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+k_{SSB}  see PBCH data tab 3GPP TS 38.211, sec 7.4.3.1 
+Time 
+Domai
+n 
+Case see PBCH data tab 3GPP TS 38.213, sec 4.1 
+ssb index in slot 
+  
+see PBCH data tab 3GPP TS 38.213, sec 4.1 
+Power Offset 
+\beta_{PSS} PSS EPRE to SSS EPRE in an SSB 3GPP TS 38.213, sec 4.1 
+ 4 
+ Beamforming 5 
+In this release, the AAL_DOWNLINK_High-PHY profile supports the following beamforming methods available for 6 
+OFH signaling: 7 
+- Predefined-Beam Beamforming, as defined in section 10.4.2.1 of [8]; 8 
+- Weight-based Dynamic Beamforming, as defined in section 10.4.2.2 of [8]; 9 
+- Attribute-Based Dynamic Beamforming, as defined in section 10.4.3 of [8]; 10 
+- Channel-Information-Based Beamforming, as defined in section 10.4.4 of [8]. 11 
+ 12 
+ Predefined-Beam Beamforming 13 
+AALI shall support Application signaling of the following parameters, as needed for AF-signaling of beamId in C-Plane 14 
+Section Types 1, 3 [8]: 15 
+- frequency-domain beam indices 16 
+- time-domain-domain beam indices 17 
+- a mixture of the two (“hybrid beamforming”). 18 
+ Weight-based Dynamic Beamforming  19 
+AALI shall support Application signaling of the following parameters, as needed for AF -signaling of beamforming 20 
+weight vectors of (bfwI, bfwQ) in C-Plane Extensions 1, 11, 19 [8]: 21 
+Table 4-11 Weight-based Dynamic Beamforming Parameters for Downlink 22 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             30 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+AF Parameters Summary AF Role 
+AF  Application 
+Channel Estimation Abstraction A representation of SRS-based 
+channel observations, as documented 
+in the SRS channel model in section 
+4.3.5.2, e.g. for usage antennaSwitch 
+Signals an abstraction of the Channel 
+Estimation to the Application 
+Application  AF 
+UEs  Selected UEs for scheduling (for an 
+illustration refer to the L users 
+referenced in Appendix J.4 of [8] 
+Compute precoding weights for the 
+selected UEs and layers, e.g. based on 
+the reported Channel Estimation and its 
+Abstraction. 
+ 
+Signal to O-RU beamforming vectors 
+of weights (bfwI, bfwQ) over C-Plane 
+for the Application-selected UEs and 
+layers. 
+ 
+Alternatively, the beamforming weights 
+may be consumed in AF itself, e.g. Cat-
+A, when precoding is applied in the O-
+DU. 
+Layers, per UE Selected Layers for scheduling (for 
+an illustration refer to the K layers 
+referenced in Appendix J.4 of [8]  1 
+The High-PHY AAL API shall be extensible to allow, in future releases, the optional ability for the beamforming 2 
+weights to be generated outside the AF that consumes them for generating the appropriate C - and U-plane signaling by 3 
+the accelerator, e.g. to generate the corresponding U-Plane eAxC I/Q sample streams and C-plane ueId field(s). 4 
+ 5 
+ Attribute-Based Dynamic Beamforming  6 
+AALI shall support Application signaling of the following parameters, as needed for AF -signaling of beamforming 7 
+attributes (bfAzPt, bfZePt, bfAz3dd, bfZe3dd, bfAzSl, bfZeSl) in C-Plane Extensions 2 [8]: 8 
+- Zenith main and 3dB angles 9 
+- Azimuth main and 3dB angles 10 
+- Sidelobe Angles 11 
+ 12 
+ Channel-Information-Based Beamforming  13 
+AALI shall support Application signaling of the following parameters, as needed for AAL_DOWNLINK_High -14 
+PHYprofile signaling of channel estimate vectors of (ciIsample, ciQsample) in C-Plane Section 6 [8]: 15 
+Table 4-12 Channel-Information-Based Beamforming Parameters for Downlink 16 
+AF Parameters Summary AF Role 
+AF à Application 
+Channel Estimation Abstraction A representation of SRS-based 
+channel observations, as documented 
+in the SRS channel model in section 
+4.3.5.2, e.g. for usage antennaSwitch 
+Signals an abstraction of the Channel 
+Estimation to the Application 
+Application à AF 
+UEs  Selected UEs for scheduling (for an 
+illustration refer to the L users 
+referenced in Appendix J.4 of [8] 
+Signal to O-RU the Channel Estimates 
+for the Application-selected UEs and 
+layers  
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             31 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Layers, per UE Selected Layers for scheduling (for 
+an illustration refer to the K layers 
+referenced in Appendix J.4 of [8] 
+ 1 
+ O-DU AAL_UPLINK_High-PHY Profile Specification 2 
+This profile provides acceleration functionality for the following channels and signals:  3 
+- PUSCH (including Data, DM-RS and PT-RS) 4 
+- PUCCH (Data) – Format 0 5 
+- PUCCH (including Data and DM-RS) – Format 1 6 
+- PUCCH (including Data and DM-RS) – Formats 2, 3, 4 7 
+- SRS 8 
+- PRACH 9 
+ 10 
+This section presents parametrization for each of these channels and signals. 11 
+ Profile Operation 12 
+The AAL_UPLINK_High-PHY Profile interface shall work on a slot basis. An operation can be performed one slot at a 13 
+time, where the slot, numerology and SFN are signaled for the API. 14 
+The output data is specific to each uplink channel composing the profile.  15 
+The input data consists of: 16 
+- a set of Application-supplied parameters for each of the modelled uplink channels 17 
+- a set of U-Plane OFH packets. 18 
+ 19 
+For the OFH packets, the AAL-LPU interfaces directly with the OFH and is responsible for handling its exchange of 20 
+information with OFH.  21 
+ Summary of Capabilities  22 
+The AAL_UPLINK_High-PHY Profile capabilities shall be reported to the application.  23 
+Table 4-1 lists a subset of the AAL_UPLINK_High-PHY profile capabilities that should be reported to the application 24 
+with respect the acceleration of the various channel functionalities and interaction.  25 
+Note additional capabilities can also be reported by the AALI implementation.  26 
+Table 4-13 Sample AAL_UPLINK_High-PHY Profile Capabilities  27 
+ 28 
+Capability Short summary 3GPP Spec Reference 
+3GPP Release Rel-15, Rel-16, … https://www.3gpp.org/specifications/work-
+plan 
+PUSCH TBs / slot Number of PUSCH TBs per slot Outside the scope of 3GPP  
+Cyclic Prefix  Normal or Extended 3GPP TS 38.211, sec 4.2 
+Subcarrier Spacing 15, 30, 60, 120, 240 kHz; can be 
+channel-specific. 
+3GPP TS 38.211, sec 4.2 
+Bandwidth Support 5, 10, 15, … MHz 3GPP TS 38.104, sec 5.3 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             32 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PUSCH UCI Multiplexing Supported or not  3GPP TS 38.212, sec 6.3.2 
+PUSCH Frequency Hopping Supported or not  3GPP TS 38.214, sec 6.3 
+PUSCH DM-RS Configuration 
+Type 
+1 or 2 or both 3GPP TS 38.211, sec 6.4.1.1.3 
+PUSCH DM-RS Max Length 1 or 2  3GPP TS 38.211, sec 6.4.1.1.3 
+PUSCH Mapping Type A or B or both 3GPP TS 38.211, sec 6.4.1.1.3 
+PUSCH Waveform CP-OFDM or DFT-S-OFDM  3GPP TS 38.211, sec 6.3.1.4 
+PUSCH CBG ReTx Supported or not 3GPP TS 38.212, sec 5.4.2.1, 7.3.1.1.2 
+PUSCH PT-RS support Support for PT-RS 3GPP TS 38.211, sec 6.4.1.2 
+PUSCH Aggregation Factor 1-8 or not supported 3GPP TS 38.214, sec 6.1.2.1 
+PUSCH LBRM Support Supported or not 3GPP TS 38.212, sec 5.4.2.1 
+PUCCH Formats 0, 1, 2, 3 or 4  3GPP TS 38.211, sec 6.3.2 
+PUCCH Group and Sequence 
+Hopping 
+Group, sequence or neither  3GPP TS 38.211, sec 6.3.2.2 
+PUCCHs per Slot Max number of PUCCH Resources 
+per slot 
+Outside the scope of 3GPP 
+PUCCH Aggregation Factor Supported or not (formats 1, 3, 4)  
+SRS usage support beamManagement, codebook, 
+nonCodebook, antennaSwitching, 
+including any combination. If none 
+of the supported reports (see “SRS 
+report type support”) requires usage 
+awareness, this usage support may be 
+omitted or set to all usage types. 
+3GPP TS 38.214, sec 6.2.1 
+SRS report type support e.g. SVD (singular value 
+decomposition), or H (raw channel) 
+report or SINR or other reports, 
+subsampled in frequency domain. 
+ 
+Sec 4.3.5.2 
+SRS Report RB subsampling RB resolution at which the SRS 
+reports may be subsampled 
+Outside the scope of 3GPP 
+SRS Reports per Slot Maximum number of SRS reports 
+per slot 
+Outside the scope of 3GPP 
+SRS: Max number ports per UE Maximum number of ports to sample 
+per UE 
+Partly outside the scope of 3GPP 
+3GPP TS 38.211, sec 6.4.1.4.1 
+SRS Configurations Capabilities regarding SRS 
+configurations: 
+- Support for consecutive 
+SRS symbols 
+- SRS frequency hopping 
+- Comb Size 
+- Cyclic shifts 
+- Symbols per slot 
+3GPP TS 38.211, sec 6.4.1.4 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             33 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+SRS distribution Capabilities regarding SRS 
+occurrence in time: 
+- Periodicity 
+- Duty Cycle: Maximum 
+proportion of SRS-bearing 
+slots in an SRS period. 
+- Bitmap of symbol locations 
+per slot 
+- Symbols per slot 
+ 
+This capability is agnostic to SRS 
+trigger type (e.g. periodic / semi-
+persistent / aperiodic). 
+3GPP TS 38.211, sec 6.4.1.4 
+Partly outside 3GPP Scope 
+PRACH Formats 0-3, A1-3, B1-4, C0-1 3GPP TS 38.211, sec 6.3.3 
+PRACH Restricted Sets Type A, B, none 3GPP TS 38.211, sec 6.3.3 
+PRACH FD Occasions Per Slot Per configuration 3GPP TS 38.211, sec 6.3.3.2 
+PRACH Configurations Max number of PRACH 
+configurations 
+3GPP TS 38.331, 6.3.2 
+PRACH ROs per slot Max number of Time and Frequency 
+domain ROs per slot, across all 
+configurations 
+Outside the scope of 3GPP 
+PRACH Root Processing Rate Number of roots that can be 
+processed per unit of time. Can be 
+per preamble format 
+Outside the scope of 3GPP 
+PRACH ROs Queue Size The maximum queue size for 
+processing Rach Occasions 
+Outside the scope of 3GPP 
+UCI Part1  Part2 Maps Limitations regarding to the storage 
+of UCI Part1Part2 maps 
+Outside the scope of 3GPP 
+UL MIMO: SDM & Bandwidth 
+joint support 
+Support for forming joint precoders 
+across bandwidth, and across 
+baseband antenna ports. Includes the 
+option of “no support”. 
+Outside the scope of 3GPP 
+UL MIMO: Maximum number 
+of layers 
+The maximum number of layers that 
+can be multiplexed (can be channel 
+specific) 
+Outside the scope of 3GPP 
+UL: MIMO Maximum number 
+of layers per UE 
+The maximum number of layers that 
+can be allocated to a UE 
+3GPP TS 38.211, sec 6.3.1.3 
+… … … 
+ 1 
+ PUSCH Channel Model 2 
+Per section 5.1.3.3.7 of the O-RAN AAL GAnP document [7] for the PUSCH High-PHY Profile, the PUSCH Channel 3 
+model of the AAL_UPLINK_High-PHY Profile supports acceleration of PUSCH Data, DM-RS and PT-RS 4 
+functionality. 5 
+The set of accelerated functions associated with the processing of PUSCH TB(s) is as follows: 6 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             34 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+• IQ decompression1 1 
+• RE de-mapping 2 
+• Combining 3 
+• Channel estimation (see DM-RS and PT-RS) 4 
+• Channel equalization (see DM-RS and PT-RS) 5 
+• Transform precoding (optional- only required for DFT-s-OFDM waveform) 6 
+• Demodulation 7 
+• Descrambling 8 
+• Rate de-matching 9 
+• LDPC decoding 10 
+• CRC check 11 
+• UCI Decoding 12 
+ 13 
+The set of accelerated functions associated with the processing of PUSCH DM-RS is as follows: 14 
+• IQ decompression1 15 
+• RE de-mapping 16 
+• Combining 17 
+• Demodulation 18 
+• Sequence detection 19 
+ 20 
+The set of accelerated functions associated with the processing of PUSCH PT-RS is as follows: 21 
+• IQ decompression1 22 
+• RE de-mapping 23 
+• Combining 24 
+• Demodulation 25 
+• Layer demapping 26 
+• Sequence detection 27 
+ PUSCH input and output for AAL_UPLINK_High-PHY Profile  28 
+The AAL_UPLINK_High-PHY profile shall signal PUSCH allocation(s) per slot.  29 
+From Application, the PUSCH interface receives the associated parameters for the P USCH allocation. 30 
+The output data consists of: 31 
+- the CRC status for the PUSCH codeword, as well as optionally for individual CBs. 32 
+- in cases of successful CRC verification: the TB(s) output of the decoder. 33 
+- in case of UCI inclusion: the included UCI payload(s) 34 
+ PUSCH Parameters 35 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 36 
+Application shall supply all relevant parameters; for ease of reading, the parameters are organized per signal type: Data, 37 
+DM-RS, PT-RS. 38 
+PUSCH Data Parameters 39 
+Table 4-14: PUSCH Data Parameters 40 
+AF parameters Short summary 3GPP Spec Reference 
+MAC TB 
+TBS Transport block size. Computed at 
+L2. 
+3GPP TS 38.214, sec 6.1.4.2 
+ TB (if TB CRC passes) This is an output: the TB 
+corresponding to the PUSCH 
+codeword 
+ 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             35 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+UCI detection (if relevant) 
+UCI part 1 size Size of UCI part 1 (or single UCI) 3GPP TS 38.212, sec 6.3.2.4  
+alphaScaling Needed to compute number of coded 
+symbols per layer 
+3GPP TS 38.212, sec 6.3.2.4  
+harqAckBitLength Number of HARQ-ACK bits  3GPP TS 38.212, sec 6.3.2.4  
+betaOffsetHarq or Q’_{ACK} betaOffsetHarq: Beta Offset for 
+HARQ-ACK bits.  
+Q’_{ACK}: the number of coded 
+modulation symbols per layer for 
+HARQ-ACK transmission 
+3GPP TS 38.212, sec 6.3.2.4  
+betaOffsetCsiPart1 or Q’_{CSI-1} betaOffsetCsiPart1: Beta Offset for 
+CSI part 1 bits.  
+Q’_{CSI-1}: number of coded 
+modulation symbols per layer for 
+CSI part 1 transmission 
+3GPP TS 38.212, sec 6.3.2.4  
+betaOffsetCsiPart2 Beta Offset for CSI part 2 bits.  3GPP TS 38.212, sec 6.3.2.4  
+mappings from Csi Part1 to length 
+and priorities of CSI part 2 reports 
+Needed to compute in L1 the actual 
+size of CSI part 2 
+3GPP TS 38.213, sec 9.3 
+ UCI part 1 This is an output: Uninterpreted UCI 
+part 1 
+ 
+ UCI part 2 This is an output: Uninterpreted UCI 
+part 2 
+ 
+CRC Check 
+ CRC status This is an output: CRC Status for 
+CW + other metrics (e.g. SINR) 
+38.212, section  6.2.1 
+CB CRC and CB Desegmentation 
+C number of expected code blocks 3GPP TS 38.214, sec 5.2.2 
+CB presence[*] Presence indicator (e.g. bitmap), for 
+each CB 
+3GPP TS 38.214, sec 6.2.3 
+ report: per-CB CRC status This is an output: CRC Status per CB 
++ other metrics (e.g. SINR) 
+3GPP TS 38.214, sec 6.2.3 
+LDPC Decoding 
+rv_{id} redundancy version, per CW. 
+Determines starting position k_0 in 
+the circular buffer. In DCI, or from 
+aggregation. 
+ 
+3GPP TS 38.214, sec 6.1.4, sec 6.1.2.1 
+R or (MCS Table and MCS index) R: target code rate 
+Explicit, for initial transmission. 
+Implicit from TBSize and allocation, 
+for retransmissions. 
+ 
+MCS Table and MCS index: target 
+code rate can be extracted from the 
+index (first transmission), or as 
+above for retransmissions. 
+3GPP TS 38.214, sec 6.1.4.1 
+new Data Indication Signals whether there is a new 
+transmission, or a retransmission (per 
+CW) 
+3GPP TS 38.212, sec 7.3.1.1 
+3GPP TS 38.214, sec 5.1.7.2 
+HARQ process number  harq process number for the UL 
+buffer 
+3GPP TS 38.212, sec 7.3.1.1 
+LDPC base graph LDPC base graph to use (can be 
+explicit, or derived from TB size and 
+initial target rate) (per CW) 
+3GPP TS 38.212, sec 7.2.2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             36 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Rate Dematching 
+TBS_{LBRM} or N_{CB} TBS_{LBRM}: Reference TBS for 
+allocations subject to  rateMatching 
+= limitedBufferRM; impacts circular 
+buffer length 
+N_{CB} = circular buffer length, 
+after account for any FBRM/LBRM  
+considerations. 
+3GPP TS 38.212, sec 5.4.2.1, 6.2.5 
+C number of expected code blocks. 
+Also uses the rate match size E_r, 
+which is a computed field 
+3GPP TS 38.212, sec 6.2.6 
+N[*] number of bits in each CB 3GPP TS 38.212, sec 6.2.6 
+CB Deconcatentation 
+C number of expected code blocks. 
+Also uses the rate match size E_r, 
+which is a computed field 
+3GPP TS 38.212, sec 6.2.6 
+N[*] number of bits in each CB 3GPP TS 38.212, sec 6.2.6 
+ Descrambling 
+n_{ID} or c_{init} n_{ID}: data scrambling identity 
+(PCI by default) 
+c_{init}: scrambling initialization 
+3GPP TS 38.211, sec 6.3.1.1 
+n_{RNTI} RNTI associated with the PDSCH 
+transmission  
+3GPP TS 38.211, sec 6.3.1.1 
+Demodulation 
+Q_m or (MCS Table and MCS 
+index) 
+Q_m: Signaled via MCS in DCI 
+ 
+MCS Table and MCS index: 
+modulation can be extracted from the 
+MCS table and index. 
+3GPP TS 38.214, sec 6.1.4.1 
+IDFT for DFT-s-OFDM 
+transformPrecoder Signaled in DCI 3GPP TS 38.214, sec 6.3.1.4 
+Channel Estimation & Equalization 
+<see PUSCH DMRS> 
+  
+<see PUSCH PTRS> 
+  
+Combining 
+See section 4.2.74.3.7 Combiner matrix is per PUSCH 
+allocation 
+ 
+RE Demapping 
+Frequency  
+Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth part: 
+VRBs indexing is relative to the 
+Bandwidth part for the PUSCH 
+allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the Bandwidth 
+part for the PUSCH allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} subcarrier spacing impacts waveform 
+generation, including centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+number of DMRS CDM 
+groups without data 
+No PUSCH mapping on DMRS 
+CDM groups marked as having no 
+data. 
+3GPP TS 38.212, sec 7.3.1.1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             37 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+resource allocation type Bitmap-based (type 0) or offset & 
+length (type 1) 
+3GPP TS 38.214, sec 6.1.2.2 
+RB bitmap type 0: allocation is based on this 
+bitmap. In 3GPP, it is signaled at RB 
+group resolution 
+3GPP TS 38.214, sec 6.1.2.2.1 
+3GPP TS 38.212, sec 7.3.1.1.2 
+RB_{start} type 1: start of allocation derived 
+from DCI RIV 
+3GPP TS 38.214, sec 6.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.1.2 
+L_{RBs} type1: number of continuously 
+allocated VRBs derived from DCI 
+RIV 
+3GPP TS 38.214, sec 5.1.2.2.2 
+3GPP TS 38.212, sec 7.3.1.1.2 
+(intra-slot) frequency 
+hopping 
+indicates whether PUSCH allocation 
+is based on intra-slot frequency 
+hopping 
+3GPP TS 38.212, sec 7.3.1.1 
+3GPP TS 38.214, sec 6.3 
+RB_{start} location of the second frequency hop 3GPP TS 38.214, sec 6.3 
+txDirect Current Location indicates the subcarrier index within 
+the carrier corresponding to the 
+numerology of the corresponding 
+uplink BWP 
+3GPP TS 38.331, sec 6.3.2 
+shift7dot5kHz Indicates whether there is 7.5 kHz 
+shift or not.  
+3GPP TS 38.331, sec 6.3.2 
+Time 
+Domain 
+S Start symbol index, for the allocation 3GPP TS 38.214, Table 6.1.2.1-1 
+L Number of symbols, for the 
+allocation 
+3GPP TS 38.214, Table 6.1.2.1-1 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+PUSCH DM-RS Parameters 2 
+Table 4-15: PUSCH DM-RS Parameters 3 
+AF parameters Short summary 3GPP Spec Reference 
+DMRS Sequence 
+N_{ID} or c_{init}[l] N_ID: scrambling identifier for 
+n_{SCID} 
+c_{init}[l]: scrambling 
+initialization for DMRS symb l 
+(CP-OFDM) or for entire DMRS 
+(Rel-15 DFT-S-OFDM) 
+3GPP TS 38.211, sec 6.4.1.1.1.1/2 
+n_{SCID} sequence index (from DCI; 
+defaults to 0) 
+3GPP TS 38.211, sec 6.4.1.1.1.1/2 
+   
+N_{ID}^{RS} same as N_ID^PUSCH, or PCI 
+(DFT-S-OFDM) 
+3GPP TS 38.211, sec 6.4.1.1.1.2 
+seqOrGroup Hopping indicates whether sequence or 
+group hopping is enabled 
+3GPP TS 38.211, sec 6.4.1.1.1.2 
+U low PAPR group number [DFT-s-
+OFDM] 
+3GPP TS 38.211, sec 5.2.2 
+V low PAPR sequence number 
+[DFT-s-OFDM] 
+3GPP TS 38.211, sec 5.2.2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             38 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Demodulation 
+Transform Precoder CP-OFDM: PUSCH DM-RS uses 
+QPSK modulation 
+DFT-s-OFDM: PUSCH DMRS 
+uses low-PAPR sequences  
+3GPP TS 38.211, sec 6.4.1.1.1.1/2 
+Combining 
+[see PUSCH data combining] DMRS follows PUSCH-data 
+combining 
+ 
+TPMI [optional] PMI of the UE, can help 
+with combiner formation 
+3GPP TS 38.211, sec 6.3.1.5 
+RE Demapping 
+Frequency Domain N_{BWP}^{start} see PUSCH data tab 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} see PUSCH data tab 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} see PUSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+DMRS ports (per layer) OC weights applied to DM-RS 
+REs, based on DM-RS CDM 
+group and identifier for each DM-
+RS port. 
+3GPP TS 38.211, sec 6.4.1.1.3  
+Time Domain 
+symbol Positions location of DMRS in a slot 
+sufficiently captures the impact of 
+upper layer parameters, e.g. 
+mapping type, additional pos 
+3GPP TS 38.211, sec 6.4.1.1.3 
+configuration  type  DMRS configuration type controls 
+port to CDM group 
+correspondence 
+3GPP TS 38.211, sec 6.4.1.1.3  
+DMRS ports (per layer) OC weights applied to DM-RS 
+REs, based on DM-RS CDM 
+group and identifier for each DM-
+RS port. 
+3GPP TS 38.211, sec 6.4.1.1.3  
+Cyclic Prefix see PUSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+PUSCH PT-RS Parameters 2 
+Table 4-16: PUSCH PT-RS Parameters 3 
+AF parameters Short summary 3GPP Spec Reference 
+Sequence Detection 
+NrofPorts number of PT-RS ports (Rel-15: 
+only one) 
+3GPP TS 38.212, sec 7.3.1.1.2 
+associated DM-RS ports[*] DM-RS ports associated with each 
+of the PT_RS ports 
+3GPP TS 38.214, sec 6.2.3.1 
+3GPP TS 38.212, sec 7.3.1.1.2 
+N_{group}^{PT-RS} Number of PT-RS groups 3GPP TS 38.211, sec 6.4.1.2.1.2 
+3GPP TS 38.214, sec 6.2.3.2 
+N_{samp}^ {group} Number of samples per PT-RS 
+group 
+3GPP TS 38.211, sec 6.4.1.2.1.2 
+3GPP TS 38.214, sec 6.2.3.2 
+N_{ID} Identity for associated PUSCH 3GPP TS 38.211, sec 6.2.3.2 
+Layer Demapping 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             39 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+NrofPorts number of PT-RS ports 3GPP TS 38.212, sec 7.3.1.1.2 
+dmrs Port(s) DM-RS ports associated with each 
+of the PT-RS ports 
+3GPP TS 38.214, sec 6.2.3.1 
+3GPP TS 38.212, sec 7.3.1.1.2 
+Combining 
+same as the associated dmrs 
+Port(s) 
+  
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} see PUSCH data tab 3GPP TS 38.211, section 7.3.1.6 
+N_{BWP}^{size} see PUSCH data tab 3GGP TS 38.211, section 7.3.1.6 
+µ, µ_{0} see PUSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+K_{PT-RS} frequency density (includes the 
+case where there is no PT-RS) 
+3GPP TS 38.214, sec 6.2.3.1, table 
+6.2.3.1-2 
+k_{ref}^{RE} re offset (can depend on DMRS 
+association and RRC signaling of 
+resourceElementOffset) 
+3GPP TS 38.211, sec 6.4.1.2.2, table 
+6.4.1.2.2.1-1 
+3GPP TS 38.331, sec 6.3.1 
+n_{RNTI} RNTI associated with the PUSCH 
+transmission  
+3GPP TS 38.211, sec 7.4.1.2.2 
+Time Domain 
+L_{PT-RS} time density (includes the case 
+where there is no PT-RS) [CP-
+OFDM] 
+3GPP TS 38.214, sec 6.2.3.1, table 
+6.2.3.1-1 
+symbol Positions see PUSCH DMRS tab 
+symbols used for DMRS (PT-RS 
+skips over these) 
+3GPP TS 38.211, sec 
+7.4.1.1.2 and Tables 7.4.1.1.2-3 and 
+7.4.1.1.2-4 
+Cyclic Prefix see PUSCH data tab 3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+Power Offset  
+alpha_ {PTRS}^{PUSCH} PUSCH to PT-RS power ratio per 
+layer per RE 
+3GPP TS 38.214, sec 6.2.3.1, Table 
+6.2.3.1-3 
+ 1 
+ PUCCH Channel Model 2 
+Per section 5.1.3.3.7 of the O-RAN AAL GAnP document [7] for the PUCCH High-PHY Profile, the PUCCH Channel 3 
+model of the AAL_UPLINK_High-PHY Profile supports acceleration of PUCCH Format 0, Format 1 UCI and DM-RS 4 
+and Formats 2,3,4 UCI and DM-RS. 5 
+The set of accelerated functions associated with the processing of PUCCH Format 0 is as follows:  6 
+• IQ decompression1 7 
+• RE de-mapping 8 
+• Sequence detection 9 
+ 10 
+The set of accelerated functions associated with the processing of PUCCH Format 1 UCI is as follows: 11 
+• IQ decompression1 12 
+• RE de-mapping 13 
+• Channel estimation 14 
+• Channel equalization 15 
+• Demodulation 16 
+ 17 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             40 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+The set of accelerated functions associated with the processing of PUCCH Format 1 DM -RS is as follows: 1 
+• IQ decompression1 2 
+• RE de-mapping 3 
+• Combining 4 
+• Demodulation 5 
+• Sequence detection 6 
+ 7 
+The set of accelerated functions associated with the processing of PUCCH Formats  2, 3, 4 is as follows: 8 
+• IQ decompression1 9 
+• RE de-mapping 10 
+• Channel estimation 11 
+• Channel equalization 12 
+• Transform precoding (optional- only required for DFT-s-OFDM waveform) 13 
+• Demodulation 14 
+• Descrambling 15 
+• Rate de-matching 16 
+• Polar/Block decoding 17 
+• CRC check 18 
+ 19 
+The set of accelerated functions associated with the processing of PUCCH Format s 2, 3, 4 DM-RS is as follows: 20 
+• IQ decompression1 21 
+• RE de-mapping 22 
+• Combining 23 
+• Demodulation 24 
+• Sequence detection 25 
+ 26 
+ PUCCH input and output for AAL_UPLINK_High-PHY Profile  27 
+The AAL_UPLINK_High-PHY profile shall signal PUCCH resource(s) per slot.  28 
+From Application, the PUCCH interface receives the associated parameters for the configuration of the PU CCH 29 
+resource. 30 
+The output data consists of: 31 
+- the CRC or detection status of the PUCCH UCI payload (HARQ, SR or CSI), as well as related metrics (e.g. 32 
+SINR) 33 
+- The UCI Payload: HARQ, SR (Formats 0/1) or transparent UCI payload(s) (Formats 2/3/4). 34 
+ PUCCH Parameters 35 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 36 
+Application shall supply all relevant parameters; for ease of reading, the parameters are grouped as follows, in 37 
+alignment with the O-RAN AAL GAnP document [7]: PUCCH Format 0, PUCCH Format 1 (UCI and DMRS), 38 
+PUCCH Formats 2/3/4 (UCI and DMRS). Only one of these sets of parameters is applicable to any one PUCCH 39 
+resource: 40 
+ 41 
+PUCCH Format 0 Parameters 42 
+Table 4-17: PUCCH Format 0 Parameters 43 
+AF parameters Short summary 3GPP Spec Reference 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             41 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+UCI  
+SR presence indicates whether SR can be 
+indicated 
+3GPP TS 38.213, sec 9.2 
+HARQ bits indicates number of HARQ bits 3GPP TS 38.213, sec 9.2 
+ SR and HARQ This is an output: SR and HARQ 
+observations, or outcome of 
+detection; Also: metrics like 
+SINR, RSRP, etc. 
+3GPP TS 38.213, sec 9.2 
+Sequence Detection 
+pucch-GroupHopping indicates whether group, sequence 
+or no hopping is applied 
+3GPP TS 38.211, sec 6.3.2.2.1 
+n_{ID} hopping hopping identifier 3GPP TS 38.211, sec 6.3.2.2.1 
+M0 initial cyclic shift 3GPP TS 38.211, sec 6.3.2.2.2 
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative to 
+the Bandwidth part for the 
+PUCCH allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PUCCH 
+allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+RB_{BWP}^{offset} PRB offset, prior to any hopping 3GPP TS 38.213, sec 9.2.1 
+[intra-slot] frequency 
+hopping 
+indicates whether the allocation 
+hops in frequency or not 
+3GPP TS 38.211, sec 6.3.2.2.1 
+second Hop RB offset RB offset of the second hop, in 
+case of intra-slot frequency 
+hopping 
+3GPP TS 38.213, sec 9.2.1 
+Time Domain 
+symbol start first symbol for the PUCCH 
+allocation 
+3GPP TS 38.213, sec 9.2.2 
+number of symbols number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+PUCCH Format 1 UCI Parameters 2 
+Table 4-18: PUCCH Format 1 UCI Parameters 3 
+AF parameters Short summary 3GPP Spec Reference 
+UCI 
+SR presence indicates whether SR can be 
+indicated 
+3GPP TS 38,213, sec 9.2.4 
+HARQ/SR bits indicates number of HARQ bits 3GPP TS 38,213, sec 9.2.2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             42 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+ SR and HARQ This is an output: SR and HARQ 
+observations, if any (or outcome 
+of detection + metrics like SINR, 
+RSRP) 
+ 
+Demodulation 
+pucch-GroupHopping indicates whether group, 
+sequence or no hopping is applied 
+3GPP TS 38.211, sec 6.3.2.2.1 
+n_{ID} hopping hopping identifier 3GPP TS 38.211, sec 6.3.2.2.1 
+m0 initial cyclic shift 3GPP TS 38.211, sec 6.3.2.2.2 
+timeDomainOCC index of orthogonal sequence w 3GPP TS 38.211, sec 6.3.2.4.1 
+3GPP TS 38.213, section 9.2.1  
+HARQ/SR bits Number of bits determines 
+modulation: BPSK or QPSK 
+3GPP TS 38.211, sec 6.3.2.4.1 
+Channel Estimation and Equalization 
+see PUCCH Format 1 DM-RS    
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative to 
+the Bandwidth part for the 
+PUCCH allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PUCCH 
+allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+RB_{BWP}^{offset} PRB offset, prior to any hopping 3GPP TS 38.213, sec 9.2.1 
+[intra-slot] frequency 
+hopping 
+indicates whether the allocation 
+hops in frequency or not 
+3GPP TS 38.211, sec 6.3.2.2.1 
+second Hop RB offset RB offset of the second hop, in 
+case of intra-slot frequency 
+hopping 
+3GPP TS 38.213, sec 9.2.1 
+Time Domain 
+symbol start first symbol for the PUCCH 
+allocation 
+3GPP TS 38.213, sec 9.2.2 
+number of symbols number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             43 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PUCCH Format 1 DM-RS Parameters 1 
+Table 4-19: PUCCH Format 1 DM-RS Parameters2 2 
+AF parameters Short summary 3GPP Spec Reference 
+Descrambling 
+pucch-GroupHopping indicates whether group, 
+sequence or no hopping is applied 
+3GPP TS 38.211, sec 6.3.2.2.1,  
+6.4.1.3.1.1 
+n_{ID} hopping hopping identifier 3GPP TS 38.211, sec 6.3.2.2.1,  
+6.4.1.3.1.1 
+m0 initial cyclic shift 3GPP TS 38.211, sec 6.3.2.2.2,  
+6.4.1.3.1.1 
+timeDomainOCC index of orthogonal sequence w 3GPP TS 38.211, sec 6.3.2.4.1,  
+6.4.1.3.1.1  
+3GPP TS 38.213, sec 9.2.1 
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative to 
+the Bandwidth part for the 
+PUCCH allocation  
+3GPP TS 38.211, sec 6.3.1.7, 
+6.4.1.3.1.2 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PUCCH 
+allocation  
+3GPP TS 38.211, sec 6.3.1.7, 
+6.4.1.3.1.2 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1, 
+6.4.1.3.1.2 
+RB_{BWP}^{offset} PRB offset, prior to any hopping 3GPP TS 38.213, sec 9.2.1 
+3GPP TS 38.211, sec 6.4.1.3.1.2 
+[intra-slot] frequency 
+hopping 
+indicates whether the allocation 
+hops in frequency or not 
+3GPP TS 38.211, sec 6.3.2.2.1, 
+6.4.1.3.1.2 
+second Hop RB offset RB offset of the second hop, in 
+case of intra-slot frequency 
+hopping 
+3GPP TS 38.213, sec 9.2.1 
+3GPP TS 38.211, sec 6.4.1.3.1.2 
+Time Domain 
+symbol start first symbol for the PUCCH 
+allocation 
+3GPP TS 38.213, sec 9.2.2 
+3GPP TS 38.211, sec 6.4.1.3.1.2 
+number of symbols number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+3GPP TS 38.211, sec 6.4.1.3.1.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1, 
+6.4.1.3.1.2  
+3GPP TS 38.214, Table 5.1.2.1-1 
+PUCCH Format 2/3/4 UCI Parameters 3 
+Table 4-20: PUCCH Formats 2/3/4 Parameters 4 
+AF parameters Short summary 3GPP Spec Reference 
+UCI 
+ 
+2 All the parameters in this PUCCH Format 1 DM-RS table are also present in the PUCCH 
+Format 1 UCI table 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             44 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+O^{SR} indicates the number of SR bits 3GPP TS 38.213, sec 9.2 
+3GPP TS 38.212, Table  6.3.1.4-1 
+O^{ACK} indicates number of HARQ bits 3GPP TS 38.213, sec 9.2 
+3GPP TS 38.212, Table  6.3.1.4-1 
+O^{CSI-part1} indicates the number of CSI part 
+1 bits 
+3GPP TS 38.213, sec 9.2 
+3GPP TS 38.212, Table  6.3.1.4-1 
+mappings from CSI Part1 to length 
+and priorities of CSI part 2 reports 
+Needed to compute in L1 the 
+actual size of CSI part 1 
+(Formats 3,4) 
+3GPP TS 38.213, sec 9.2.5 
+<-- UCI part1 & part2 (if present) This is an output: UCI reports 
+(or outcome of decoding + 
+metrics like SINR, RSRP, etc.) 
+3GPP TS 38.213, sec 9.2 
+PUCCH Format Type 2, 3 or 4 3GPP TS 38.213, sec 9.2.2 
+CRC check 
+<acceleration based on hardcoded 
+parameters> 
+CRC size and generator depend 
+on the payload size A, and fixed 
+parameters 
+3GPP TS 38.212, sec 6.3.1.2  
+Polar/Block decoding 
+<acceleration based on hardcoded 
+parameters> 
+Encoding depends on the 
+payload size A, and 
+corresponding number of code 
+blocks, and fixed parameters 
+3GPP TS 38.212, sec 6.3.1.3 
+Rate de-matching 
+N_{symb,UCI}^{PUCCH,*} number of symbols carrying UCI 
+for PUCCH formats 2/3/4 
+respectively 
+3GPP TS 38.212, Table  6.3.1.4-1 
+N_{SF}^{PUCCH,*} spreading factor for PUCCH 
+formats 4 
+3GPP TS 38.213, Table  6.3.1.4  
+N_{PRBI}^{PUCCH,*} Actual number of RBs used by 
+the UE for this allocation, for 
+each format, respectively 
+3GPP TS 38.213, sec 9.2.1 
+\pi/2-BPSK indicates that Formats 3-4 use 
+\pi/2-BPSK, rather than QPSK 
+modulation 
+Note: QPSK for Format 2 
+3GPP TS 38.211, sec 6.3.2.6.2, sec 
+6.3.2.5.2 
+R_{UCI}^{max} Max coding rate to determine 
+how to feedback UCI 
+3GPP TS 38.212, Table  6.3.1.4-1 
+Descrambling 
+n_{RNTI} RNTI associated with the 
+PUCCH transmission 
+3GPP TS 38.211, sec 6.3.2.5.1 and 
+6.3.2.6.1 
+n_{ID} or c_{init} n_{ID}: scrambling id (PCI by 
+default) 
+c_{init}: scrambling 
+initialization 
+3GPP TS 38.211, sec 6.3.2.5.1 and 
+6.3.2.6.1 
+Demodulation 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             45 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+<acceleration based on already-
+defined parameters> 
+See \pi/2-BPSK parameter 
+ 
+Block-wise Despreading 
+occ-Index index of orthogonal sequence for 
+Format 4. 
+3GPP TS 38.213, section 9.2.1  
+occ-Length length of orthogonal sequence 
+for Format 4. 
+3GPP TS 38.213, section 9.2.1  
+IDFT for DFT-s-OFDM 
+RB Size Actual number of RBs used by 
+the UE for this allocation 
+(Format 3) 
+3GPP TS 38.213, sec 9.2.1 
+number of symbols number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+Channel Estimation and Equalization 
+see PUCCH Format 2/3/4 DM-RS   
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative 
+to the Bandwidth part for the 
+PUCCH allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PUCCH 
+allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+RB_{BWP}^ 
+{offset} 
+PRB offset, prior to any hopping 3GPP TS 38.213, sec 9.2.1 
+N_{PRBI}^ 
+{PUCCH,*} 
+Actual number of RBs used by 
+the UE for this allocation, for 
+each format, respectively 
+3GPP TS 38.213, sec 9.2.1 
+[intra-slot] frequency 
+hopping 
+indicates whether the allocation 
+hops in frequency or not 
+3GPP TS 38.211, sec 6.3.2.2.1 
+3GPP TS 38.212, sec 6.3.1.4 
+second Hop RB 
+offset 
+RB offset of the second hop, in 
+case of intra-slot frequency 
+hopping 
+3GPP TS 38.213, sec 9.2.1 
+Time Domain 
+symbol start first symbol for the PUCCH 
+allocation 
+3GPP TS 38.213, sec 9.2.2 
+N_{symb,UCI}^ 
+{PUCCH,*} 
+number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             46 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PUCCH Format 2/3/4 DM-RS Parameters 1 
+Table 4-21: PUCCH Formats 2/3/4 DM-RS Parameters 2 
+AF parameters Short summary 3GPP Spec Reference 
+Descrambling 
+N_{ID}^0 or c_{init}[l] N_{ID}^0: scrambling ID 0 for 
+Format 2 
+c_{init}[l]: scrambling 
+initialization, per DMRS symb l. 
+3GPP TS 38.211, sec 6.4.1.3.2.1 
+pucch-GroupHopping indicates whether group, 
+sequence or no hopping is 
+applied (Formats 3/4) 
+3GPP TS 38.211, sec 6.3.2.2.1 
+n_{ID} hopping hopping identifier (Formats 3/4) 3GPP TS 38.211, sec 6.3.2.2.1 
+m0 initial cyclic shift (Formats 3/4) 3GPP TS 38.211, sec 6.3.2.2.2 
+occ-Index index of orthogonal sequence for 
+Format 4. 
+3GPP TS 38.213, section 9.2.1  
+occ-Length length of orthogonal sequence 
+for Format 4. 
+3GPP TS 38.213, section 9.2.1  
+RE Demapping 
+Frequency Domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of bandwidth 
+part: VRBs indexing is relative 
+to the Bandwidth part for the 
+PUCCH allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+N_{BWP}^{size} Size of bandwidth part: VRBs 
+indexing is relative to the 
+Bandwidth part for the PUCCH 
+allocation  
+ 3GPP TS 38.211, sec 6.3.1.7 
+µ, µ_{0} subcarrier spacing impacts 
+waveform generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+RB_{BWP}^ 
+{offset} 
+PRB offset, prior to any hopping 3GPP TS 38.213, sec 9.2.1 
+N_{PRBI}^ 
+{PUCCH,*} 
+Actual number of RBs used by 
+the UE for this allocation, for 
+each format, respectively 
+3GPP TS 38.213, sec 9.2.1 
+[intra-slot] frequency 
+hopping 
+indicates whether the allocation 
+hops in frequency or not 
+3GPP TS 38.211, sec 6.3.2.2.1 
+3GPP TS 38.212, sec 6.3.1.4 
+second Hop RB 
+offset 
+RB offset of the second hop, in 
+case of intra-slot frequency 
+hopping 
+3GPP TS 38.213, sec 9.2.1 
+Time Domain 
+symbol start first symbol for the PUCCH 
+allocation 
+3GPP TS 38.213, sec 9.2.2 
+N_{symb,UCI}^ 
+{PUCCH,*} 
+number of symbols for the 
+PUCCH allocation 
+3GPP TS 38.213, sec 9.2.2 
+additionalDMRS Indicates 2 additional DMRS 
+symbols per hop of a PUCCH 
+Format 3 or 4 (depending on 
+length) 
+3GPP TS 38.213, sec 9.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 3 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             47 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+ SRS Channel Model 1 
+Per section 5.1.3.3.7 of the O-RAN AAL GAnP document [7] for the SRS High-PHY Profile, the SRS Channel model 2 
+of the AAL_UPLINK_High-PHY Profile supports acceleration of SRS. 3 
+The set of accelerated functions associated with the processing of SRS is as follows: 4 
+• IQ decompression1 5 
+• RE de-mapping 6 
+• Channel estimation 7 
+ SRS input and output for AAL_UPLINK_High-PHY Profile  8 
+The AAL_UPLINK_High-PHY profile shall signal SRS Resource(s) per slot.  9 
+From Application, the SRS interface receives the associated parameters for the configuration of the SRS Resource. 10 
+The output data consists of the channel estimation metrics 11 
+ SRS Parameters 12 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 13 
+Application shall supply all relevant parameters; for ease of reading, the parameters are grouped as follows, in 14 
+alignment with the O-RAN AAL GAnP document [7]: 15 
+ 16 
+SRS Parameters 17 
+Table 4-22: SRS Parameters 18 
+AF parameters Short summary 3GPP Spec Reference 
+Channel Estimation (report types are per implementation and may be optional. Combinations - of one or 
+more, or even none - of report types linked to an SRS resource are also possible, and AF shall indicate this 
+in a capability)  
+usage usage of the SRS 
+resource: 
+beamManagement, 
+codebook, 
+nonCodebook, 
+antennaSwitching 
+3GPP TS 38.331, sec 
+6.3.2 
+ 
+requested report type depends on usage 
+ 
+SVD report type format of U, V entries Size and formats e.g. 
+BFP, etc used for 
+encoding channel 
+eigenvector matrices 
+See section 4.2.74.3.7 
+format of eigenvalues Size and formats e.g. 
+BFP, etc used for 
+encoding channel 
+singular values 
+frequency resolution of SVD 
+report 
+e.g. RB, PRG, etc 
+<-- SVD reports at the required 
+resolution 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             48 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+H (raw channel) 
+report type 
+format of H entries Size and formats e.g. 
+BFP, etc used for 
+encoding channel  
+matrices 
+See section 4.2.74.3.7 
+frequency resolution of H 
+report 
+e.g. RB, PRG, etc 
+<-- H reports at the required 
+resolution 
+ SINR report type frequency resolution of H 
+report 
+e.g. RB, PRG, etc 
+ 
+<-- SINR reports at the required 
+resolution (per 
+symbol) 
+ 
+Additional report 
+types can be 
+added 
+   
+ RE demapping 
+N_{ap}^{SRS} number of SRS Ports 3GPP TS 38.211, sec 
+6.4.1.4.1 
+n_{SRS}^{CS} cyclic shift 3GPP TS 38.211, sec 
+6.4.1.4.2 
+n_{ID}^{SRS} SRS sequence identity 3GPP TS 38.211, sec 
+6.4.1.4.2 
+SRS Group and Sequence Hopping Group, sequence or 
+neither  
+3GPP TS 38.211, sec 
+6.4.1.4.2 
+Frequency domain 
+N_{BWP}^{start} Start, w.r.t. CRB, of 
+bandwidth part: VRBs 
+indexing is relative to 
+the Bandwidth part for 
+the allocation  
+ 3GPP TS 38.211, sec 
+6.3.1.7 
+N_{BWP}^{size} Size of bandwidth 
+part: VRBs indexing is 
+relative to the 
+Bandwidth part for the 
+allocation  
+ 3GPP TS 38.211, sec 
+6.3.1.7 
+µ, µ_{0} subcarrier spacing 
+impacts waveform 
+generation, including 
+centering 
+3GPP TS 38.211, sec 4.2, 
+5.3.1 
+K_{TC} transmission comb 
+number 
+3GPP TS 38.211, sec 
+6.4.1.4.2 
+\bar{k}_{TC} transmission comb 
+offset 
+3GPP TS 38.211, sec 
+6.4.1.4.3 
+n_{shift} frequency domain 
+shift value 
+3GPP TS 38.211, sec 
+6.4.1.4.3 
+n_{RRC} frequency domain 
+position 
+3GPP TS 38.211, sec 
+6.4.1.4.3 
+Frequency 
+Hopping 
+Signaling Alt-1: 
+RRC 
+parameters 
+C_{SRS} SRS bandwidth index  3GPP TS 38.211, sec 
+6.4.1.4.3 
+B_{SRS} SRS bandwidth config 
+index 
+3GPP TS 38.211, sec 
+6.4.1.4.3 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             49 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+b_{hop} frequency hopping 3GPP TS 38.211, sec 
+6.4.1.4.3 
+ 
+Frequency 
+Hopping 
+Signaling Alt-2: 
+L2 computed 
+fields 
+m_{SRS,b} SRS bandwidth size 3GPP TS 38.211, sec 
+6.4.1.4.3 
+srs 
+Bandwidth 
+Start 
+PRB index (w.r.t. 
+CRB0) for the start of 
+SRS signal 
+transmission 
+3GPP TS 38.211 [2], 
+section 6.4.1.4.2 
+Time domain 
+N_{symb}^{SRS} number of consecutive 
+OFDM symbols for 
+SRS 
+3GPP TS 38.211, sec 
+6.4.1.4.1 
+l_0 the starting position in 
+the time domain given 
+3GPP TS 38.211, sec 
+6.4.1.4.1 
+T_{SRS} periodicity for SRS 3GPP TS 38.211, sec 
+6.4.1.4.3 
+T_{offset} slot offset 3GPP TS 38.211, sec 
+6.4.1.4.3 
+R Repetition factor 3GPP TS 38.211, sec 
+6.4.1.4.3 
+ 1 
+ PRACH Channel Model 2 
+Per section 5.1.3.3.7 of the O-RAN AAL GAnP document [7] for the PRACH High-PHY Profile, the PRACH Channel 3 
+model of the AAL_UPLINK_High-PHY Profile supports acceleration of PRACH. 4 
+The set of accelerated functions associated with the processing of PRACH is as follows: 5 
+• IQ decompression1 6 
+• RE de-mapping 7 
+• Root sequence generation and correlation  8 
+• IFFT 9 
+• Noise estimation 10 
+• Peak search for power delay profile 11 
+• Preamble detection and delay/timing advance estimation 12 
+ PRACH input and output for AAL_UPLINK_High-PHY Profile  13 
+The AAL_UPLINK_High-PHY profile shall signal PRACH Resource Occasion(s) per slot.  14 
+From Application, the PRACH interface receives the associated parameters for the configuration of the PRACH 15 
+Occasion. 16 
+The output data consists of the PRACH detection outcome and metrics 17 
+ PRACH Parameters 18 
+The following parameters are required to be supported by the AALI implementation when offloading operations. 19 
+Application shall supply all relevant parameters; for ease of reading, the parameters are grouped as follows, in 20 
+alignment with the O-RAN AAL GAnP document [7]: 21 
+ 22 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             50 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+PRACH Parameters 1 
+Table 4-23: PRACH Parameters 2 
+AF parameters Short summary 3GPP Spec Reference 
+Preamble Detection + Delay Estimation 
+<-- report detected preambles list of detected preambles, per RO 
+ 
+<-- timing advance per detected preamble & RO: timing 
+advance 
+3GPP TS 38.213, sec 4.2 
+<-- detection metrics per detected preamble & RO: SINR, 
+Rx Power, etc. 
+ 
+Peak Search 
+<see Root Sequence 
+Correlation> 
+Correlation is over the root 
+sequences with valid preambles in 
+each RACH occasion. The 
+mechanism for detecting peaks is 
+per implementation. 
+ 
+ Noise Estimation 
+<per implementation> One possibility is to perform noise 
+estimation on an unused root 
+sequence, in which case the identity 
+of the unused root sequence can be 
+signaled. 
+ 
+Note: Noise estimation is 
+implementation-specific, and this 
+channel profile does not currently 
+assume any one implementation. 
+ 
+ iFFT 
+<based on RE mapping 
+parameters and sequence 
+length> 
+The formula for generating the 
+PRACH waveform is provided in 
+the reference to the right. 
+3GPP TS 38.211, sec  5.3.2 
+ Root Sequence Correlation 
+restrictedSetConfig  Configuration of an unrestricted set 
+or one of two types of restricted 
+sets, type A and type B 
+3GPP TS 38.211, sec 6.3.3.1 
+N_{preamble}^{total} number of preambles, per PRACH 
+occasions 
+3GPP TS 38.213, section 8.1 
+preamble index start preamble index start for each 
+PRACH occasion in this PRACH 
+configuration 
+3GPP TS 38.213, section 8.1 
+N_{cs} cyclic shift interval 3GPP TS 38.211, sec 6.3.3.1 
+RE Demapping 
+Frequency Domain M number of FDM occasions per 
+PRACH slot 
+3GPP TS 38.211, sec 6.3.3.2 
+k1[*] offset in units of BWP PRBs (per 
+RO) 
+3GPP TS 38.211, sec 5.3.2 
+µ_{PUSCH} subcarrier spacing of UL BWP and 
+of maximal SCS BWP 
+3GPP TS 38.211, sec 5.3.2 
+µ_{PRACH} subcarrier spacing of PRACH 
+preamble 
+3GPP TS 38.211, sec 5.3.2 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             51 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+\bar{k} guard offset from k1 (can be derived 
+from the SCS for PRACH and 
+PUSCH and PRACH format) 
+3GPP TS 38.211, sec 6.3.3 
+Time Domain 
+starting 
+symbol 
+prachStartSymbol  3GPP TS 38.211, sec 6.3.3.2, 
+Tables 6.3.3.2-2 to 6.3.3.2-4 
+prachFormat formats of the PRACH slot (0, 1, 2, 
+3, A1, … A3/B3) 
+3GPP TS 38.213, sec 9.2.2 
+N_t^{RA,slot} number of Time domain PRACH 
+occasions within a PRACH slot 
+3GPP TS 38.213, sec 9.2.2 
+Cyclic Prefix Cyclic prefix type. Impacts time-
+domain allocation, including 
+waveform generation 
+3GPP TS 38.211, sec 4.2, 5.3.1 
+3GPP TS 38.214, Table 5.1.2.1-1 
+ 1 
+ Beamforming 2 
+In this release, the AAL_UPLINK_High-PHY profile supports the following beamforming methods available for OFH 3 
+signaling: 4 
+- Predefined-Beam Beamforming, as defined in section 10.4.2.1 of [8]; 5 
+- Weight-based Dynamic Beamforming, as defined in section 10.4.2.2 of [8]; 6 
+- Attribute-Based Dynamic Beamforming, as defined in section 10.4.3 of [8]; 7 
+- Channel-Information-Based Beamforming, as defined in section 10.4.4 of [8]. 8 
+ 9 
+ Predefined-Beam Beamforming 10 
+AALI shall support Application signaling as described in section 4.2.7.1 11 
+ Weight-based Dynamic Beamforming  12 
+AALI shall support Application signaling of the following parameters, as needed for AAL_UPLINK_High- PHY profile 13 
+signaling of beamforming weight vectors of (bfwI, bfwQ) in C-Plane Extensions 1, 11, 19 [8]: 14 
+Table 4-24 Weight-based Dynamic Beamforming Parameters for Uplink 15 
+AF Parameters Summary AF Role 
+AF  Application 
+Channel Estimation Abstraction A representation of SRS-based 
+channel observations, as documented 
+in the SRS channel model in section 
+4.3.5.2, e.g. for usage: codebook or 
+usage: noncodebook 
+Signals an abstraction of the Channel 
+Estimates to the Application 
+Application  AF 
+UEs  Selected UEs for scheduling (for an 
+illustration refer to the L users 
+referenced in Appendix J.4 of [8] 
+Compute combining weights for the 
+selected UEs and Precoders, e.g. based 
+on the reported Channel Estimation and 
+its Abstraction. 
+ 
+Signal to O-RU beamforming vectors 
+of weights (bfwI, bfwQ) over C-Plane 
+for the Application-selected UEs and 
+Precoders 
+UE-based Precoder Selected precoding matrix for 
+scheduling the UEs (see section 
+6.3.1.5 in of 3GPP TS 38.211) 
+ 16 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             52 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+The High-PHY AAL API shall be extensible to allow, in future releases, the optional ability for the beamforming 1 
+weights to be generated outside the AF that consumes them for generating the appropriate C - and U-plane signaling by 2 
+the accelerator, e.g. to generate the corresponding U-Plane eAxC I/Q sample streams and C-plane ueId field(s). 3 
+ 4 
+ Attribute-Based Dynamic Beamforming  5 
+AALI shall support Application signaling as described in section 4.2.7.3 6 
+ Channel-Information-Based Beamforming  7 
+AALI shall support Application signaling of the following parameters, as needed for AF-signaling of channel estimate 8 
+vectors of (ciIsample, ciQsample) in C-Plane Section 6 [8]: 9 
+Table 4-25 Channel-Information-Based Beamforming Parameters for Downlink 10 
+AF Parameters Summary AF Role 
+AF  Application 
+Channel Estimation Abstraction A representation of SRS-based 
+channel observations, as documented 
+in the SRS channel model in section 
+4.3.5.2, e.g. for usage: codebook or 
+usage: noncodebook 
+Signals an abstraction of the Channel 
+Estimation the Application 
+Application  AF 
+UEs  Selected UEs for scheduling (for an 
+illustration refer to the L users 
+referenced in Appendix J.4 of [8] 
+Signal to O-RU the Channel Estimates 
+for the Application-selected UEs and 
+Precoders  
+Layers, per UE Selected precoding matrix for 
+scheduling the UEs (see section 
+6.3.1.5 in of 3GPP TS 38.211) 
+ 11 
+ 12 
+Annex ZZZ : O-RAN Adopter License Agreement 13 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O- RAN SPECIFICATION, ADOPTER 14 
+AGREES TO THE TERMS OF THIS AGREEMENT. 15 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O -RAN Alliance and the 16 
+entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 17 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 18 
+Section 1: DEFINITIONS 19 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 20 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 21 
+fifty (50%) percent or more of the voting stock or equity in an entity. 22 
+1.2 “Compliant Implementation” means any system, AAL-LPU, method or operation (whether implemented in 23 
+hardware, software or combinations thereof) that fully conforms to a Final Specification. 24 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 25 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 26 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does 27 
+not add any significant new features or functionality and remains interoperable with the prior version of an O -RAN 28 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 29 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             53 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 1 
+patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, 2 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) 3 
+such Member, Contributor or Academic Contributor has the right to grant a license without the payment of 4 
+consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering 5 
+any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible 6 
+on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art 7 
+generally available at the date any Final Specification was published by the O -RAN Alliance or the date the patent 8 
+claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate 9 
+a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a 10 
+Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such paten t 11 
+claims shall be considered Necessary Claims. 12 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 13 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 14 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the 15 
+licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.  16 
+Section 2: COPYRIGHT LICENSE 17 
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, 18 
+nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN 19 
+Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in 20 
+furtherance of implementations of an ORAN 21 
+Specification. 22 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 23 
+agreement with O-RAN Alliance. 24 
+Section 3: FRAND LICENSE 25 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate 26 
+Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and 27 
+conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to 28 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 29 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 30 
+license shall not extend: (a) to any part or function of a product in which a Compliant Imple mentation is incorporated 31 
+that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal 32 
+grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 33 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 34 
+customers of such licensed Compliant Implementations. 35 
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affili ates has 36 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 37 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 38 
+its Affiliates for its license of Necessary Claims to its licensees. 39 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License 40 
+Agreement to each Members, Contributors, Academic Contributors, Adopters and their A ffiliates under Fair 41 
+Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a 42 
+nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent 43 
+license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute 44 
+Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a 45 
+product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or 46 
+(b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal 47 
+grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes 48 
+the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors 49 
+and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such 50 
+licensed Compliant Implementations. 51 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             54 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Section 4: TERM AND TERMINATION 1 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.  2 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 3 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty 4 
+(30) days after being given notice specifying the breach. 5 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 6 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after 7 
+the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the 8 
+version that was current as of the date of termination. 9 
+Section 5: CONFIDENTIALITY 10 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN 11 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable 12 
+care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 13 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 14 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; 15 
+(2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed 16 
+by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of 17 
+confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a 18 
+court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior 19 
+written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or 20 
+Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O -RAN 21 
+Alliance’s prior written approval. 22 
+Section 6: INDEMNIFICATION 23 
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic 24 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), 25 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or 26 
+imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or 27 
+judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of 28 
+products that comply with O-RAN Specifications. 29 
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 30 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 31 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER 32 
+PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 33 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, 34 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE,  AND WHETHER OR 35 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O- RAN 36 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 37 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE 38 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 39 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 40 
+FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR 41 
+CONDITION FOR O-RAN SPECIFICATIONS. 42 
+Section 8: ASSIGNMENT 43 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 44 
+other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, 45 
+written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN 46 
+Alliance may freely assign this Agreement. 47 
+
+ 
+________________________________________________________________________________________________  
+ 
+Copyright © 2022 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.             55 
+                      O-RAN.WG6.AAL-HI_PHY.0-v01.00 TS 
+ 
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS 1 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 2 
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this Agreement, 3 
+including as licensees under Section 3. 4 
+Section 10: BINDING ON AFFILIATES 5 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 6 
+association’s agreement that its Affiliates are likewise bound to the obligations tha t are applicable to Adopter hereunder 7 
+and are also entitled to the benefits of the rights of Adopter hereunder. 8 
+Section 11: GENERAL 9 
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.  10 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 11 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating 12 
+to the subject matter of this Agreement.  13 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and 14 
+regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export 15 
+control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement 16 
+prohibits any communication that would violate the antitrust laws. 17 
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, 18 
+or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 19 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O -RAN Alliance or its Members, 20 
+Contributors or Academic Contributors. 21 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, 22 
+void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken 23 
+from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agr eement will remain in 24 
+full force and effect. 25 
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the 26 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not 27 
+be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert 28 
+or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be a nd remain in full 29 
+force and effect. 30 

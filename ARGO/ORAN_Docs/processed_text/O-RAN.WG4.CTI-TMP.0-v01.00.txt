@@ -1,0 +1,1842 @@
+O-RAN.WG4.CTI-TMP.0-v01.00
+Technical  Specification 
+O-RAN Fronthaul Working Group 4
+Cooperative Transport Interface 
+Transport Management Plane Specification 
+VAT ID DE321720189
+This is a re-published version of the attached final specification. 
+For this re-published version, the prior versions of the IPR Policy will apply, except that the previous 
+requirement for Adopters (as defined in the earlier IPR Policy) to agree to an O-RAN Adopter License 
+Agreement to access and use Final Specifications shall no longer apply or be required for these Final 
+Specifications after 1st July 2022.
+The copying or incorporation into any other work of part or all of the material available in this 
+specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, 
+save that you may print or download extracts of the material on this site for your personal use, or copy 
+the material on this site for the purpose of sending to individual third parties for their information 
+provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform 
+the third party that these conditions apply to them and that they must comply with them.
+
+ 
+ 
+                        O-RAN.WG4.CTI-TMP.0-v01.00 
+Technical  Specification 
+ 
+O-RAN Fronthaul Working Group 4   
+ 
+Cooperative Transport Interface 
+Transport Management Plane Specification 
+ 
+ 
+  
+Copyright © 2021 by O-RAN ALLIANCE e.V. 
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or 
+preparing derivatives of, you agree to be and are bound to the terms of the O -RAN Adopter License Agreement contained in the Annex ZZZ 
+of this specification. All other rights reserved. 
+ 
+O-RAN ALLIANCE e.V. 
+Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238 
+VAT ID DE321720189 Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ             1 
+ 
+ 
+ 
+ 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   2 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+Revision History 1 
+Date Revision Description 
+2020.11.05 01.00 First release of the specification 
+ 2 
+ 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   3 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+Contents  1 
+Revision History ................................................................................................................................................. 2 2 
+1 Introductory Material ............................................................................................................................... 5 3 
+1.1 Scope ................................................................................................................................................................. 5 4 
+1.2 References.......................................................................................................................................................... 5 5 
+1.3 Conventions ....................................................................................................................................................... 6 6 
+1.4 Definitions and Abbreviations ........................................................................................................................... 6 7 
+1.4.1 Definitions .................................................................................................................................................... 6 8 
+1.4.2 Abbreviations ............................................................................................................................................... 6 9 
+2 High Level Description ............................................................................................................................ 9 10 
+2.1 General CTI Management Architecture ............................................................................................................. 9 11 
+2.1.1 Foreword on management domains ............................................................................................................. 9 12 
+2.1.2 Summary of architecture .............................................................................................................................. 9 13 
+2.1.3 Parameters to be configured ......................................................................................................................... 9 14 
+3 CTI Management.................................................................................................................................... 10 15 
+3.1 CTI Configuration parameters ......................................................................................................................... 10 16 
+3.1.1 Summary of Management Objects ............................................................................................................. 10 17 
+3.2 CTI connectivity parameters and configuration ............................................................................................... 17 18 
+3.2.1 Point-point or switched Ethernet connectivity between TN and O-DU ..................................................... 17 19 
+3.2.2 IP routing connectivity between TN and O-DU ......................................................................................... 18 20 
+4 CTI procedures ....................................................................................................................................... 22 21 
+4.1 Correlations to be performed ........................................................................................................................... 22 22 
+4.2 Auto Discovery for correlation of CTI session ID to transport parameter in TN ............................................ 23 23 
+4.2.1 Switched Ethernet connectivity between O-RU and O-DU ....................................................................... 23 24 
+4.2.2 IP routing connectivity between O-RU and O-DU .................................................................................... 24 25 
+4.3 Auto discovery for correlation of CTI session ID to CTI server...................................................................... 25 26 
+4.4 Performing correlations without Auto Discovery method ............................................................................... 25 27 
+5 CTI YANG Model Definition ................................................................................................................ 27 28 
+5.1 Approach to uniqueness of parameters ............................................................................................................ 27 29 
+5.2 CTI YANG Model Related to O-DU ............................................................................................................... 29 30 
+5.2.1 Overview .................................................................................................................................................... 29 31 
+5.2.2 O-RAN-CTI-Common ............................................................................................................................... 29 32 
+5.2.3 O-RAN-CTI-O-DU .................................................................................................................................... 30 33 
+5.3 CTI YANG Model Related to TN (informative) ............................................................................................ 31 34 
+5.3.1 Overview .................................................................................................................................................... 31 35 
+5.3.2 O-RAN-CTI-Common ............................................................................................................................... 31 36 
+5.3.3 O-RAN-CTI-TN-generic ............................................................................................................................ 31 37 
+5.3.4 O-RAN-CTI-TN-PON ............................................................................................................................... 33 38 
+5.3.5 O-RAN-CTI-TN-DOCSIS ......................................................................................................................... 33 39 
+Annex A YANG Module Graphical Representation ................................................................................... 34 40 
+A.1 o-ran-cti-common.yang Module ................................................................................................................................ 34 41 
+A.2 o-ran-cti-odu.yang Module ........................................................................................................................................ 35 42 
+A.3 o-ran-cti-tn-generic.yang Module .............................................................................................................................. 36 43 
+A.4 o-ran-cti-tn-pon.yang module .................................................................................................................................... 37 44 
+A.5 o-ran-cti-tn-docsis.yang Module ................................................................................................................................ 37 45 
+Annex ZZZ O-RAN Adopter License Agreement...................................................................................... 38 46 
+ZZZ.1 Section 1: DEFINITIONS ............................................................................................................................... 38 47 
+ZZZ.2 Section 2: COPYRIGHT LICENSE ................................................................................................................ 38 48 
+ZZZ.3 Section 3: FRAND LICENSE ......................................................................................................................... 39 49 
+ZZZ.4 Section 4: TERM AND TERMINATION ....................................................................................................... 39 50 
+ZZZ.5 Section 5: CONFIDENTIALITY .................................................................................................................... 39 51 
+ZZZ.6 Section 6: INDEMNIFICATION .................................................................................................................... 40 52 
+ZZZ.7 Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY .................................................................... 40 53 
+ZZZ.8 Section 8: ASSIGNMENT ............................................................................................................................... 40 54 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   4 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ZZZ.9 Section 9: THIRD-PARTY BENEFICIARY RIGHTS ................................................................................... 40 1 
+ZZZ.10 Section 10: BINDING ON AFFILIATES ....................................................................................................... 40 2 
+ZZZ.11 Section 11: GENERAL .................................................................................................................................... 40 3 
+ 4 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   5 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+1 Introductory Material 1 
+1.1 Scope 2 
+This Technical Specification has been produced by the O-RAN Alliance. 3 
+The contents of the present document are subject to continuing work within O-RAN and may change following formal 4 
+O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re -released by O-5 
+RAN with an identifying change of release date and an increase in version number as follows: 6 
+Release x.y.z 7 
+where: 8 
+x the first digit  is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, 9 
+etc. (the initial approved document will have x=01). 10 
+y the second digit is incremented when editorial only changes have been incorporated in the document.  11 
+z the third digit included only in working versions of the document indicating incremental changes during the 12 
+editing process. 13 
+The present document describes the Transport Management Plane for the Cooperative Transport Interface (CTI). CTI is 14 
+an interface between O-DUs and Transport Nodes of a packet-based transport network that is used to interconnect the O-15 
+DUs to a variety of O -RUs. CTI specifically targets transport Nodes that manage a shared point -to-multipoint access 16 
+network. Intermediate transport nodes (routers and switches) that only manage point-to-point links do not exchange CTI 17 
+messages with the O -DUs. CTI consists of a Transport Control plane (TC) and a Transport Management Plane (TM). 18 
+This document specifies the TM-plane. The TC-plane is described in [1]. The reader is referred to the TC-plane document 19 
+for a description of the protocol as well as background, context, motivation and topologies with CTI. 20 
+This document focuses on the management aspect of CTI. The goals are to define the CTI-related configurable parameters 21 
+at TN and at O-DU, to define a suitable set of YANG modules to capture these parameters, to describe necessary steps in 22 
+the configur ation of the parameters, and to define an auto -discovery method to automate the correlation between TN 23 
+specific parameters and CTI parameters. 24 
+Disclaimer: the CTI configuration parameters and their corresponding YANG modules are subject to evolution in the next 25 
+version of this specification. 26 
+The wording for requirements in this document follows the guidelines of RFC 2119.  27 
+1.2 References 28 
+The following documents contain provisions which, through reference in this text, constitute provisions of the present 29 
+document. 30 
+• References are either specific (identified by date of publication, edition numbe r, version number, etc.) or 31 
+non-specific. 32 
+• For a specific reference, subsequent revisions do not apply. 33 
+• For a non-specific reference, the latest version applies. In the case of a reference to a 3GPP document (including 34 
+a GSM document), a non-specific reference implicitly refers to the latest version of that document. 35 
+[1] O-RAN.WG4.CTI-TCP.0-v01.00 “Cooperative Transport Interface, Transport Control Plane Specification”  36 
+[2] 3GPP TR 21.905: “Vocabulary for 3GPP Specifications”. 37 
+[3] ORAN-WG4.CUS.0-v04.00 “Control, User and Synchronization Plane Specification”. 38 
+[4] ORAN-WG4.MP.0-v04.00 “Management Plane Specification”. 39 
+[5] IETF RFC 3046 “DHCP Relay Agent Information Option” 40 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   6 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+[6] IETF RFC 3315 “Dynamic Host Configuration Protocol for IPv6 (DHCPv6)” 1 
+[7] IETF RFC 2132 “DHCP Options and BOOTP Vendor Extensions” 2 
+[8] IETF RFC 3925  “Vendor-Identifying Vendor Options for Dynamic Host Configuration Protocol version 4 3 
+(DHCPv4)” 4 
+[9] IETF RFC 6939 “Client Link-Layer Address Option in DHCPv6” 5 
+[10] Broadband Forum TR-385 “ITU-T PON YANG modules” 6 
+[11] Broadband Forum TR-383 “Common YANG Modules for Access Networks“ 7 
+[12] RFC 6991 “Common YANG datatypes” 8 
+[13] RFC 8343 “A YANG Data Model for Interface Management“ 9 
+[14] RFC 8344 “A YANG Data Model for IP Management“ 10 
+[15] CM-SP-MULPIv3.1-I19-191016, “DOCSIS 3.1 MAC and Upper Layer Protocols Interface Specification” , 11 
+Cable Television Laboratories, Inc 12 
+1.3 Conventions 13 
+In this specification the following convention applies any time a bit field is displayed in a figure. The bit field should be 14 
+interpreted by reading the figure from left to right, then from top to bottom, with the MSB being the first bit so read and 15 
+the LSB being the last bit so read. 16 
+1.4 Definitions and Abbreviations 17 
+1.4.1 Definitions 18 
+For the purposes of the present document, the terms and definitions given in 3GPP TR 21.905 [2] and the following apply. 19 
+A term defined in the present document takes precedence over the definition of the same term, if any, in 3GPP TR 21.905 20 
+[2]. 21 
+New terms used in this document: 22 
+• CTI client: a process in the O-DU that exchanges CTI messages with one or multiple CTI servers, e.g. to request 23 
+a given transport capacity.  24 
+• CTI server: a process in the Transport Node that exchanges CTI messages with one or multiple CTI clients, e.g. 25 
+to receive capacity requests. 26 
+• CTI message sender: CTI client or CTI server generating a CTI message 27 
+• CTI message receiver; CTI client or CTI server receiving a CTI message 28 
+ 29 
+Generic terms used in this document:  30 
+• Mobile slot: a subframe in 3GPP LTE or a slot in 3GPP NR. 31 
+ 32 
+1.4.2 Abbreviations 33 
+For the purposes of the present document, the following abbreviations apply. 34 
+BWR   Bandwidth Reporting 35 
+CM   Cable Modem 36 
+CMTS    Cable Modem Termination System 37 
+CoS   Class of Service 38 
+CO DBA   Cooperative DBA 39 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   7 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+CTI   Cooperative Transport Interface 1 
+DBA   Dynamic Bandwidth Allocation 2 
+DHCP   Dynamic Host Configuration Protocol 3 
+DOCSIS   Data Over Cable Service Interface Specification 4 
+DP   Destination Port 5 
+DSCP   Differentiated Services Code Point 6 
+EMS   Element Management System 7 
+FQDN   Fully Qualified Domain Name 8 
+L2 / L3 / L4   ISO/OSI Layer 2 / Layer 3 / Layer 4 9 
+LLID   Logical Link ID 10 
+MAC   Media Access Control 11 
+NA(P)T   Network Address (and Port) Translation 12 
+NMS   Network Management System 13 
+O-CU   O-RAN Central Unit 14 
+O-DU   O-RAN Distributed Unit 15 
+O-RU   O-RAN Radio Unit 16 
+OLT   Optical Line Termination 17 
+ONU   Optical Networking Unit 18 
+OSS   Operations Support System 19 
+PCP   Priority Code Point 20 
+PON   Passive Optical Network 21 
+QoS   Quality of Service 22 
+RAN   Radio Access Network 23 
+RO   Read-Only 24 
+SCN   Service Class Name 25 
+SF   Service Flow 26 
+SMO   Service Management and Orchestration 27 
+SN   IP subnet 28 
+SP   Source Port 29 
+T-CONT   Transmission Container 30 
+TC   Traffic Class for IPv6 31 
+T-plane   Transport plane (consists of TC-plane and TM-plane) 32 
+TC-plane   Transport Control plane 33 
+TDM   Time Division Multiplexing 34 
+TM-plane   Transport Management plane 35 
+TN   Transport Node 36 
+ToS   Type of Service 37 
+TPID   Tag Protocol Identifier 38 
+TU   Transport Unit 39 
+UDP    User Datagram Protocol 40 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   8 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+UE   User Equipment 1 
+VID   VLAN ID 2 
+VLAN   Virtual LAN 3 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   9 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+2 High Level Description 1 
+2.1 General CTI Management Architecture 2 
+2.1.1 Foreword on management domains  3 
+This document refers to separate “transport domain OSS” and “ RAN domain SMO”, without any implication of 4 
+ownership of the domain s or use of particular processes or protocols in the transport domain OSS. E ach domain is 5 
+responsible for managing its nodes and can do so independently, but for CTI some level of mutual coordination is needed. 6 
+Note that using two domains in this document does not preclude a lternative approaches such as an integrated OSS for 7 
+both domains, or an overarching orchestrat ing function that would select the parameters and forward them to the OSS 8 
+domains.  9 
+2.1.2 Summary of architecture  10 
+As the configuration of CTI parameters in the O-DU is non real-time, it will be done over the O-RAN O1 interface using 11 
+NETCONF/YANG. 12 
+This document does not make assumptions about the management process in the Transport OSS.  13 
+Several CTI parameters are common for O-DU and TN side and must be aligned. There is a need for coordination between 14 
+both operation domains. This document specifies the needs, but does not make assumptions about the process or protocols 15 
+to ensure such coordination. The only process described in this document is an automated auto -discovery which allows 16 
+to link a TN specific transport parameter with each individual CTI session ID. 17 
+This document does not make assumptions about the integration of functional features into physical nodes. For example, 18 
+the document does not restrict the realization of the RAN domain DHCP server, which may be integrated with the O-DU, 19 
+may be provided by the transport system, or may be accessed via a relay. 20 
+ 21 
+Figure 2-1 :  Management architecture for CTI 22 
+2.1.3 Parameters to be configured  23 
+There are two types of parameters related to CTI: 24 
+• Parameters to establish L2 or L2 + L3/L4 connectivity for CTI messages between CTI servers and CTI clients , 25 
+to be configured by Transport OSS and by RAN SMO, and their corresponding YANG models 26 
+ 27 
+• Parameters for the operation of CTI, to be configured by Transport OSS and by RAN SMO, and their 28 
+corresponding YANG models 29 
+ 30 
+ 31 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   10 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+3 CTI Management  1 
+3.1 CTI Configuration parameters 2 
+ 3 
+3.1.1 Summary of Management Objects  4 
+The management interface between the OSS and the O-DU and the TN contains the following parameters as summarized 5 
+in Table 3-1 and Table 3-2. The tables indicate data format, data unit, values, description, and when a parameter is Read-6 
+only (RO), so not configurable. 7 
+This section is an update of section 3.3.2 of [1], Tables 3-1 and 3-2 supersede Table 3 -9 of [1]. Please see [1] for more 8 
+background on the meaning and use of the CTI parameters. 9 
+Notes: 10 
+Note 1: wherever applicable, the YANG model follows modules already in use in O -RAN like [12] and [13]. 11 
+Note 2: parameters marked with (*) are from ITU-T PON YANG modules [10] and OLT YANG modules [11], 12 
+parameters marked with (**) are from Cable Labs YANG modules. 13 
+Note 3: This version of the document only specifies the use of single (.1Q) VLAN tag for CTI  transport and L2 filter  14 
+parameter. The use of dual VLAN-tag will be specified in a later version of this document. 15 
+Note 4: If there is any confl ict between the YANG models and the accompanying text description in this specification, 16 
+the definition of the YANG models shall take precedence. 17 
+Note 5: In case of L2 transport of CTI, the packet is encapsulated in Ethernet with the invariant value of O-RAN Ethertype 18 
+(0x9433), so the Ethertype is not part of the Table. The Ethernet Protocol Subtype (see [1])) for O-RAN CTI is also an 19 
+invariant value but not formally specified yet, so it is made configurable (value 0x1 is temporarily proposed in [1]).  20 
+Note 6: In case of UDP/IP transport of CTI, the CTI UDP listening port is also invariant but not (yet) a well-known port, 21 
+so it is also still made configurable.  22 
+ 23 
+Table 3-1 : CTI transport parameters 24 
+Name Data format Unit Value range 
+ 
+(default value) 
+Reserved 
+values 
+Description 
+ 
+(parameter used in TN,  
+or O-DU, or both) 
+CTI client MAC Address String (see [12]) N/A  N/A (TN) 
+(O-DU as Read-Only) 
+CTI server MAC 
+address 
+String (see [12]) N/A  N/A (TN as Read-Only) 
+(O-DU) 
+CTI Protocol Subtype Uint16 (see [1]) N/A (0x1) N/A 2-Byte field when L2 
+encapsulation of CTI messages 
+(TN, O-DU) 
+CTI .1Q VLAN ID  
+(Note 3) 
+Uint16 N/A 1 .. 4094 Value 0 
+(priority 
+tagged) not 
+recom-
+mended 
+ (TN, O-DU) 
+CTI PCP Uint8  N/A 0 .. 7 N/A (TN, O-DU) 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   11 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+CTI client FQDN String (see [12]) N/A  N/A CTI client as IP host described 
+as FQDN 
+(TN) 
+CTI client IPv4 address String (see [12]) N/A  N/A CTI client as IP host described 
+as IPv4 address 
+(TN, O-DU) 
+CTI client IPv6 address String (see [12]) N/A  N/A CTI client as IP host described 
+as IPv6 address 
+(TN, O-DU) 
+CTI server FQDN String (see [12]) N/A  N/A CTI server as IP host described 
+as FQDN 
+(O-DU) 
+CTI server IPv4 address String (see [12]) N/A  N/A CTI server as IP host described 
+as IPv4 address 
+(TN, O-DU) 
+CTI server IPv6 address String (see [12]) N/A  N/A CTI server as IP host described 
+as IPv6 address 
+(TN, O-DU) 
+CTI DSCP (if IPv4) Uint8 (see [12]) N/A  N/A (TN, O-DU) 
+CTI TC (if IPv6) Uint8 (see [12]) N/A  N/A (TN, O-DU) 
+CTI UDP listening port Uint16 (see [12]) N/A  N/A Either well-known port if defined 
+for CTI. Or chosen unique value 
+for all nodes in the network. 
+(TN, O-DU) 
+CTI egress interface (*) String N/A  N/A either vlan-subinterface or l2-
+termination-subinterface 
+(PON-based TN) 
+CTI use of IP Boolean N/A  N/A Use IP transport capabilities 
+(see [14]) of the L2 interface (if 
+available) for CTI 
+(PON-based TN) 
+CTI connectivity profile 
+ID 
+String N/A  N/A Identifier for a given set of 
+connectivity parameters to use 
+between a CTI server and CTI 
+client 
+ 1 
+Table 3-2 : CTI operational parameters 2 
+Name Data format Unit Value range 
+(default value) 
+Special or 
+Reserved 
+values 
+Description 
+ 
+(parameter used in TN,  
+or O-DU, or both) 
+CTI enable Boolean N/A (true) N/A Enables/disables CTI in server 
+or client 
+(TN, O-DU) 
+CTI Flow ID Uint8 N/A 0 .. 0xEF  
+(0) 
+ 
+0xF0..0xFF 
+ 
+CTI Flow IDs correspond to a 
+set of matching frame and 
+packet classifiers, the matching 
+transport ID (DOCSIS Service 
+Flow ID or PON T-CONT) when 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   12 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+taken together with CTI session 
+ID, as well as the mobile flow 
+identifier. 
+(TN, O-DU) 
+CTI Flow L2 MAC 
+Destination Address 
+String (see [12]) N/A All unicast MAC 
+addresses 
+N/A [15] C.2.1.8.1 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L2 MAC 
+Source Address 
+String (see [12]) N/A All unicast MAC 
+addresses 
+N/A [15] C.2.1.6.2 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L2 Ethertype String N/A All valid 
+Ethertypes 
+N/A [15] C.2.1.6.3 
+(TN, O-DU) 
+CTI Flow L2 PCP Uint8 N/A 0..7 N/A [15] C.2.1.9.1 
+(TN, O-DU) 
+CTI flow L2 .1Q VLAN 
+ID (Note 3) 
+Uint16 N/A 0 .. 4094 
+ 
+N/A [15] C.2.1.9.2 
+(TN, O-DU) 
+CTI Flow L3 IPv4 DSCP Uint8 (see [12]) N/A 0 .. 63 N/A [15] C.2.1.6.1 (6 bit) 
+(TN, O-DU) 
+CTI Flow L3 IPv4 
+Protocol Field 
+Uint8  N/A  N/A [15] C.2.1.6.2 
+(TN, O-DU) 
+CTI Flow L3 IPv4 
+Source Address 
+String (see [12]) N/A All unicast IPv4 
+addresses 
+N/A [15] C.2.1.6.3 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv4 
+Source Prefix 
+String (see [12]) N/A  N/A [15] C.2.1.6.4 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv4 
+Destination Addr 
+String (see [12]) N/A All unicast IPv4 
+addresses 
+N/A [15] C.2.1.6.5 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv4 
+Destination Prefix 
+String (see [12]) N/A  N/A [15] C.2.1.6.6 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv6 Traffic 
+Class 
+Uint8 (see [12]) N/A  N/A [15] C.2.1.10.1 
+(TN, O-DU) 
+CTI Flow L3 IPv6 Flow 
+Label 
+Uint32 (see [12]) N/A  N/A [15] C.2.1.10.2 
+(TN, O-DU) 
+CTI Flow L3 IPv6 Next 
+Header 
+Uint8 N/A  N/A [15] C.2.1.10.3 
+(TN, O-DU) 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   13 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+CTI Flow L3 IPv6 
+Source Address 
+String (see [12]) N/A All unicast IPv6 
+addresses 
+N/A [15] C.2.1.10.4 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv6 
+Source Prefix 
+String (see [12]) N/A  N/A [15] C.2.1.10.5 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv6 
+Destination Address 
+String (see [12]) N/A All unicast IPv6 
+addresses 
+N/A [15] C.2.1.10.6 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L3 IPv6 
+Destination Prefix 
+String (see [12]) N/A  N/A [15] C.2.1.10.7 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L4 UDP 
+Source Port Start 
+Uint16 (see [12]) N/A  N/A [15] C.2.1.7.1 From the 
+perspective of upstream  
+packets to TU ingress.This 
+defines the UDP source port to 
+use on a CTI flow. This can 
+help with classification 
+uniqueness. 
+(TN, O-DU) 
+CTI Flow L4 UDP 
+Source Port End 
+Uint16 (see [12]) N/A  N/A [15] C.2.1.7.2 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L4 UDP 
+Destination Port Start 
+Uint16 (see [12]) N/A  N/A [15] C.2.1.7.3 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow L4 UDP 
+Destination Port End 
+Uint16 (see [12]) N/A  N/A [15] C.2.1.7.4 From the 
+perspective of upstream  
+packets to TU ingress. 
+(TN, O-DU) 
+CTI Flow Max Latency Uint16 5 µs 1 .. 65 535 
+ 
+N/A The maximum latency provides 
+a guideline on the latency 
+bound expected for the CTI 
+flow. The latency bound is 
+defined as one-way and is 
+referenced  
+- at TN: between the TU UNI 
+port and the TN network port 
+- at O-DU: between the O-RU 
+and the O-DU 
+(TN, O-DU) 
+CTI Flow time interval 
+per report 
+Uint8 0.25 ms 1 .. 255 N/A Rate of reporting for given Flow 
+ID in given CTI session ID 
+(O-DU) 
+CTI Flow PON T-CONT String (*) N/A  N/A Corresponding T-CONT for the 
+combination CTI Flow ID & CTI 
+session ID 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   14 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+(PON-based TN) 
+PON session 
+configuration data: OLT 
+Channel Termination  
+String (*) N/A  N/A Corresponding OLT Channel 
+Termination id (PON port) for a 
+CTI session ID 
+(PON-based TN) 
+PON session 
+configuration data: ONU 
+(v-ani)  
+String (*) N/A  N/A Corresponding ONU id for a 
+CTI session ID 
+(PON-based TN) 
+PON session 
+configuration data: ONU 
+UNI (v-enet)  
+String (*) N/A  N/A Corresponding ONU UNI id for 
+a CTI session ID 
+(PON-based TN) 
+CTI Flow DOCSIS 
+Service Class Name 
+String (len 1..15) (**) N/A  N/A Corresponding DOCSIS service 
+class name to tie DOCSIS 
+Service Flow for the 
+combination CTI Flow ID & CTI 
+session ID 
+(DOCSIS-based TN) 
+DOCSIS CTI Session 
+configuration data: cm-
+mac-address 
+(**) 
+String (see [12]) N/A  N/A Corresponding Cable Modem 
+MAC address for a CTI session 
+ID  
+(DOCSIS-based TN) 
+CTI report messaging: 
+use of type 1 extension 
+Boolean N/A  N/A Set (yes/no) per CTI Session ID 
+(TN, O-DU) 
+CTI report messaging: 
+use of type 2 
+Boolean N/A (false) N/A Set (yes/no) per CTI Session ID 
+(TN, O-DU) 
+CTI client name String N/A Proposed format: 
+concatenation of 
+O-DU-Identifier + 
+“_” + 2 characters 
+(letters or 
+numbers) 
+ 
+with O-DU- 
+Identifier format: 
+mfg-name_model-
+name_serial-num  
+N/A Unique name for CTI client  
+(TN, O-DU) 
+CTI server name String N/A Proposed format:  
+concatenation of 
+Access-Node-
+Identifier used in 
+DHCP Agent 
+Circuit ID + “_” + 2 
+characters (letters 
+or numbers) 
+N/A Unique name for CTI server 
+(TN, O-DU) 
+CTI Pattern ID Uint32 N/A 0 .. 0x00FFFFFF 0 means 
+that pattern 
+information 
+is not 
+commu-
+nicated 
+uniquely identifies a CTI 
+pattern. The intended use is to 
+describe the bytes per symbol 
+for each symbol or group of 
+symbols within a mobile slot.  
+(TN, O-DU) 
+CTI Pattern Duration Uint8 125 µs 1 .. 255 N/A the length of a single mobile 
+slot time, in units of 125 µs 
+(TN, O-DU) 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   15 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+CTI Pattern Events Uint8 N/A 1 .. 255 N/A This is the number of events 
+per pattern. An event is 
+typically a symbol or a group of 
+symbols within a slot. For 
+example, if a slot contained 14 
+symbols, there could be 14 
+events with each being one 
+symbol or 7 events with each 
+being 2 symbols.  
+Events are defined to be 
+equally spaced within a duration 
+time with the bytes being 
+delivered at the end of the 
+event. 
+(TN, O-DU) 
+CTI Pattern Event 
+Multiplier 
+Uint8 N/A 1 .. 255 N/A number of sequential events 
+that have the same byte count. 
+The multiplier variable and the 
+byte count variable are used in 
+pair to describe an event. 
+(TN, O-DU) 
+CTI Pattern Event Bytes Uint16 N/A 0 .. 0xFFFE 0xFFFF number of bytes per event. A 
+byte count is allowed to be 0 
+bytes. A reserved value of 
+0xFFFF indicates a residual 
+average, where: 
+  Residual average  
+= [ CTI byte count - sum(explicit 
+bytes described) ]  
+    /sum(events without explicit 
+bytes described) 
+(TN, O-DU) 
+CTI session ID String N/A Proposed format: 
+physical MAC 
+address (hex) 
+String with 
+only 0’s is 
+“null 
+session” 
+Unique reference to TU or TU 
+interface 
+(TN, O-DU) 
+O-RU ID String 
+ 
+N/A Proposed format: 
+mfg-name_model-
+name_serial-num 
+ 
+N/A Unique reference to O-RU 
+linked to CTI session ID 
+(TN, O-DU) 
+O-RU interface ID String 
+ 
+N/A Proposed format: 
+mfg-name_model-
+name_serial-
+num_macaddr 
+N/A Unique reference to O-RU 
+interface linked to CTI session 
+ID 
+(TN, O-DU) 
+CTI Nominal message 
+exchange Time Interval 
+Uint8 0.25 ms 1 .. 20 21 .. 255 This value, abbreviated as 
+CTI_NOM, is the minimum 
+average interval that is set for a 
+CTI-Report message to be sent 
+from the CTI client to the CTI 
+server. CTI_NOM is selected 
+per CTI Session ID based on 
+mobile slot length, TN CTI rate 
+category, O-DU rate category.  
+ 
+CTI-Report messages can be 
+sent less often. Because of 
+queuing in the system, this 
+value should be interpreted as a 
+rate and not as a spacing 
+between packets. Typical 
+values may be 1–2 ms for LTE, 
+or lower for 5G. 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   16 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+(TN, O-DU) 
+CTI Time Keep-Alive Unit8 0.1s 1 .. 255  This value, abbreviated as 
+CTI_KA, is the maximum time 
+interval between consecutive 
+CTI-Keep-Alive messages 
+between the CTI client and the 
+CTI server. 
+(TN, O-DU) 
+CTI Time Out Uint8 0.1s 1 .. 255  This value, abbreviated as 
+CTI_TO, is the timeout value 
+that a CTI-Beacon-Ack 
+message needs to be received 
+by the CTI client (O-DU) or the 
+CTI server (transport system) 
+before that respective system 
+suspends CTI operations and 
+returns to its CTI configuration 
+state. 
+Must be > N x CTI Keep-alive 
+value, with N≥2 
+(TN, O-DU) 
+Supported CTI version Uint8 N/A 1 .. 15 0 Supported version. Starts with 
+value 1. 
+Read-Only if about node itself. 
+(TN, O-DU) 
+O-DU CTI rate category Uint8 N/A 1 .. 5 N/A Capability of O-DU to send CTI 
+messages. 
+Read-Only. 
+(TN, O-DU) 
+O-DU CTI timing 
+performance 
+(see section 4.2 in [1]) 
+Uint8 20 µs 1 .. 255 N/A Capability of O-DU to quickly 
+send CTI messages. 
+Read-Only. 
+(TN, O-DU) 
+TN CTI rate category Uint8 N/A 1 .. 5 N/A Capability of O-DU to receive 
+CTI messages 
+(TN, O-DU) 
+TN CTI timing 
+performance 
+(see section 4.2 in [1]) 
+Uint8 20 µs 1 .. 255 N/A Capability of TN to quickly 
+process CTI messages 
+(TN, O-DU) 
+Use of PON ranging 
+notification 
+Boolean N/A  N/A (PON-based TN, O-DU) 
+PON ranging min 
+notification advance 
+time 
+Uint16 ms 1 .. 65 535 N/A (PON-based TN, O-DU) 
+Transport type Identity N/A “pon-transport” 
+“docsis-transport” 
+N/A Indicates which transport 
+technology-specific module to 
+load in the TN Yang module 
+(TN) 
+Indicates the transport 
+technology of the TN in which a 
+given CTI server is located 
+(O-DU) 
+ 1 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   17 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+3.2 CTI connectivity parameters and configuration 2 
+This chapter describes how to enable CTI connectivity between the CTI servers and CTI clients. It is a conceptual 3 
+description of the configuration needs and does not specify protocols or methods or sequences of actions for the 4 
+configuration. 5 
+3.2.1 Point-point or switched Ethernet connectivity between TN and O-DU 6 
+3.2.1.1 L2 Connectivity parameters 7 
+The packets will follow the Ethernet encapsulation as described in [1].  8 
+Both O-DU and TN need to know the corresponding VLAN(s) and MAC addresses of resp ectively the CTI servers and 9 
+CTI clients they have to connect to.  As mentioned in [1], each TN can host multiple CTI servers, each O -DU can host 10 
+multiple CTI clients, and connectivity between all clients and servers must be supported.  11 
+The operator is free to choose how to segment the network with different VLANs, from a si ngle flat model (option A: 12 
+same VLAN configuration for CTI in the whole network) to differentiation (a VLAN configuration per TN -O-DU pair 13 
+(Option B) or per client-server pair (Option C)). 14 
+ 15 
+Figure 3-1 :  Layer 2 interconnection options 16 
+Note (not shown in the figure) that an intermediate switch may perform VLAN translation between Transport domain and 17 
+RAN domain. 18 
+Note that the YANG model caters for all possibilities by defining a set of connectivity parameters per pair of CTI server 19 
+– CTI client. 20 
+3.2.1.2 Configuration of L2 connectivity parameters 21 
+ 22 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   18 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 3-2 :  Configuration of Layer 2 connectivity parameters in case of Ethernet switching 2 
+ 3 
+The process involves following steps:  4 
+1) [per CTI server] CTI server MAC addr is stored in Transport OSS 5 
+[per CTI client] CTI client MAC addr is stored in RAN SMO 6 
+2) [per CTI server and per CTI client] Transport OSS and RAN SMO exchange CTI server and CTI client MAC 7 
+addresses from 1), and exchange [per (CTI client;CTI server) combination] the VLAN ID to be used 8 
+3) [per CTI client] Transport OSS configures MAC addr of CTI clients and VLAN ID s in TN 9 
+[per CTI server] RAN SMO configures MAC addr of CTI servers and VLAN IDs in O-DU 10 
+ 11 
+ 12 
+3.2.2 IP routing connectivity between TN and O-DU 13 
+3.2.2.1 L2 + L3/L4 Connectivity parameters 14 
+The packets will follow the UDP/IP/Ethernet encapsulation as described in [1].  15 
+Both O-DU and TN need to know the corresponding L2 and L3/L4 parameters to use for communicating with respectively 16 
+the CTI servers and CTI clients they have to connect to. As mentioned in [1], each TN can host multiple CTI servers, 17 
+each O-DU can host multiple CTI clients, and connectivity between all clients and servers must be supported.  18 
+ 19 
+At Ethernet level, each CTI client and CTI server  can have its  own MAC address , and VLAN s are used based on the 20 
+subnetting at IP level. 21 
+At IP level, subnetting will define how many IP addresses are used and how the different nodes will be interconnected; 22 
+- If all CTI servers and clients in the whole network are part of a single subnet (Option A), e ach client can use 23 
+single IP address (for communicating with all servers), each server can use a single IP addres (for communicating 24 
+with all clients), and the TNs and O-DUs are connected by point-point links or intermediate switches. 25 
+- Alternatively, the network could be split in multiple subnets  on a node level , where communication between 26 
+subnets happen via an intermediate router. Option B shows an example of one subnet at O-DU side and one 27 
+subnet at TN side, interconnected by an intermediate router. 28 
+- Alternatively, the network could be split in multiple subnets along TN-O-DU combinations. Option C shows an 29 
+example of one subnet per O-DU, shared with all TNs. The CTI servers in the TNs support multiple IP addresses 30 
+(one per subnet) and there is no need for routing between the TNs and O -DUs (e.g. intermediate switch).  31 
+- (note that sharing subnets across transport and RAN domains (options A and C) probably only apply to cases of 32 
+a single operator managing both domains). 33 
+ 34 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   19 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+At UDP level, a single UDP listening port  value is used for all clients, servers a nd messages. The source port value can 1 
+be freely chosen. Its value remains the same during a communication session between the CTI client and CTI server, but 2 
+can be ephemeral from one communication session to the next.  3 
+Note that the YANG model caters for all possibilities by defining a set of connectivity parameters per pair of CTI server 4 
+– CTI client. 5 
+ 6 
+ 7 
+ 8 
+ 9 
+Figure 3-3 :  Layer 3 interconnection options 10 
+3.2.2.2 Configuration of L2 connectivity parameters 11 
+ 12 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   20 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+ 2 
+Figure 3-4 a, b:  Configuration of Layer 2 connectivity parameters in case of IP routing  3 
+The process involves following steps:  4 
+1) If subnets are shared between Transport and RAN domains (options A and C in section 3.2.2.1 and Fig 3-2a), 5 
+the common VLAN IDs must be coordinated between the Transport OSS and RAN SMO. Otherwise (Option 6 
+B in section 3.2.2.1 and Fig 3-2b) this step is not needed. 7 
+2) [per CTI client] Transport OSS configures VLAN ID to be used for TC -plane 8 
+[per CTI server] RAN SMO configures VLAN ID to be used for TC-plane 9 
+The MAC addresses of the next hop in will be fetched by normal means (ARP) after configuration of L3 parameters 10 
+(see section 3.2.2.3). 11 
+ 12 
+3.2.2.3 Configuration of L3 connectivity parameters 13 
+ 14 
+ 15 
+Figure 3-5 :  Configuration of Layer 3 connectivity parameters in case of IP routing 16 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   21 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+The process involves following steps: 1 
+1) [per CTI server] CTI server (in TN) gets L3 configuration, statically or by DHCPv4 or DHCPv6 (or stateless 2 
+for IPv6) 3 
+[per CTI client] CTI client (in O-DU) gets L3 configuration, statically or by DHCPv4 or DHCPv6 (or stateless 4 
+for IPv6) 5 
+2) [per CTI server] the assigned CTI server IP address is stored in Transport OSS 6 
+[per CTI client] the assigned CTI client IP address is stored in RAN SMO 7 
+3) [per CTI server and per CTI client] Transport OSS and RAN SMO exchange this information about allocated 8 
+IP addresses of respectively CTI servers and CTI clients 9 
+4) [per CTI client] Transport OSS configures IP addr of CTI clients in TN 10 
+[per CTI server] RAN SMO configures IP addr of CTI servers in O-DU 11 
+ 12 
+3.2.2.4 Remarks about layer 3 connectivity 13 
+The O-RU and the O -DU need routing table configuratio n (multiple subnets) , this document doesn’t describe this 14 
+configuration. 15 
+Additionally, the DHCP relay agent in the first router facing the O -RU (TN) must be configured with the IP address of 16 
+the DHCP server in the RAN domain to allow DHCP communication between the DHCP client in the O-RU and the RAN 17 
+DHCP server. 18 
+In some subnet cases there could be a router between the TN and O-DU. The configuration of the router is not described 19 
+in this document.  20 
+There could also be a NAT (NAPT) between the TN and O-DU. In that case there are a couple of attention points that 21 
+need to be considered, namely the impact of destination port translation, the need of NAT traversal, etc… This is out of 22 
+scope of this document.   23 
+ 24 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   22 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+4 CTI procedures 1 
+Proper interpretation of CTI messages by the TNs requires a level of cooperation between the CTI server side and CTI 2 
+client side to guarantee consistency of the parameter values and and correlation between the parameters. Although it is 3 
+possible to rely on manual correlation actions, it is beneficial to automate the process. This section describes an automated 4 
+autodiscovery method of the correlation of the CTI session IDs with the TU/TN transport parameter they correspond to.  5 
+The same method can also be used to determine which CTI server must be associated per gi ven CTI session ID. 6 
+4.1 Correlations to be performed 7 
+For proper operation of CTI, several parameters need to be consistent at both TN and at O-DU sides. This means that the 8 
+same values must be consistently configured at both CTI server and CTI client side by t heir respective management 9 
+systems. The method or protocols for this coordination between Transport OSS and RAN SMO are out of scope of this 10 
+document. 11 
+Static parameters such as timer values, CTI Flow ID filters, CTI Pattern IDs etc… can be coordinated at O SS level 12 
+independently of the topology of the O-RUs and transport nodes. 13 
+Dynamically allocated parameters such as IP addresses of CTI servers and CTI clients are dependent of the 14 
+interconnection topology of TNs and O -DUs, but not of the topology of the O -RUs. They can be coordinated at OSS 15 
+level. 16 
+The topology of O-RU deployments will require the following correlations for every CTI session ID, based which TU 17 
+interface each O -RU interface is connected to  (see Figure 4-1 for a logical view of the correlations. This figure is 18 
+conceptual only and does not represent how or where the correlation must be executed (in the TN or in its management 19 
+system)): 20 
+• The TN mus t determine  which transport parameter must be linked to the corresponding CTI session ID 21 
+(combined with a CTI flow ID if used) in the CTI report messages (note that multiple transport parameters could 22 
+be configured on a TU interface, only one pertains to a  combination CTI session ID + CTI flow ID).  Note that 23 
+CTI flow IDs are only unique per CTI client (different clients could use the same Flow ID for different 24 
+meanings), so the CTI client must be taken into account in the correlation. 25 
+• The TN must also keep track of which CTI client is reporting the CTI session ID, to send messages related to 26 
+that CTI session ID. A single CTI client can report about multiple CTI session IDs.  27 
+• At O-DU side, the CTI client must correlate which CTI session ID to use for each O -RU interface it reports 28 
+about. This is a one-to-one relationship. For reporting between different flows on the same CTI session ID the 29 
+O-DU must also be aware of the class of service associated to each flow, which in turn is represented by a given 30 
+set of L2/ L3/L4 filter parameters reflecting how uplink traffic is tagged by the O -RU. This tagging could be 31 
+different in different transport networks (a single O -DU can in principle manage O -RUs in multiple transport 32 
+networks), so the CTI server (reflecting the TN) must be taken into account in the correlation. 33 
+• The O-DU must also know to which CTI server to send the reports for a given CTI session ID. Multiple reports 34 
+could have to be sent to the same CTI server. 35 
+ 36 
+Note that it is recommended to us e the physical MAC address of the O -RU port over which the O -RU has M -plane 37 
+connectivity as the value of the CTI session ID. 38 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   23 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 4-1 :  O-RU topology-dependent correlations for CTI session IDs 2 
+(conceptual only, for YANG elements please see Chapter 5) 3 
+4.2 Auto Discovery for correlation of CTI session ID to transport 4 
+parameter in TN 5 
+This optional method is a means to automate the correlation of CTI session ID with the required transport parameter on 6 
+the corresponding TU (or TU UNI) on the corresponding TU or TU UNI . It avoids relying on manual correlation during 7 
+the installation phase of the O-RU to a given TU interface. 8 
+The method is based on  re-using the DHCP exchange from the O -RU that is performed during start up of the O -RU to 9 
+achieve IP connectivity for the M -plane [4]. Both cases of layer 2 and layer 3 connectivity are very similar , using the 10 
+DHCP relay agent in the TN to add the agent circuit ID as the key for the correlation. The only differences are the use of 11 
+giaddr by the DHCP relay agent in case of layer 3 connectivity, and the mandatory use of IP in the C -plane and U-plane 12 
+traffic in case of layer 3 connectivity. 13 
+If the M-plane uses IPv4, the DHCP relay agent adds Option 82 [5], which contains the agent circuit ID (sub option code 14 
+1), which is a string uniquely identifying the TU interface on which the DHCP request was received.  15 
+If the M-plane uses IPv6, the DHCPv6 relay agent adds Option 18 [6], which contains the agent circuit ID. 16 
+Additionally, the possible use of DHCP Option 60 [7] and DHCP Option 124 [8] by the O-RU is specified in [4]. Even if 17 
+such options are not used, the O-RU interface will be discover ed by the RAN SMO during the autoconfiguration of the 18 
+O-RU through M-plane exchanges. 19 
+Once the O-RU is configured, the RAN SMO can correlate the agent circuit ID with the O-RU interface ID based on the 20 
+allocated IP address. In turn the O-RU interface is uniquely linked to a CTI session ID. The correlation [agent circuit ID, 21 
+CTI session ID ] can then be notified back to the transport OSS, which pushes the correlation to the corresponding TN 22 
+that terminates the given TU. 23 
+It is recommend ed to use the  unique MAC address of the  O-RU interface as the CTI session ID. For IPv4 t his is 24 
+communicated to the DHCP server in the field “chaddr” of DHCP option 82. For IPv6 it can be communicated as “client 25 
+link layer address” in DHCP v6 Option 79 [9]. If the O -RU does not use  Option 79 in DHCPv6, there needs to be a 26 
+preconfigured association [O-RU ID; MAC address] in the RAN SMO. 27 
+The following sections 4.2.1 and 4.2.2 supersede section 3.2.1.2 in [1]. 28 
+4.2.1 Switched Ethernet connectivity between O-RU and O-DU 29 
+ 30 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   24 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 4-2 :  Auto-discovery method with Layer 2 interconnectivity 2 
+ 3 
+The sequence of steps is as follows (example for IPv4); 4 
+1) O-RU starts by issuing DHCP discovery for its M-plane communication. The DHCP relay agent in TN adds 5 
+option 82 to DHCP Discovery. 6 
+Note that at start up the O-RU can be unaware of the configured M-plane VLAN ID. It will scan multiple 7 
+VLAN IDs (and untagged) until receiving an answer from the O-DU side. Only DHCP messages with VLAN 8 
+ID matching the configured M-plane VLAN ID will be passed through (with option 82 stamped) by the TN, all 9 
+other messages are discarded by the TN. 10 
+2) O-RU gets M-plane IP configuration (by DHCP), starts up and gets configured by M-plane:  11 
+• Either options 60 or 124 are used that can fully identify O-RU ID 12 
+• Or the O-RU ID is discovered during O-RU configuration by the RAN SMO via the M-plane 13 
+3) Two associations are extracted and stored in the RAN SMO: 14 
+• RAN DHCP server extracts the association [assigned M-plane IP address; Agent Circuit ID; chaddr] 15 
+• If O-RU ID is present in DHCP options 60 or 124, the RAN domain DHCP server extracts the 16 
+association [assigned M-plane IP address; O-RU ID]. If the DHCP options 60 or 124 are not used, the 17 
+association is extracted by RAN SMO. 18 
+• If DHCP server is hosted in the O-DU, the information is communicated to the RAN SMO over the 19 
+O1 interface 20 
+4) RAN SMO correlates [Agent Circuit ID; chaddr] with [O-RU ID] based on M-plane IP address. 21 
+5) RAN SMO configures O-DU (via O1) so that CTI client uses CTI session ID = chaddr for this O-RU ID. 22 
+6) RAN SMO informs Transport OSS with association [Agent Circuit ID; CTI session ID] 23 
+7) Transport OSS is able to determine the corresponding TN from “Access-Node-Identifier” in Agent Circuit ID, 24 
+and then configures association (Circuit ID; CTI session ID) to that TN. 25 
+ 26 
+4.2.2 IP routing connectivity between O-RU and O-DU 27 
+ 28 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   25 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 4-3 :  Auto-discovery method with Layer 3 interconnectivity 2 
+ 3 
+The sequence of steps is as follows (example for IPv4); 4 
+1) O-RU starts by issuing DHCP discovery for its M-plane communication. The DHCP relay agent in TN adds 5 
+option 82 to DHCP Discovery, adds “giaddr”, converts the message from broadcast to unicast, and forwards it 6 
+to RAN DHCP server. Note that this requires that the DHCP relay agent in the TN is pre -configured with the 7 
+IP address of the RAN DHCP server, as mentioned in section 3.2.2.4. 8 
+Note that at start up the O-RU can be unaware of the configured M-plane VLAN ID (if it is used between TU 9 
+and TN). The O-RU will scan multiple VLAN IDs (and untagged) until receiving an answer from the O-DU 10 
+side. The TN will only process DHCP messages with a VLAN ID matching the configured M -plane VLAN ID, 11 
+all others are discarded by the TN. 12 
+The remaining steps 2 – 7 are identical to the steps in section 4.2.1. 13 
+Note that the same approach can be taken in case the transport domain would be responsible to the IP configuration of 14 
+the O-RUs (DHCP server hosted in the transport domain). This scenario is not  worked out in this document as it is  15 
+considered to be unlikely.   16 
+ 17 
+4.3 Auto discovery for correlation of CTI session ID to CTI server 18 
+There needs to be  a pre-configuration at Transport OSS of Agent cicuit ID (only the relevant fields) to Server ( Server 19 
+Name and MAC address in case of L2 connectivity for CTI). This association must be communicated to the RAN SMO. 20 
+After the auto discovery of 4.2, the RAN SMO knows the Agent circuit ID per O-RU (interface), and the CTI session ID 21 
+per O-RU (interface). It can then associate the CTI session ID of that O-RU (interface) to its corresponding CTI server 22 
+based on the TN-identifying portion of the Agent circuit ID. 23 
+ 24 
+4.4 Performing correlations without Auto Discovery method 25 
+In this case the correlations are not facilitated by  an automated exchange of messages, and will involve a manual 26 
+configuration during installation  of each O-RU, and several extra coordination steps between Transport OSS and RAN 27 
+SMO; 28 
+1) the correlation of CTI session ID to O -RU (interface) will need to be done at installation time, by manually 29 
+populating the association of an O-RU (interface) identifier to a TU (interface) indentifier in the Transport OSS. 30 
+It is then up to the Transport OSS to correlate the O-RU (interface) further to the transport parameter based on 31 
+the TU (interface) identifier, and if needed to ask for the associated CTI session ID to the RAN SMO (in case 32 
+the O-RU identifier that is visible to the Transport operator would be another identifier than the CTI session ID). 33 
+ 34 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   26 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+2) the correlation of CTI session ID to a given CTI server will need an extra level of coordination between the 1 
+Transport OSS and the RAN SMO. Based on the manual association in step 1), the Transport OSS can deduce 2 
+the corresponding CTI server for a given CTI session ID based on the TU identifier (which is linked to a given 3 
+TN user-facing port, which in turn is controlled by a given CTI server). The Transport OSS then communicates 4 
+the association of CTI session ID  (or the O -RU identifier ) with the associated CTI Server name (and MAC 5 
+address in case of L2 connecivity for CTI) to the RAN SMO.    6 
+ 7 
+ 8 
+ 9 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   27 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+5 CTI YANG Model Definition 1 
+This document specifies the CTI YANG model to be used in the O-DU 2 
+This document also proposes a CTI YANG model to be  used in a TN  from a generic perspective, with a  specific 3 
+declination for PON OLT and DOCSIS CMTS . The TN YANG model is provided here for further distribution towards 4 
+the corresponding external bodies for their consideration (Broadband Forum for PON, Cable Labs for DOCSIS). 5 
+  6 
+The YANG model follows a modular approach.  7 
+Structures that are used in the O-DU and that are also proposed for consideration at the TN are defined in module o-ran-8 
+cti-common.  9 
+The specific structures for the O -DU are defined in module o-ran-cti-o-du. Together, the modules o-ran-cti-10 
+common and o-ran-cti-o-du specify CTI for the O-DU side and fit into the wider O-DU YANG model. 11 
+The specific structures for the TN are defined in module o-ran-cti-tn-generic, which contains no TN technology 12 
+specific structures. Technology-specific structures are defined in the separate modules o-ran-cti-pon and o-ran-13 
+cti-tn-docsis respectively. A TN then has to combine o-ran-cti-common, o-ran-cti-tn-generic and one tn-14 
+technology module for a full description of CTI YANG, which in turn has to f it into the wider TN YANG model. 15 
+ 16 
+ 17 
+Figure 5-1 :  CTI YANG modules and relationships 18 
+ 19 
+5.1 Approach to uniqueness of parameters  20 
+Depending on its position in the YANG structure, a parameter can be unique for the whole node, or only within a smaller 21 
+context in the node allowing for multiple values to be configured inside the same node. Additionally, if a parameter must 22 
+be unique across the whole network, this consistency must be assured by the SMO system to configure the same value in 23 
+all its managed nodes. 24 
+ 25 
+CTI Session ID:  26 
+The CTI Session ID must be unique across the whole network. Recommendation is to use the MAC address of the O-RU 27 
+interface it is linked to. 28 
+The CTI session ID element is used as the cornerstone in the TN and O-DU YANG models. 29 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   28 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+CTI server name, CTI client name:  2 
+The names must be unique across the whole network 3 
+ 4 
+O-RU ID or O-RU interface ID:  5 
+They are used locally in the O-DU, so in principle only unique within one O-DU. But more practical if it is unique across 6 
+the whole network.  7 
+ 8 
+Filter values linked to a CTI Flow ID:  9 
+From O-DU point of view a Flow ID can either represent the  same filter values over the whole network (all TNs), or the 10 
+same ID could represent different filter values in different transport networks (eg if TNs in different transport networks 11 
+use different VLAN tagging). Therefore the CTI Flow ID is defined at per-CTI server level in the O-DU.  12 
+From the TN point of view a Flow ID can either represent the same filter values over the whole network (all O -DUs), or 13 
+the same ID could represent different filter values in different RAN networks, eg if the same ID would be  re-used by 14 
+accident by two different RAN networks (sets of O -DUs). Therefore the CTI Flow ID is defined at per -CTI client level 15 
+in the TN. 16 
+ 17 
+Pattern characteristics linked to a CTI Pattern ID:  18 
+From O-DU point of view a Pattern ID will represent the same pattern characteristics no matter on which TN an O-RU is 19 
+connected to. The Pattern ID can therefore be unique at O-DU node level. It is up to the RAN SMO to configure consistent 20 
+values across the different O-DUs. 21 
+From TN point of view a same Pattern ID could be re -used by accident by two different RAN networks (sets of O-DUs) 22 
+while representing different pattern characteristics. The CTI Pattern ID is therefore defined at a per -CTI client level in 23 
+the TN, allowing to make such differentiation.  24 
+ 25 
+L2, L3, L4 Parameters for CTI connectivity: 26 
+As mentioned in section 3.2, different sorts of connectivity can be used  between pairs of clients and servers. Therefore 27 
+the parameters are grouped into a so -called “connectivity profile”, and pair of CTI client – CTI server can have its own 28 
+connectivity profile. In the O-DU the connectivity profiles are defined at top level, and each CTI session ID can refer to 29 
+a given connectivity profile. The same approach is done in the TN: connectivity profile at top level, and each CTI session 30 
+ID can refer to a given one.    31 
+Note that there is no distinction between message types (all message between a CTI client and CTI server use the same  32 
+connectivity parameters).  33 
+ 34 
+CTI timers 35 
+It is assumed that there will be no difference in timer values throughout the network, their values will be unique. The 36 
+timers are defined at the top level in the TN and O-DU YANG modules. 37 
+ 38 
+UDP listening port 39 
+When UDP/IP is used for CTI transport between a CTI client and a CTI server, all messages between all CTI servers and 40 
+all CTI clients over all networks  will use the sam e destination port value. Without a well -known IANA port, a single 41 
+value must be consistently configured in all TN and O-DU nodes.  42 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   29 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+CTI versions 2 
+Each TN can support one or more versions, each O -DU can support one or more versions. The supported versions a re a 3 
+list structure in the O-DU and in the TN. Each CTI client must know what versions are supported by a given CTI server, 4 
+and vice versa. The CTI version is defined per CTI client in the TN, per CTI server in the O -DU. 5 
+Please note there is no version negociation mechanism in CTI between a CTI client and a CTI server. 6 
+ 7 
+Ethertype and Protocol subtype values when CTI directly encapsulated in L2 8 
+The values for the O-RAN Ethertype and CTI Protocol Subtype are invariant over all networks. 9 
+ 10 
+5.2 CTI YANG Model Related to O-DU  11 
+5.2.1 Overview 12 
+The o-ran-cti-o-du module imports the o-ran-cti-common module and uses its structures. 13 
+The o-ran-cti-o-du module only describes the CTI aspect of the O-DU as stand-alone module (together with o-ran-14 
+cti-common). It can be imported in the wider O-DU YANG structure for O -DUs that support CTI. For O -DUs that do 15 
+not support CTI there is no change in their YANG structure.  16 
+ 17 
+5.2.2 O-RAN-CTI-Common 18 
+The o-ran-cti-common module defines common structures for the other modules, rather than commonly configured 19 
+values.  20 
+The actual configured values have to be coordinated between the different modules (by the RAN SMO and transport  21 
+OSS) for consistency. 22 
+As an example, a given CTI flow ID can be re-used in multiple CTI sessions between a CTI server and a CTI client , but 23 
+then represents the same Ethernet / UDPIP filters. Obviously its filter definition must be consistent between both TN and 24 
+O-DU sides.  25 
+ 26 
+Figure 5-2 :  Schematic overview of parameters in module o-ran-cti-common 27 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   30 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+5.2.3 O-RAN-CTI-O-DU 2 
+Generic elements, some of which imported from O-RAN-CTI-COMMON 3 
+O-RU ID or O-RU interface ID: these keys are needed for the auto-discovery process in section 4.2. Proposal is to use 4 
+Vendor code + product code (both ORAN SW + ORAN HW) + Serial nb (a .k.a. O-RU instance ID ). The format is 5 
+mentioned in Table 3-2. 6 
+CTI server name: unique identifier of a given CTI server, based on the Access Node Identifier. The format is mentioned 7 
+in Table 3-2. 8 
+CTI client name: unique identifier of a given CTI client, based on an O-DU Identifier which follows the same format as 9 
+O-RU ID. The format is mentioned in Table 3-2. 10 
+CTI flows in use: indicates for a given CTI session ID which CTI flows are being used. There is always at least one flow; 11 
+if there is no classification into different flows this is represented by CTI Flow ID=0x00. Each flow in use also contains 12 
+the T34max value, and the time interval per report for that flow. 13 
+CTI connectivity profile ; groups connectivity parameters for L2 or L2 + L3/L4 to communicate between a CTI client 14 
+and a given CTI server. 15 
+CTI client; contains all elements per client, e.g. which CTI session IDs are handled by that CTI client. Per CTI  session 16 
+ID there is a group (within the context of that client) of related parameters to that session, amongst which the flows in 17 
+use. In case of L2 connectivity the client also contains its unique L2 connectivity parameter , namely its MAC address. 18 
+CTI server; contains all elements per server, amongst which the CTI flows that need to be classified by that TN. Note 19 
+that each client can communicate to multiple servers, for multiple CTI session IDs per server. The server also contains its 20 
+unique connectivity parameters: in case of L2 connectivity the server's MAC address, and in case of UDP/IP connectivity 21 
+the server's host (IP address or FQDN). 22 
+ 23 
+Technology-sepcific elements: 24 
+Use of PON ranging: to indicate whether a given CTI server generates PON ranging notifications (per server), and from 25 
+O-DU perspective how much advance time it needs to receive such a message.  26 
+Min notification advance time; if PON ranging is used by one or many TNs, this parameter indicates how soon all CTI 27 
+clients of this O-DU need that information. 28 
+ 29 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   31 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 5-3 :  Schematic overview of parameters in module o-ran-cti-o-du  2 
+(including imported parameters from module o-ran-cti-common in blue) 3 
+ 4 
+5.3 CTI YANG Model Related to TN (informative) 5 
+5.3.1 Overview 6 
+The module o-ran-cti-o-tn-generic imports the module CTI common. 7 
+The modules o-ran-cti-o-tn-pon and o-ran-cti-o-tn-docsis import the module CTI common. 8 
+The module o-ran-cti-o-tn-generic is augmented with elements of the corresponding technology-specific module 9 
+(o-ran-cti-o-tn-pon or o-ran-cti-o-tn-docsis)  10 
+ 11 
+For TNs that do not support CTI there of course is no change in their YANG model.  12 
+ 13 
+5.3.2 O-RAN-CTI-Common  14 
+See 5.1.2 15 
+5.3.3 O-RAN-CTI-TN-generic 16 
+It includes generic elements, some of which imported from O-RAN-CTI-COMMON 17 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   32 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+CTI server-client pair; groups connectivity parameters at L2 or L2 + L3/L4 to communicate CTI messages between a 1 
+given CTI client and a given CTI server. This element is augmented with either PON -specific or DOCSIS specific 2 
+parameters. 3 
+CTI client name: unique identifier of a given CTI client, based on an O-DU Identifier which follows the same format as 4 
+O-RU ID. The format is mentioned in Table 3-2. 5 
+CTI client; contains elements per client on an O-DU, amongst which the patterns as defined in that CTI client. The client 6 
+also contains its unique connectivity parameters: in case of L2 connectivity the client’s MAC address, and in case of 7 
+UDP/IP connectivity the client’s host (IP address or FQDN). 8 
+CTI server name: unique identifier of a given CTI server, based on the Access Node Identifier. The format is mentioned 9 
+in Table 3-2. 10 
+CTI server; contains elements per server, amongst which the CTI Session IDs managed by that server.  In case of L2 11 
+connectivity the client also contains its unique L2 connectivity parameter , namely its MAC address. The server element 12 
+also includes a list of server-client pairs. This allows to define CTI connectivity at per client level for this server. 13 
+CTI Sessions : Per CTI session ID the related parameters like CTI client, CTI server, Nominal time interval for the 14 
+messages, technology-specific session info, and which flows are in use for that CTI session. Each CTI session ID is linked 15 
+to a single CTI client and single CTI server, and the CTI connectivity parameters can be deduced from the pair server -16 
+client.  17 
+CTI flows in use: indicates for a given CTI session ID which CTI flows are being used. There is always at least one flow; 18 
+if there is no classification into different flows this is represented by CTI Flow ID=0x00. Each flow in use also contains 19 
+the portion of the T34max value that can be spent as latency in the transport system. 20 
+ 21 
+It also includes technology-specific elements, which are augmented via either o-ran-cti-tn-pon or o-ran-cti-tn-docsis; 22 
+Technology-specific session info:  23 
+For PON refers to the Channel Termination, ONU (or ONU UNI) for a given CTI session ID. This allows to collect all 24 
+CTI session IDs per Channel Termination (for generating PON ranging notifications) and to link a given CTI session ID 25 
+to the T-CONT corresponding to that ONU (or ONU UNI). 26 
+For DOCSIS refers to the Cable Modem MAC address 27 
+Technology-specific flow info 28 
+For PON this is the T-CONT associated to given CTI session ID + CTI flow ID, to which Cooperative DBA must allocate 29 
+bandwidth based on the reports for that CTI flow ID in that CTI session ID. 30 
+For DOCSIS this is the Service Class Name and L2 flow or UDP/IP flow associated to given CTI session ID + CTI flow 31 
+ID. 32 
+Technology-specific client info:  selects whether to enable PON ranging notification , and defines (per CTI client) how 33 
+much time in advance the messages must be sent. 34 
+Technology-specific connectivity parameters are added directly into the server-client pair grouping. 35 
+ 36 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   33 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ 1 
+Figure 5-4 :  Schematic overview of parameters in module o-ran-cti-o-tn-generic 2 
+(including imported parameters from module o-ran-cti-common (in blue), 3 
+including parameters augmented from modules o-ran-cti-tn-pon (in yellow) and o-ran-cti-tn-docsis (in green)) 4 
+ 5 
+5.3.4 O-RAN-CTI-TN-PON 6 
+ 7 
+Figure 5-5 :  Schematic overview of parameters in module o-ran-cti-tn-pon 8 
+ 9 
+5.3.5 O-RAN-CTI-TN-DOCSIS 10 
+ 11 
+Figure 5-6 :  Schematic overviews of parameters in module o-ran-cti-tn-docsis 12 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   34 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+Annex A YANG Module Graphical Representation 1 
+ 2 
+The different released version of the set of YANG modules for the O -RU can be downloaded from O -RAN’s website 3 
+http://www.o-ran.org/specifications/ . The YANG models are available in a zip file, whose name is used to represent the 4 
+version of the YANG model and follows the numerical format defined in subsection 1.1 with the periods replaced with 5 
+“-”, i.e., YANG models for release 1.0.0 of the CTI TM -Plane specification are avai lable in the file 1 -0-0.zip. This zip 6 
+file includes all published revisions of the YANG models supporting a particular release of the CTI TM -Plane 7 
+specification. 8 
+This Annex provides a set of “tree -views” of the modules to provide a simplified graphical rep resentation of the data 9 
+models. These trees have been automatically generated using the pyang YANG validator tool. If there are any  10 
+inconsistencies between the tree representation in this Annex and the yang models, the yang models shall take precedence. 11 
+ 12 
+A.1 o-ran-cti-common.yang Module 13 
+The group structure for the module is provided below. This module does not generate tree view as groups are all 14 
+independent definitions. 15 
+ 16 
+ 17 
+ 18 
+
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   35 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+A.2 o-ran-cti-odu.yang Module 1 
+The tree structure for the module is provided below. 2 
+module: o-ran-cti-odu 3 
+  +--rw cti-odu 4 
+     +--rw protocol-subtype?                 uint16 5 
+     +--rw cti-listening-udp-port?           inet:port-number 6 
+     +--rw cti-ka                            uint8 7 
+     +--rw cti-to                            uint8 8 
+     +--ro cti-message-timing-performance    uint8 9 
+     +--ro cti-report-rate-category          uint8 10 
+     +--ro supported-versions*               or-ctic:cti-version 11 
+     +--rw pon-specific-info! 12 
+     |  +--rw min-notification-advance-time?   uint16 13 
+     +--rw docsis-specific-info! 14 
+     +--rw connectivity-profile* [profile-id] 15 
+     |  +--rw profile-id                  string 16 
+     |  +--rw server-name?                -> /cti-odu/cti-tn-server/name 17 
+     |  +--rw client-name?                -> /cti-odu/cti-client/name 18 
+     |  +--rw (connectivity-type)? 19 
+     |     +--:(ethernet) 20 
+     |     |  +--rw l2-connectivity 21 
+     |     |     +--rw vlan-tag?   -> /if:interfaces/interface/or-if:vlan-id 22 
+     |     +--:(udpip) 23 
+     |        +--rw udpip-connectivity 24 
+     |           +--rw vlan-tag?                -> /if:interfaces/interface/or-if:vlan-id 25 
+     |           +--rw cti-client-ip-address?   or-ctic:local-ipv4-or-ipv6 26 
+     +--rw patterns* [pattern-id] 27 
+     |  +--rw pattern-id                  uint32 28 
+     |  +--rw pattern-duration?           uint8 29 
+     |  +--rw pattern-events?             uint8 30 
+     |  +--rw pattern-event-multiplier?   uint8 31 
+     |  +--rw pattern-event-bytes?        uint16 32 
+     +--rw cti-client* [name] 33 
+     |  +--rw name                         string 34 
+     |  +--rw cti-enable                   boolean 35 
+     |  +--rw (connectivity-type)? 36 
+     |  |  +--:(ethernet) 37 
+     |  |     +--rw cti-client-mac-addr?   -> /if:interfaces/interface/phys-address 38 
+     |  +--rw cti-session* [id] 39 
+     |     +--rw id                                       string 40 
+     |     +--rw o-ru-id?                                 string 41 
+     |     +--rw o-ru-interface-id?                       string 42 
+     |     +--rw cti-server                               -> /cti-odu/cti-tn-server/name 43 
+     |     +--rw cti-connectivity-profile-id?             -> /cti-odu/connectivity-profile/profile-id 44 
+     |     +--rw cti-nominal-report-msg-interval          uint8 45 
+     |     +--rw cti-report-messaging-use-of-type1-ext?   boolean 46 
+     |     +--rw cti-flows-in-use* [cti-flow-id] 47 
+     |        +--rw cti-flow-id                 -> /cti-odu/cti-tn-server/cti-flows/flow-id 48 
+     |        +--rw time-interval-per-report?   uint8 49 
+     |        +--rw max-t34-latency?            uint16 50 
+     +--rw cti-tn-server* [name] 51 
+        +--rw name                                  string 52 
+        +--rw (connectivity-type)? 53 
+        |  +--:(ethernet) 54 
+        |  |  +--rw cti-server-mac-addr?            yang:mac-address 55 
+        |  +--:(udpip) 56 
+        |     +--rw cti-server-host?                inet:host 57 
+        +--rw cti-enable?                           boolean 58 
+        +--rw version*                              or-ctic:cti-version 59 
+        +--rw cti-report-messaging-use-of-type-2?   boolean 60 
+        +--rw cti-flows* [flow-id] 61 
+        |  +--rw flow-id             uint8 62 
+        |  +--rw (filter-type)? 63 
+        |     +--:(ethernet) 64 
+        |     |  +--rw l2-flow 65 
+        |     |     +--rw source-mac?        yang:mac-address 66 
+        |     |     +--rw destination-mac?   yang:mac-address 67 
+        |     |     +--rw ethertype?         ethertype 68 
+        |     |     +--rw pcp?               or-types:pcp 69 
+        |     |     +--rw vlan-id?           or-types:vlan-id 70 
+        |     +--:(udpip) 71 
+        |        +--rw udpip-flow 72 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   36 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+        |           +--rw source-address?           inet:ip-address 1 
+        |           +--rw source-prefix?            inet:ip-prefix 2 
+        |           +--rw destination-address?      inet:ip-address 3 
+        |           +--rw destination-prefix?       inet:ip-prefix 4 
+        |           +--rw dscp?                     inet:dscp 5 
+        |           +--rw source-port-start?        inet:port-number 6 
+        |           +--rw source-port-end?          inet:port-number 7 
+        |           +--rw destination-port-start?   inet:port-number 8 
+        |           +--rw destination-port-end?     inet:port-number 9 
+        |           +--rw ipv4-protocol?            uint8 10 
+        |           +--rw ipv6-traffic-class?       uint8 11 
+        |           +--rw ipv6-flow?                inet:ipv6-flow-label 12 
+        |           +--rw ipv6-next-header?         uint8 13 
+        +--rw pon-specific-server-info! 14 
+        |  +--rw use-notification-from-this-cti-server?   boolean 15 
+        +--rw docsis-specific-server-info! 16 
+ 17 
+A.3 o-ran-cti-tn-generic.yang Module 18 
+The tree structure for the module is provided below. 19 
+module: o-ran-cti-tn-generic 20 
+  +--rw cti-tn 21 
+     +--rw transport-type?                      identityref 22 
+     +--rw protocol-subtype?                    uint16 23 
+     +--rw cti-listening-udp-port?              inet:port-number 24 
+     +--rw cti-ka                               uint8 25 
+     +--rw cti-to                               uint8 26 
+     +--ro tn-cti-message-timing-performance    uint8 27 
+     +--ro cti-report-rate-category             uint8 28 
+     +--ro supported-versions*                  or-ctic:cti-version 29 
+     +--rw cti-client* [name] 30 
+     |  +--rw name                               string 31 
+     |  +--rw cti-enable                         boolean 32 
+     |  +--rw version*                           or-ctic:cti-version 33 
+     |  +--rw (connectivity-type)? 34 
+     |  |  +--:(ethernet) 35 
+     |  |  |  +--rw cti-client-mac-addr?         yang:mac-address 36 
+     |  |  +--:(udpip) 37 
+     |  |     +--rw cti-client-host?             inet:host 38 
+     |  +--rw technology-specific-client-info 39 
+     |  +--rw patterns* [pattern-id] 40 
+     |     +--rw pattern-id                  uint32 41 
+     |     +--rw pattern-duration?           uint8 42 
+     |     +--rw pattern-events?             uint8 43 
+     |     +--rw pattern-event-multiplier?   uint8 44 
+     |     +--rw pattern-event-bytes?        uint16 45 
+     +--rw cti-tn-server* [name] 46 
+     |  +--rw name                  string 47 
+     |  +--rw cti-enable?           boolean 48 
+     |  +--ro cti-session-ids*      -> /cti-tn/cti-session/id 49 
+     |  +--rw server-client-pair* [client-name] 50 
+     |     +--rw client-name    -> /cti-tn/cti-client/name 51 
+     +--rw cti-session* [id] 52 
+        +--rw id                                  string 53 
+        +--rw cti-client                          -> /cti-tn/cti-client/name 54 
+        +--rw cti-tn-server                       -> /cti-tn/cti-tn-server/name 55 
+        +--rw cti-nominal-report-msg-interval     uint8 56 
+        +--rw cti-flows* [cti-flow-id] 57 
+        |  +--rw cti-flow-id                      uint8 58 
+        |  +--rw max-portion-t34-latency?         uint16 59 
+        |  +--rw technology-specific-flow-info 60 
+        +--rw technology-specific-session-info 61 
+ 62 
+ 63 
+ 64 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   37 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+A.4 o-ran-cti-tn-pon.yang module 1 
+The tree structure for the module is provided below. 2 
+module: o-ran-cti-tn-pon 3 
+  augment /or-ctig:cti-tn/or-ctig:cti-session/or-ctig:technology-specific-session-info: 4 
+    +--rw olt-channel-termination-ref?   if:interface-ref 5 
+    +--rw cti-session-id-ingress?        if:interface-ref 6 
+  augment /or-ctig:cti-tn/or-ctig:cti-session/or-ctig:cti-flows/or-ctig:technology-specific-flow-info: 7 
+    +--rw associated-tcont?   -> /bbf-xpongemtcont:xpongemtcont/tconts/tcont/name 8 
+  augment /or-ctig:cti-tn/or-ctig:cti-client/or-ctig:technology-specific-client-info: 9 
+    +--rw use-notifications                boolean 10 
+    +--rw min-notification-time-advance?   uint16 11 
+  augment /or-ctig:cti-tn/or-ctig:cti-tn-server/or-ctig:server-client-pair: 12 
+    +--rw cti-l2-interface?   if:interface-ref 13 
+    +--rw cti-use-of-ip?      boolean 14 
+ 15 
+A.5 o-ran-cti-tn-docsis.yang Module 16 
+The tree structure for the module is provided below. 17 
+module: o-ran-cti-tn-docsis 18 
+  augment /or-ctig:cti-tn/or-ctig:cti-session/or-ctig:technology-specific-session-info: 19 
+    +--rw cm-mac-address?   yang:mac-address 20 
+  augment /or-ctig:cti-tn/or-ctig:cti-session/or-ctig:cti-flows/or-ctig:technology-specific-flow-info: 21 
+    +--rw associated-scn?     string 22 
+    +--rw (filter-type)? 23 
+       +--:(ethernet) 24 
+       |  +--rw l2-flow 25 
+       |     +--rw source-mac?        yang:mac-address 26 
+       |     +--rw destination-mac?   yang:mac-address 27 
+       |     +--rw ethertype?         ethertype 28 
+       |     +--rw pcp?               or-types:pcp 29 
+       |     +--rw vlan-id?           or-types:vlan-id 30 
+       +--:(udpip) 31 
+          +--rw udpip-flow 32 
+             +--rw source-address?           inet:ip-address 33 
+             +--rw source-prefix?            inet:ip-prefix 34 
+             +--rw destination-address?      inet:ip-address 35 
+             +--rw destination-prefix?       inet:ip-prefix 36 
+             +--rw dscp?                     inet:dscp 37 
+             +--rw source-port-start?        inet:port-number 38 
+             +--rw source-port-end?          inet:port-number 39 
+             +--rw destination-port-start?   inet:port-number 40 
+             +--rw destination-port-end?     inet:port-number 41 
+             +--rw ipv4-protocol?            uint8 42 
+             +--rw ipv6-traffic-class?       uint8 43 
+             +--rw ipv6-flow?                inet:ipv6-flow-label 44 
+             +--rw ipv6-next-header?         uint8 45 
+  augment /or-ctig:cti-tn/or-ctig:cti-tn-server/or-ctig:server-client-pair: 46 
+    +--rw l4-cti-if 47 
+       +--rw cti-server-ip-interface-ref?   or-ctic:local-ipv4-or-ipv6 48 
+       +--rw vlan-id?                       or-types:vlan-id 49 
+ 50 
+ 51 
+ 52 
+ 53 
+ 54 
+ 55 
+ 56 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   38 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+Annex ZZZ O-RAN Adopter License Agreement 1 
+ 2 
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O -RAN SPECIFICATION, ADOPTE R 3 
+AGREES TO THE TERMS OF THIS AGREEMENT. 4 
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity 5 
+that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”). 6 
+This is a license agreement for entities who wish to adopt any O-RAN Specification. 7 
+ZZZ.1 Section 1: DEFINITIONS 8 
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with 9 
+another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of 10 
+fifty (50%) percent or more of the voting stock or equity in an entity. 11 
+1.2 “Compliant Implementation” means any system, device, method or operation (wh ether implemented in hardware, 12 
+software or combinations thereof) that fully conforms to a Final Specification. 13 
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their 14 
+Affiliates, who wish to download, use or otherwise access O-RAN Specifications. 15 
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not 16 
+add any significant new features or functionality and remains interoperable with the prior ve rsion of an O -RAN 17 
+Specification. The term “O-RAN Specifications” includes Minor Updates. 18 
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design 19 
+patents and design registrations, throughout the  world, which (i) are owned or otherwise licensable by a Member, 20 
+Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such 21 
+Member, Contributor or Academic Contributor has the right to grant a lice nse without the payment of consideration to a 22 
+third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not 23 
+included in the Final Specification). A claim is necessarily infringed only when it is n ot possible on technical (but not 24 
+commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date 25 
+any Final Specification was published by the O -RAN Alliance or the date the patent claim first cam e into existence, 26 
+whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation 27 
+without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be 28 
+implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered 29 
+Necessary Claims. 30 
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, 31 
+Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term 32 
+allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing 33 
+Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates. 34 
+ZZZ.2 Section 2: COPYRIGHT LICENSE 35 
+2.1 Subject to the terms and conditions of this Agreement, O -RAN Alliance hereby grants to Adopter a nonexclusive, 36 
+nontransferable, irrevocable, non -sublicensable, worl dwide copyright license to obtain, use and modify O -RAN 37 
+Specifications, but not to further distribute such O -RAN Specification in any modified or unmodified way, solely in 38 
+furtherance of implementations of an ORAN Specification. 39 
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written 40 
+agreement with O-RAN Alliance. 41 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   39 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ZZZ.3 Section 3: FRAND LICENSE 1 
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based o n a separate 2 
+Patent License Agreement to each Adopter under Fair Reasonable And Non - Discriminatory (FRAND) terms and 3 
+conditions with or without compensation (royalties) a nonexclusive, non -transferable, irrevocable (but subject to 4 
+Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, 5 
+use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such 6 
+license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that 7 
+is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant 8 
+to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the 9 
+foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s 10 
+customers of such licensed Compliant Implementations. 11 
+3.2 Notwithstanding the a bove, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has 12 
+reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter 13 
+is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and 14 
+its Affiliates for its license of Necessary Claims to its licensees. 15 
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement 16 
+to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non -17 
+Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non -18 
+transferable, irrevocable (but subject to Defensive Suspension), non -sublicensable, worldwide patent license under their 19 
+Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant 20 
+Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a 21 
+Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, 22 
+Contributors, Academic Contributors, Adopters and their Affiliate s that is not making a reciprocal grant to Adopter, as 23 
+set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the 24 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates ’ distributors and the use by the 25 
+Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant 26 
+Implementations. 27 
+ZZZ.4 Section 4: TERM AND TERMINATION 28 
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4. 29 
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement 30 
+if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) 31 
+days after being given notice specifying the breach. 32 
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, 33 
+after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the 34 
+date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the version 35 
+that was current as of the date of termination. 36 
+ZZZ.5 Section 5: CONFIDENTIALITY 37 
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O -RAN 38 
+Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. 39 
+Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of 40 
+confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any 41 
+information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) 42 
+publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by 43 
+O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on 44 
+such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized 45 
+governmental body, or as required by law, provided that Adopter provi des reasonable prior written notice to O -RAN 46 
+Alliance, and cooperates with O -RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to 47 
+have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval. 48 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   40 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+ZZZ.6 Section 6: INDEMNIFICATION 1 
+Adopter shall indemnify, defend, and hold harmless the O -RAN Alliance, its Members, Contributors or Academic 2 
+Contributors, and their employees, and agents and their respective successors, heirs and assigns  (the “Indemnitees”), 3 
+against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed 4 
+upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments  arising 5 
+out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with 6 
+O-RAN Specifications. 7 
+ZZZ.7 Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY 8 
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S 9 
+INDEMNIFICATION OBLIGATIONS, IN NO EVENT shall ANY PARTY BE LIABLE TO ANY OTHER PARTY 10 
+OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL 11 
+DAMAGES RESULTING FROM ITS PERFORMANCE OR NON -PERFORMANCE UNDER T HIS AGREEMENT, 12 
+IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR 13 
+NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O -RAN 14 
+SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, 15 
+WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O -RAN ALLIANCE AND THE 16 
+MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY 17 
+OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, 18 
+FITNESS FOR ANY PAR TICULAR PURPOSE, ERROR -FREE OPERATION, OR ANY WARRANTY OR 19 
+CONDITION FOR O-RAN SPECIFICATIONS. 20 
+ZZZ.8 Section 8: ASSIGNMENT 21 
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or 22 
+other sublicenses to thi s Agreement, except as expressly authorized hereunder, without having first received the prior, 23 
+written consent of the O -RAN Alliance, which consent may be withheld in O -RAN Alliance’s sole discretion. O -RAN 24 
+Alliance may freely assign this Agreement. 25 
+ZZZ.9 Section 9: THIRD-PARTY BENEFICIARY RIGHTS 26 
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, 27 
+Contributors and Academic Contributors) are entitled to rights as a third -party beneficiary under this  Agreement, 28 
+including as licensees under Section 3. 29 
+ZZZ.10 Section 10: BINDING ON AFFILIATES 30 
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or 31 
+association’s agreement that its Affiliates are  likewise bound to the obligations that are applicable to Adopter hereunder 32 
+and are also entitled to the benefits of the rights of Adopter hereunder. 33 
+ZZZ.11 Section 11: GENERAL 34 
+This Agreement is governed by the laws of Germany without regard to its conflict or ch oice of law provisions.  35 
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly 36 
+supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relati ng 37 
+to the subject matter of this Agreement.  38 
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulation s 39 
+with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and 40 
+antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any 41 
+communication that would violate the antitrust laws. 42 
+
+ 
+________________________________________________________________________________________________ 
+Copyright © 2021 by the O-RAN ALLIANCE e.V. 
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ.        
+   41 
+O-RAN.WG4.CTI-TMP.0-v01.00 
+By execution hereof, no form of any partner ship, joint venture or other special relationship is created between Adopter, 1 
+or O -RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this 2 
+Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, 3 
+Contributors or Academic Contributors. 4 
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void 5 
+or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from 6 
+the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full 7 
+force and effect. 8 
+Any failure by a party or third party ben eficiary to insist upon or enforce performance by another party of any of the 9 
+provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be 10 
+construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or 11 
+rely upon any such provision, right  or remedy in that or any other instance; rather the same shall be and remain in full 12 
+force and effect. 13 

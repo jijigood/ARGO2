@@ -1,0 +1,1144 @@
+O-RAN.WG5.C.1-v04.00
+O-RAN.WG5.C.1-v04.00
+Technical Specification
+O-RAN Open F1/W1/E1/X2/Xn Interfaces Working Group
+NR C-plane profile
+Copyright © 2021 by the O-RAN Alliance e.V.
+By using, accessing or downloading any part of this O-RAN specification document, including by copying, saving, distributing, displaying or preparing derivatives of, you agree to be and are bound to the terms of the O-RAN Adopter License Agreement contained in Annex ZZZ of this specification. All other rights reserved.
+O-RAN ALLIANCE e.V.
+Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238
+VAT ID DE321720189.
+Copyright © 2021 by the O-RAN Alliance e.V.
+Your use is subject to the terms of the O-RAN Adopter License Agreement in Annex ZZZ											  1
+Revision History
+Contents
+Revision History	2
+1	Scope	6
+1.1	UE connectivity options used in this document	7
+1.1.1	NR Non-Standalone (NSA)	7
+1.1.2	NR Standalone (SA)	8
+2	References	9
+3	Definitions and abbreviations	9
+3.1	Definitions	9
+3.2	Abbreviations	9
+4	Non-UE associated procedures	10
+4.1	X2-C and F1-C for EN-DC	10
+4.1.1	EN-DC X2 Setup	10
+4.1.2	Reset	12
+4.1.3	EN-DC Configuration Update	14
+4.1.4	Partial Reset	16
+4.1.5	F1 Setup	19
+4.1.6	gNB-DU Configuration Update	20
+4.1.7	gNB-CU Configuration Update	22
+4.2	Xn-C and F1-C for NR Stand-Alone	23
+4.2.1	Xn Setup	23
+4.2.2	Reset	24
+4.2.3	F1 Setup	26
+4.2.4	gNB-DU configuration update	27
+4.2.5	gNB-CU configuration update	29
+4.2.6	Paging (CN-initiated)	30
+4.2.7	Write-Replace Warning	31
+5	EN-DC procedures	32
+5.1	Secondary Node Addition	32
+5.1.1	Secondary Node Addition (Option 3x)	32
+5.1.2	Secondary Node Addition (Option 3a)	34
+5.2	Secondary Node Release	36
+5.2.1	Secondary Node Release (MN initiated, Option 3x or 2x)	36
+5.2.2	Secondary Node Release (SN initiated, Option 3x or 2x)	38
+5.2.3	Secondary Node Release (MN initiated, Option 3a)	40
+5.2.4	Secondary Node Release (SN initiated, Option 3a)	43
+5.3	Secondary Node Change	45
+5.3.1	Secondary Node Change (MN initiated, Option 3x)	45
+5.3.2	Secondary Node Change (SN initiated, Option 3x)	47
+5.4	Inter-Master Node Handover	48
+5.4.1	Inter-Master Node Handover (without SN Change, Option 3x)	48
+5.5	Master Node to eNB/gNB Change	51
+5.5.1	Master Node to eNB Change	51
+5.6	Secondary Node Modification	53
+5.6.1	PCell change (Intra MN) (MN initiated)	53
+5.6.2	Allowed Band Combination list update by PCell/SCell change (MN initiated)	55
+5.6.3	Configured Band Combination update by PSCell/SCell change (SN initiated)	57
+5.6.4	SCG config query (MN initiated)	57
+5.6.5	Security Key Change Procedure (MN initiated)	58
+5.6.6	Measurement Gap Coordination Procedure (MN initiated)	61
+5.6.7	Measurement Gap Coordination for per FR1 or per UE gap Procedure (SN initiated)	63
+5.6.8	Measurement Gap Coordination for per FR2 gap (with MN involvement) Procedure (SN initiated)	65
+5.6.8a	Measurement Gap Coordination for per FR2 gap (without MN involvement) Procedure (SN initiated)	67
+5.6.9	UL Configuration Update Procedure (SN initiated)	68
+5.6.10	Addition of SN terminated split bearer (MN initiated)	69
+5.6.11	Removal of SN terminated split bearer (MN initiated)	71
+5.6.12	Bearer type change from SN terminated split bearer to SN terminated MCG bearer (MN initiated)	73
+5.6.13	Bearer type change from SN terminated MCG bearer to SN terminated split bearer (MN initiated)	75
+5.6.14	Bearer type change from SN terminated split bearer to SN terminated MCG bearer (SN initiated)	76
+5.6.15	PSCell Change using SRB1 for RRC Reconfiguration – full configuration option	78
+5.6.16	PSCell Change using SRB1 for RRC Reconfiguration – delta configuration option	81
+5.6.17	Intra gNB-DU PSCell Change using SRB1 for RRC Reconfiguration	84
+5.6.18	Inter gNB-DU PSCell Change using SRB3 for RRC Reconfiguration	86
+5.6.19	Intra gNB-DU PSCell Change using SRB3 for RRC Reconfiguration	88
+5.6.20	gNB-DU configuration query	89
+5.6.21	DRB ID change (SN initiated)	89
+5.6.22	Full Reconfiguration (SN initiated)	91
+5.7	RRC Transfer	93
+5.7.1	UE measurement transfer	93
+5.8	E-UTRA – NR Cell Resource Coordination	94
+5.8.1	E-UTRA - NR Cell Resource Coordination (MN initiated, Option 3x/3a)	94
+5.8.2	E-UTRA - NR Cell Resource Coordination (SN initiated, Option 3x/3a)	96
+6	NR procedures	98
+6.1	UE Initial Access	98
+6.1.1	UE context creation (service request)	98
+6.1.2	UE context creation (registration request)	99
+6.2 	UE Context Release	101
+6.2.1	UE Context Release	101
+6.3	UE Context Modification	102
+6.3.1	Message Flow	102
+6.4	Inter gNB-Handover	104
+6.4.1	Inter gNB HO	104
+6.5	 Intra gNB-Handover	105
+6.5.1	Intra gNB-DU, Intra Cell Handover	105
+6.5.2	Intra gNB-DU, Inter Cell Handover	106
+6.5.3	Inter gNB-DU Handover	107
+6.6	 <void>	108
+6.7	 <void>	108
+6.8	 Inter RAT Handover	108
+6.8.1	Inter RAT HO to LTE	108
+6.9	 RRC state transition	109
+6.9.1	RRC connected to RRC inactive	109
+6.9.2	RRC inactive to RRC connected	110
+6.10 	RRC Connection Re-establishment	111
+6.10.1	RRC Connection Re-establishment (Intra gNB-DU)	111
+6.10.2	RRC Connection Re-establishment (Inter gNB-DU)	112
+7	NR-DC procedures	114
+7.1	S-NG-RAN NODE ADDITION	114
+7.1.1	S-NG-RAN Node Addition	114
+7.2	S-NG-RAN NODE MODIFICATION	116
+7.2.1	M-NG-RAN node initiated SN modification	116
+7.2.2	S-NG-RAN node initiated SN modification with MN involvement	123
+7.2.3	S-NG-RAN node initiated SN modification without MN involvement	127
+7.3	S-NG-RAN NODE RELEASE	129
+7.3.1	M-NG-RAN node initiated S-NG-RAN Node Release without keeping UE	129
+7.3.2	M-NG-RAN node initiated S-NG-RAN Node Release with keeping UE	131
+7.3.3	S-NG-RAN node initiated S-NG-RAN Node Release	133
+Annex ZZZ: O-RAN Adopter License Agreement	137
+Section 1: DEFINITIONS	137
+Section 2: COPYRIGHT LICENSE	137
+Section 3: FRAND LICENSE	137
+Section 4: TERM AND TERMINATION	138
+Section 5: CONFIDENTIALITY	138
+Section 6: INDEMNIFICATION	138
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY	139
+Section 8: ASSIGNMENT	139
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS	139
+Section 10: BINDING ON AFFILIATES	139
+Section 11: GENERAL	139
+1	Scope
+The present document provides profiles for C-plane procedures and functions to achieve interoperability among different vendors. The profile specifies the expected behavior of each node, e.g., message flow of each use case, definitions of IEs, etc. which is not specified in 3GPP specifications. The profile specification provided in this document does not violate 3GPP specifications.
+The use cases in this specification cover selected 3GPP functionalities. 
+In the IE tables:
+If optional IEs are essential for a use case to work, they are categorized ‘included’ in the IE tables.
+If optional IEs are used under certain conditions applicable for this use case, they are categorized ‘optionally included’.
+If optional IEs are not essential for the use case, they are set to ‘not included’.
+One or more use cases described in this document can be initiated in a single procedure if this is allowed by 3GPP specifications. In these cases, the IE tables need to be augmented and the ‘included’ IEs of the procedure are the combination of ‘included’ IEs of the individual use cases, unless otherwise specified in 3GPP.
+In addition, it is also possible to combine the initiation of one or multiple use cases of this document with other functions of the 3GPP procedure as defined in the relevant 3GPP specifications.
+The use cases are described based on following two architectures defined by 3GPP for 5G.
+For a description of the overall architecture in E-UTRA NR Dual Connectivity (EN-DC) also known as NR Non-Standalone (NSA) as depicted in Figure 1-1 see TS 37.340 [1].
+Figure 1-1:	EN-DC Overall Architecture
+The overall architecture of NG-RAN as shown in Figure 1-2 is described in TS 38.300 [6].
+Figure 1-2:	NG-RAN Overall Architecture
+1.1	UE connectivity options used in this document
+3GPP architecture provides different options in the way a UE can be connected to the network. Throughout this document the configuration options as explained in the following chapters are used. Note that these chapters focus on explaining the connectivity for the profiled use case. There might be additional bearers such as MCG or default bearers that are not shown in the figures.
+1.1.1	NR Non-Standalone (NSA)
+In NSA architecture the UE relies on LTE access to attach to EPC network and uses NR as secondary RAT for increased throughput using dual connectivity. In this version of the specification EN-DC is used with two different options to establish the UP bearer(s).
+1.1.1.1	SN terminated SCG bearer (‘Option 3a’)
+First option is typically referred to as ‘Option 3a’. The PDCP and S1-U terminate in en-gNB acting as Secondary Node (SN). From there SCG bearers are used to convey UP data to/from the UE (‘SN terminated SCG bearer’).
+Figure 1.1.1.1-1:	SN terminated SCG bearer (‘Option 3a’)
+1.1.1.2	SN terminated split bearer (‘Option 3x’)
+This option also terminates UP PDCP in SN en-gNB, but the SN en-gNB splits the UP bearer in two legs utilizing X2-U and, if applicable F1-U, to send / receive UP data to/from the UE via bearer using RLC in both, MCG and SCG. This UE connectivity option is referred to as ‘Option 3x’ or ‘SN terminated split bearer’.
+Figure 1.1.1.2-1:	SN terminated split bearer (‘Option 3x’)
+1.1.2	NR Standalone (SA)
+In NR SA, also referred to as ‘Option 2’, the NG-RAN based on gNB RAN nodes only is connected to 5GC, i.e. no EPC is involved and ng-eNBs are not considered to be part of NG-RAN.
+1.1.2.1	NR-DC with SN terminated Split bearer
+In case a UE connects with option 2 and uses NR-NR dual connectivity (NR-DC) this specification in its current version is profiling cases where MN and SN are gNBs. 3GPP shows options to terminate NG-U on MN, SN or both. Current version of this specification considers use cases with PDCP terminated on SN. SN splits the UP bearer in a leg via Xn-U and, if applicable F1-U, to convey UP data via bearer using RLC in both, MCG and SCG (‘SN terminated split bearer’).
+When profiling the NR SA SN terminated split bearer cases it was further assumed that MN is serving FR1 cells with a larger coverage area than FR2 cells served by SN.  By that the amount of unwanted mobility inter MN mobility events is reduced.
+Figure 1.1.2.1-1:	NR-DC with SN terminated split bearer
+2	References
+The following documents contain provisions which, through reference in this text, constitute provisions of the present document.
+-	References are either specific (identified by date of publication, edition number, version number, etc.) or non-specific.
+-	For a specific reference, subsequent revisions do not apply.
+-	For a non-specific reference, the latest version applies.
+[1]	3GPP TS 37.340 V15.10.0: "Evolved Universal Terrestrial Radio Access (E-UTRA) and NR; Multi-connectivity; Stage 2".
+[2]	3GPP TS 36.423 V15.11.0: "Evolved Universal Terrestrial Radio Access Network (E-UTRAN); X2 Application Protocol (X2AP)".
+[3]	3GPP TS 38.473 V15.11.1: "NG-RAN; F1 Application Protocol (F1AP)".
+[4]	3GPP TS 38.331 V15.11.0: "NR; Radio Resource Control (RRC) Protocol Specification".
+[5]	3GPP TS 38.423 V15.9.0: "NG-RAN; Xn application protocol (XnAP)".
+[6]	3GPP TS 38.300 V15.11.0: "NR; NR and NG-RAN Overall Description; Stage 2"
+[7]					3GPP TS 38.401 V15.9.0: "NG-RAN Architecture description"
+3	Definitions and abbreviations
+3.1	Definitions
+Definitions used in this specification refer to the ones defined in the referenced 3GPP specifications.
+3.2	Abbreviations
+Abbreviations used in this specification refer to the ones defined in the referenced 3GPP specifications.
+4	Non-UE associated procedures
+4.1	X2-C and F1-C for EN-DC
+This section provides the relevant profiling information to achieve interoperability for non-UE associated procedures as defined in TS 36.423 [2] and TS 38.473 [3]. In this version of the profile, the following procedures are defined:
+EN-DC X2 Setup;
+Reset (for X2 and F1);
+EN-DC Configuration Update;
+Partial Reset;
+F1 Setup;
+gNB-DU Configuration Update;
+gNB-CU Configuration Update.
+4.1.1	EN-DC X2 Setup
+4.1.1.1	EN-DC X2 Setup (eNB initiated)
+The following parameter condition is applied for this procedure.
+NR neighbour information IE can optionally be used for:
+UC1: 	eNB sending NR neighbour cell information per E-UTRAN cell to en-gNB for inter-en-gNB mobility
+UC2:	en-gNBs sending NR neighbour cell information per NR cell to eNB for building NR neighbour relations
+4.1.1.1.1	Message flow for X2
+Figure 4.1.1.1.1-1: eNB Initiated EN-DC X2 Setup, successful operation
+4.1.1.1.2	X2-C IE handling
+4.1.1.2	EN-DC X2 Setup (en-gNB initiated)
+The following parameter condition is applied for this procedure.
+NR neighbour information IE can optionally be used for:
+UC1: 	eNB sending NR neighbour cell information per E-UTRAN cell to en-gNB for inter-en-gNB mobility
+UC2:	en-gNBs sending NR neighbour cell information per NR cell to eNB for building NR neighbour relations
+4.1.1.2.1	Message flow for X2
+Figure 4.1.1.2.1-1: en-gNB Initiated EN-DC X2 Setup, successful operation
+4.1.1.2.2	X2-C IE handling
+4.1.2	Reset
+4.1.2.1	Reset (eNB initiated)
+4.1.2.1.1	Message flow for X2
+Figure 4.1.2.1.1-1: eNB initiated Reset, successful operation
+4.1.2.1.2	X2-C IE handling
+4.1.2.2	Reset (en-gNB initiated)
+4.1.2.2.1	Message flow for X2
+Figure 4.1.2.2.1-1: en-gNB initiated Reset, successful operation
+4.1.2.2.2	X2-C IE handling
+4.1.2.3	Reset (gNB-DU initiated)
+4.1.2.3.1	Message flow for X2 and F1
+Figure 4.1.2.3.1-1: gNB-DU initiated (Whole) Reset, successful operation
+NOTE1:	If part of UE associations over the X2 interface are affected by F1 Reset procedure, then PARTIAL RESET REQUIRED message is sent from the gNB-CU and PARTIAL RESET CONFIRM message is sent from the MeNB.
+NOTE2:	If all of UE associations over the X2 interface are affected by F1 Reset procedure, then up to implementation, either PARTIAL RESET REQUIRED message or RESET REQUEST message is sent from the gNB-CU. PARTIAL RESET CONFIRM message or RESET RESPONSE message is sent from the MeNB/eNB accordingly.
+4.1.2.3.2	F1-C IE handling
+4.1.2.4	Reset (gNB-CU initiated)
+4.1.2.4.1	Message flow for X2 and F1
+Figure 4.1.2.4.1-1: gNB-CU initiated (Whole) Reset, successful operation
+NOTE1:	The timing of sending the Step 1a RESET message is an example, it may be sent e.g. after step 2 and it is up to implementation.
+4.1.2.4.2	F1-C IE handling
+4.1.3	EN-DC Configuration Update
+4.1.3.1	Served NR cell information Update (en-gNB initiated)
+The following parameter condition is applied for this procedure.
+NR neighbour information IE can optionally be used for:
+UC2:	en-gNBs sending NR neighbour cell information per NR cell to eNB for building NR neighbour relations
+4.1.3.1.1	Message flow for X2
+Figure 4.1.3.1.1-1: en-gNB Initiated EN-DC Configuration Update, successful operation
+4.1.3.1.2	X2-C IE handling
+4.1.3.2	Served LTE cell information Update (eNB initiated)
+The following parameter condition is applied for this procedure.
+NR neighbour information IE can optionally be used for:
+UC1: 	eNB sending NR neighbour cell information per E-UTRAN cell to en-gNB for inter-en-gNB mobility
+UC2:	en-gNBs sending NR neighbour cell information per NR cell to eNB for building NR neighbour relations
+4.1.3.2.1	Message flow for X2
+Figure 4.1.3.2.1-1: eNB Initiated EN-DC Configuration Update, successful operation
+4.1.3.2.2	X2-C IE handling
+4.1.4	Partial Reset
+4.1.4.1	Partial Reset (MeNB initiated)
+4.1.4.1.1	Message flow for X2
+Figure 4.1.4.1.1-1: MeNB initiated Partial Reset of EN-DC, successful operation.
+4.1.4.1.2	X2-C IE handling
+4.1.4.1.3	Message flow for X2 and F1
+Figure 4.1.4.1.3-1: MeNB initiated Partial Reset, successful operation
+NOTE1:	If multiple gNB-DUs are configured and a certain gNB-DU has allocated one or more UE contexts, the gNB-CU performs OPT.
+NOTE2:	The timing of sending the Step 1a RESET message is an example, it may be sent e.g. before step 2 and it is up to implementation.
+NOTE3:	The timing of sending the Step 2 PARTIAL RESET CONFIRM message is an example, it may be sent e.g. after step 1a or step 1b and it is up to implementation.
+4.1.4.1.4	F1-C IE handling
+4.1.4.2	Partial Reset (en-gNB initiated)
+4.1.4.2.1	Message flow for X2
+Figure 4.1.4.2.1-1: en-gNB initiated Partial Reset of EN-DC, successful operation.
+4.1.4.2.2	X2-C IE handling
+4.1.4.3	Partial Reset (gNB-DU initiated)
+4.1.4.3.1	Message flow for X2 and F1
+Figure 4.1.4.3.1-1: gNB-DU initiated Partial Reset, successful operation
+4.1.4.3.2	F1-C IE handling
+4.1.4.4	Partial Reset (gNB-CU initiated)
+4.1.4.4.1	Message flow for X2 and F1
+Figure 4.1.4.4.1-1: gNB-CU initiated Partial Reset, successful operation
+NOTE1:	If multiple gNB-DUs are configured and a certain gNB-DU has allocated one or more UE contexts, the gNB-CU performs OPT.
+NOTE2:	The timing of sending the Step 1a RESET message is an example, it may be sent e.g. after step 2 and it is up to implementation.
+4.1.4.4.2	F1-C IE handling
+4.1.5	F1 Setup
+4.1.5.1	F1 Setup
+The following parameter condition is applied for this procedure.
+4.1.5.1.1	Message flow for X2 and F1
+Figure 4.1.5.1.1-1: F1 Setup, successful operation
+NOTE1:	If the gNB-CU requests the gNB-DU to activate cells via F1 SETUP RESPONSE message, then the gNB-DU will initiate gNB-DU Configuration Update procedure for cell activation use case, i.e. to indicate Service Status for activated cells (OPT1).
+NOTE2:	If the gNB-CU requests the gNB-DU to activate cells which have been reported by F1 SETUP REQUEST message some time after it sends F1 SETUP RESPONSE message, then it initiates gNB-CU Configuration Update procedure for cell activation use case (OPT2).
+NOTE3:	If the F1 SETUP REQUEST message does not contain gNB-DU Served Cells List, then neither OPT1 nor OPT2 will be conducted.
+4.1.5.1.2	F1-C IE handling
+4.1.6	gNB-DU Configuration Update
+4.1.6.1	gNB-DU Configuration Update
+The following parameter condition is applied for this procedure.
+4.1.6.1.1	Message flow for X2 and F1
+Figure 4.1.6.1.1-1: gNB-DU Configuration Update, successful operation
+NOTE1:	If the gNB-CU requests the gNB-DU to activate cells via GNB-DU CONFIGURATION UPDATE ACKNOWLEDGE message in step 2, then the gNB-DU will trigger additional GNB-DU CONFIGURATION UPDATE procedure to inform the Service Status for activated cells (OPT1).
+NOTE2:	If the gNB-DU uses this procedure to add, delete or modify cells, and if the X2 interface has been established between the gNB-CU and the eNB, then the addition, deletion or modification of the cells will be propagated over the X2 interface  as described in Chapter 4.1.3.1.
+NOTE3:	If the gNB-DU uses this procedure to inform the Service Status for activated cells, and if the X2 interface has been established between the gNB-CU and the eNB, the change of Service Status will not be propagated over the X2 interface.
+4.1.6.1.2	F1-C IE handling
+4.1.6.1.2.1	Cell addition
+4.1.6.1.2.2	Cell deletion
+4.1.6.1.2.3	Cell modification
+4.1.6.1.2.4	Cell activation
+Cell activation can be achieved by including Cells to be Activated List IE in GNB-DU CONFIGURATION UPDATE ACKNOWLEDGE message of any of the use cases Cell addition (chapter 4.1.6.1.2.1), Cell deletion (chapter 4.1.6.1.2.2), Cell modification (chapter 4.1.6.1.2.3) or Service Status change (chapter 4.1.6.1.2.6).
+4.1.6.1.2.5	Cell deactivation
+Cell deactivation can be achieved by including Cells to be Deactivated List IE in GNB-DU CONFIGURATION UPDATE ACKNOWLEDGE message of any of the use cases Cell addition (chapter 4.1.6.1.2.1), Cell deletion (chapter 4.1.6.1.2.2), Cell modification (chapter 4.1.6.1.2.3) or Service Status change (chapter 4.1.6.1.2.6).
+4.1.6.1.2.6	Service Status change
+4.1.7	gNB-CU Configuration Update
+4.1.7.1	gNB-CU Configuration Update
+The following parameter condition is applied for this procedure.
+4.1.7.1.1	Message flow for X2 and F1
+Figure 4.1.7.1.1-1: gNB-CU Configuration Update, successful operation
+NOTE1:	In case of cell activation, the gNB-DU will initiate the gNB-DU Configuration Update procedure towards the gNB-CU to report the Service Status for activated cells (step 3).
+4.1.7.1.2	F1-C IE handling
+4.1.7.1.2.1	Cell activation
+4.1.7.1.2.2	Cell deactivation
+4.2	Xn-C and F1-C for NR Stand-Alone
+This section provides the relevant profiling information to achieve interoperability for non-UE associated procedures as defined in TS 38.423 [5] and TS 38.473 [3]. The following use cases are profiled for NR Stand-Alone (SA):
+Xn Setup
+Reset
+F1-Setup
+gNB-DU configuration update
+gNB-CU configuration update
+Paging
+Write-Replace-Warning
+4.2.1	Xn Setup
+The purpose of the Xn Setup procedure is to exchange application level configuration data needed for two NG-RAN nodes to interoperate correctly over the Xn-C interface.
+The following parameter condition is applied for this procedure.
+4.2.1.1	Xn message flow
+Figure 4.2.1.1-1: Xn Setup message flow
+4.2.1.2	Xn IE handling
+4.2.2	Reset
+Purpose of the Xn Reset procedure is to align resources in gNB1 and gNB2 in the event of an abnormal failure. The procedure either resets the complete Xn interface or selected UE contexts depending on the Reset Request TypeInfo IE. The procedure does not affect the application level configuration data exchanged during e.g. an Xn Setup procedure.
+4.2.2.1	Message flow on Xn
+Figure 4.2.2.1-1: Reset message flow on Xn
+4.2.2.2	Xn-C IE handling
+4.2.2.2.1	Reset
+4.2.2.2.2	Partial Reset
+4.2.2.3	Reset (gNB-CU initiated)
+4.2.2.3.1	Message flow on Xn and F1
+Figure 4.2.2.3.1-1: Reset message flow on Xn and F1 (gNB-CU initiated)
+NOTE: 	Step 1 and 2 is only applicable if Xn interface is configured, these messages are defined in section
+Chapter 4.2.2.2 above
+4.2.2.3.2	F1 IE handling
+4.2.2.3.2.1	Reset
+4.2.2.3.2.2	Partial reset
+4.2.2.4	Reset (gNB-DU initiated)
+4.2.2.4.1	Message flow on Xn and F1
+Figure 4.2.2.3-2: Reset message flow on Xn and F1 (gNB-DU initiated)
+NOTE1: 	Step 1 and 2 is only applicable if Xn interface is configured, these messages are defined in section 
+Chapter 4.2.2.2 above
+NOTE2: 	The order of sending message 2a is an example, it may be sent e.g. after step 1 or 2 and is up to implementation
+4.2.2.4.2	F1 IE handling
+4.2.2.4.2.1	Reset
+Message IE content is same as in 4.2.2.3.2.1
+4.2.2.4.2.2	Partial reset
+Message IE content is same as in 4.2.2.3.2.2
+4.2.3	F1 Setup
+4.2.3.1	F1 Setup
+The purpose of the F1 Setup procedure is to exchange application level data needed for the gNB-DU and the gNB-CU to correctly interoperate on the F1 interface.
+The following parameter condition is applied for this procedure.
+4.2.3.1.1	Message flow for F1
+Figure 4.2.3.1.1-1: F1 Setup, successful operation
+NOTE1:	If the gNB-CU requests the gNB-DU to activate cells via F1 SETUP RESPONSE message, then the gNB-DU will initiate gNB-DU Configuration Update procedure for cell activation use case, i.e. to indicate Service Status for activated cells (OPT1).
+NOTE2:	If the gNB-CU requests the gNB-DU to activate cells which have been reported by F1 SETUP REQUEST message some time after it sends F1 SETUP RESPONSE message, then it initiates gNB-CU Configuration Update procedure for cell activation use case (OPT2).
+4.2.3.1.2	F1-C IE handling
+4.2.4	gNB-DU configuration update
+4.2.4.1	gNB-DU Configuration Update
+The purpose of the gNB-DU Configuration Update procedure is to update application level configuration data needed for the gNB-DU and the gNB-CU to interoperate correctly on the F1 interface.
+The following parameter condition is applied for this procedure.
+4.2.4.1.1	Message flow for F1
+Figure 4.2.4.1.1-1: gNB-DU Configuration Update, successful operation
+NOTE1:	If the gNB-CU requests the gNB-DU to activate cells via GNB-DU CONFIGURATION UPDATE 
+			ACKNOWLEDGE message in step 2, then the gNB-DU will trigger additional GNB-DU
+			CONFIGURATION UPDATE procedure to inform the Service Status for activated cells.(OPT1)
+4.2.4.1.2	F1-C IE handling
+4.2.4.1.2.1   Cell addition
+4.2.4.1.2.2   Cell deletion
+4.2.4.1.2.3   Service Status change
+4.2.4.1.2.4   Cell modification
+4.2.5	gNB-CU configuration update
+4.2.5.1	gNB-CU Configuration Update
+The purpose of the gNB-CU Configuration Update procedure is to update application level configuration data needed for the gNB-DU and gNB-CU to interoperate correctly on the F1 interface.
+The following parameter condition is applied for this procedure.
+4.2.5.1.1	Message flow for F1
+Figure 4.2.5.1.1-1: gNB-CU Configuration Update, successful operation
+NOTE1:	In case of cell activation, the gNB-DU will initiate the gNB-DU Configuration Update procedure towards the gNB-CU to report the Service Status for activated cells (step 3).
+4.2.5.1.2	F1-C IE handling
+4.2.5.1.2.1   Cell activation
+4.2.5.1.2.2   Cell deactivation
+4.2.5.1.2.3   Cell modification - update of gNB-CU generated SIB information
+4.2.5.1.2.4   Cell barring
+4.2.6	Paging (CN-initiated)
+The purpose of the Paging procedure is to enable the gNB to page a UE in RRC_IDLE state.
+The following parameter condition is applied for this procedure.
+4.2.6.1	Message flow for F1
+Figure 4.2.6.1-1: Paging
+4.2.6.2	F1-C IE handling
+4.2.7	Write-Replace Warning
+4.2.7.1	Public Warning Initiation
+The purpose of Write-Replace Warning procedure is to start or overwrite the broadcasting of warning messages.
+4.2.7.1.1	Message flow for F1
+Figure 4.2.7.1.1-1: Write-Replace Warning – Public Warning Initiation
+4.2.7.1.2	F1-C IE handling
+5	EN-DC procedures
+This section provides the control plane profile to achieve interoperability for UE associated procedures as defined in TS 36.423 [2], TS 38.473 [3] and TS 38.331 [4]. In this version of the profile, the following procedures are defined:
+Secondary Node Addition;
+Secondary Node Release;
+Secondary Node Change;
+Inter-Master Node Handover;
+Master Node to eNB/gNB Change;
+Secondary Node Modification;
+RRC Transfer;
+E-UTRA-NR Cell Resource Coordination
+5.1	Secondary Node Addition
+5.1.1	Secondary Node Addition (Option 3x)
+The following parameter condition is applied for this procedure.
+5.1.1.1	Message flow for X2
+Figure 5.1.1.1-1: Secondary Node Addition procedure (option 3x) – X2 message flow
+NOTE1:　SN Status Transfer is executed in step 7 for the bearers using RLC AM.
+NOTE2:	UL Data forwarding handling is executed optionally in step 8.
+5.1.1.2	X2-C IE handling
+5.1.1.3	Message flow for X2 and F1
+Figure 5.1.1.3-1: Secondary Node Addition procedure (option 3x) – X2 and F1 message flow
+NOTE1:　SN Status Transfer is executed in step 7 for the bearers using RLC AM.
+NOTE2:	UL Data forwarding handling is executed optionally in step 8.
+5.1.1.4	F1-C IE handling
+5.1.2	Secondary Node Addition (Option 3a)
+The following parameter condition is applied for this procedure.
+5.1.2.1	Message flow for X2
+Figure 5.1.2.1-1: Secondary Node Addition procedure (option 3a) - X2 message flow
+NOTE1:   SN Status Transfer is executed in step 7 for the bearers using RLC AM.
+NOTE2:	UL Data forwarding handling is executed optionally in step 8.
+5.1.2.2	X2-C IE handling
+5.1.2.3	Message flow for X2 and F1
+Figure 5.1.2.3-1: Secondary Node Addition procedure (option 3a) – X2 and F1 message flow
+NOTE1:   SN Status Transfer is executed in step 7 for the bearers using RLC AM.
+NOTE2:	UL Data forwarding handling is executed optionally in step 8.
+5.1.2.4	F1-C IE handling
+5.2	Secondary Node Release
+5.2.1	Secondary Node Release (MN initiated, Option 3x or 2x)
+The following parameter condition is applied for this procedure.
+5.2.1.1	Message flow for X2
+Figure 5.2.1.1-1: SN Release procedure – MN initiated (option 3x or 2x) – X2 message flow
+NOTE1:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC 
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE2:　SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE3:	UL Data forwarding handling is executed optionally in step 6.
+NOTE4:	UL Data forwarding handling won’t be done in step 6, if UE connection is released by MME.
+NOTE5:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE6:	If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of data forwarding to send the Secondary RAT Data Usage Report.
+5.2.1.2	X2-C IE handling
+5.2.1.3	Message flow for X2 and F1
+Figure 5.2.1.3-1: SN Release procedure – MN initiated (option 3x or 2x) – X2 and F1 message flow
+NOTE1:	If the gNB has SN terminated split bearer (i.e. option 3x), the gNB-CU performs UE Context Modification procedure to the gNB-DU in order to stop the data transmission for the UE in step 2a/2b. It is up to gNB-DU implementation when to stop the UE scheduling.
+NOTE2:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC 
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE3:　SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE4:	UL Data forwarding handling is executed optionally in step 6.
+NOTE5:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE6:	If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of data forwarding to send the Secondary RAT Data Usage Report.
+NOTE7:	If the gNB has SN terminated split bearer (i.e. option 3x), the gNB-CU performs UE Context Release procedure in step 9a/9b.
+5.2.1.4	F1-C IE handling
+5.2.2	Secondary Node Release (SN initiated, Option 3x or 2x)
+The following parameter condition is applied for this procedure.
+5.2.2.1	Message flow for X2
+Figure 5.2.2.1-1: SN Release procedure – SN initiated (option 3x or 2x) – X2 message flow
+NOTE1:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC
+			 connection re-establishment due to Radio Link Failure in MN.
+NOTE2:　SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE3:	UL Data forwarding handling is executed optionally in step 6.
+NOTE4:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE5:	If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of data forwarding to send the Secondary RAT Data Usage Report.
+5.2.2.2	X2-C IE handling
+5.2.2.3	Message flow for X2 and F1
+Figure 5.2.2.3-1: SN Release procedure – SN initiated (option 3x or 2x) – X2 and F1 message flow
+NOTE1:	In case of gNB-DU initiated use case, the gNB-DU may send UE Context Release Request message to the gNB-CU in step 1a.
+NOTE2:	If the gNB has SN terminated split bearer (i.e. option 3x), the gNB-CU performs UE Context Modification procedure to the gNB-DU in order to stop the data transmission for the UE in step 2a/2b. It is up to gNB-DU implementation when to stop the UE scheduling.
+NOTE3:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE4:　SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE5:	UL Data forwarding handling is executed optionally in step 6.
+NOTE6:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE7:	If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of data forwarding to send the Secondary RAT Data Usage Report.
+NOTE8:	If the gNB has SN terminated split bearer (i.e. option 3x), the gNB-CU performs UE Context Release procedure in step 9a/9b.
+5.2.2.4	F1-C IE handling
+5.2.3	Secondary Node Release (MN initiated, Option 3a)
+The following parameter condition is applied for this procedure.
+5.2.3.1	Message flow for X2
+Figure 5.2.3.1-1: SN Release procedure – MN initiated (option 3a) - X2 message flow
+NOTE1:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC 
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE2:   SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE3:	UL Data forwarding handling is executed optionally in step 6.
+NOTE4:	Data forwarding handling won’t be done in step 6, if UE connection is released by MME.
+NOTE5:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE6:   If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of 
+			data forwarding to send the Secondary RAT Data Usage Report.
+5.2.3.2	X2-C IE handling
+5.2.3.3	Message flow for X2 and F1
+Figure 5.2.3.3-1: SN Release procedure – MN initiated (option 3a) - X2 and F1 message flow
+NOTE1:	If the gNB has SN terminated SCG bearer (i.e. option 3a), the gNB-CU performs UE Context Modification procedure to the gNB-DU in order to stop the data transmission for the UE in step 2a/2b. It is up to gNB-DU implementation when to stop the UE scheduling.
+NOTE2:　It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE3:   SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE4:	UL Data forwarding handling is executed optionally in step 6.
+NOTE5:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE6:   If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of data forwarding to send the Secondary RAT Data Usage Report.
+5.2.3.4	F1-C IE handling
+5.2.4	Secondary Node Release (SN initiated, Option 3a)
+The following parameter condition is applied for this procedure.
+5.2.4.1	Message flow for X2
+Figure 5.2.4.1-1: SN Release procedure – SN initiated (option 3a) - X2 message flow
+NOTE1:   It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE2:   SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE3: 	UL Data forwarding handling is executed optionally in step 6.
+NOTE4:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE5:   If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of 
+			data forwarding to send the Secondary RAT Data Usage Report.
+5.2.4.2	X2-C IE handling
+5.2.4.3	Message flow for X2 and F1
+Figure 5.2.4.3-1: SN Release procedure – SN initiated (option 3a) – X2 and F1 message flow
+NOTE1: 	In case of gNB-DU initiated use case, the gNB-DU may send UE Context Release Request message to the   gNB-CU in step 1a.
+NOTE2: 	If the gNB has SN terminated SCG bearer (i.e. option 3a), the gNB-CU performs UE Context Modification procedure to the gNB-DU in order to stop the data transmission for the UE in step 2a/2b. It is up to gNB-DU implementation when to stop the UE scheduling.
+NOTE3:   It does not necessarily need to involve signalling towards the UE in step 3 and 4, e.g., in case of the RRC
+			connection re-establishment due to Radio Link Failure in MN.
+NOTE4:   SN Status Transfer is executed in step 5 for the bearers using RLC AM.
+NOTE5: 	UL Data forwarding handling is executed optionally in step 6.
+NOTE6:	Secondary RAT Data Usage Report is executed optionally in step 7, if SN supports this procedure.
+NOTE7:   If data forwarding is applied, step 7 can take place before step 6. The SN does not need to wait for the end of 
+			data forwarding to send the Secondary RAT Data Usage Report.
+5.2.4.4	F1-C IE handling
+5.3	Secondary Node Change
+5.3.1	Secondary Node Change (MN initiated, Option 3x)
+The following parameter condition is applied for this procedure.
+5.3.1.1	Message flow for X2
+Figure 5.3.1.1-1: SN Change procedure – MN initiated (option 3x)
+NOTE: 	Step 10 is optional.
+5.3.1.2	X2-C IE handling
+5.3.1.3 	Message flow for X2 and F1
+Figure 5.3.1.3-1: SN Change procedure – MN initiated (option 3x)
+5.3.1.4	F1-C IE handling
+5.3.2	Secondary Node Change (SN initiated, Option 3x)
+The following parameter condition is applied for this procedure.
+5.3.2.1	Message flow for X2
+Figure 5.3.2.1-1: SN Change procedure – SN initiated (option 3x)
+NOTE: 	Step 11 is optional.
+5.3.2.2	X2-C IE handling
+5.3.2.3 	Message flow for X2 and F1
+Figure 5.3.2.3-1: SN Change procedure – SN initiated (option 3x)
+5.3.2.4	F1-C IE handling
+5.4	Inter-Master Node Handover
+5.4.1	Inter-Master Node Handover (without SN Change, Option 3x)
+The following parameter condition is applied for this procedure.
+5.4.1.1	Message flow for X2
+Figure 5.4.1.1-1: Inter-Master Node Handover (without SN change, option 3x)
+5.4.1.2	X2-C IE Handling
+5.4.1.3 	Message flow for X2 and F1- Inter DU PSCell change
+Figure 5.4.1.3-1: Inter-Master Node Handover without SN change – Inter DU PSCell change
+5.4.1.4	F1-C IE handling
+5.4.1.5 Message flow for X2 and F1 – Intra DU PSCell change or Security key change only.
+Figure 5.4.1.5-1: Inter-Master Node Handover without SN change – Intra DU PSCell change orSecurity key change only
+NOTE: 	gNB-DU configuration query is not necessarily needed for the Intra-DU PSCell changes, but it is
+			implementation specific if used or not.
+5.4.1.6	F1-C IE handling
+5.5	Master Node to eNB/gNB Change
+5.5.1	Master Node to eNB Change
+The following parameter condition is applied for this procedure.
+5.5.1.1	Message flow for X2
+Figure 5.5.1.1-1: Master Node to eNB change
+NOTE:	Step 10a/b is optional.
+5.5.1.2	X2-C IE Handling
+5.5.1.3 	Message flow for X2 and F1
+Figure 5.5.1.3-1: Master Node to eNB change
+5.5.1.4	F1-C IE handling
+5.6	Secondary Node Modification
+5.6.1	PCell change (Intra MN) (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.1.1	Message flow for X2
+Figure 5.6.1.1-1: PCell change (Intra MN) (MN initiated)
+5.6.1.2	X2-C IE handling
+5.6.1.3	Message flow for X2 and F1
+Figure 5.6.1.3-1: PCell change (Intra MN) (MN initiated)
+5.6.1.4	F1-C IE handling
+5.6.2	Allowed Band Combination list update by PCell/SCell change (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.2.1	Message flow for X2
+Figure 5.6.2.1-1: Allowed Band Combination list update by PCell/SCell change (MN initiated)
+NOTE1: 	In step 6, MN shall send X2AP: SgNB Reconfiguration Complete message to SN if MN received NR RRCReconfiguration or RadioBearerConfig from SN.
+5.6.2.2	X2-C IE handling
+5.6.2.3	Message flow for X2 and F1
+Figure 5.6.2.3-1: Allowed Band Combination list update by PCell/SCell change (MN initiated)
+NOTE1: 	In step 6, MN shall send X2AP: SgNB Reconfiguration Complete message to SN if MN received NR RRCReconfiguration or RadioBearerConfig from SN.
+5.6.2.4	F1-C IE handling
+5.6.3	Configured Band Combination update by PSCell/SCell change (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.3.1	Message flow for X2
+Figure 5.6.3.1-1: Configured Band Combination update by PSCell/SCell change (SN initiated)
+NOTE1: 	If PSCell and/or SCell Change procedure using SRB3 for RRC Reconfiguration is successfully completed 			and selectedBandCombination is updated, SgNB initiates this procedure.
+5.6.3.2	X2-C IE handling
+5.6.4	SCG config query (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.4.1	Message flow for X2
+Figure 5.6.4.1-1: SCG config query (MN initiated)
+5.6.4.2	X2-C IE handling
+5.6.4.3	Message flow for X2 and F1
+Figure 5.6.4.3-1: SCG config query (MN initiated)
+5.6.4.4	F1-C IE handling
+5.6.5	Security Key Change Procedure (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.5.1	Message flow for X2
+Figure 5.6.5.1-1: Security Key Change (MN initiated) – X2 message flow
+NOTE1: 	In case of S-KgNB update scenario, Random Access Procedure in step 4 isn’t performed.
+NOTE2: 	In step 7, Random Access Procedure isn’t performed in case of Option 2x.
+5.6.5.2	X2-C	 IE handling
+5.6.5.3	Message flow for X2 and F1
+Figure 5.6.5.3-1: Security Key Change (MN initiated) – X2 and F1 message flow
+NOTE1: 	In case of S-KgNB update scenario, Random Access Procedure in step 4 isn’t performed.
+NOTE2: 	Steps 1a/1b and steps 6a/6b aren’t performed in case of Option 2x.
+NOTE3: 	In step 7, Random Access Procedure isn’t performed in case of Option 2x.
+5.6.5.4	F1-C IE handling
+5.6.6	Measurement Gap Coordination Procedure (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.6.1	Message flow for X2
+Figure 5.6.6.1-1: Measurement Gap Coordination (MN initiated) – X2 message flow
+NOTE: 	In step 2, SN should include scg-CellGroupConfig IE in X2AP: SgNB Modification Request Acknowledge message to receive X2AP: SgNB Reconfiguration Complete message in step 5.
+5.6.6.2	X2-C IE handling
+5.6.6.3	Message flow for X2 and F1
+Figure 5.6.6.3-1: Measurement Gap Coordination (MN initiated) – X2 and F1 message flow
+NOTE: 	In step 2, SN should include scg-CellGroupConfig IE in X2AP: SgNB Modification Request Acknowledge message to receive X2AP: SgNB Reconfiguration Complete message in step 5.
+5.6.6.4	F1-C IE handling
+5.6.7	Measurement Gap Coordination for per FR1 or per UE gap Procedure (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.7.1	Message flow for X2
+Figure 5.6.7.1-1: Measurement Gap Coordination FR1/UE gap (SN initiated) – X2 message flow
+NOTE1: 	MN ignores the 1st scg-CellGroupConfig IE received in SgNB Modification Required message in step 1 if it receives a 2nd scg-CellGroupConfig IE in SgNB Modification Request Acknowledge message in step 3.
+NOTE2: 	Step 6 uses X2AP: SgNB Modification Confirm message because SN initiated SN modification procedure is handled as the exception scenario described in TS 37.340 [1].
+5.6.7.2	X2-C IE handling
+5.6.7.3	Message flow for X2 and F1
+Figure 5.6.7.3-1: Measurement Gap Coordination FR1/UE gap (SN initiated) – X2 and F1 message flow
+NOTE1: 	MN ignores the 1st scg-CellGroupConfig IE received in SgNB Modification Required message in step 1 if it receives a 2nd scg-CellGroupConfig IE in SgNB Modification Request Acknowledge message in step 3.
+NOTE2: 	Step 6 uses X2AP: SgNB Modification Confirm message because SN initiated SN modification procedure is handled as the exception scenario described in TS 37.340 [1].
+5.6.7.4	F1-C IE handling
+5.6.8	Measurement Gap Coordination for per FR2 gap (with MN involvement) Procedure (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.8.1	Message flow for X2
+Figure 5.6.8.1-1: Measurement Gap Coordination FR2 (SN Initiated) – X2 message flow
+5.6.8.2	X2-C IE handling
+5.6.8.3	Message flow for X2 and F1
+Figure 5.6.8.3-1: Measurement Gap Coordination FR2 (SN Initiated) – X2 and F1 message flow
+5.6.8.4	F1-C IE handling
+5.6.8a	Measurement Gap Coordination for per FR2 gap (without MN involvement) Procedure (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.8a.1	Message flow for F1
+Figure 5.6.8a.1-1: Measurement Gap Coordination FR2 (SN Initiated) – without MN involvement
+5.6.8a.2	F1-C IE handling
+5.6.9	UL Configuration Update Procedure (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.9.1	Message flow for X2
+Figure 5.6.9.1-1: UL Configuration Update (SN initiated) – X2 message flow
+5.6.9.2	X2-C IE handling
+5.6.9.3	Message flow for X2 and F1
+Figure 5.6.9.3-1: UL Configuration Update (SN initiated) – X2 and F1 message flow
+5.6.9.4	F1-C IE handling
+5.6.10	Addition of SN terminated split bearer (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.10.1	Message flow for X2
+Figure 5.6.10.1-1: Addition of SN terminated split bearer (MN initiated)
+5.6.10.2	X2-C IE handling
+5.6.10.3	Message flow for X2 and F1
+Figure 5.6.10.3-1: Addition of SN terminated split bearer (MN initiated)
+5.6.10.4	F1-C IE handling
+5.6.11	Removal of SN terminated split bearer (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.11.1	Message flow for X2
+Figure 5.6.11.1-1: Removal of SN terminated split bearer (MN initiated)
+NOTE:	Step 8 is optional.
+5.6.11.2	X2-C IE handling
+5.6.11.3	Message flow for X2 and F1
+Figure 5.6.11.3-1: Removal of SN terminated split bearer (MN initiated)
+5.6.11.4	F1-C IE handling
+5.6.12	Bearer type change from SN terminated split bearer to SN terminated MCG bearer (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.12.1	Message flow for X2
+Figure 5.6.12.1-1: Bearer type change from SN terminated split bearer to SN terminated MCG bearer (MN initiated)
+5.6.12.2	X2-C IE handling
+5.6.12.3	Message flow for X2 and F1
+Figure 5.6.12.3-1: Bearer type change from SN terminated split bearer to SN terminated MCG bearer (MN initiated)
+NOTE1: 	This version of the specification assumes all SN terminated split bearers of the UE are changed to SN terminated MCG bearer.
+NOTE2: 	It is possible that all SN terminated split bearers are not changed at a same time to SN terminated MCG bearer. In that case UE Context Modification Request/Response is used to remove Bearer context from gNB-DU, allowing UE context to be kept in gNB-DU. This option is not part of this version of specification.
+5.6.12.4	F1-C IE handling
+5.6.13	Bearer type change from SN terminated MCG bearer to SN terminated split bearer (MN initiated)
+The following parameter condition is applied for this procedure.
+5.6.13.1	Message flow for X2
+Figure 5.6.13.1-1: Bearer type change from SN terminated MCG bearer to SN terminated split bearer (MN initiated)
+NOTE:	Step 6. RA procedure is not needed in case of UE has already another existing 3x bearer. This option is not 
+			part of this version of the specification.
+5.6.13.2	X2-C IE handling
+5.6.13.3	Message flow for X2 and F1
+Figure 5.6.13.3-1: Bearer type change from SN terminated MCG bearer to SN terminated split bearer (MN initiated)
+NOTE1: 	This version of the specification assumes all SN terminated MCG bearers of the UE are changed to SN terminated split bearers.
+NOTE2: 	It is possible that all SN terminated MGG bearers are not changed at a same time to SN terminated split bearer. In that case, if UE has already SN terminated split bearer, RA procedure is not needed, and UE Context Modification Request/Response is used to add Bearer context to gNB-DU. This option is not part of this version of specification.
+5.6.13.4	F1-C IE handling
+5.6.14	Bearer type change from SN terminated split bearer to SN terminated MCG bearer (SN initiated)
+The following parameter condition is applied for this procedure.
+5.6.14.1	Message flow for X2
+Figure 5.6.14.1-1: Bearer type change from SN terminated split bearer to SN terminated MCG bearer (SN initiated)
+5.6.14.2	X2-C IE handling
+5.6.14.3	Message flow for X2 and F1
+Figure 5.6.14.3-1: Bearer type change from SN terminated split bearer to SN terminated MCG bearer (SN initiated)
+NOTE1: 	This version of the specification assumes all SN terminated split bearers of the UE are changed to SN terminated MCG bearer.
+NOTE2: 	It is possible that all SN terminated split bearers are not changed at a same time to SN terminated MCG bearer. In that case UE Context Modification Request/Response is used to remove Bearer context from gNB-DU, allowing UE context to be kept in gNB-DU. This option is not part of this version of specification.
+5.6.14.4	F1-C IE handling
+5.6.15	PSCell Change using SRB1 for RRC Reconfiguration – full configuration option
+The following parameter condition is applied for this procedure.
+5.6.15.1	Message flow for X2
+Figure 5.6.15.1-1: PSCell change using SRB1 for RRC Reconfiguration – full configuration option
+NOTE1:	Above message flow represents the case where RRC: Measurement Report is handled via SRB1. If RRC: Measurement Report is handled via SRB3, RRC Transfer message is not used.
+5.6.15.2	X2-C IE Handling
+5.6.15.3	Message flow for X2 and F1 - Inter gNB-DU scenario
+Figure 5.6.15.3-1: Inter gNB-DU PSCell change using SRB1 for RRC Reconfiguration – full configuration option
+NOTE1: 	In step 2f, if the target gNB-DU supports the delta configuration option, the gNB-DU won’t include Full Configuration IE in this message. In this case, “PSCell Change using SRB1 for RRC Reconfiguration – delta configuration option (Inter gNB-DU scenario)” described in section 5.6.16.1 is applied.
+5.6.15.4	F1-C IE Handling
+5.6.16	PSCell Change using SRB1 for RRC Reconfiguration – delta configuration option
+The following parameter condition is applied for this procedure.
+5.6.16.1	Message flow for X2
+Figure 5.6.16.1-1: PSCell change using SRB1 for RRC Reconfiguration – delta configuration option
+NOTE1: 	Above message flow represents the case where RRC: Measurement Report is handled via SRB1. If RRC: Measurement Report is handled via SRB3, RRC Transfer message is not used.
+NOTE2:	It is optional to change security key during PSCell change using delta configuration. This option is not used 
+			in this version of the specification and the message flow does not show the corresponding signalling.
+5.6.16.2	X2-C IE Handling
+5.6.16.3	Message flow for X2 and F1 - Inter gNB-DU scenario
+Figure 5.6.16.3-1: Inter gNB-DU PSCell change using SRB1 for RRC Reconfiguration – delta configuration option
+NOTE:	It is optional to change security key during PSCell change using delta config. This option is not used in this 
+			version of the specification and the message flow does not show the corresponding signalling.
+5.6.16.4	F1-C IE Handling
+5.6.17	Intra gNB-DU PSCell Change using SRB1 for RRC Reconfiguration
+The following parameter condition is applied for this procedure.
+5.6.17.1	Message flow for X2 and F1 - Intra gNB-DU scenario
+Figure 5.6.17.1-1: Intra gNB-DU PSCell change using SRB1 for RRC Reconfiguration
+NOTE:	It is optional to change security key during intra gNB-DU PSCell change. This option is not used in this 
+			version of the specification and the message flow does not show the corresponding signalling.
+5.6.17.2	X2-C IE Handling
+5.6.17.3	F1-C IE Handling
+5.6.18	Inter gNB-DU PSCell Change using SRB3 for RRC Reconfiguration
+The following parameter condition is applied for this procedure.
+5.6.18.1	Message flow for F1 - Inter gNB-DU scenario
+Figure 5.6.18.1-1: Inter gNB-DU PSCell change using SRB3 for RRC Reconfiguration
+NOTE1: 	In step 6, if the target gNB-DU doesn’t supports the delta configuration option, the gNB-DU includes Full Configuration IE in this message. In this case, “PSCell Change using SRB1 for RRC Reconfiguration – full configuration option (Inter gNB-DU scenario)” described in section 5.6.15.1 is applied.
+5.6.18.2	F1-C IE Handling
+5.6.19	Intra gNB-DU PSCell Change using SRB3 for RRC Reconfiguration
+The following parameter condition is applied for this procedure.
+5.6.19.1	Message flow for F1 - Intra gNB-DU scenario
+Figure 5.6.19.1-1: Intra gNB-DU PSCell change using SRB3 for RRC Reconfiguration
+5.6.19.2	F1-C IE Handling
+5.6.20	gNB-DU configuration query
+5.6.20.1	Message flow
+Figure 5.6.20.1-1: gNB-DU configuration query
+5.6.20.2	F1-C IE handling
+5.6.21	DRB ID change (SN initiated)
+Purpose of the DRB ID change procedure is to allow SgNB to request new DRB ID from MeNB in EN-DC for an already established SN terminated bearer in case of PDCP Count wrap around.
+The following parameter condition is applied for this procedure.
+5.6.21.1	Message flow for X2
+Figure 5.6.21.1-1: DRB-ID change (SN initiated) on X2
+5.6.21.2	X2-C IE handling
+5.6.21.3	Message flow for X2 and F1
+Figure 5.6.21.1-1: DRB-ID change (SN initiated) on X2 and F1
+5.6.21.4	F1-C IE handling
+5.6.22	Full Reconfiguration (SN initiated)
+Purpose of the full reconfiguration procedure (SN initiated) is to reset PDCP COUNT using full reconfiguration option in case of PDCP Count wrap around.
+The following parameter condition is applied for this procedure.
+5.6.22.1	Message Flow for X2
+Figure 5.6.22.1-1: Full Reconfiguration (SN initiated)
+NOTE: 	In step 1, SgNB needs to set PDCP Change Indication IE to update S-KgNB.
+5.6.22.2	X2-C IE Handling
+5.6.22.3	Message Flow for X2 and F1
+Figure 5.6.22.3-1: Full Reconfiguration (SN initiated)
+NOTE1: 	In step 1a/1b, gNB-CU needs to get the full configuration information from gNB-DU.
+NOTE2: 	In step 1, SgNB needs to set PDCP Change Indication IE to update S-KgNB.
+5.6.22.4	F1-C IE Handling
+5.7	RRC Transfer
+5.7.1	UE measurement transfer
+The purpose of this procedure is to enable transfer of the NR RRC message container with the NR measurements or NR failure information from the MeNB to the en-gNB, when received from the UE.
+The following parameter condition is applied for this procedure.
+5.7.1.1	Message flow for X2
+Figure 5.7.1.1-1: UE measurement transfer on X2
+5.7.1.2	X2-C IE handling
+5.8	E-UTRA – NR Cell Resource Coordination
+This section provides the relevant profiling information to achieve Dynamic Spectrum Sharing (DSS) interoperability for non-UE associated procedures as defined in TS 36.423 [2] and TS 38.473 [3]. In this version of the profile, the following procedures are defined:
+E-UTRA - NR Cell Resource Coordination Request (MN initiated, Option 3x/3a);
+E-UTRA - NR Cell Resource Coordination Request (SN initiated, Option 3x/3a);
+5.8.1	E-UTRA - NR Cell Resource Coordination (MN initiated, Option 3x/3a)
+The purpose of the procedure is to exchange DSS information between MN and SN, procedure is initiated by MN.
+The following parameter condition is applied for this procedure.
+5.8.1.1	Message flow for X2
+Figure 5.8.1.1-1: E-UTRA – NR CELL RESOURCE COORDINATION REQUEST (MN Initiated) procedure
+5.8.1.2	X2-C IE handling
+5.8.1.3 Message flow for X2 and F1
+Figure 5.8.1.3-1: GNB-DU RESOURCE COORDINATION REQUEST procedure
+5.8.1.4	F1-C IE handling
+5.8.2	E-UTRA - NR Cell Resource Coordination (SN initiated, Option 3x/3a)
+The purpose of the procedure is to exchange DSS information between MN and SN, procedure is initiated by SN.
+The following parameter condition is applied for this procedure.
+5.8.2.1	Message flow for X2
+Figure 5.8.2.1-1: E-UTRA - NR CELL RESOURCE COORDINATION REQUEST (SN Initiated) procedure
+5.8.2.2	X2-C IE handling
+5.8.2.3 Message flow for X2 and F1
+Figure 5.8.2.3-1: GNB-DU RESOURCE COORDINATION REQUEST procedure
+5.8.2.4	F1-C IE handling
+6	NR procedures
+This section provides description of control plane procedures to achieve interoperability for UE associated procedures as defined in 3GPP TS 38.401. In this version of the profile, the following procedures are defined:
+UE Initial Access
+UE Context Release
+UE Context Modification
+Inter gNB-Handover
+Intra gNB-Handover
+Inter gNB-DU Handover
+Inter RAT Handover
+RRC state transition
+RRC Connection Re-establishment
+6.1	UE Initial Access
+This section provides description for an Initial UE Context setup request procedure.
+6.1.1	UE context creation (service request)
+Purpose of the Attach/Service Request procedure is to register a new UE in the network i.e. create a new UE context in NG-RAN. In this use case the UE context creation includes setup of DRB.
+The following parameter condition is applied for this procedure.
+6.1.1.1	Message Flow
+In case optional F1 interface is not used the use-case description collapses to Uu and NG interface which are both outside scope of this specification. Hence no further details are provided here, however the message sequences can be easily derived from the flow on the following section.
+6.1.1.2 	Message Flow over F1
+Figure 6.1.1.2-1: Initial access - UE context creation
+NOTE1: 	In case UE Capabilities are not provided by AMF in message 8. INITIAL UE CONTEXT SETUP REQUEST the message sequence as shown in the options box apply with additional UE CapabilityEnquiry procedure and related RRC Transfer messages.
+NOTE2: 	Messages 10. and 11 are send only once - depending on the need for UE capability Enquiry procedure.
+NOTE3: 	According to Ref [4] chapter 5.3.1.1 messages 11 and 12 (UE CapabilityEnquiry) or 17 and
+			 18 (RRC Reconfiguration) can be initiated by gNB-CU after having activated AS security before
+			 receiving message 10 and 6 (SecurityModeComplete).
+6.1.1.3 	F1-C IE handling
+6.1.2	UE context creation (registration request)
+Purpose of the procedure is to perform an initial registration of a UE in the network i.e. create a new UE context in NG- RAN for signaling only connection.
+The following parameter condition is applied for this procedure.
+6.1.2.1	Message Flow
+In case optional F1 interface is not used the use-case description collapses to Uu and NG interface which are both outside scope of this specification. Hence no further details are provided here, however the message sequences can be easily derived from the flow in the following section.
+6.1.2.2 	Message Flow over F1
+Figure 6.1.2.2-1: Initial access - UE context creation for initial registration
+NOTE1: 	In case UE Capabilities are not provided by AMF in message 8. INITIAL CONTEXT SETUP REQUEST the 			message sequence as shown in the options box applies with additional UE CapabilityEnquiry procedure and 			related DL and UL RRC Transfer messages.
+NOTE2: 	According to Ref [4] chapter 5.3.1.1 messages 11 / 16 can be initiated by gNB-CU after having activated AS
+			security before receiving message 10.
+NOTE3: 	It is AMF decision to include NAS message Registration Accept either in message 8 or send separate optional message 15. The illustration here is used as example and outside scope of this specification.
+6.1.2.3 	F1-C IE handling
+6.2 	UE Context Release
+This section provides description for a UE Context Release procedure.
+6.2.1	UE Context Release
+Purpose of the UE Context Release procedure is to release the logical NG-AP signaling connection and the associated User Plane connections, and RRC signaling and resources.
+The following parameter condition is applied for this procedure.
+6.2.1.1	Message flow for F1
+Figure 6.2.1.1-1: UE Context Release
+NOTE1: 	In case of the gNB-DU initiated UE Context Release procedure, the gNB-DU will send the UE Context Release Request message to the gNB-CU in step 1.
+NOTE2: 	In case of the NG-RAN (gNB-CU/gNB-DU) initiated UE Context Release procedure, the gNB-CU will send the UE Context Release Request message to the AMF in step 2.
+NOTE3: 	In step 4, the gNB-CU may not include the RRC-Container IE to avoid sending the RRCRelease message, if it detects the disconnection from the UE.
+6.2.1.2	F1-C IE handling
+6.3	UE Context Modification
+This section provides a description for a UE Context Modification procedure.
+6.3.1	Message Flow
+Figure 6.3.1-1: UE Context Modification
+6.3.1.1	SCell to be setup/removed
+Purpose of this procedure is to setup or remove SCell(s) for a UE.
+The following parameter condition is applied for this procedure.
+6.3.1.1.1	F1-C IE handling
+6.3.1.2	DRB to be setup
+Purpose of this procedure is to setup DRB(s) for a UE.
+The following parameter condition is applied for this procedure.
+NOTE1: 	There are more than one trigger to setup DRBs, for example, addition of QoS Flows by PDU Session Resource Setup/ Modification Request, or based on internal decision by gNB-CU.
+6.3.1.2.1	F1-C IE handling
+6.3.1.3	DRB to be released
+Purpose of this procedure is to release DRB(s) for a UE.
+The following parameter condition is applied for this procedure.
+NOTE1: 	There are more than one trigger to release DRBs, for example, release of QoS Flows by PDU Session 
+			Resource Release/ Modification Request, or based on internal decision by gNB-CU.
+6.3.1.3.1	F1-C IE handling
+6.4	Inter gNB-Handover
+6.4.1	Inter gNB HO
+The purpose of the Inter gNB HO is to move UE to the cell of another gNB.
+The following parameter condition is applied for this procedure.
+6.4.1.1	Inter gNB Handover message flow for Xn
+Figure 6.4.1.1-1: Inter gNB Handover message flow for Xn according to [6]
+6.4.1.2	Xn-C IE handling
+6.4.1.3	Inter gNB Handover message flow for Xn and F1
+Figure 6.4.1.3-1: Inter gNB Handover message flow for Xn and F1 according to [7]
+NOTE: 	It is implementation specific if or when step 0. gNB-DU Configuration Query is needed for source gNB-CU 			to obtain source cell configuration, in order to enable delta configuration to be used during Handover.
+6.4.1.4	F1-C IE handling
+6.5		Intra gNB-Handover
+6.5.1	Intra gNB-DU, Intra Cell Handover
+Purpose of the procedure is to provide Intra Cell HO e.g. in case of Security Key Change, DRBid change (PDCP Count wrap around) or Full Reconfiguration (PDCP Count wrap around) during NR operation.
+The following parameter condition is applied for this procedure.
+6.5.1.1	Intra gNB-DU, Intra Cell Handover message flow
+Figure 6.5.1.1-1: Intra gNB-DU, Intra Cell Handover according to [7].
+NOTE: 	It is up to gNB-CU implementation whether to start sending DL User Data to gNB-DU before or after reception of the Downlink Data Delivery Status.
+6.5.1.2	F1-C IE handling
+6.5.2	Intra gNB-DU, Inter Cell Handover
+Purpose of the procedure is to provide UE connected mode mobility between cells of the same gNB-DU during NR operation.
+The following parameter condition is applied for this procedure.
+6.5.2.1	Intra gNB-DU, Inter Cell Handover message flow
+Figure 6.5.2.1-1: Intra gNB-DU, Inter Cell Handover according to [7].
+NOTE: 	It is up to gNB-CU implementation whether to start sending DL User Data to gNB-DU before or after reception of the Downlink Data Delivery Status.
+6.5.2.2	F1-C IE handling
+6.5.3	Inter gNB-DU Handover
+Purpose of the procedure is to provide UE connected mode mobility within the same gNB-CU by moving to another gNB-DU during NR operation.
+The following parameter condition is applied for this procedure.
+6.5.3.1	Inter gNB-DU Handover message flow
+Figure 6.5.3.1-1: Inter gNB-DU Handover according to [7]
+NOTE1: 	It is implementation specific if or when step 3. gNB-DU Configuration Query is needed for source gNB-CU to obtain source cell configuration, in order to enable delta configuration to be used during Handover.
+NOTE2: 	It is up to gNB-CU implementation whether to start sending DL User Data to gNB-DU before or after reception of the Downlink Data Delivery Status.
+6.5.3.2	F1-C IE handling
+6.6		<void>
+6.7		<void>
+6.8		Inter RAT Handover
+6.8.1	Inter RAT HO to LTE
+The purpose of the Inter RAT HO to LTE is to move UE from the NR cell to the LTE cell.
+The following parameter condition is applied for this procedure.
+6.8.1.1	Inter RAT Handover to LTE message flow
+Figure 6.8.1.1-1: Inter RAT Handover to LTE message flow
+6.8.1.2 F1-C IE handling
+6.9		RRC state transition
+6.9.1	RRC connected to RRC inactive
+This use case profiles F1 procedures for the RRC state transition of a UE from RRC connected to RRC inactive. The use case is specified in [7] chapter 8.6.
+6.9.1.1	RRC connected to RRC inactive message flow
+Figure 6.9.1.1-1: RRC connected to RRC inactive message flow
+6.9.1.2 F1-C IE handling
+6.9.2	RRC inactive to RRC connected
+This use case describes the F1 procedures use during UE transition from RRC inactive to RRC connected state with UP data exchange option
+6.9.2.1	RRC inactive to RRC connected message flow
+Figure 6.9.2.1-1: RRC inactive to RRC connected message flow
+NOTE1: 	Optionally in case of DL data or DL signaling arrival paging procedure as shown in step 1 is triggered
+			by gNB-CU
+6.9.2.2 F1-C IE handling
+6.10 	RRC Connection Re-establishment
+6.10.1	RRC Connection Re-establishment (Intra gNB-DU)
+Purpose of the RRC Connection Re-establishment (Intra gNB-DU) procedure is to reestablish the RRC connection to the same gNB-DU that was serving the UE prior to the failure.
+The following parameter condition is applied for this procedure.
+6.10.1.1	Message flow for F1
+Figure 6.10.1.1-1: RRC Connection Re-establishment (Intra gNB-DU)
+NOTE1:  If the gNB-CU needs to modify the UE Context established prior to the failure, steps 8-9 may be performed.
+6.10.1.2	F1-C IE handling
+6.10.2	RRC Connection Re-establishment (Inter gNB-DU)
+Purpose of the RRC Connection Re-establishment (Inter gNB-DU) procedure is to reestablish the RRC connection to the new gNB-DU other than the gNB-DU that was serving the UE prior to the failure.
+The following parameter condition is applied for this procedure.
+6.10.2.1	Message flow for F1
+Figure 6.10.2.1-1: RRC Connection Re-establishment (Inter gNB-DU)
+6.10.2.2	F1-C IE handling
+7	NR-DC procedures
+This section provides description of control plane procedures to achieve interoperability for NR-DC procedures as defined in Ref [1]. In this version of the profile, the following procedures are defined:
+S-NG-RAN node addition
+S-NG-RAN node modification
+S-NG-RAN node release
+7.1	S-NG-RAN NODE ADDITION
+This section provides description of S-NG-RAN node addition procedure. Purpose is to establish a UE context at the SN in order to provide resources from the SN to the UE.
+7.1.1	S-NG-RAN Node Addition
+Purpose of the S-NG-RAN Node Addition procedure is to establish the UE context and relevant resources at the S-NG-RAN node.
+The following parameter condition is applied for this procedure.
+7.1.1.1	Message flow for Xn
+Figure 7.1.1.1-1: S-NG-RAN Node Addition procedure – Xn message flow
+NOTE: 	UL Data Forwarding is executed optionally in step 9.
+7.1.1.2	Xn-C IE handling
+7.1.1.3	Message flow for Xn and F1
+Figure 7.1.1.3-1: S-NG-RAN Node Addition procedure – Xn and F1 message flow
+NOTE:	UL Data Forwarding is executed optionally in step 9.
+7.1.1.4	F1-C IE handling
+7.2	S-NG-RAN NODE MODIFICATION
+This section provides description of S-NG-RAN node modification. It can be initiated either by the MN or by the SN and be used to modify the current user plane resource configuration or to modify other properties of the UE context within the same SN.
+7.2.1	M-NG-RAN node initiated SN modification
+The following parameter condition is applied for this procedure.
+7.2.1.1	PDU Session addition
+Purpose of the PDU Session Addition is to setup new PDU Session as SN terminated split bearer. PDU Session Addition will always result new DRB addition in SN.
+7.2.1.1.1	Message flow for Xn
+Figure 7.2.1.1.1-1: MN initiated SN Modification – PDU Session addition
+NOTE1:	If SN terminated split bearer is added directly from new PDU Session Setup from AMF(blind addition), 
+			without PDU Session in MN terminated MCG bearer on MN side, step 7 and step 8 are not needed.
+7.2.1.1.2	Xn-IE handling
+7.2.1.1.3	Message flow for Xn+F1
+Figure 7.2.1.1.3-1: MN initiated SN Modification – PDU Session addition
+7.2.1.1.4	F1-IE handling
+7.2.1.2	PDU Session Release
+Purpose of the PDU Session release is to release the PDU Session including all Qos Flows mapped to it. PDU Session Release will always result in at least one DRB release also.
+7.2.1.2.1	Message flow for Xn
+Figure 7.2.1.2.1-1: MN initiated SN Modification – PDU Session Release
+NOTE1: 	Steps 3, 7 and step 8 are needed when PDCP termination point is moved from SN to MN with data 
+			forwarding of the released DRB/PDU session is requested by SN and MN accepted.
+NOTE2: 	Step 9 is optional.
+7.2.1.2.2	Xn-IE handling
+7.2.1.2.3	Message flow for Xn+F1
+Figure 7.2.1.2.3-1: MN initiated SN Modification – PDU Session Release
+NOTE:	In Step 2a, DRB(s) modification is done in case of PDU Session is kept in MN and PDCP termination point 
+			moved from SN to MN. DRB(s) Release is done when PDU Session is released also from MN.
+7.2.1.2.4	F1-IE handling
+7.2.1.3	PDU Session Modification
+Void
+7.2.1.4	Security Key change
+7.2.1.4.1	Message flow for Xn
+Figure 7.2.1.4.1-1: MN initiated SN Modification – Security Key Change
+7.2.1.4.2	Xn-IE handling
+7.2.1.4.3	Message flow for Xn+F1
+Figure 7.2.1.4.3-1: MN initiated SN Modification – Security Key Change
+7.2.1.4.4	F1-IE handling
+7.2.1.5	SCG Configuration Query
+The MN uses the procedure to query the current SCG configuration, e.g. when delta configuration is applied in an MN initiated SN change.
+7.2.1.5.1	Message flow for Xn
+Figure 7.2.1.5.1-1: MN initiated SN Modification – SCG Config Query
+7.2.1.5.2	Xn-IE handling
+7.2.1.5.3	Message flow for Xn+F1
+Figure 7.2.1.5.3-1: MN initiated SN Modification – SCG Config Query + DU Config Query
+7.2.1.5.4	F1-IE handling
+7.2.2	S-NG-RAN node initiated SN modification with MN involvement
+The following parameter condition is applied for this procedure.
+7.2.2.1	PDU Session Modification
+Void
+7.2.2.2 PDU Session Release
+Purpose of the procedure is for SN initiate PDU Session release with releasing all Qos flows of the PDU Session from the UE that has more than one PDU Sessions. Procedure will result always in at least one DRB release.
+7.2.2.2.1	Message flow for Xn
+Figure 7.2.2.2.1-1: SN initiated SN Modification with MN involvement – PDU Session Release
+NOTE1: 	Step 5 and 6 are needed when PDU session is kept in MN and related SN terminated split bearers moved to 
+			MN terminated MCG bearers with forwarding supported.
+NOTE2: 	Step 7 is optional.
+7.2.2.2.2	Xn-IE handling
+7.2.2.2.3	Message flow for Xn+F1
+Figure 7.2.2.2.3.1-1: SN initiated SN Modification with MN involvement – PDU Session Release
+7.2.2.2.4	F1-IE handling
+7.2.2.3	Security Key Change
+Purpose of the Security Key Change procedure is for SN to initiate Security Key Change in both SN and MN and inform it to the UE.
+7.2.2.3.1	Message flow for Xn
+Figure 7.2.2.3.1-1: SN initiated SN Modification with MN involvement – Security Key Change
+NOTE:	Since only SN security key is provided in step 2, the MN does not need to wait for the reception of step 3 to 
+			initiate the RRC connection reconfiguration procedure.
+7.2.2.3.2	Xn-IE handling
+7.2.2.3.3	Message flow for Xn+F1
+Figure 7.2.2.3.3-1: SN initiated SN Modification with MN involvement – Security Key Change
+7.2.2.3.4	F1-IE handling
+7.2.3	S-NG-RAN node initiated SN modification without MN involvement
+The following parameter condition is applied for this procedure.
+7.2.3.1	SRB3 not supported
+The following parameter condition is applied for this procedure.
+7.2.3.1.1	SN Modification – Scell(s) Addition / Release
+Purpose of the PDU Session Modification is to add or release SCell(s) to SN without MN involvement. Since SRB3 is not supported, RRC messages used to configure UE are sent via MN, but MN is not involved in other way in procedure.
+7.2.3.1.1.1	Message flow for Xn
+Figure 7.2.3.1.1.1-1: SN initiated SN Modification without MN involvement – Scell(s) Addition/Release
+7.2.3.1.1.2	Xn-IE handling
+7.2.3.1.1.3	Message flow for Xn+F1
+Figure 7.2.3.1.1.3-1: SN initiated SN Modification without MN involvement – Scell(s) Addition/Release
+7.2.3.1.1.4	F1-IE handling
+7.3	S-NG-RAN NODE RELEASE
+This section provides description of S-NG-RAN node release procedure. It can be initiated either by the MN or by the SNand is used to initiate the release of the UE context at the SN.
+7.3.1	M-NG-RAN node initiated S-NG-RAN Node Release without keeping UE
+Purpose of the M-NG-RAN node initiated S-NG-RAN Node Release without keeping UE is to release the UE context and relevant resources at both the M-NG-RAN node and the S-NG-RAN node.
+The following parameter condition is applied for this procedure.
+7.3.1.1	Message flow for Xn
+Figure 7.3.1.1-1: M-NG-RAN node initiated S-NG-RAN Node Release without keeping UE
+NOTE1:	If the M-NG-RAN node receives the UE Context Release Command message from the AMF in step 1, 
+			it shall initiate this procedure.
+NOTE2:	The secondary RAT data volume reporting function is performed optionally in step 4.
+7.3.1.2	Xn-C IE handling
+7.3.1.3	Message flow for Xn and F1
+Figure 7.3.1.3-1: M-NG-RAN node initiated S-NG-RAN Node Release without keeping UE
+NOTE1:	If the M-NG-RAN node receives the UE Context Release Command message from the AMF in step 1, 
+			it shall initiate this procedure.
+NOTE2:	Step 2a may apply to the case that the gNB-DU triggers the M-NG-RAN node initiated S-NG-RAN Node
+			Release.
+NOTE3:	The secondary RAT data volume reporting function is performed optionally in step 4.
+7.3.1.4	F1-C IE handling
+7.3.2	M-NG-RAN node initiated S-NG-RAN Node Release with keeping UE
+Purpose of the M-NG-RAN node initiated S-NG-RAN Node Release with keeping UE is to release the UE context and relevant resources at the S-NG-RAN node, and to keep the UE context and relevant resources at the M-N-RAN node.
+The following parameter condition is applied for this procedure.
+7.3.2.1	Message flow for Xn
+Figure 7.3.2.1-1: M-NG-RAN node initiated S-NG-RAN Node Release with keeping UE
+NOTE1:	The secondary RAT data volume reporting function is performed optionally in Step 8.
+NOTE2:	Steps 6-8 may take place any time after step 2.
+7.3.2.2	Xn-C IE handling
+7.3.2.3	Message flow for Xn and F1
+Figure 7.3.2.3-1: M-NG-RAN node initiated S-NG-RAN Node Release with keeping UE
+NOTE1:	The secondary RAT data volume reporting function is performed optionally in Step 8.
+NOTE2:	Steps 6-8 may take place any time after step 4b.
+7.3.2.4	F1-C IE handling
+7.3.3	S-NG-RAN node initiated S-NG-RAN Node Release
+Purpose of the S-NG-RAN node initiated S-NG-RAN Node Release procedure is to release the UE context and relevant resources at the S-NG-RAN node.
+The following parameter condition is applied for this procedure.
+7.3.3.1	Message flow for Xn
+Figure 7.3.3.1-1: S-NG-RAN node initiated S-NG-RAN Node Release
+NOTE1:	In step 5, if the PDCP termination point is changed, the S-NG-RAN node sends the SN Status Transfer
+			message.
+NOTE2: 	When the S-NG-RAN node proposes data forwarding, step 6 is performed if the M-NG-RAN node accepts 
+			the proposed forwarding.
+NOTE3:	UL data Forwarding is performed optionally in step 6.
+NOTE4:	The secondary RAT data volume reporting function is performed optionally in Step 7.
+NOTE5:	Steps 5-7 may take place any time after step 2.
+NOTE6:	In case of the S-NG-RAN node initiated S-NG-RAN Node Release with keeping the UE in the MN side, the
+			MN shall perform the RRC reconfiguration procedure to modify the RRC connection and execute the PDU 
+			Session Path Update procedure to 5GC (OPT1).
+NOTE7:	In case of the S-NG-RAN node initiated S-NG-RAN Node Release without keeping the UE in the MN side, 
+			the MN shall perform the RRC connection release procedure to release the RRC connection (OPT2).
+7.3.3.2	Xn-C IE handling
+7.3.3.3	Message flow for Xn and F1
+Figure 7.3.3.3-1: S-NG-RAN node initiated S-NG-RAN Node Release
+NOTE1:	Step 1a may apply to the case that the gNB-DU triggers the S-NG-RAN node initiated S-NG-RAN Node 
+			Release.
+NOTE2:	In step 5, if the PDCP termination point is changed, the S-NG-RAN node sends the SN Status Transfer 
+			message.
+NOTE3:	When the S-NG-RAN node proposes data forwarding, step 6 is performed in case the M-NG-RAN node
+			accepts the proposed forwarding.
+NOTE4:	UL data Forwarding is performed optionally in step 6.
+NOTE5:	The secondary RAT data volume reporting function is performed optionally in Step 7.
+NOTE6:	Steps 5-7 may take place any time after step 2.
+NOTE7:  In case of the S-NG-RAN node initiated S-NG-RAN Node Release with keeping the UE in the MN side, the 
+			MN-CU shall perform the UE Context Modification procedure to indicate the Bearer Type Change IE in the
+			UE Context Modification Request message and execute the PDU Session Path Update procedure to 5GC 
+			(OPT1).
+NOTE8:  In case of the S-NG-RAN node initiated S-NG-RAN Node Release without keeping the UE in the MN side, 
+			the MN-CU shall perform the UE Context Release procedure to release whole UE context (OPT2).
+7.3.3.4	F1-C IE handling
+Annex ZZZ: O-RAN Adopter License Agreement
+BY DOWNLOADING, USING OR OTHERWISE ACCESSING ANY O-RAN SPECIFICATION, ADOPTER AGREES TO THE TERMS OF THIS AGREEMENT.
+This O-RAN Adopter License Agreement (the “Agreement”) is made by and between the O-RAN Alliance and the entity that downloads, uses or otherwise accesses any O-RAN Specification, including its Affiliates (the “Adopter”).
+This is a license agreement for entities who wish to adopt any O-RAN Specification.
+Section 1: DEFINITIONS
+1.1 “Affiliate” means an entity that directly or indirectly controls, is controlled by, or is under common control with another entity, so long as such control exists. For the purpose of this Section, “Control” means beneficial ownership of fifty (50%) percent or more of the voting stock or equity in an entity.
+1.2 “Compliant Implementation” means any system, device, method or operation (whether implemented in hardware, software or combinations thereof) that fully conforms to a Final Specification.
+1.3 “Adopter(s)” means all entities, who are not Members, Contributors or Academic Contributors, including their Affiliates, who wish to download, use or otherwise access O-RAN Specifications.
+1.4 “Minor Update” means an update or revision to an O-RAN Specification published by O-RAN Alliance that does not add any significant new features or functionality and remains interoperable with the prior version of an O-RAN Specification. The term “O-RAN Specifications” includes Minor Updates.
+1.5 “Necessary Claims” means those claims of all present and future patents and patent applications, other than design patents and design registrations, throughout the world, which (i) are owned or otherwise licensable by a Member, Contributor or Academic Contributor during the term of its Member, Contributor or Academic Contributorship; (ii) such Member, Contributor or Academic Contributor has the right to grant a license without the payment of consideration to a third party; and (iii) are necessarily infringed by a Compliant Implementation (without considering any Contributions not included in the Final Specification). A claim is necessarily infringed only when it is not possible on technical (but not commercial) grounds, taking into account normal technical practice and the state of the art generally available at the date any Final Specification was published by the O-RAN Alliance or the date the patent claim first came into existence, whichever last occurred, to make, sell, lease, otherwise dispose of, repair, use or operate a Compliant Implementation without infringing that claim. For the avoidance of doubt in exceptional cases where a Final Specification can only be implemented by technical solutions, all of which infringe patent claims, all such patent claims shall be considered Necessary Claims.
+1.6 “Defensive Suspension” means for the purposes of any license grant pursuant to Section 3, Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates, may have the discretion to include in their license a term allowing the licensor to suspend the license against a licensee who brings a patent infringement suit against the licensing Member, Contributor, Academic Contributor, Adopter, or any of their Affiliates.
+Section 2: COPYRIGHT LICENSE
+2.1 Subject to the terms and conditions of this Agreement, O-RAN Alliance hereby grants to Adopter a nonexclusive, nontransferable, irrevocable, non-sublicensable, worldwide copyright license to obtain, use and modify O-RAN Specifications, but not to further distribute such O-RAN Specification in any modified or unmodified way, solely in furtherance of implementations of an ORAN
+Specification.
+2.2 Adopter shall not use O-RAN Specifications except as expressly set forth in this Agreement or in a separate written agreement with O-RAN Alliance.
+Section 3: FRAND LICENSE
+3.1 Members, Contributors and Academic Contributors and their Affiliates are prepared to grant based on a separate Patent License Agreement to each Adopter under Fair Reasonable And Non- Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license shall not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Adopter if that Adopter is not making a reciprocal grant to Members, Contributors and Academic Contributors, as set forth in Section 3.3. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Adopter’s distributors and the use by the Adopter’s customers of such licensed Compliant Implementations.
+3.2 Notwithstanding the above, if any Member, Contributor or Academic Contributor, Adopter or their Affiliates has reserved the right to charge a FRAND royalty or other fee for its license of Necessary Claims to Adopter, then Adopter is entitled to charge a FRAND royalty or other fee to such Member, Contributor or Academic Contributor, Adopter and its Affiliates for its license of Necessary Claims to its licensees.
+3.3 Adopter, on behalf of itself and its Affiliates, shall be prepared to grant based on a separate Patent License Agreement to each Members, Contributors, Academic Contributors, Adopters and their Affiliates under Fair Reasonable And Non-Discriminatory (FRAND) terms and conditions with or without compensation (royalties) a nonexclusive, non-transferable, irrevocable (but subject to Defensive Suspension), non-sublicensable, worldwide patent license under their Necessary Claims to make, have made, use, import, offer to sell, lease, sell and otherwise distribute Compliant Implementations; provided, however, that such license will not extend: (a) to any part or function of a product in which a Compliant Implementation is incorporated that is not itself part of the Compliant Implementation; or (b) to any Members, Contributors, Academic Contributors, Adopters and their Affiliates that is not making a reciprocal grant to Adopter, as set forth in Section 3.1. For the avoidance of doubt, the foregoing licensing commitment includes the distribution by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ distributors and the use by the Members’, Contributors’, Academic Contributors’, Adopters’ and their Affiliates’ customers of such licensed Compliant Implementations.
+Section 4: TERM AND TERMINATION
+4.1 This Agreement shall remain in force, unless early terminated according to this Section 4.
+4.2 O-RAN Alliance on behalf of its Members, Contributors and Academic Contributors may terminate this Agreement if Adopter materially breaches this Agreement and does not cure or is not capable of curing such breach within thirty (30) days after being given notice specifying the breach.
+4.3 Sections 1, 3, 5 - 11 of this Agreement shall survive any termination of this Agreement. Under surviving Section 3, after termination of this Agreement, Adopter will continue to grant licenses (a) to entities who become Adopters after the date of termination; and (b) for future versions of ORAN Specifications that are backwards compatible with the version that was current as of the date of termination.
+Section 5: CONFIDENTIALITY
+Adopter will use the same care and discretion to avoid disclosure, publication, and dissemination of O-RAN Specifications to third parties, as Adopter employs with its own confidential information, but no less than reasonable care. Any disclosure by Adopter to its Affiliates, contractors and consultants should be subject to an obligation of confidentiality at least as restrictive as those contained in this Section. The foregoing obligation shall not apply to any information which is: (1) rightfully known by Adopter without any limitation on use or disclosure prior to disclosure; (2) publicly available through no fault of Adopter; (3) rightfully received without a duty of confidentiality; (4) disclosed by O-RAN Alliance or a Member, Contributor or Academic Contributor to a third party without a duty of confidentiality on such third party; (5) independently developed by Adopter; (6) disclosed pursuant to the order of a court or other authorized governmental body, or as required by law, provided that Adopter provides reasonable prior written notice to O-RAN Alliance, and cooperates with O-RAN Alliance and/or the applicable Member, Contributor or Academic Contributor to have the opportunity to oppose any such order; or (7) disclosed by Adopter with O-RAN Alliance’s prior written approval.
+Section 6: INDEMNIFICATION
+Adopter shall indemnify, defend, and hold harmless the O-RAN Alliance, its Members, Contributors or Academic Contributors, and their employees, and agents and their respective successors, heirs and assigns (the “Indemnitees”), against any liability, damage, loss, or expense (including reasonable attorneys’ fees and expenses) incurred by or imposed upon any of the Indemnitees in connection with any claims, suits, investigations, actions, demands or judgments arising out of Adopter’s use of the licensed O-RAN Specifications or Adopter’s commercialization of products that comply with O-RAN Specifications.
+Section 7: LIMITATIONS ON LIABILITY; NO WARRANTY
+EXCEPT FOR BREACH OF CONFIDENTIALITY, ADOPTER’S BREACH OF SECTION 3, AND ADOPTER’S INDEMNIFICATION OBLIGATIONS, IN NO EVENT SHALL ANY PARTY BE LIABLE TO ANY OTHER PARTY OR THIRD PARTY FOR ANY INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES RESULTING FROM ITS PERFORMANCE OR NON-PERFORMANCE UNDER THIS AGREEMENT, IN EACH CASE WHETHER UNDER CONTRACT, TORT, WARRANTY, OR OTHERWISE, AND WHETHER OR NOT SUCH PARTY HAD ADVANCE NOTICE OF THE POSSIBILITY OF SUCH DAMAGES. O-RAN SPECIFICATIONS ARE PROVIDED “AS IS” WITH NO WARRANTIES OR CONDITIONS WHATSOEVER, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. THE O-RAN ALLIANCE AND THE MEMBERS, CONTRIBUTORS OR ACADEMIC CONTRIBUTORS EXPRESSLY DISCLAIM ANY WARRANTY OR CONDITION OF MERCHANTABILITY, SECURITY, SATISFACTORY QUALITY, NONINFRINGEMENT, FITNESS FOR ANY PARTICULAR PURPOSE, ERROR-FREE OPERATION, OR ANY WARRANTY OR CONDITION FOR O-RAN SPECIFICATIONS.
+Section 8: ASSIGNMENT
+Adopter may not assign the Agreement or any of its rights or obligations under this Agreement or make any grants or other sublicenses to this Agreement, except as expressly authorized hereunder, without having first received the prior, written consent of the O-RAN Alliance, which consent may be withheld in O-RAN Alliance’s sole discretion. O-RAN Alliance may freely assign this Agreement.
+Section 9: THIRD-PARTY BENEFICIARY RIGHTS
+Adopter acknowledges and agrees that Members, Contributors and Academic Contributors (including future Members, Contributors and Academic Contributors) are entitled to rights as a third-party beneficiary under this Agreement, including as licensees under Section 3.
+Section 10: BINDING ON AFFILIATES
+Execution of this Agreement by Adopter in its capacity as a legal entity or association constitutes that legal entity’s or association’s agreement that its Affiliates are likewise bound to the obligations that are applicable to Adopter hereunder and are also entitled to the benefits of the rights of Adopter hereunder.
+Section 11: GENERAL
+This Agreement is governed by the laws of Germany without regard to its conflict or choice of law provisions.
+This Agreement constitutes the entire agreement between the parties as to its express subject matter and expressly supersedes and replaces any prior or contemporaneous agreements between the parties, whether written or oral, relating to the subject matter of this Agreement.
+Adopter, on behalf of itself and its Affiliates, agrees to comply at all times with all applicable laws, rules and regulations with respect to its and its Affiliates’ performance under this Agreement, including without limitation, export control and antitrust laws. Without limiting the generality of the foregoing, Adopter acknowledges that this Agreement prohibits any communication that would violate the antitrust laws.
+By execution hereof, no form of any partnership, joint venture or other special relationship is created between Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors. Except as expressly set forth in this Agreement, no party is authorized to make any commitment on behalf of Adopter, or O-RAN Alliance or its Members, Contributors or Academic Contributors.
+In the event that any provision of this Agreement conflicts with governing law or if any provision is held to be null, void or otherwise ineffective or invalid by a court of competent jurisdiction, (i) such provisions will be deemed stricken from the contract, and (ii) the remaining terms, provisions, covenants and restrictions of this Agreement will remain in full force and effect.
+Any failure by a party or third party beneficiary to insist upon or enforce performance by another party of any of the provisions of this Agreement or to exercise any rights or remedies under this Agreement or otherwise by law shall not be construed as a waiver or relinquishment to any extent of the other parties’ or third party beneficiary’s right to assert or rely upon any such provision, right or remedy in that or any other instance; rather the same shall be and remain in full force and effect.

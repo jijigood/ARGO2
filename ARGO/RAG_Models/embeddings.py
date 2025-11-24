@@ -22,6 +22,8 @@ try:  # pragma: no cover - optional dependency for device detection
 except ImportError:  # pragma: no cover
     torch = None  # type: ignore
 
+from .oran_parser import ORANSectionParser
+
 
 DEFAULT_EMBEDDING_MODEL = os.getenv(
     "ARGO_EMBEDDING_MODEL",
@@ -95,6 +97,63 @@ class TextChunker:
                 }
                 chunked_docs.append(chunked_doc)
         
+        return chunked_docs
+
+
+class SectionAwareChunker(TextChunker):
+    """Enhanced chunker that respects section boundaries."""
+
+    def __init__(self, chunk_size: int = 200, chunk_overlap: int = 50):
+        super().__init__(chunk_size, chunk_overlap)
+        self.parser = ORANSectionParser()
+
+    def chunk_document_with_sections(
+        self,
+        doc: Dict,
+        preserve_boundaries: bool = True,
+    ) -> List[Dict]:
+        """Chunk a document while preserving section structure."""
+
+        work_group = self.parser.extract_work_group(doc.get("doc_id", ""))
+
+        if not preserve_boundaries:
+            fallback_chunks = super().chunk_documents([doc])
+            for chunk in fallback_chunks:
+                chunk.setdefault("section_id", "unknown")
+                chunk.setdefault("section_title", doc.get("title", ""))
+                chunk.setdefault("work_group", work_group)
+            return fallback_chunks
+
+        sections = self.parser.parse_document(
+            doc.get("content", ""),
+            doc_id=doc.get("doc_id", "unknown"),
+            work_group=work_group,
+        )
+
+        chunked_docs: List[Dict] = []
+
+        for section_idx, section in enumerate(sections):
+            section_chunks = self.chunk_by_sentences(section.get("content", ""))
+            if not section_chunks:
+                continue
+
+            for i, chunk_text in enumerate(section_chunks):
+                chunked_doc = {
+                    "doc_id": doc.get("doc_id"),
+                    "chunk_id": f"{doc.get('doc_id')}_sec{section_idx}_chunk_{i}",
+                    "title": doc.get("title", ""),
+                    "content": chunk_text,
+                    "category": doc.get("category", "unknown"),
+                    "complexity": doc.get("complexity", 2),
+                    "chunk_index": i,
+                    "total_chunks": len(section_chunks),
+                    "source_path": doc.get("source_path"),
+                    "section_id": section.get("section_id", "unknown"),
+                    "section_title": section.get("section_title", ""),
+                    "work_group": section.get("work_group", work_group),
+                }
+                chunked_docs.append(chunked_doc)
+
         return chunked_docs
 
 

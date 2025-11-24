@@ -1,0 +1,1476 @@
+Copyright © 2023 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this specification in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this specification for your personal use, or copy the material of this specification for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+Contents
+Introduction
+Scope
+This Technical Specification has been produced by the O-RAN.org.
+The contents of the present document are subject to continuing work within O-RAN WG6 and may change following formal O-RAN approval. Should the O-RAN.org modify the contents of the present document, it will be re-released by O-RAN Alliance with an identifying change of release date and an increase in version number as follows:
+Release x.y.z
+where:
+x	the first digit is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have x=01).
+y	the second digit is incremented when editorial only changes have been incorporated in the document.
+z	the third digit included only in working versions of the document indicating incremental changes during the editing process.
+This document defines O-RAN O-Cloud IMS interface functions and protocols for the O-RAN O2 interface. The document studies the functions conveyed over the interface, including management functions, procedures, operations and corresponding solutions, and identifies existing standards and industry work that can serve as a basis for O-RAN work.
+References
+3GPP TR 21.905: “3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; Vocabulary for 3GPP Specifications”
+O-RAN Whitepaper
+ORAN-WG4.MP.0-v01.00: O-RAN Alliance Working Group 4 Management Plane Specification
+O-RAN WG1 Architecture Description
+O-RAN WG1 OAM Architecture
+O-RAN WG1 O1 Interface Specification
+O-RAN WG6 Cloud Architecture and Deployment Scenarios
+RFC 6241, “Network Configuration Protocol (NETCONF)”, IETF, June 2011
+RFC 7950, “The YANG 1.1 Data Modeling Language”, IETF, August 2016
+RFC 2119, "Key words for use in RFCs to Indicate Requirement Levels", IETF, March 1997
+3GPP TS 29.501 "5G System; Principles and Guidelines for Services Definition; Stage 3(Release 16)", September 2020
+3GPP TS 29.571 "", September 2020
+ONAP VES Event Listener Specification v7.2, May 2020 (Draft)
+3GPP TS 29.500: "5G System; Technical Realization of Service Based Architecture; Stage 3".
+OpenAPI: "OpenAPI 3.0.0 Specification", https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md.
+3GPP TS 33.501: "Security architecture and procedures for 5G system".
+IETF RFC 6749: "The OAuth 2.0 Authorization Framework".
+3GPP TS 29.510: "5G System; Network Function Repository Services; Stage 3".
+IETF RFC 7540: "Hypertext Transfer Protocol Version 2 (HTTP/2)".
+IETF RFC 8259: "The JavaScript Object Notation (JSON) Data Interchange Format".
+IETF RFC 7807: "Problem Details for HTTP APIs".
+ETSI GS NFV-SOL 013v3.3.1: " Protocols and Data Models; Specification of common aspects for RESTful NFV MANO APIs", September 2020
+O-RAN WG6 "Orchestration Use Case and Requirements for O-RAN Virtualized RAN"
+O-RAN WG6 "O-RAN O2 General Aspects and Principles Specification"
+ETSI GS NFV-SOL 015v1.2.1: " Protocols and Data Models; Specification of Patterns and Conventions for RESTful NFV-MANO APIs", December 2020
+ISO/IEC 9646-7: "Information technology - Open Systems Interconnection - Conformance testing methodology and framework - Part 7: Implementation Conformance Statements".
+ITU-T Recommendation X.733 (02/92): "Information technology - Open Systems Interconnection - Systems Management: Alarm reporting function".
+ITU-T Recommendation X.736, "Information Technology - Open Systems Interconnection - System Management: Security Alarm Reporting Function', 1992"
+Definitions and Abbreviations
+Definitions
+FFS.
+Abbreviations
+For the purposes of the present document, the abbreviations given in 3GPP TR 21.905 [1] and the following apply. An abbreviation defined in the present document takes precedence over the definition of the same abbreviation, if any, in 3GPP TR 21.905 [1].
+DMS	O-Cloud Deployment Management Services
+FCAPS	Fault, Configuration, Accounting, Performance, Security
+HATEOAS	Hypermedia as the Engine of Application State
+IMS	O-Cloud Infrastructure Management Services
+MANO	Management and Orchestration
+MnS	Management Service
+MOC	Managed Object Class
+MOI	Managed Object Instance
+MVP	Minimum Viable Product
+O-RAN	Open Radio Access Network
+ONAP	Open Network Automation Platform
+OSM	Open Source Mano
+RAN				Radio Access Network
+TLS				Transport Layer Security
+TR					Technical Report
+TS					Technical Specification
+SMO				Service Management and Orchestration
+Service Definitions
+O2ims Services
+General
+Table 2.1.1-1 O2ims Services to API mapping summarizes the corresponding O2ims service APIs defined.
+Table 2.1.1-1 O2ims Services to API mapping
+Infrastructure Inventory Service Objects
+General
+The O2ims_InfrastructureInventory services has operations on the following managed service objects that are provided by the O-Cloud:
+-	OCloud,
+-	ResourceType,
+-	ResourcePool,
+-	Resource,
+-	DeploymentManager, and
+- 	InventoryChangeSubscription
+Figure 2.1.1.1.1-1 illustrates the relationships in between the managed service objects of the O2ims_InfrastructureInventory services.
+@startuml
+Hide empty methods
+Namespace OCloud.Infrastructure.Inventory {
+Class “O-Cloud” as OCloud {
+.. Identifiers ..
++oCloudID : UUID
++globalCloudID : UUID
+.. Attributes ..
++name : String
++description : String
++infrastructureMangementServiceEndPoint: URI
++smoRegistrationService: URI
++extensions : KeyValuePair[*]
+.. Composition ..
++resourceTypes : ResourceType[1..*]
++deploymentManagers : DeploymentManager[1..*]
++resourcePools : ResourcePool[1..*]
+}
+Class DeploymentManager {
+.. Identifiers ..
++deploymentManagerID : UUID
+.. Attributes ..
++name : String
++description : String
++oCloudID : UUID
++deploymentManagementServiceEndPoint : URI
++extensions : KeyValuePair[*]
+.. Composition ..
++supportedLocations : UUID [1..*]
++capabilities : KeyValuePair [1..*]
++capacity : KeyValuePair [1..*]
+}
+Class ResourcePool {
+.. Identifiers ..
++resourcePoolID : UUID
++globalLocationID : UUID
+.. Attributes ..
++name : String
++description : String
++location : String
++oCloudID : UUID
++extensions : KeyValuePair[*]
+.. Composition ..
++resources : Resource[1..*]
+}
+Class Resource {
+.. Identifiers ..
++resourceID : UUID
+.. Attributes ..
++resourceTypeID : ResourceTypeID
++description : String
++extensions : KeyValuePair[*]
++resourcePoolID : UUID
++globalAssetID : UUID [0..1]
+.. Composition ..
++elements : Resource[*]
+}
+Class ResourceType {
+.. Identifiers ..
++resourceTypeID : UUID
+.. Attributes ..
++name : String
++description : String
++vendor : String
++model : String
++version : String
++resourceKind : ResourceKind
++resourceClass : ResourceClass
++extensions : KeyValuePair[*]
+.. Composition ..
++alarmDictionary : ORAN.Application.AlarmDictionary
+}
+Enum ResourceKind {
+UNDEFINED
+PHYSICAL
+LOGICAL
+}
+Enum ResourceClass {
+UNDEFINED
+COMPUTE
+NETWORKING
+STORAGE
+}
+OCloud “1” *--> “+deploymentManagers\n1..*” DeploymentManager : HasMany
+OCloud “1” *--> “+resourcePools\n1..*” ResourcePool : HasMany
+ResourcePool “1” *--> “+resources\n1..*” Resource : HasMany
+Resource “1” o--> “+elements\n0..*” Resource  : IsComposedOf
+Resource “0..*” --> “+resourceType\n1” ResourceType : HasA
+OCloud “1” *--> “+resourceTypes\n1..*” ResourceType : HasMany
+ResourceType “*” --> “+resourceKind\n1” ResourceKind : HasA
+ResourceType “*” --> “+resourceClass\n1” ResourceClass : HasA
+ResourceType "1" *-r-> "+alarmDictionary\n0..1" ORAN.Application.AlarmDictionary : MayHaveA
+}
+@enduml
+Figure 2.1.1.1.1-1: Relationship in between the managed service objects of the O2ims_InfrastructureInventory services
+@startuml
+Hide empty members
+Namespace OCloud.Infrastructure.Inventory {
+Class Subscription {
+.. Identifiers ..
++subscriptionID : UUID
+.. Attributes ..
++consumerSubscriptionID : UUID
++filter : string
+.. Composition ..
++callback : URL
+}
+InfrastructureInventoryObject <|-- Resource
+InfrastructureInventoryObject <|-- ResourceType
+InfrastructureInventoryObject <|-- ResourcePool
+InfrastructureInventoryObject <|-- DeploymentManager
+InfrastructureInventoryObject <|-- “O-Cloud”
+Enum NotificationEventType {
+CREATE
+MODIFY
+DELETE
+}
+Class InfrastructureInventoryEvent << (N,orchid) >> {
+.. Attributes ..
++consumerSubscriptionID : UUID
++notificationEventType : NotificationEventType
+objectRef : URL
+.. Composition ..
++priorObjectState : InfrastructureInventoryObject[0..1]
++postObjectState : InfrastructureInventoryObject[0..1]
+}
+InfrastructureInventoryEvent “*” --> “+notificationEventType\n1” NotificationEventType : HasA
+InfrastructureInventoryEvent “*” --> “+priorObjectState\n0..1” InfrastructureInventoryObject: MayHaveA
+InfrastructureInventoryEvent “*” --> “+postObjectState\n0..1” InfrastructureInventoryObject: HasA MayHaveA
+Subscription “1” --> “*” InfrastructureInventoryEvent : Subscription_Creates_Notification
+}
+@enduml
+Figure 2.1.1.1.1-2 Infrastructure Inventory Subscribe/Notify Relationships of the O2ims_InfrastructureInventory Services
+OCloud
+The OCloud service object represents an instance of an O-Cloud. For more information about O-Cloud, refer to clause 3.1 in the "O-RAN O2 General Aspects and Principles Specification" [24].
+The information representing the OCloud shall follow the provisions indicated in table 2.1.1.1.2-1.
+Table 2.1.1.1.2-1: Attributes of the OCloud
+ResourceType
+The ResourceType service object represents a resource type in an O-Cloud.
+Resource types provide the categorization of O-Cloud Nodes as described in the O-RAN Cloud Architecture and Deployment Scenarios [7] specification. The values for these types are used to build the inventory and enable an authorized consumer to track resource changes over time. The O-Cloud provides a mechanism to discover the resource types with respective operations on resource types.
+Please note that the list of resource classes is not exhaustive, and additional classes are FFS.
+The information representing the ResourceType shall follow the provisions indicated in table 2.1.1.1.3-1.
+Table 2.1.1.1.3-1: Attributes of the ResourceType
+ResourcePool
+The ResourcePool service object respresents a resource pool instance in an O-Cloud.
+The O-Cloud is a distributed cloud with resources placed in different locations. Those resources are organized into resource pools. There can be more than one resource pool for a given O-Cloud at the same physical location. However, each resource pool requires a different identity since the SMO will direct a deployment based on homing policies to a specific location. This is different than typical cloud deployments as location is key to meeting latency requirements, sometime to elements outside of the O-Cloud.
+NOTE:	The identity of a resource pool cannot be tied to a specific resource within the pool as that resource may be replaced as part of the O-Cloud lifecycle.
+The information representing the ResourcePool shall follow the provisions indicated in table 2.1.1.1.4-1.
+Table 2.1.1.1.4-1: Attributes of the ResourcePool
+Resource
+The Resource service object represents an instance of a resource in the O-Cloud.
+Resource pools are comprised of resources, wherein a specific instance of a resource can only be part of a single resource pool.
+Resources are of a specific resource type. The resource type of a given resource instance does not change over the lifetime of such a resource instance.
+The information representing an individual Resource shall follow the provisions indicated in table 2.1.1.1.5-1.
+Table 2.1.1.1.5-1: Attributes of the Resource
+DeploymentManager
+The DeploymentManager service object represents an instance of a DMS in the O-Cloud. This service object allows a client to discover the details about a DMS instance. This service object provides a list of supported capabilities, and metrics for total capacity, current allocations, current reservations. For more information about DMS, refer to clause 1.3.1 in the "O-RAN O2 General Aspects and Principles Specification" [24].
+The available capacity information supported by a DeploymentManager shall be calculated as Capacity - Allocated - Reserved.
+The information representing an instance of a DeploymentManager shall follow the provisions indicated in table 2.1.1.1.6-1.
+Table 2.1.1.1.6-1: Attributes of the DeploymentManager
+Subscription
+The Subscription service object represents an instance of a subscription to infrastructure inventory notifications for when resources within the inventory change.
+Subscriptions are required for a notification to be generated. Information about the change are provided to the consumer when the consumers specified criteria is met. The absence of a filter means all events are sent.
+The information representing one subscription shall follow the provisions indicated in table 2.1.1.1.7-1.
+Table 2.1.1.1.7-1: Attributes of the Subscription
+InfrastructureInventoryObject
+The InfrastructureInventoryObject is an abstract class which shall be implemented by one of its specific sub-classes. The InfrastructureInventoryObject does not have any common attributes.
+Infrastructure Lifecycle Management Service Objects
+General
+The O2ims_InfrastructureLifecycleManagement services has operations on the following managed service objects that are of interest to the SMO:
+-	OCloud,
+-	DeploymentManager,
+-	Location,
+-	Asset,
+Figure 2.1.1.2.1-1 illustrates the relationships in between the managed service objects of the SMO Inventory and the O2ims_InfrastructureInventory service objects as a result of LifeCycle operations.
+@startuml
+hide empty members
+namespace OCloud.Infrastructure.Inventory {
+class "O-Cloud" as OCloud {
++globalCloudID : UUID
++infrastructureMangementServiceEndPoint: URI
+}
+class DeploymentManager
+class ResourcePool {
+.. Identifiers ..
++resourcePoolID : UUID
++globalLocationID : UUID
+.. Composition ..
++resources : Resource[1..*]
+}
+class Resource {
+.. Identifiers ..
++resourceID : UUID
+.. Attributes ..
++resourcePoolID : UUID
++globalAssetID : UUID [0..1]
+}
+OCloud "1" *-d-> "1..*" DeploymentManager : OCloud_HasMany_deploymentManagers
+OCloud "1" *--> "1..*" ResourcePool : OCloud_HasMany_resourcePools
+DeploymentManager -d[hidden]- ResourcePool
+ResourcePool "1" --> "1..*" Resource : ResourcePool_HasMany_Resources
+}
+namespace SMO.Cloud.Inventory {
+class "O-Cloud" as OCloud {
++globalCloudID : UUID
++oCloudID : UUID
++infrastructureMangementServiceEndPoint: URI
+.. composition ..
++deploymentManagers : DeploymentManager[1..*]
+}
+class DeploymentManager {
+.. Identifiers ..
++globalDeploymentManagerID : UUID
++cloudDeploymentManagerID : UUID
+.. Attributes ..
++globalCloudID : UUID
++serviceEndPoint : URI
++locations: Location[1..*]
+}
+class Location {
+.. Identifiers ..
++globalLocationID : UUID
+.. Attributes ..
++name : string
++description: string
++coordinate : Coordinate [0..1]
++address : PostalAddress [0..1]
+}
+class Asset {
+.. Identifiers ..
++globalAssetID : UUID
+.. Attributes ..
++vendorID : UUID
++supplierID : UUID
++invoiceID : UUID
++inServiceDate : DateTime [0..1]
++decommisionDate : DateTime [0..1]
++globalLocationID : UUID
++cloudResourceID : UUID
++cloudRef : URI
+}
+Asset "1..*" -u-> "1" Location : Asset_isDeployedAt_globalLocationID
+OCloud "1" <--> "1..*" DeploymentManager : globalCloudID_hasMany_deploymentManagers
+DeploymentManager "*" o--> "1..*" Location : DeploymentManager_SupportMany_locations
+}
+SMO.Cloud.Inventory.OCloud "1" <-r-> "1" OCloud.Infrastructure.Inventory.OCloud : globalCloudID_IsA_cloudID
+SMO.Cloud.Inventory.DeploymentManager "1" <-r-> "1" OCloud.Infrastructure.Inventory.DeploymentManager : cloudDeploymentManagerID_IsA_deploymentManagerID
+SMO.Cloud.Inventory.Location "1" -r- "1" OCloud.Infrastructure.Inventory.ResourcePool : globalLocationID_IsAt_deploymentManagerID
+SMO.Cloud.Inventory.Asset "1" <-r-> "1" OCloud.Infrastructure.Inventory.Resource : cloudResourceID_MaybeA_globalAssetID
+@enduml
+Figure 2.1.1.2.1-1 SMO to OCloud Inventory Relationships
+OCloud
+The OCloud service object represents an instance of an O-Cloud within the SMO. For more information about O-Cloud, refer to clause 3.1 in the "O-RAN O2 General Aspects and Principles Specification" [24].
+The SMO has a view of the O-Cloud and initiates its deployment. From the O2 General Aspects and Principles [24] the SMO generates an ID and inventory record for the O-Cloud. Once the O-Cloud has reached a level of completeness, when it is ready to be provisioned for used to deploy workloads, the O-Cloud invokes a callback identified at the onset of the lifecycle process passing enough information for the SMO to associate the assigned globalCloudID, with the internal oCloudID and store its Infrastructure Management Service end point. The relationship to the globalCloudID and oCloudID is one-to-one in that there is a single, unique globalCloudID for each O-Cloud. The O-Cloud generates its own ID for its internal data relationships. Thus, reducing the coupling of the O-Cloud and the SMO which could be from different vendors. There is no guarantee that two different O-Clouds will not have the same internal oCloudID and therefore it is the responsibility of the SMO to discern and federate the two with different globalCloudID values.
+The information representing the OCloud shall follow the provisions indicated in table 2.1.1.2.2-1.
+Table 2.1.1.2.2-1: Attributes of the OCloud
+DeploymentManager
+The DeploymentManager service object represents an instance of a DMS in an O-Cloud that has been registered and discovered from the O-Cloud Infrastructure Inventory. This service object allows SMO clients to discover the details about a DMS instance. This service object provides a list of supported capabilities, and metrics for total capacity, current allocations, current reservations. For more information about DMS, refer to clause 1.3.1 in the "O-RAN O2 General Aspects and Principles Specification" [24].
+The total capacity of a DeploymentManager and its capabilities is determined by the resources that though provisioning has been made available to the DeploymentManager. The DeploymentManager updates its inventory record when new resources have been assigned or removed which affect its total capacity. It also periodically updates it inventory record based on workload deployments which affect both its allocations and potentially reservations. From these values the SMO can calculate the available capacity of the Deployment Manager by subtracting Allocations and Reservations from its total Capacity (AvailableCapacity = TotalCapacity - Allocations - Reservations).
+The information representing an instance of a DeploymentManager shall follow the provisions indicated in table 2.1.1.2.3-1.
+Table 2.1.1.2.3-1: Attributes of the DeploymentManager
+Location
+The Location service object represents a location where assets can be deployed. This could be an central, regional, or edge location.
+The information representing an instance of a Location shall follow the provisions indicated in table 2.1.1.2.4-1.
+Table 2.1.1.2.4-1: Attributes of the Location
+Asset
+The Asset service object represents an asset purchased or leased with a right-to-use by the operator and thus requires Asset Tracking.
+The information representing an instance of an Asset should follow the provisions indicated in table 2.1.1.2.5-1.
+Table 2.1.1.2.5-1: Attributes of an Asset
+Infrastructure Monitoring Fault Service Objects
+General
+The O2ims_InfrastructureMonitoring services has operations on the following managed service objects that are provided by the O-Cloud for faults:
+-	Alarms,
+-	ProbableCauses,
+-	Subscriptions
+Figure 2.1.1.3.1-1 illustrates the relationships in between the managed service objects of the O2ims_InfrastructureMonitoring services.
+@startuml
+Hide empty members
+Namespace SMO.Cloud.Inventory {
+Class "O-Cloud" as OCloud {
++globalCloudID : UUID
+}
+}
+Namespace ORAN.Application {
+Class AlarmDefinition{
++alarmDefinitionID : UUID
+}
+}
+Namespace OCloud.Infrastructure.Inventory {
+Class ResourceType {
++resourceTypeID : UUID
+}
+Class Resource {
++resourceID : UUID
+}
+Resource -u[hidden]-> ResourceType
+Resource -d[hidden]-> ORAN.Application.AlarmDefinition
+}
+Namespace OCloud.Infrastructure.Alarm {
+Class Subscription {
+.. Identifiers ..
++subscriptionID : UUID
+.. Attributes ..
++consumerSubscriptionID : UUID
++filter : string
+.. Composition ..
++callback : URL
+}
+Enum AlarmNotificationType {
+NEW
+CHANGE
+CLEAR
+ACKNOWLEDGE
+}
+Enum PerceivedSeverity {
+CRITICAL
+MAJOR
+MINOR
+WARNING
+INDETERMINATE
+CLEARED
+}
+Class ProbableCause {
+.. Identifiers ..
++probableCauseID : UUID
+.. Attributes ..
++name : String
++description : String
+}
+Class AlarmEventRecord {
+.. Identifiers ..
++alarmEventRecordID : UUID
+.. Relationships ..
++resourceTypeID : UUID
++resourceID : UUID
++alarmDefinitionID : UUID
++probableCauseID : UUID
+.. Attributes ..
++alarmRaisedTime : DateTime
++alarmChangedTime : DateTime
++alarmClearedTime : DateTime
++alarmAckbowledgedTime : DateTime
++alarmAcknowledged : Boolean
++perceivedSeverity : PerceivedSeverity
++extensions : KeyValue[*]
+}
+AlarmEventRecord "0..*" --> "+probableCauseID\n1" ProbableCause : IsDiagnosedAs
+AlarmEventRecord "*" --> "1" PerceivedSeverity : hasA
+Class AlarmEvent << (N,orchid) >> {
+.. Attributes ..
++globalCloudID : UUID
++consumerSubscriptionID : UUID
++alarmNotificationType : AlarmNotificationType
+objectRef : URL
+.. Composition ..
++alarmEventRecord : AlarmEventRecord
+}
+AlarmEvent "1" -r-> "*" SMO.Cloud.Inventory.OCloud : isReportedBy
+AlarmEvent *-> AlarmEventRecord : Has A
+AlarmEvent “*” --> “+alarmNotificationType\n1” AlarmNotificationType : HasA
+Subscription “1” --> “*” AlarmEvent : Subscription_Creates_Notification
+AlarmEventRecord "0..*" -u-> "+resourceTypeID\n1" OCloud.Infrastructure.Inventory.ResourceType : IsForA
+AlarmEventRecord "0..*" -r-> "+resourceID\n1" OCloud.Infrastructure.Inventory.Resource : IsForA
+AlarmEventRecord "0..*" -d-> "+alarmDefinitionID\n1" ORAN.Application.AlarmDefinition : IsDefinedByA
+}
+@enduml
+Figure 2.2.1.3.1-3 Infrastructure Fault Relationships of the O2ims_InfrastructureMonitoring Services
+AlarmEventRecord
+The AlarmEventRecord service object represents a stored instance detected within the O-Cloud Resources and stored by the IMS.
+The AlarmEventRecord can represent either a current active alarm or one that occurred in the past. Retention of an AlarmEventRecord is dependent on IMS configuration which would be set through an IMS Provisioning service.
+The information representing an individual AlarmEventRecord follows the provisions indicated in table 2.1.1.3.2-1.
+Table 2.1.1.3.2-1: Attributes of the AlarmEventRecord
+ProbableCauses
+ProbableCauses provides further qualification as to the root cause of an alarm. Probable causes are more of a description and therefore somewhat verbose. They are represented by an assigned ID which when needed the textual attributes can be looked up. Many ProbableCauses are defined in ITU-T Rec. X.733 [27] and ITU-T Rec X.736 [28]. The probable cause gives an indication of a possible root cause(s) that might have triggered the alarm on the resource based on detectable signatures with the O-Cloud. Additional ProbableCauses can be added by the O-Cloud provider. Work to standardize the probable causes for O-Cloud is for FFS.
+The information representing one probableCause follows the provisions indicated in table 2.1.1.3.3-1.
+Table 2.1.1.3.3-1: Attributes of the ProbableCause
+Subscription
+The Subscription service object represents an instance of a subscription to infrastructure fault notifications for when qualifying alarm list entry changes occur.
+Subscriptions are required for a notification to be generated. A consumer, such as the SMO, establishes a valid subscription to alarms. Information about the alarm is provided to the consumer when the consumers specified criteria is met. The absence of a filter means all events are sent.
+The information representing one subscription follows the provisions indicated in table 2.1.1.3.4-1.
+Table 2.1.1.3.4-1: Attributes of the Subscription
+Infrastructure Monitoring Performance Service Objects
+General
+The O2ims_InfrastructureMonitoring services follow a flow described in the O2 GAP clause 3.9.9. This primarily consists of:
+The Performance Measurement Store - used for storage and storage configuration of performance measurements.
+The Performance Measurement Job - used to collect performance measurements and insert them into the Performance Measurement Store.
+The Performance Measurement Subscription - used to identify what PerformanceMeasurementRecord(s) in the PeformanceMeasurementStore are reported, when they are reported, and how the report is to be delivered to the subscriber.
+The Performance Measurement Report - The notification payload used to convey measurement values identified by a Performance Subscription to the identified subscriber in a format selected by the subscriber.
+Figure 2.1.1.4.1-1 Performance Monitoring Information Flow
+The O2ims_InfrastuctureMonitoring information model have sub-components as follows:
+Performance Store
+PerformanceMeasurementStore
+PerformanceMeasurementRecord
+Performance Jobs
+PerformanceMeasurementJob
+MeasuredResource
+CollectedMeasurement
+PerformanceMeasurementJobChangeSubscription
+Performance Subscriptions
+PerformanceSubscription
+PerformanceReportingFrequency
+PerformanceSubscriptionCriteria
+Performance Reports
+PerformanceMeasurementReport
+JobReport
+ResourceReport
+MeasurementValue
+NotifyFileReady
+FileInfo
+Figure 2.1.1.4.1-1 illustrates the relationships in between the managed service objects of the O2ims_InfrastructureMonitoring services.
+@startuml
+Hide Empty members
+Namespace OCloud.Infrastructure.Inventory {
+Class ResourceType {
+resourceTypeId : UUID;
+}
+Class Resource {
+resourceId : UUID;
+}
+}
+Namespace OCloud.Infrastructure.Performance {
+Enum PerformanceMeasurementJobChangeSubscriptionType {
+ADD
+DELETE
+BOTH
+}
+Enum PerformanceMeasurementJobChangeSubscriptionDetailType {
+NONE
+DELTA
+COMPLETE
+}
+Class PerformanceMeasurementJobChangeSubscription << InformationObjectClass >> {
+performanceMeasuementJobChangeSubscriptionId : UUID;
+consumerPerformanceJobChangeSubscriptionId : UUID;
+performanceChangesToNotify : PerformanceJobChangeSubscriptionType;
+detailsToInclude : PerformanceJobChangeSubscriptionDetailType
+subscriptionJobFilter : KeyValue[0..*];
+callback : URL;
+}
+PerformanceMeasurementJobChangeSubscription .. PerformanceMeasurementJobChangeSubscriptionType
+PerformanceMeasurementJobChangeSubscription .. PerformanceMeasurementJobChangeSubscriptionDetailType
+Class PerformanceMeasurementJobChangeNotification << (N,orchid) Notification >> {
+performanceMeasurementJobChangeSubscriptionId : UUID;
+consumerPerformanceJobChangeSubscriptionId : UUID;
+performanceMeasurementJobId : UUID;
+objectRef : URL;
+typeOfChange : PerformanceMeasurementJobChangeSubscriptionType
+resourceChangeDetails : MeasureResource[0..*];
+measurementChangeDetails : CollectedMeasurement[0..*]
+}
+PerformanceMeasurementJobChangeNotification .. PerformanceMeasurementJobChangeSubscriptionType
+PerformanceMeasurementJobChangeNotification --> MeasuredResource
+PerformanceMeasurementJobChangeNotification --> CollectedMeasurement
+PerformanceMeasurementJobChangeSubscription "1" --> "*" PerformanceMeasurementJobChangeNotification : Subscription_Creates_Notification
+Enum PerformanceMeasurementJobState {
+ACTIVE
+SUSPENDED
+DEPRECATED
+}
+Class MeasuredResource << (D ,#FF7700) dataType >> {
+resourceTypeId : UUID;
+resourceId : UUID;
+timeAdded : TimeStamp[1..*];
+timeDeleted : TimeStamp[0..*];
+isCurrentlyMeasured : Boolean;
+}
+Class CollectedMeasurement << (D ,#FF7700) dataType >> {
+resourceTypeId : UUID;
+performanceMeasurementDefinitionId : String;
+isCurrentlyCollected : Boolean;
+timeAdded : TimeStamp[1..*];
+timeDeleted : TimeStamp[0..*];
+}
+Class PerformanceMeasurementJob << InformationObjectClass >>  {
+performanceMeasurementJobId : UUID;
+consumerPerformanceJobId : UUID;
+state : PerformanceMeasurementJobState
+resourceScopeCriteria : KeyValueType[1.. *];
+measurementSelectionCriteria : KeyValueType[1.. *];
+qualifiedResourceTypes : UUID[0..*];
+measuredResources : MeasuredResource[0..*];
+collectedMeasurements : CollectedMeasurement[0..*];
+}
+PerformanceMeasurementJob .u. PerformanceMeasurementJobState
+PerformanceMeasurementJob "1" *--> "*\nresource" MeasuredResource : Job_Measures_Resources
+PerformanceMeasurementJob "1" *--> "*\nresource" CollectedMeasurement : Job_Collects_Measurements
+PerformanceMeasurementJob "*" --> "*" OCloud.Infrastructure.Inventory.ResourceType : Job_Measures_ResourceTypes
+CollectedMeasurement "*" --> "1\nperformanceMeasurementDefinitionId" ORAN.Application.PerformanceMeasurementDefinition : Measure_DefinedBy_Dictionary
+Class PerformanceMeasurementRecord << (D ,#FF7700) dataType >> {
+performanceMeasurementJobId : UUID ;
+resourceId : UUID;
+performanceMeasurementDefinitionId : String;
+timeStamp : DateTime[0..1];
+measurementValue : ValueType;
+isSuspect : Boolean[0..1];
+}
+PerformanceMeasurementRecord "*" --> "1" PerformanceMeasurementJob : CollectedBy
+PerformanceMeasurementRecord "*" --> "1" OCloud.Infrastructure.Inventory.Resource : MeasuredObject
+PerformanceMeasurementRecord "*" --> "1" ORAN.Application.PerformanceMeasurementDefinition : IsDefinedBy
+Class PerformanceMeasurementStore << InformationObjectClass >> {
+retentionPeriod : uint;
+measurements : PerformanceMeasurementRecord[0..*];
+}
+PerformanceMeasurementStore "1" *--> "*" PerformanceMeasurementRecord : MayHaveMany
+Class PerformanceSubscriptionCriteria << (D ,#FF7700) dataType >> {
+jobCriteria : KeyValueType[0..*];
+resourceTypeCriteria : KeyValueType[0..*];
+resourceCriteria : KeyValueType[0..*];
+measurementCriteria : KeyValueType[0..*];
+}
+enum ReportFormat {
+NOTIFICATION
+STREAM
+FILE
+}
+enum SubscriptionMode {
+TARGET_DEFINED
+ON_CHANGE
+SAMPLE
+}
+Class PerformanceReportingFrequency << (D ,#FF7700) dataType >> {
+subscriptionCriteria : PerformanceSubscriptionCriteria;
+subscriptionMode : SubscriptionMode;
+reportInterval : Uint64;
+suppressRedundant : Boolean;
+heartbeatInterval : Uint64;
+}
+PerformanceReportingFrequency *--> PerformanceSubscriptionCriteria
+PerformanceReportingFrequency .r. SubscriptionMode
+Class PerformanceSubscription << InformationObjectClass >> {
+performanceSubscriptionId : UUID;
+consumerPerformanceSubscriptionId : UUID;
+globalSubscriptionCriteria : PerformanceSubscriptionCriteria;
+reportFormat : ReportFormat;
+callback : URL;
+measurementReportingFrequencies : PerformanceReportingFrequency [1..*];
+}
+PerformanceSubscription .. ReportFormat
+PerformanceSubscription *--> PerformanceReportingFrequency
+PerformanceSubscription "1" *-u-> "0..1" PerformanceSubscriptionCriteria : MayHave
+PerformanceSubscription ..> PerformanceMeasurementStore : SelectsFrom
+Class MeasurementValue << (D ,#FF7700) dataType >> {
+measureId : MeasureIdentifier
+lastUpdateTime : DateTime[0..1];
+measureValue : ValueType;
+isSuspect : Boolean[0..1];
+}
+MeasurementValue "measureId" -d- ORAN.Application.PerformanceMeasurementDefinition : identifies
+Note left on link : measureId can be either:\n\t- performanceMeasurementName\n\t- performanceMeasureId.
+Class ResourceReport << (D ,#FF7700) dataType >> {
+resourceId : UUID;
+measureValues : MeasureValue[1..*];
+}
+ResourceReport "1" *--> "*" MeasurementValue : hasMany
+ResourceReport "1" *--> "1" OCloud.Infrastructure.Inventory.Resource : MeasuredObject
+Class JobReport << (D ,#FF7700) dataType >> {
+performanceJobId : UUID;
+consumerJobId : UUID;
+measuredResources[1..*] : ResourceReport;
+}
+JobReport "1" .. "1" PerformanceMeasurementJob : IsFor
+JobReport "1" *--> "1..*" ResourceReport : hasMany
+Class PerformanceMeasurementReport << (N,orchid) Notification >> {
+globalOCloudId : UUID;
+notificationTime : DateTime;
+performanceSubscriptionId : UUID;
+consumerPerformanceSubscriptionId : UUID;
+jobReports : JobReport[1..*];
+}
+PerformanceMeasurementReport .. PerformanceSubscription: triggeredBy
+PerformanceMeasurementReport  "1" *--> "1..*" JobReport  : hasMany
+Enum FileDataType {
+PERFORMANCE
+ANALYTICS
+}
+Class FileInfo << (D ,#FF7700) dataType >> {
+fileLocation : URI;
+fileSize : Uint;
+fileReadyTime : DateTime;
+fileExpirationTime : DateTime;
+fileCompression : String;
+fileDataType : FileDataType;
+}
+FileInfo .. FileDataType
+Class NotifyFileReady << (N,orchid)Notification >> {
+globalCloudId : UUID;
+performanceSubscriptionId : UUID;
+consumerPerformanceSubscriptionId : String;
+eventTime : DateTime;
+fileInfoList : FileInfo[1..*];
+}
+NotifyFileReady *--> FileInfo
+NotifyFileReady .. PerformanceSubscription: triggeredBy
+}
+Namespace ORAN.Application {
+Class PerformanceMeasurementDefinition {
+performanceMeasurementDefinitionId : UUID
+performanceMeasurementName : String;
+performanceMeasurementId : Uint;
+}
+}
+@enduml
+Figure 2.1.1.4.1-2 Infrastructure Performance Relationships of the O2ims_InfrastructureMonitoring Services
+PerformanceMeasurementStore
+The PerformanceMeasurementStore service object represents the O-Cloud internal store where PerformanceMeasurementRecord(s) are retained according to the retention policy of the O-Cloud based on the configured retention period.
+The information representing the attributes of the PerformanceMeasurementStore follows the provisions indicated in table 2.1.1.4.2-1.
+Table - Attributes of the PerformanceMeasurementStore
+PerformanceMeasurementRecord
+The PerformanceMeasurementRecord service object represents a collected measurement in the PerformanceMeasurementStore.
+The information representing the attributes of the PerformanceMeasurementRecord follows the provisions indicated in table 2.1.1.4.3-1.
+Table - Attributes of the PerformanceMeasurementRecord
+PerformanceMeasurementJob
+The PerformanceMeasurementJob service object represents a process established to collect measurements and place them in the PerformanceMeasurementStore.
+The information representing the attributes of the PerformanceMeasurementJob follows the provisions indicated in table 2.1.1.4.4-1.
+Table - Attributes of the PerformanceMeasurementJob
+MeasuredResource
+The MeasuredResource service object represents a Resource that is or has been within the scope of a PerformanceMeasurementJob.
+The information representing the attributes of the MeasuredResource follows the provisions indicated in table 2.1.1.4.5-1.
+Table - Attributes of the MeasuredResource
+CollectedMeasurement
+The CollectedMeasurement service object represents a measurement associated with a specific ResourceType that is or has been within the scope of a PerformanceMeasurementJob.
+The information representing the attributes of the CollectedMeasurement follows the provisions indicated in table 2.1.1.4.6-1.
+Table - Attributes of the CollectedMeasurement
+PerformanceMeasurementJobChangeSubscription
+The PerformanceMeasurementJobChangeSubscription service object represents a subscription for events to be notified such as when the scope of a PerformanceMeasurementJob changes either due to an update to its criteria or a change in inventory.
+The information representing the attributes of the PerformanceJobChangeSubscription follows the provisions indicated in table 2.1.1.4.7-1.
+Table - Attributes of the PerformanceJobChangeSubscription
+PerformanceMeasurementJobChangeNotification
+The PerformanceMeasurementJobChangeNotification notification represents the information about a change that occurred to a PerformanceMeasurementJob due to an update to its criteria or a change in inventory for which there is a PerformanceMeasurementJobChangeSubscription established.
+The information representing the attributes of the PerformanceMeasurementJobChangeNotification follows the provisions indicated in table 2.1.1.4.8-1.
+Table - Attributes of the PerformanceMeasurementJobChangeNotification
+PerformanceSubscription
+The PerformanceSubscription service object represents the information required to establish the criteria by which a PerformanceMeasurementReport notification is to be generated and where to send that notification.
+The information representing the attributes of the PerformanceSubscription follows the provisions indicated in table 2.1.1.4.9-1.
+Table - Attributes of the PerformanceSubscription
+PerformanceReportingFrequency
+The PerformanceReportingFrequency service object represents the frequency that specified measurements are to be reported.
+The information representing the attributes of the PerformanceReportingFrequency follows the provisions indicated in table 2.1.1.4.10-1.
+Table - Attributes of the PerformanceReportingFrequency
+PerformanceSubscriptionCriteria
+The PerformanceSubscriptionCriteria service object represents the information required to establish which measurements for which resource shall be included in a PerformanceMeasurementReport.
+The information representing the attributes of the PerformanceSubscriptionCriteria follows the provisions indicated in table 2.1.1.4.11-1.
+Table - Attributes of the PerformanceSubscriptionCriteria
+PerformanceMeasurementReport
+The PerformanceMeasurementReport notification represents the information required to define the scope of the JobReports being sent in the notification.
+The information representing the attributes of the PerformanceMeasurementReport follows the provisions indicated in table 2.1.1.4.12-1.
+Table - Attributes of the PerformanceMeasurementReport
+JobReport
+The list of performance reports generated from corresponding PerformanceManagementJobs. A single subscription can be used to subscribe to measurements collected by multiple PerformanceManagementJobs and corresponding reports.
+The information representing the attributes of the JobReport follows the provisions indicated in table 2.1.1.4.13-1.
+Table - Attributes of the JobReport
+ResourceReport
+The ResourceReport dataType represents the information required to identify the resource for which a set of measurements are being reported in the notification.
+The information representing the attributes of the ResourceReport follows the provisions indicated in table 2.1.1.4.14-1.
+Table - Attributes of the ResourceReport
+MeasurementValue
+The MeasurementValue dataType represents the information about a collected measurement and its value to be included in a notification.
+The information representing the attributes of the MeasurementValue follows the provisions indicated in table 2.1.1.4.15-1.
+Table - Attributes of the MeasurementValue
+NotifyFileReady
+The NotifyFileReady notification represents the information about one (1) or more files to be made available to a subscriber where the SubscriptionMode is FILE. This notification only makes the consumer aware of the file and does not predicate delivery of the fle (push or pull).
+The information representing the attributes of the NotifyFileReady follows the provisions indicated in table 2.1.1.4.16-1.
+Table 2.1.1.4.16- Attributes of the NotifyFileReady
+FileInfo
+The FileInfo dataType represents the information about one or more generated files to be collected by a subscriber where the SubscriptionMode is FILE that is now available for collection.
+The information representing the attributes of the FileInfo follows the provisions indicated in table 2.1.1.4.17-1.
+Table 2.1.1.4.17- Attributes of the FileInfo
+O2ims_InfrastructureInventory Services
+Any object in the O-Cloud which can generate a fault, a performance metric, or is exposed to the SMO for configuration needs to have a type, which depicts the class of object. Generally, an O-Cloud is a composition of provisioned resources serving different roles, such as compute, storage, or networking.
+Service description
+O-Clouds contain physical, software and logical resources. The O-Cloud is the source of information for these assets but is required to provide a mechanism for asset management to account for them. The O2ims_InfrastructureInventory services provides the read-only interface to its inventory such that accounting can be achieved.
+The O-Cloud SHALL expose its capabilities and supported resource types to the SMO.
+The O2ims_InfrastructureInventory services SHALL be available only after the O-Cloud has registered its IMS endpoint with the SMO.
+The O2ims_InfrastructureInventory services SHALL provide the list of resource type(s) supported by the O-Cloud across all resource pools defined in its distributed deployment.
+Service operations
+Query O-Cloud Information
+The O2ims_InfrastructureInventory service shall enable an authorized consumer to query and retrieve various information related to the O-Cloud infrastructure and its resources.
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to retrieve the O-Cloud information.
+Table 2.1.2.2.1-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.2.2-1: Query O2ims_InfrastructureInventory operation
+The input parameters sent when invoking the operation shall support means to:
+-	Filter to select which information is queried about the supported service objects specified in clause 2.1.2.2. Filtering by names, identifiers, metadata information and status information shall be supported.
+-	Select the list of attributes of information of the supported service objects to be returned matching the filter. An absence of attribute selection shall return the complete information of the service objects matching the filter the authorized consumer is allowed to query.
+The query operation shall support returning information about one or a set of service objects (i.e., list/array of service objects).
+As a result of this operation, the producer (O-Cloud) shall indicate to the consumer whether the query was processed successfully. If the operation is not successful, the O-Cloud shall return to the consumer appropriate error information.
+O-Cloud Inventory Event Notifications
+The O2ims_InfrastructureInventory service shall provide a consumer who has established a valid subscription to be notified when an event which  matches the subscription filter selection criteria to be sent to the consumer (SMO).
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to subscribe to the notification service, and to allow the notification service to invoke the specified callback procedure.
+Table 2.1.2.2.2-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.2.2.2-1: O2ims Inventory Subscribe/Notify operation
+The information representing one subscription shall follow the provisions indicated in table 2.1.2.2.2-2.
+Table 2.1.2.2.2-2: Attributes of the InfrastructureInventoryEvent
+O2ims_InfrastructureMonitoring Services
+Any object in the Infrastructure Inventory can generate faults or provide performance metrics. Also, a consumer such as the SMO may want to monitor the reachability of the IMS and therefore request a heartbeat message to be periodically sent. The O2ims_InfrastructureMonitoring services provide these. For this release on fault is defined. Performance and Heartbeat is FFS.
+Alarm Services
+It is important to understand the differences between faults and alarms. All faults are logged, only some faults may be worthy of being an alarm. Policies within the IMS determine if a fault or set of faults warrant an alarm to be created. All Alarms are also logged. The services for accessing log files containing all fault data is FFS. The following services are associated with alarms.
+Service description
+The O-Cloud has a historical table of past and active alarms. The SMO or any other consumer with permissions can query this table for trending analysis, correlation, or synchronization. Additionally, the service provides the ability to subscribe to alarm events which are evaluated whenever a change occurs to an AlarmEventRecord.
+For a complete list of requirements see the O-Cloud Alarm related use cases in [23].
+Service operations
+Query Alarm Information
+The O2ims_ InfrastructureMonitoring service shall enable an authorized consumer to query and retrieve AlarmEventRecord information related to the O-Cloud infrastructure and its resources.
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to retrieve the O-Cloud information.
+Table 2.1.3.1.2.1-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.3.1.2.1-1: Query O2ims_InfrastructureAlarmInformation operation
+The input parameters sent when invoking the operation shall support means to:
+-	Filter to select which information is queried about the supported service objects specified in clause 2.1.3.1.2. Filtering by names, identifiers, metadata information and status information shall be supported.
+-	Select the list of attributes of information of the supported service objects to be returned matching the filter. An absence of attribute selection shall return the complete information of the service objects matching the filter the authorized consumer is allowed to query.
+The query operation shall support returning information about one or a set of service objects (i.e., list/array of service objects).
+As a result of this operation, the producer (O-Cloud) shall indicate to the consumer whether the query was processed successfully. If the operation is not successful, the O-Cloud shall return to the consumer appropriate error information.
+The full requirements defintions can be found in [23]. The following identifiers uniquely identify the requirements applicable to this operation: [REQ-ORC-O2-17], [REQ-ORC-O2-18], [REQ-ORC-O2-21], [REQ-ORC-O2-22], [REQ-ORC-O2-25].
+Infrastructure Alarm Acknowledge
+The O2ims_InfrastructureMonitoring service shall enable an authorized consumer to acknowledge an AlarmEventRecord recorded in the IMS.
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to acknowledge an alarm.
+Table 2.1.3.1.2.2-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.3.1.2.2-1: O2ims_InfrastructureAlarmAcknowlege operation
+The input parameters sent when invoking the operation shall support the means to:
+-	identify the specific AlarmEventRecord to be acknowledged.
+As a result of this operation, the producer (O-Cloud) shall indicate to the consumer whether the AlarmEventRecord was acknowledged successfully. If the operation is not successful, the O-Cloud shall return to the consumer appropriate error information.
+The full requirements defintions can be found in [23]. The following identifiers uniquely identify the requirements applicable to this operation: [REQ-ORC-O2-27], [REQ-ORC-O2-29]
+Infrastructure Alarm Clear
+The O2ims_InfrastructureMonitoring service shall enable an authorized consumer to clear an AlarmEventRecord recorded in the IMS which requires manual clearing by its definition in the alarm dictionary.
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to clear an alarm.
+Table 2.1.3.1.2.3-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.3.1.2.3-1: O2ims_InfrastructureAlarmClear operation
+The input parameters sent when invoking the operation shall support the means to:
+-	identify the specific AlarmEventRecord to be cleared.
+NOTE:	If the identified entry is defined with a clearing type of AUTOMATIC then it is up to the cloud vendor implementation on how this will affect the AlarmEventRecord and the ClearInfrastructureAlarmResponse. One example implementation may allow manual clear of an automatic alarm and if the O-Cloud re-detects the fault a new alarm is issued. Another implementation example may reject the request and leave the AlarmEventRecord unchanged.
+As a result of this operation, the producer (O-Cloud) shall indicate to the consumer whether the AlarmEventRecord was cleared successfully. If the operation is not successful, the O-Cloud shall return to the consumer appropriate error information.
+The full requirements defintions can be found in [23]. The following identifiers uniquely identify the requirements applicable to this operation: [REQ-ORC-O2-28], [REQ-ORC-O2-30].
+Infrastructure Alarm Event Notifications
+The O2ims_InfrastructureMonitoring service shall provide a consumer who has established a valid subscription to alarms to be notified when an event which matches the subscription filter criteria to be sent to the consumer (SMO).
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the authorized consumer to subscribe to the notification service, and to allow the notification service to invoke the specified callback procedure.
+Table 2.1.3.1.2.4-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.3.1.2.4-1: O2ims Alarm Subscribe/Notify operation
+The information representing one subscription shall follow the provisions indicated in table 2.1.3.1.2.4-2.
+Table 2.1.3.1.2.4-2: Attributes of the InfrastructureAlarmEventNotification
+As a result of this operation, the producer (O-Cloud) shall indicate to the consumer whether the subscription was processed successfully. If the operation is not successful, the O-Cloud shall return to the consumer appropriate error information.
+The full requirements defintions can be found in [23]. The following identifiers uniquely identify the requirements applicable to this operation: [REQ-ORC-O2-14], [REQ-ORC-O2-15], [REQ-ORC-O2-23], [REQ-ORC-O2-24]
+O2ims_InfrastructureProvisioning Services
+Service description
+The O-Cloud, as a distributed cloud, is connected by transport WANs. The Resource Pool therefore has to be configured for ingress and egress rules onto the transport networks for Front-Haul, Mid-Haul, and Back-Haul. Other activities such as creating logical resource groups within a Resource Pool and other types of O-Cloud configuration activities are provided by the O2ims_InfrastructureProvisioning services.
+Service operations
+FFS
+O2ims_InfrastructureSoftwareManagement Services
+Service description
+The O2ims_InfrastructureSoftware Management services support procedures that enable SMO/FOCOM to initiate the software update process for the O-Cloud Infrastructure Management software, the Deployment Management software, Server OS Software, updates, and patches, and firmware updates for accelerators. For initial release the O-Cloud software can be manually updated. Therefore, the orchestrated Software Update procedure is deferred FFS.
+O2ims_InfrastructureLifecycleManagement Services
+Service description
+Although O-Clouds are usually built for future capacity, they are not static. Physical resources can become defective or obsolete. Also, the O-Cloud may grow beyond its initial deployed capacity. These activities represent life cycle events to the O-Cloud. Automation is expected to offload manual processes due to the high numbers expected of O-Cloud instances. O2ims_InfrastructureLifecycleManagement Services support procedures for the automation of O-Clouds lifecycle events.
+Service operations
+Primary Use cases for O-Cloud Genesis and O-Cloud Scaling are FFS. However, for this release the Notification to a callback specified at the onset of O-Cloud Genesis is defined.
+O-Cloud Available Event Notification
+The O2ims_InfrastructureLifecycle service shall provide a consumer who was established at the onset of O-Cloud Genesis. Data expected to be included with the callback URI in the genesis data is the globalCloudID, each globalLocationID, and each AssetID for infrastructure at those locations. Once enough of the O-Cloud is discovered, provisioned and is available for additional provisioning or workload deployments, the O-Cloud shall send the O-CloudAvailableEvent to the consumer (SMO), thus registering its InfrastructureManagementServiceEndPoint with the SMO. After receiving the notification, the SMO will interogate the InfrastructureInventory APIs to account for corporate assets and discover the DMS service endpoints to allow workloads to be deployed.
+NOTE:	It is up to the protocol and data model specification to determine the one or various protocol operations enabling the notification service to invoke the specified callback procedure.
+Table 2.1.6.2.1-1 lists the information flow exchanged between the SMO and the O-Cloud.
+Table 2.1.6.2.1-1: O2ims Lifecycle Notification operation
+The information representing O-Cloud Available Notification shall follow the provisions indicated in table 2.1.2.1-2.
+Table 2.1.6.2.1-2: Attributes of the OCloudAvailableNotification
+API definitions
+General aspects
+Introduction
+The present document defines the protocol and data model for the following O2ims service interfaces in the form of RESTful Application Programming Interface (API) specifications:
+O2ims_InfrastructureInventory Service API (as produced by the O-Cloud towards the SMO).
+O2ims_InfrastructureMonitoring Service API (as produced by the O-Cloud towards the SMO)
+O2ims_InfrastructureProvisioning Service API (as produced by the O-Cloud towards the SMO)
+O2ims_InfrastructureSoftwareManagement Service API (as produced by the O-Cloud towards the SMO)
+O2ims_InfrastructureLifecycleManagement Service API (as produced by the O-Cloud towards the SMO).
+Table 3.1.1-1 lists the versions of the APIs defined in the present document.
+Table 3.1.1-1: Versions of the APIs specified in the present document
+The design of the protocol and data model for the above interfaces is based on the information model and requirements defined in XXX [Error! Reference source not found.]. In clause 3, general aspects are specified that apply to multiple APIs for O2ims services. In addition, the provisions in clauses 3.1.2, 3.1.3, 3.1.4, 3.1.5, 3.1.6, 3.1.7, and 3.1.8 define common aspects of RESTful APIs, and shall apply for all APIs defined in the present document.
+In the subsequent clauses, the protocol and data model for the individual interfaces are specified. Per interface, the resource structure with associated HTTP methods is defined and applicable flows are provided. Further, the resources and the data model are specified in detail.
+Even though the different interfaces defined in the present document are related, implementations shall not assume a particular order of messages that arrive via different interfaces.
+URI structure and supported content formats
+This clause specifies the URI prefix and the supported formats applicable to the O2ims RESTful APIs.
+All resource URIs of the APIs shall have the following prefix, except the "API versions" resource which shall follow the rules specified in clause 9.3 of ETSI GS NFV-SOL 013 [22]:
+{apiRoot}/<apiName>/<apiMajorVersion>/
+The request URIs used in HTTP requests from the API service consumer towards the API service producer shall have the Resource URI structure defined in clause 4.4.1 of 3GPP TS 29.501 [11], i.e.:
+{apiRoot}/<apiName>/<apiMajorVersion>/<apiSpecificResourceUriPart>
+with the following components:
+-	The {apiRoot} shall be set as described in clause 4.4.1 of 3GPP TS 29.501 [11].
+-	The <apiName> indicates the API name of the service interface in an abbreviated form. The {apiName} of each interface is defined in the clause specifying the corresponding O2ims RESTful API.
+-	The <apiMajorVersion> indicates the current major version of the API and is defined in the clause specifying the corresponding O2ims RESTful API.
+-	The <apiSpecificResourceUriPart> indicates a resource URI of the API, and shall be set as described in in the corresponding O2ims RESTful API for each one of the defined resources.
+Either HTTP/2, as defined in IETF RFC 7540 [19], or HTTP/1.1, as defined in IETF RFC 7230 [ref-rfc7230] shall be used.
+The Transmission Control Protocol (TCP) as specified in IETF RFC 793 [ref-rfc793] shall be used as transport protocol for HTTP/2 and HTTP/1.1.
+For HTTP requests and responses that have a body, the content format JSON (see IETF RFC 8259 [ref-rfc8259]) shall be supported. The JSON format shall be signalled by the content type "application/json".
+All APIs shall support and use HTTP over TLS (also known as HTTPS) (see IETF RFC 2818 [Error! Reference source not found.]). At least support TLS version 1.2 but recommended to support TLS version 1.3 as defined by IETF RFC 5246 [ref-rfc5246] shall be supported.
+NOTE 1:	The HTTP protocol elements mentioned in the O2ims RESTful APIs originate from the HTTP specification; HTTPS runs the HTTP protocol on top of a TLS layer. For simplicity, the O2ims RESTful APIs specifications therefore use the statement above to mention "HTTP request", "HTTP header", etc., without explicitly calling out HTTPS.
+NOTE 2:	There are a number of best practices and guidelines how to configure and implement TLS 1.2 in a secure manner, as security threats evolve. A detailed specification of those is beyond the scope of the present document; the reader is referred to external documentation such as annex E of ETSI TS 133 310 [Error! Reference source not found.].
+All resource URIs of the API shall comply with the URI syntax as defined in IETF RFC 3986 [Error! Reference source not found.]. An implementation that dynamically generates resource URI parts (individual path segments, sequences of path segments that are separated by "/", query parameter values) shall ensure that these parts only use the character set that is allowed by IETF RFC 3986 [ref-rfc3986] for these parts.
+NOTE 3:	This means that characters not part of this allowed set are escaped using percent-encoding as defined by IETF RFC 3986 [ref-rfc3986].
+Unless otherwise specified explicitly, all request URI parameters that are part of the path of the resource URI shall be individual path segments, i.e. shall not contain the "/" character.
+NOTE 4:	A request URI parameter is denoted by a string in curly brackets, e.g. {fooId}.
+Usage of HTTP header fields
+General
+HTTP headers are components of the header section of the HTTP request and response messages. They contain the information about the server/client and metadata of the transaction. The use of HTTP header fields shall comply with the provisions defined for those header fields in the specifications referenced from tables 3.1.3.2-1 and 3.1.3.3-1. The following clauses describe more details related to selected HTTP header fields.
+Request header fields
+This clause describes the usage of selected HTTP header fields of the request messages in the O2ims RESTful APIs. The HTTP header fields used in the request messages that shall be supported are specified in table 3.1.3.2-1.
+Table 3.1.3.2-1: Header fields supported in the request message
+Response header fields
+This clause describes the usage of selected HTTP header fields of the response messages in the O2ims RESTful APIs. The HTTP header fields used in the response messages are specified in table 3.1.3.3-1.
+Table 3.1.3.3-1: Header fields supported in the response message
+Result set control
+Introduction
+This clause specifies procedures that allow to control the size of the result set of GET requests w.r.t. the number of entries in a response list (using attribute-based filtering) or w.r.t. the number of attributes returned in a response (using attribute selection).
+Attribute-based filtering and selector
+The use of attribute-based filtering shall be supported by O2ims RESTful APIs as specified in clause 5.2.2 and 5.3.2 of ETSI GS NFV-SOL 013 [22].
+NOTE:	ETSI GS NFV-SOL 013 [22] refers to "RESTful NFV-MANO API" specification; and wherever such reference is provided "O2ims RESTful API" is to be considered instead for the purpose of the present document.
+Handling of large query results
+The handling of large query results shall be supported by O2ims RESTful APIs as specified in clause 5.4.2 of ETSI GS NFV-SOL 013 [22].
+Error reporting
+In RESTful interfaces, application errors are mapped to HTTP errors. Since HTTP error information is generally not enough to discover the root cause of the error, additional application specific error information is typically delivered.
+The error reporting shall be supported by O2ims RESTful APIs as specified in clause 6 of ETSI GS NFV-SOL 013 [22].
+NOTE:	ETSI GS NFV-SOL 013 [22] refers to "RESTful NFV-MANO API" specification; and wherever such reference is provided "O2ims RESTful API" is to be considered instead for the purpose of the present document.
+Common data types
+Structured data types
+Introduction
+This clause defines data structures that are referenced from data structures in multiple O2ims RESTful APIs.
+Type: Object
+An object contains structured data and shall comply with the provisions of clause 4 of IETF RFC 8259 [ref-rfc8259].
+Type: Link
+This type represents a link to a resource using an absolute URI. It shall comply with the provisions defined in table 7.1.3-1.
+Table 3.1.6.1.3-1: Definition of the Link data type
+Type: NotificationLink
+This type represents a link to a resource in a notification, using an absolute or relative URI. It shall comply with the provisions defined in table 3.1.6.1.4-1.
+Table 3.1.6.1.4-1: Definition of the NotificationLink data type
+Type: KeyValuePairs
+This type represents a list of key-value pairs. The order of the pairs in the list is not significant. In JSON, a set of key-value pairs is represented as an object. It shall comply with the provisions defined in clause 4 of IETF RFC 8259 [ref-rfc8259]. In the following example, a list of key-value pairs with four keys ("aString", "aNumber", "anArray" and "anObject") is provided to illustrate that the values associated with different keys can be of different type.
+EXAMPLE:
+{
+"aString" : "O2ims service",
+"aNumber" : 0.03,
+"anArray" : [1,2,3],
+"anObject" : {"organization" : "O-RAN", workingGroup" : "WG6"}
+}
+Type: ApiVersionInformation
+This type represents API version information. It shall comply with the provisions defined in table 3.1.6.1.6-1.
+Table 3.1.6.1.6-1: ApiVersionInformation data type
+Simple data types and enumerations
+Introduction
+This clause defines simple data types and enumerations that can be referenced from data structures defined in multiple interfaces.
+Simple data types
+Table 3.1.6.2.2-1 lists the simple data types that are referenced from multiple interfaces.
+Table 3.1.6.2.2-1: Simple data types
+Authorization of API requests and notifications
+Introduction
+The present version of this document does not specify specific authorization mechanisms to be considered for handling API requests and notifications specified in the present document. It is expected that implementations will leverage best practices and guidelines from relevant standards such as those defined in:
+-	IETF RFC 5246 [ref-rfc5246] for the use of TLS 1.2/1.3,
+-	IETF RFC 7235 [ref-rfc7235] for authentication mechanisms over HTTP/1.1,
+-	IETF RFC 6749 [ref-rfc6749] for the use of OAuth 2.0 authorization framework,
+-	IETF RFC 6750 [ref-rfc6750] for the use of OAuth 2.0 bearer tokens, and
+-	IETF RFC 7519 [ref-rfc7519] for use of JSON web tokens.
+Version management
+Version identifiers and parameters
+API version identifiers and rules for incrementing version identifier fields shall be supported by O2ims RESTful APIs as specified in clause 9.1 and 9.2 of ETSI GS NFV-SOL 013 [22].
+NOTE:	ETSI GS NFV-SOL 013 [22] refers to "RESTful NFV-MANO API" specification and OpenAPI specification that ETSI publishes; and wherever such reference is provided "O2ims RESTful API" and OpenAPI that O-RAN publishes is to be considered instead for the purpose of the present document.
+Clause 9.2.2 of ETSI GS NFV-SOL 013 [22] provides examples of backward and non-backward compatible changes.
+Version information retrieval and signaling
+The API producer shall support the dedicated URIs to enable API consumers to retrieve information about API versions supported by an API producer as specified in clause 9.3 of ETSI GS NFV-SOL 013 [22], and the API consumer shall include the "Version" HTTP header in each HTTP request as specified in clause 9.4 of ETSI GS NFV-SOL 013 [22].
+NOTE:	ETSI GS NFV-SOL 013 [22] refers to "RESTful NFV-MANO API" specification; and wherever such reference is provided "O2ims RESTful API" is to be considered instead for the purpose of the present document.
+O2ims_InfrastructureInventory Service API
+Description
+This API allows the SMO to invoke O2ims_InfrastructureInventory Services towards the O-Cloud.
+The operations defined for O2ims_InfrastructureInventory Services through this API are:
+Query information about one or multiple Resource Type
+Query information about one or multiple Resource Pool
+Query information about one or multiple Resource
+Query information about one or multiple Deployment Manager
+Query information about one or multiple Subscriptions
+Notify consumer identified by an established subscription which is not filtered by the filter criteria of the occurrence of a change to the infrastructure inventory objects
+API version
+For the O2ims_InfrastructureInventory Service API version as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0, and the PATCH version field shall be 0.
+REST resources structure and methods
+All resource URIs of the API shall use the base URI specification defined in clause 3.1.2. The string "O2ims_infrastructureInventory" shall be used to represent {apiName}. All resource URIs in the clauses below are defined relative to the formed base URI (i.e., {apiRoot}/O2ims_infrastructureInventory/{apiVersion}).
+When ambiguity is possible, the term REST resource is used to make the distinction between the term resource as understood within the context of REST API from the term resource as understood within the context of O-RAN.
+Figure 3.2.3-1 shows the overall resource URI structure defined for the O2ims_InfrastructureInventory Service API.
+Figure 3.1.8.2-1 Resource URI structure of the O2ims-infrastructureInventory API
+Table 3.1.6.2.2-1 provides an overview of the resources and applicable HTTP methods.
+The O-Cloud shall support responding to requests for all HTTP methods on the resources in table 3.2.3-1 that are marked as "M" (mandatory) in the "Cat" column. The O-Cloud shall also support the "API versions" resources as specified in clause 3.1.8.
+Table 3.1.6.2.2-1 Resources and methods overview
+REST resources
+Introduction
+There are no preconditions or postconditions for a successful execution of each of the O2ims_InfrastructureInventory Service API triggered by an operation.
+REST resource: Resource Type List
+Description
+This resource represents the list of resource types that the O-Cloud is designed to support. The Resource Type List contains Resource Type Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourceTypes
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.2.4.2.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+GET
+The GET operation is used to retrieve the list of resource type.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.2.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found.2.
+Table 3.2.4.2.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+REST resource: Resource Type Description
+Description
+This resource respresents the description of a resource type. The Resource Type Description is a record of the attributes. The record contains mandatory fields and allows for non-standard attributes to also be inventoried.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourceTypes/{resourceTypeId}
+This resource shall support the resource URI variables defined in Table 3.2.4.3.2-1.
+Table 3.2.4.3.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+GET
+The GET operation is used to retrieve the resource type description of a single resource type.
+This method shall support the URI query parameters specified in Table 3.2.4.3.3.2-1.
+Table 3.2.4.3.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in 2.
+Table 3.2.4.3.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+REST resource: Resource Pool List
+Description
+This resource represents the list of Resource Pools that the O-Cloud has resource deployed to. The Resource Pool List contains Resource Pool Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourcePools
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.2.4.4.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22].
+GET
+The GET operation is used to retrieve the list of resource pools.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.4.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found..
+Table 3.2.4.4.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Resource Pool Description
+Description
+The Resource Pool Description represents the description of a resource pool. This includes some mandatory attributes and allows for extended attributes as well.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourcePools/{resourcePoolId}
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.2.4.5.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the resource pool description of a single resource pool.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.5.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found.2.
+Table 3.2.4.5.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Resource List
+Description
+This resource represents the list of resources in a specific Resource Pool. The Resource List contains Resource Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourcePools/{resourcePoolId}/resources
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.2.4.6.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the list of resource descriptions in the specific Resource Pool.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.6.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found..
+Table 3.2.4.6.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Resource Description
+Description
+The Resource Description represents the description of an individual resource instance in a resource pool. This includes some mandatory attributes including a reference to the Resource Type that defines it and allows for extended attributes as well.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/resourcePools/{resourcePoolId}/resources/{resourceId}
+This resource shall support the resource URI variables defined in Table 3.2.4.7.2-1.
+Table 3.2.4.7.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the resource description of an individual resource instance in a resource pool.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.7.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.7.3.2-2.
+Table 3.2.4.7.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Deployment Manager List
+Description
+This resource represents the set of Deployment Managers in the O-Cloud the SMO can use for managing Deployments. The Deployment Manager List contains Deployment Manager Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/deploymentManagers
+This resource shall support the resource URI variables defined in Table 3.2.4.8.2-1.
+Table 3.2.4.8.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the list of deployment manager.
+This method shall support the URI query parameters specified in Table 3.2.4.8.3.2-1.
+Table 3.2.4.8.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found..
+Table 3.2.4.4.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Deployment Manager Description
+Description
+The Deployment Manager Description represents the description of a Deployment Manager instance in the O-Cloud. This includes some mandatory attributes including a reference to the capabilities that defines it and allows for extended attributes as well.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/deploymentManagers/{deploymentManagerId}
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.2.4.9.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the deployment manager description of a single deployment manager.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.2.4.9.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found..
+Table 3.2.4.9.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Cloud Description
+Description
+This resource represents the attributes of the O-Cloud instance and provides the Cloud Description.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/
+This resource shall support the resource URI variables defined in Table 3.2.4.10.2-1.
+Table 3.2.1.10.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the O-Cloud description.
+This method shall support the URI query parameters specified in Table 3.2.4.10.3.2-1.
+Table 3.2.4.10.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.10.3.2-2.
+Table 3.2.4.10.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Inventory Subscription List
+Description
+This resource represents the set of Inventory Subscriptions in the O-Cloud the SMO can use for being notified when certain changes in the inventory object occur. The Inventory Subscription List contains Inventory Subscription Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/subscriptions
+This resource shall support the resource URI variables defined in Table 3.2.4.11.2-1.
+Table 3.2.4.11.2-1 Resource URI variables for this resource
+Resource methods
+POST
+The POST operation is used to create an inventory subscription.
+This method shall support the URI query parameters specified in Table 3.2.4.11.3.1-1.
+Table 3.2.4.11.3.1-1 URI query parameters supported by the POST method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.11.3.1-2.
+Table 3.2.4.11.3.1-2: Details of the POST request/response on this resource
+GET
+The GET operation is used to retrieve the list of inventory subscriptions.
+This method shall support the URI query parameters specified in Table 3.2.4.11.3.2-1.
+Table 3.2.4.11.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.11.3.2-2.
+Table 3.2.4.11.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Inventory Subscription Description
+Description
+The Inventory Susbcription Description represents the description of a subscription to inventory change events in the O-Cloud.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureInventory/{apiMajorVersion}/subscriptions/{subscriptionId}
+This resource shall support the resource URI variables defined in Table 3.2.4.12.2-1.
+Table 3.2.4.12.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the inventory subscription description of a single inventory subscription.
+This method shall support the URI query parameters specified in Table 3.2.4.12.3.2-1.
+Table 3.2.4.12.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.12.3.2-2.
+Table 3.2.4.12.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+The DELETE operation is used to delete the inventory subscription description of a single inventory subscription.
+This method shall support the URI query parameters specified in Table 3.2.4.12.3.5-1.
+Table 3.2.4.12.3.5-1 URI query parameters supported by the DELETE method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.2.4.12.3.5-2.
+Table 3.2.4.12.3.5-2: Details of the DELETE request/response on this resource
+Notifications
+General
+Notifications shall comply to the Subscribe/Notify pattern described in clause 5.9 of ETSI GS NFV-SOL 015 [25].
+Table 3.2.5.1-1 Notifications overview
+Inventory Change Notification Description
+The Inventory Change Notification is used by the O-Cloud Infrastructure Management Service to report changes to the O2ims Inventory to a O2ims consumer that has subscribed to such notifications.
+Target URI
+The Inventory Subscription.Callback URI “{InventoryEventNotification}” shall be used with the callback URI variables define in table 3.2.5.1.2-1.
+Table 3.2.5.1.2-1 Inventory Subscription.Callback URI Vairables
+Data model
+REST resource data types
+This clause specifies the data types to be used in resource representations and notifications supported by the present API.
+Table 3.2.6.1-1 specifies the data types defined for the O2ims_InfrastructureInventory service API.
+Table 3.2.6.1-1: Osmo_CloudInventory resource data types
+Structured data types
+Introduction
+This clause defines the structures to be used in resource representations.
+Type: ResourceTypeInfo
+This type represents information about a type of a resource deployed in the O-Cloud Infrastructure. It shall comply with the provisions defined in table 3.2.6.2.2-1.
+Table 3.2.6.2.2-1 Definition of type ResourceTypeInfo
+Type: ResourcePoolInfo
+This type represents information about a logical Resource Pool which comprises O-Cloud Resources at a location. It shall comply with the provisions defined in table 3.2.6.2.3-1.
+Table 3.2.6.2.3-1 Definition of type ResourcePoolInfo
+Type: ResourceInfo
+This type represents a resource instance of the O-Cloud Infrastructure. It shall comply with the provisions defined in table 3.2.6.2.4-1.
+Table 3.2.6.2.4-1 Definition of type ResourceInfo
+Type: DeploymentManagerInfo
+This type represents information about a Deployment Manager for managing Deployments into the O-Cloud. It shall comply with the provisions defined in table 3.2.6.2.5-1.
+Table 3.2.6.2.5-1 Definition of type DeploymentManagerInfo
+Type: CloudInfo
+This type represents information about an O-Cloud instance. It shall comply with the provisions defined in table 3.2.6.2.6-1.
+Table 3.2.6.2.6-1 Definition of type CloudInfo
+Type: InventorySubscriptionInfo
+This type represents information about an instance of a subscription to O2ims Inventory change events. It shall comply with the provisions defined in table 3.2.6.2.7-1.
+Table 3.2.6.2.7-1 Definition of type InventorySubscriptionInfo
+Type: AlarmDictionary
+This type represents information about alarms that can be reported by a given ResourceType within the O-Cloud. The Alarm Dictionary object is defined not only for O-Clouds but for Network Functions as well. Therefore, its structure may overlap with other O-Cloud structures and contain redundant information that is used by the SMO. It shall comply with the provisions defined in table 3.2.6.2.8-1.
+Table 3.2.6.2.8-1 Definition of type AlarmDictionary
+Note 1: Italized and grayed text is only provided for informative purposes. These values are used by other dictionary providers, but not the O2 IMS.
+Type: AlarmDefinition
+This type represents information about an alarm that can be reported by a given ResourceType within the O-Cloud. It shall comply with the provisions defined in table 3.2.6.2.9-1.
+Table 3.2.6.2.9-1 Definition of type AlarmDefinition
+Note 1: Italized and grayed text is only provided for informative purposes. These values are used by other dictionary providers, but not the O2 IMS.
+Simple data types and enumerations
+Introduction
+This clause defines simple data types and enumerations that can be referenced from data structures defined in the previous clauses. The simple data types defined in a request body, response body, or a structured type are defined in ETSI GS NFV-SOL 013 [22] or this clause of the specification.
+Simple data types
+The simple data types defined in table 3.2.6.3.2-1 shall be supported.
+Table 3.2.6.3.2-1: Simple data types
+Error handling
+General
+For the O2ims_InfrastructureInventory Service API, HTTP error responses shall be supported as specified in clause 3.1.5.
+In addition, the requirements in the following clauses are applicable for the O2ims_InfrastructureInventory Service API.
+Protocol errors
+No specific protocol errors for the O2ims_InfrastructureInventory Service API are specified.
+Application errors
+No specific application errors for the O2ims_InfrastructureInventory Service API are specified
+Security
+No specific security procedures for the O2ims_InfrastructureInventory Service API are specified beyond those in clause 3.1.7.
+O2ims_InfrastructureMonitoring Service API
+Description
+This API allows the SMO to invoke O2ims_InfrastructureMonitoring Services towards the O-Cloud.
+The operations defined for O2ims_InfrastructureMonitoring Services through this API are:
+Query information about one or multiple Alarms
+Create a subscription to Alarms of interest
+Notify consumer identified by an established subscription which is not filtered by the filter criteria of the occurrence of a change to the alarm objects
+Services for IMS Performance Monitoring and Heartbeat are FFS.
+API version
+For the O2ims_InfrastructureMonitoring Service API version as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0, and the PATCH version field shall be 0.
+REST resources structure and methods
+All resource URIs of the API shall use the base URI specification defined in clause 3.1.2. The string "O2ims_infrastructureMonitoring" shall be used to represent {apiName}. All resource URIs in the clauses below are defined relative to the formed base URI (i.e., {apiRoot}/O2ims_infrastructureMonitoring/{apiVersion}).
+When ambiguity is possible, the term REST resource is used to make the distinction between the term resource as understood within the context of REST API from the term resource as understood within the context of O-RAN.
+Figure 3.3.3-1 shows the overall resource URI structure defined for the O2ims_InfrastructureMonitoring Service API.
+Figure 3.2.7.33-1 Resource URI structure of the O2ims-infrastructureMonitoring API
+Table 3.1.6.2.2-1 provides an overview of the resources and applicable HTTP methods.
+The O-Cloud shall support responding to requests for all HTTP methods on the resources in table 3.3.3-1 that are marked as "M" (mandatory) in the "Cat" column. The O-Cloud shall also support the "API versions" resources as specified in clause 3.1.8.
+Table 3.3.3-1 Resources and methods overview
+REST resources
+Introduction
+There are no preconditions or postconditions for a successful execution of each of the O2ims_InfrastructureMonitoring Service API triggered by a corresponding operation.
+REST resource: Alarm List
+Description
+This resource represents the list of alarms that the O-Cloud has seen during its alarm retention period. The Alarm List can contain Alarm Records.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureMonitoring/{apiMajorVersion}/alarms
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.3.4.2.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the list of alarms.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.3.4.2.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Error! Reference source not found.2.
+Table 3.3.4.2.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Alarm Record
+Description
+This resource respresents the details of an Alarm Record in the Alarm List. The Alarm Record is a record of the details of an Alarm since its creation.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureMonitoring/{apiMajorVersion}/alarms/{alarmEventRecordId}
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.3.4.3.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the details of a single Alarm Event Record.
+This method shall support the URI query parameters specified in Table 3.2.4.2.3.2-1.
+Table 3.3.4.3.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in 2.
+Table 3.3.4.3.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Alarm Subscription List
+Description
+This resource represents the set of Alarm Subscriptions in the O-Cloud the SMO can use for being notified when certain changes in the Alarm List occur. The Alarm Subscription List can contain Alarm Subscription Descriptions.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureMonitoring/{apiMajorVersion}/alarmSubscriptions
+This resource shall support the resource URI variables defined in Table 3.3.4.6.2-1.
+Table 3.3.4.6.2-12 Resource URI variables for this resource
+Resource methods
+POST
+The POST operation is used to create an alarm subscription.
+This method shall support the URI query parameters specified in Table 3.3.4.4.3.1-1.
+Table 3.3.4.4.3.1-1 URI query parameters supported by the POST method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.3.4.4.3.1-2.
+Table 3.3.4.4.3.1-2: Details of the POST request/response on this resource
+GET
+The GET operation is used to retrieve the list of alarm subscriptions.
+This method shall support the URI query parameters specified in Table 3.3.4.4.3.2-1.
+Table 3.3.4.4.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.3.4.4.3.2-2.
+Table 3.3.4.4.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+REST resource: Alarm Subscription Description
+Description
+The Alarm Subscription Description represents the description of a subscription to alarm change events in the O-Cloud.
+Resource definition
+Resource URI: {apiRoot}/o2ims-infrastructureMonitoring/{apiMajorVersion}/alarmSubscriptions/{alarmSubscriptionId}
+This resource shall support the resource URI variables defined in Table 3.2.4.2.2-1.
+Table 3.3.4.5.2-1 Resource URI variables for this resource
+Resource methods
+POST
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+GET
+The GET operation is used to retrieve the alarm subscription description of a single alarm subscription.
+This method shall support the URI query parameters specified in Table 3.3.4.5.3.2-1.
+Table 3.3.4.5.3.2-1 URI query parameters supported by the GET method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.3.4.7.3.2-2.
+Table 3.3.4.7.3.2-2: Details of the GET request/response on this resource
+PUT
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+PATCH
+This method is not supported. When this method is requested on this resource, the O-Cloud shall return a "405 Method Not Allowed" response as defined in clause 6.4 of ETSI GS NFV-SOL 013 [22] .
+DELETE
+The DELETE operation is used to delete the alarm subscription description of a single alarm subscription.
+This method shall support the URI query parameters specified in Table 3.3.4.7.3.5-1.
+Table 3.3.4.5.3.5-1 URI query parameters supported by the DELETE method on this resource
+This method shall support the request data structures, the response data structures, and response codes specified in Table 3.3.4.7.3.5-2.
+Table 3.3.4.7.3.5-2: Details of the DELETE request/response on this resource
+Notifications
+General
+Notifications shall comply to the Subscribe/Notify pattern described in clause 5.9 of ETSI GS NFV-SOL 015 [25].
+Table 3.3.5.1-1 Notifications overview
+Alarm Change Notification Description
+The Alarm Change Notification is used by the O-Cloud Infrastructure Monitoring Service to report changes to the O2ims alarm List to an O2ims consumer that has subscribed to such notifications.
+Target URI
+The Alarm Subscription.Callback URI “{AlarmEventNotification}” shall be used with the callback URI variables define in table 3.3.5.1.2-1.
+Table 3.3.5.1.2-1 Definition of Alarm Change Notification type
+Data model
+REST resource data types
+This clause specifies the data types to be used in resource representations and notifications supported by the present API.
+Table 3.3.6.1-1 specifies the data types defined for the O2ims-InfrastructureMonitoring service API.
+Table 3.3.6.1-1: O2ims_InfrastructureMonitoring resource data types
+Structured data types
+Introduction
+This clause defines the data structures to be used in resource representations.
+Type: AlarmEventRecord
+This type represents information about an Alarm in the O-Cloud Infrastructure. It shall comply with the provisions defined in table 3.3.6.2.2-1.
+Table 3.3.6.2.2-1 Definition of type AlarmEventRecord
+Type: AlarmSubscriptionInfo
+This type represents information about a Subscription for Alarms in the O-Cloud. It shall comply with the provisions defined in table 3.3.6.2.3-1.
+Table 3.3.6.2.3-1 Definition of type AlarmSubscriptionInfo
+Simple data types and enumerations
+Introduction
+This clause defines simple data types and enumerations that can be referenced from data structures defined in the previous clauses. The simple data types defined in a request body, response body, or a structured type are defined in ETSI GS NFV-SOL 013 [22] or this clause of the specification.
+Simple data types
+The simple data types defined in table 3.3.6.3.2-1 shall be supported.
+Table 3.3.6.3.2-1: Simple data types
+Error handling
+General
+For the O2ims_InfrastructureInventory Service API, HTTP error responses shall be supported as specified in clause 3.1.5.
+In addition, the requirements in the following clauses are applicable for the O2ims_InfrastructureInventory Service API.
+Protocol errors
+No specific protocol errors for the O2ims_InfrastructureInventory Service API are specified.
+Application errors
+No specific application errors for the O2ims_InfrastructureInventory Service API are specified
+Security
+No specific security procedures for the O2ims_InfrastructureInventory Service API are specified beyond those in clause 3.1.7.
+O2ims_InfrastructureProvisioning Service API
+FFS
+O2ims_InfrastructureSoftwareManagement Service API
+FFS
+O2ims_InfrastructureLifecycleManagement Service API
+Description
+This API allows the SMO to invoke O2ims_ InfrastructureLifecycleManagement Services towards the O-Cloud.
+Operations against SMO Service objects are not defined.
+At this time no operations are defined for O2ims_ InfrastructureLifecycleManagement as they are FFS.
+API version
+For the O2ims_InfrastructureLifecycleManagement Service API version as specified in the present document, the MAJOR version field shall be 1, the MINOR version field shall be 0, and the PATCH version field shall be 0.
+REST resources structure and methods
+REST resource structure and methods for this API are FFS.
+REST resources
+FFS
+Notifications
+General
+Notifications shall comply to the Subscribe/Notify pattern described in clause 5.9 of ETSI GS NFV-SOL 015 [25].
+Table 3.6.5.1-1 Notifications overview
+OCloud Available Notification Description
+The OCloud Available Notification is used by the O-Cloud Infrastructure Management Service to register itself with the SMO. This occurs as part of the Genesis life cycle procedure when the O-Cloud has determined it can begin to support interactions with the SMO.
+Target URI
+OCloud Available Notification.Callback URI “{oCloudAvailableEventNotification}” shall be used with the callback URI variables define in table 3.6.5.1.2-1.
+Table 3.6.5.1.2-1 OCloud Available Notification.Callback URI Vairables
+Data Model
+REST resource data types
+This clause is FFS
+Structured data types
+This clause is FFS
+Simple data types and enumerations
+Introduction
+This clause defines simple data types and enumerations that can be referenced from data structures defined in the previous clauses. The simple data types defined in a request body, response body, or a structured type are defined in ETSI GS NFV-SOL 013 [22] or this clause of the specification.
+Simple data types
+The simple data types defined in table 3.6.6.3.2-1 shall be supported.
+Table 3.6.6.3.2-1: Simple data types
+Error handling
+General
+For the O2ims_InfrastructureInventory Service API, HTTP error responses shall be supported as specified in clause 3.1.5.
+In addition, the requirements in the following clauses are applicable for the O2ims_InfrastructureInventory Service API.
+Protocol errors
+No specific protocol errors for the O2ims_InfrastructureInventory Service API are specified.
+Application errors
+No specific application errors for the O2ims_InfrastructureInventory Service API are specified
+Security
+No specific security procedures for the O2ims_InfrastructureInventory Service API are specified beyond those in clause 3.1.7.
+History

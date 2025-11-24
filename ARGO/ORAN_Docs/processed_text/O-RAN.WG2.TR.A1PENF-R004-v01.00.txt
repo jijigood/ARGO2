@@ -1,0 +1,934 @@
+O-RAN.WG2.TR.A1PENF-R004-v01.00
+Technical Report
+Study on partial enforcement of A1 policies
+Copyright © 2025 by the O-RAN ALLIANCE e.V.
+The copying or incorporation into any other work of part or all of the material available in this document in any form without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts of the material of this document for your personal use, or copy the material of this document for the purpose of sending to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the material and that you inform the third party that these conditions apply to them and that they must comply with them.
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany
+Register of Associations, Bonn VR 11238, VAT ID DE321720189
+Contents
+Foreword	3
+Modal verbs terminology	3
+1	Scope	4
+2	References	4
+2.1	Normative references	4
+2.2	Informative references	4
+3	Definition of terms, symbols and abbreviations	4
+3.1	Terms	4
+3.2	Symbols	5
+3.3	Abbreviations	5
+4	A1 policy enforcement	5
+4.1	Introduction	5
+4.2	A1 policy lifecycle management	6
+4.3	A1 policy transactions	9
+4.4	A1 policy status and feedback	9
+5	Enhanced descriptions of A1 policy enforcement	10
+5.1	Introduction	10
+5.2	A1 policy structure and contents	10
+5.3	Applicability (from Near-RT RIC perspective)	12
+5.4	Enforceability (from Near-RT RIC perspective)	16
+5.5	A1 policy creation	18
+5.6	ACID properties of A1 policy transactions and enforcement	27
+6	Partial enforcement of A1 policies	33
+6.1	Introduction	33
+6.2	Partial applicability and enforceability of A1 policies	34
+6.3	Partiality scenarios	39
+6.4	Life cycle management and state transitions	52
+6.5	Summary	53
+7	Conclusions and recommendations	55
+7.1	General	55
+7.2	Common aspects	55
+7.3	Defining and interpreting enforceStatus	57
+7.4	Inconclusive items	59
+7.5	Recommendations	59
+Annex:  Change history	61
+Foreword
+This Technical Report (TR) has been produced by O-RAN Alliance Working Group 2. It is based on the TS-family covering the A1 interface as identified below:
+"A1 interface: General Aspects and Principles";
+"A1 interface: Use Cases and Requirements";
+"A1 interface: Transport Protocol";
+"A1 interface: Application Protocol";
+"A1 interface: Type Definitions"; and
+"A1 interface: Test Specification".
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN approval. Should the O-RAN Alliance modify the contents of the present document, it will be re-released by O-RAN with an identifying change of version date and an increase in version number as follows:
+version xx.yy.zz
+where:
+xx:	the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. (the initial approved document will have xx=01).  Always 2 digits with leading zero if needed.
+yy:	the second digit-group is incremented when editorial only changes have been incorporated in the document. Always 2 digits with leading zero if needed.
+zz:	the third digit-group included only in working versions of the document indicating incremental changes during the editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed.
+Modal verbs terminology
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and "cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of provisions).
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation.
+1	Scope
+The present document contains considerations and recommendations related to partial enforcement of A1 policies.
+2	References
+2.1	Normative references
+Not applicable.
+2.2	Informative references
+References are either specific (identified by date of publication and/or edition number or version number) or non-specific. For specific references, only the cited version applies. For non-specific references, the latest version of the referenced document (including any amendments) applies. In the case of a reference to a 3GPP document, a non-specific reference implicitly refers to the latest version of that document in Release 18, or the latest 3GPP release prior to Release 18 that includes that document.
+NOTE:	While any hyperlinks included in this clause were valid at the time of publication, O-RAN cannot guarantee their long-term validity.
+The following referenced documents are not necessary for the application of the present document, but they assist the user with regard to a particular subject area.
+[i.1]	O-RAN.WG2.TS.A1GAP-R004-v05.00: "A1 interface: General Aspects and Principles" ("A1GAP").
+[i.2]	O-RAN.WG2.TS.A1UCR-R004-v02.00: "A1 interface: Use Cases and Requirements" ("A1UCR").
+[i.3]	O-RAN.WG2.TS.A1AP-R004-v04.04: "A1 interface: Application Protocol" ("A1AP").
+[i.4]	O-RAN.WG2.TS.A1TD-R004-v10.00: "A1 interface: Type Definitions" ("A1TD").
+[i.5]	O-RAN.WG2.Non-RT-RIC-ARCH-R004-v06.00: "Non-RT RIC: Architecture".
+[i.6]	 O-RAN.WG1.TS.OAD-R004-v13.00: "O-RAN Architecture Description".
+[i.7]	O-RAN.WG3.TS.RICARCH-R004-v07.00: "Near-RT RIC: Architecture".
+[i.8]	Wikipedia, https://en.wikipedia.org/wiki/ACID.
+[i.9]	3GPP TR 32.866 v15.0.0: "3rd Generation Partnership Project; Technical Specification Group Services and System Aspects; Telecommunication management; Study on a REST(REpresentational State Transfer)-ful HTTP-based Solution Set (SS) (Release 15)".
+3	Definition of terms, symbols and abbreviations
+3.1	Terms
+For the purposes of the present document, the following terms apply:
+A1-P:	A1 policy management service
+Near-RT RIC: Near-Real Time RIC
+Non-RT RIC: Non-Real Time RIC
+policyId: A1 policy identifier
+policyTypeId: A1 policy type identifier
+3.2	Symbols
+Void
+3.3	Abbreviations
+Void
+4	A1 policy enforcement
+4.1	Introduction
+4.1.1	A1 specifications
+A1 policy management is defined in the A1 specifications:
+General aspects and principles, including lifecycle management aspects, are described in A1GAP [i.1];
+Use cases and procedures are described in A1UCR [i.2];
+Application protocol based on REST methodology, including service operations, resource definitions and Open API, are defined in A1AP [i.3];
+Type definitions, including policy types, policy representations, status and feedback content, is defined in A1TD [i.4].
+The A1 policy management service is referred to as A1-P. A1GAP [i.1] and A1UCR [i.2] corresponds to the stage 2 description while A1AP [i.3] and A1TD [i.4] corresponds to the stage 3 description of this service.
+4.1.2	A1 policy management
+A1GAP [i.1], clause 4.1.3.1, describes the A1 policy management service (A1-P) and the purpose of A1 polices as:
+“... the Non-RT RIC can define policies that are provided to the Near-RT RIC over the A1 interface. The purpose of the A1 policies is to guide the RAN performance towards the overall goal expressed in RAN intent. The A1 policies are declarative policies that contain statements on policy objectives and policy resources applicable to e.g. UEs and cells.
+The Non-RT RIC can manage the A1 policies based on A1 policy status and feedback information provided by the Near-RT RIC, and on the network status provided over O1. The Non-RT RIC can use the O1 observables to continuously evaluate the impact of the A1 policies towards fulfilment of the RAN intent and based on internal conditions it can decide to issue/update the goals expressed in the A1 policies.
+The Near-RT RIC functions based on its internal functions or applications, the configuration received over O1, and the temporary policies received over A1. The A1 policies may not survive a re-start of the Near-RT RIC. ”
+The usage of A1 policies by Non-RT RTIC to guide the RAN performance based on O1 observables is illustrated in figure 4.1.2-1 which is a simplified version of figure 4.1.2-1 in A1GAP [i.1] adapted to the description in A1GAP [i.1], clause 4.1.3.1.
+Figure 4.1.2-1: Illustration of A1 policy management based on O1 observables
+When Near-RT RIC receives an A1 policy from Non-RT RIC, it uses its internal functions and configuration to determine appropriate actions towards the E2 nodes which it controls. The activity that Near-RT RIC performs based on an A1 policy is referred to as A1 policy enforcement.
+Near-RT RIC provides status and feedback to Non-RT RIC related to its A1 policy enforcement activity and Non-RT RIC observes the impact on the E2 nodes via the O1 interface.
+4.2	A1 policy lifecycle management
+4.2.1	Use case
+The control loop implied in figure 4.1.2-1 contains the basis for describing the lifecycle of an A1 policy. The overall use case for the lifecycle of an A1 policy can be described as in table 4.2.1-1 and illustrated as in figure 4.2.1-1 in a network optimization scenario.
+Table 4.2.1-1: A1 policy lifecycle use case
+Figure 4.2.1-1: A1 policy lifecycle
+4.2.2	State machine
+As described in A1GAP [i.1], clause 5.1.3:
+An A1 policy exists in the Near-RT RIC after Non-RT RIC has sent a Create policy request that was accepted by the Near RT RIC. When the A1 policy has been created, the Non-RT RIC can assume that its enforcement status is ENFORCED. If Near-RT RIC cannot enforce the A1 policy, it will reject the Create policy request.
+The enforcement status of the A1 policy is determined by the Near-RT RIC and reflects the status of the policy enforcement activity in the Near-RT RIC. When enforcement status changes between ENFORCED and NOT_ENFORCED, Near-RT RIC sends a Notify policy status message (given that Non-RT RIC has subscribed to status notifications).
+An A1 policy can be updated by Non-RT RIC and Near-RT RIC will accept the Update policy request only if the enforcement status can be ENFORCED after the update.
+After the Non-RT RIC has sent a Delete policy request, policy enforcement is stopped, and the policy no longer exist.
+The state diagram in figure 4.2.2-1 is a simplified version of figure 5.1.3-1 in A1GAP [i.1] referring only to the messages of the A1 policy lifecycle management use case in clause 4.2.1.
+Figure 4.2.2-1: State diagram for A1 policy
+4.3	A1 policy transactions
+4.3.1	Resources and payload objects
+A1AP [i.3] describes how lifecycle management of an A1 policy is based on CRUD (Create, Read, Update, Delete) operations on a resource identified by a policy identifier (policyId) that is assigned by and is unique within the Non-RT RIC. The URI of the policy resource includes the value of the policy identifier ({policyId}).
+The status of the A1 policy is a property of the policy resources (i.e. the URI includes /status).
+The PolicyObject transferred as content in the Create policy, Query policy and Update policy operations is a representation of the A1 policy resource that represents the A1 policy enforcement activity in the Near-RT RIC.
+The PolicyStatusObject transferred as content in the Notify policy status operation is a representation of the A1 policy status and may contain feedback information.
+ProblemDetails may be included in response messages with error codes. The current definition is based on free text fields and mainly serve error handling during development and integration rather than enabling run-time corrections.
+4.3.2	Operations and response codes
+Create policy is defined as a PUT operation towards the URI including the policy identifier. The response code is 201 Created if policy creation is accepted and enforcement status can be ENFORCED. If policy creation is rejected, an appropriate HTTP status code is used to indicate the reject reason and Non-RT RIC could use it for making a new policy creation request.
+Update policy is defined as a PUT operation towards the URI including the policy identifier. The response code is 200 OK if policy update is accepted and enforcement status can be ENFORCED. If policy update is rejected, an appropriate HTTP status code is used to indicate the reject reason and Non-RT RIC could use it for making a new policy update request.
+Delete policy is defined as a DELETE operation with a 204 No content response code. Policy deletion is not supposed to be rejected although an appropriate error code could be used in such case.
+Notify policy status is defined as a POST operation with a 204 No content response code. If policy status notification is rejected, an appropriate HTTP status code is used to indicate the reject reason though Near-RT RIC is expected to use for resending the notification.
+NOTE:	The Query policy operations and Query policy status operations are not described here since not impacting A1 policy lifecycle management (in case status notifications are subscribed to).
+4.4	A1 policy status and feedback
+4.4.1	Policy status object
+The PolicyStatusObject defined in A1TD [i.4] is used in three different use cases:
+In Notify policy status change (see A1UCR [1.2], clause 6.7.3.2) the PolicyStatusObject includes enforceStatus (i.e. if the enforcement status has become ENFORCED or NOT_ENFORCED) and enforceReason (i.e. indicating the reason for the enforcement status change).
+In Query policy status (see A1UCR [1.2], clause 6.7.3.1), the PolicyStatusObject includes enforceStatus (i.e. if the enforcement status is ENFORCED or NOT_ENFORCED) and may include enforceReason (i.e. indicating the reason for the latest enforcement status change).
+In Notify policy feedback (not yet defined in A1UCR [1.2]), the PolicyStatusObject includes policy type specific feedback information in addition to enforceStatus (and enforceReason).
+4.4.2	Enforcement status
+The enforceStatus can take the values ENFORCED or NOT_ENFORCED.
+NOTE:	An A1 policy can be ENFORCED even if the UEs identified through the scope of the A1 policy are not present in any cell handled by the Near-RT RIC, i.e. even if there is no effect resulting from the enforcement activity in the Near-RT RIC.
+4.4.3	Change reasons
+The enforceReason can take the values SCOPE_NOT_APPLICABLE or STATEMENT_NOT APPLICABLE or OTHER_REASON.
+The detailed meaning of “NOT_APPLICABLE” is currently not defined.
+NOTE:	A proper definition of “NOT_APPLICABLE” could be used also as extension of ProblemDetails to provide further details in a response message with an error code (e.g. to indicate a “rejectReason”).
+4.4.4	Feedback
+The feedback part of a PolicyStatusObject is policy type specific as defined by the policy status schema of each A1 policy type (see A1TD [i.4], clauses 7.2).
+NOTE:	Currently no policy type specific part of a status schema is defined for any policy type in A1TD [i.4]).
+5	Enhanced descriptions of A1 policy enforcement
+5.1	Introduction
+This clause discusses A1 policy enforcement with enhanced descriptions that do not explicitly correspond to the current A1 specifications.
+5.2	A1 policy structure and contents
+5.2.1	Overview
+An A1 policy can contain three parts – scope identifier, policy objectives statement, and policy resources statement (see A1GAP [i.1], clause 5.1.5) – and can be read as expressing an instruction with the meaning:
+For the entities identified in the scope, strive for achieving the objectives by utilizing the conditions expressed for the resources.
+The scope identifier defined in A1TD [i.4] enables explicit or implicit identification of UEs and cells for which the enforcement aims to have an impact, and towards which the objectives would be evaluated. A UE must be connected to an identified cell to be impacted by policy enforcement.
+5.2.2	Scope targets
+To describe A1 policy enforcement, the entities being identified through the scope identifier in an A1 policy are in the present document referred to as the scope targets.
+The following attributes are currently defined in A1TD [i.4], clause 6.3.1 for the scope identifier: ueId, groupId, sliceId, qosId, cellId, cellIdList, and taIList.
+The scope targets enable identification of what is to be impacted (related to an observable outcome that can be expressed in the objectives statement) and what the required A1 policy enforcement capabilities are (e.g. which cells and slices that must be available for enforcing the policy).
+5.2.3	Objectives
+An A1 policy can contain one or more objectives. The current A1 specifications do not describe how to measure or evaluate the degree to which the objectives are achieved, it is left for Non-RT RIC to determine to which extent A1 policy enforcement leads to the intended result (see clause 4.1.2).
+Several of the A1 policy types defined in A1TD [i.4] require "at least one" of several objective attributes to be present in an A1 policy.
+NOTE:	Assumingly, not any combination of objectives attributes, and attribute values, may make sense from a consistent enforcement perspective.
+For specific objective attributes, not all attribute values may make sense. E.g. the policy schema may allow values that are considered unreasonable from the Near-RT RIC perspective.
+The current A1 specifications do not define any explicit error code or reject reason to use in case Near-RT RIC decides to reject an A1 policy creation/update request for the above reasons.
+Policy objectives may be unachievable due to conflicts with other policies or other tasks requiring the same resources in which case rejection of a policy creation request would use the 409 Conflict status code, or due to required resources not being available in which case a status change notification could indicate the change reason as OTHER REASON.
+5.2.4	Resources
+5.2.4.1	General considerations
+The resource statements enabled by the A1 policy types currently defined in A1TD [i.4] are based on cells (i.e. cell lists) and conditions related to their utilization for enforcing the A1 policy. While the cells in the scope need to be handled by the Near-RT RIC which is enforcing the A1 policy, the cells in the resource statement need not be since traffic can be steered/off-loaded to neighbouring cells handled by other Near-RT RICs.
+To transfer traffic to a cell (e.g. based on a traffic steering or a load balancing policy), a neighbourhood relation needs to be configured and if such are not available the Near-RT RIC could consider the requested A1 policy as not applicable.
+NOTE:	It is not studied in the present document if Near-RT RIC can be assumed to be aware of if the indicated cells handled by other Near-RT RICs are available, or not, when evaluating the applicability of a requested A1 policy.
+5.2.4.2	A1 Policy type specific considerations
+5.2.4.2.1	Traffic steering preferences
+Resource statements for traffic steering preferences are made based on the TspResource data type defined in A1TD [i.4], clause 6.2.4.2.
+The resource statement expresses conditions for cells to steer traffic to. It does not exclude usage of cells not included in the cellLists in the resource statement.
+The cells in the resource statement are not limited to cells handled by the Near-RT RIC.
+5.2.4.2.2	Slice SLA assurance
+Resource statements for slice SLA assurance are made based on the SliceSlaResources data type defined in A1TD [i.4], clause 6.2.4.3.
+If present, the resource statement expresses the designated target cells for attributes in SliceSlaObjectives (see A1TD [i.4], clause 6.3.3.5). It excludes usage of cells not included in the cellLists in the resource statement from being designated target cells.
+The cells in the resource statement are limited to cells handled by the Near-RT RIC.
+5.2.4.2.3	Load balancing
+Resource statements for load balancing are made based on the LbResources data type defined in A1TD [i.4], clause 6.2.4.4.
+The resource statement expresses conditions for cells to transfer traffic to. It excludes usage of cells not included in the cellList in the resource statement.
+The cells in the resource statement are not limited to cells handled by the Near-RT RIC.
+5.2.4.2.4	Energy saving
+Resource statements for energy saving are made based on the EsResource data type defined in A1TD [i.4], clause 6.2.4.5.
+The resource statements express conditions for cells to apply energy saving on. It does not exclude usage of cells not included in the cellList in the resource statement.
+The cells in the resource statement are limited to cells handled by the Near-RT RIC.
+5.3	Applicability (from Near-RT RIC perspective)
+5.3.1	Background
+Applicability is currently used to express a reason for an A1 policy status change (see clause 4.4.3 and A1TD [i.4] clause 6.2.2.3). For the scope identifier, SCOPE_NOT_APPLICABLE implies one or more of the attributes of the scope identifier cannot be applied, and hence the provided scope can no longer be applied for enforcing the A1 policy. For the objectives statement, and the resource statement, STATEMENT_NOT_APPLICABLE implies the statement can no longer be applied. Any detailed description of why the scope or the statements cannot be applied is currently not provided in the A1 specifications.
+The term applicability could potentially also be used to express one of the reasons for why an A1 policy creation/update request is rejected in a case when the requested A1 policy cannot be enforced. According to A1GAP [i.1], clause 5.1.3, Non-RT RIC can when an A1 policy creation request is accepted assume that the A1 policy is enforced. This means scope and statements are applicable if no status change notification is received with one of the NOT_APPLICABLE reason. If Non-RT RIC requests creation of an A1 policy where not all attributes can be applied, it should not assume the A1 policy creation request will be accepted or that the A1 policy remains enforced in case it was accepted.
+NOTE:	The current A1 specifications do not define any explicit error code or reject reason to use in case Near-RT RIC decides to reject an A1 policy creation/update request for applicability reasons. It is though not prohibited to use the status code 400 Bad Request and optionally express the reasons in the problem details.
+Knowledge about which A1 policies that are applicable from a Near-RT RIC perspective would help Non-RT RIC to formulate A1 policies that can be enforced, and better understand reasons for why an existing A1 policy is not achieving its objectives.
+5.3.2	A1 policy enforcement capabilities
+A definition of the term applicability would, in general, relate to the capabilities needed for applying.
+EXAMPLE 1:	A Near-RT RIC could consider an A1 policy as applicable in case it has capabilities, and is allowed to use them, to enforce it while it would consider an A1 policy as not_applicable in case it does not have capabilities, or is not allowed to use them, to enforce it.
+For the A1 interface purposes, it could be considered for Near-RT RIC to express such A1 (policy enforcement) capabilities related to the A1 policy types it supports.
+The A1 policy enforcement capabilities of a Near-RT RIC could represent what the Near-RT RIC is able, and allowed, to do in terms of A1 policy enforcement related to a supported A1 policy type. Based on its A1 policy enforcement capabilities, a Near-RT RIC could consider a requested A1 policy as applicable or not applicable.
+EXAMPLE 2:	If a Near-RT RIC has A1 policy enforcement capabilities to enforce A1 policies for cells 100-199, it would not consider an A1 policy that targets cell 201 as fully applicable since it does not have all the required A1 policy enforcement capabilities to enforce it. If Non-RT RIC was aware of these A1 policy enforcement capabilities, it would (hopefully) not create an A1 policy that expects cell 201 to be used for A1 policy enforcement.
+Two aspects of A1 policy enforcement capabilities should be separated – "configured A1 policy enforcement capabilities" and "available A1 policy enforcement capabilities":
+the configured A1 policy enforcement capabilities of a Near-RT RIC represents the capabilities configured by OAM that the Near-RT RIC can, and is allowed to, use for A1 policy enforcement (e.g., each cell is handled by one and only one Near-RT RIC based on the network configuration and cells are configured for support for certain slices); and
+the available A1 policy enforcement capabilities of a Near-RT RIC represents the subset of configured A1 policy enforcement capabilities that are available for A1 policy enforcement (e.g., all the configured cells or slices may not be available for enforcing A1 policies at every time).
+Since the available A1 policy enforcement capabilities are a subset of the configured A1 policy enforcement capabilities, they may change in case the configured A1 policy enforcement capabilities are changed. It is assumed that the available A1 policy enforcement capabilities may change more often than the configured A1 policy enforcement capabilities, but they can only change within the set of configured A1 policy enforcement capabilities.
+NOTE 1:	The reasons for why configured cells or slices may not always be available for enforcement of A1 policies is not further elaborated here.
+NOTE 2:	"Planned A1 policy enforcement capabilities" may not be relevant to consider. Only configured A1 policy enforcement capabilities are relevant when defining applicability for a Near-RT RIC that receives A1 policy creation/update requests and/or is enforcing A1 policies.
+5.3.3	Scope applicability
+5.3.3.1	Examples of A1 policy enforcement capabilities
+In the context of the A1 interface, the obvious examples of A1 policy enforcement capabilities are those that can be represented by the entities identified in the scope and resources statement (e.g. cells and slices), and the attributes of the objectives statement, defined in the A1 policy types. The configured A1 policy enforcement capabilities represent the subset of what can be expressed in A1 policies based on the A1 policy types that a Near-RT RIC has been configured or restricted to support.
+A Near-RT RIC can e.g. be configured with
+restrictions to use only certain of the allowed combinations of scope identifier attributes with objectives/resources statement defined for each A1 policy type;
+restrictions to use only certain scope identifier attributes, i.e., Near-RT RIC can be configured to not allow ueId/groupId/sliceId/qosId/cellId/cellIdList/talList based scope identifiers for an A1 policy type;
+allowed or not allowed ueId/groupId/sliceId/qosId/cellId attributes, e.g., Near-RT RIC can be configured to not allow qcI based scopes for a policy type;
+allowed or not allowed scope identifier attribute values, e.g., Near-RT RIC can be configured to not allow A1 policy enforcement for certain cellId(s) for an A1 policy type.
+NOTE 1:	Near-RT may be configured for A1 policy type restrictions as exemplified above given they are in line with the A1 specifications. It is not in scope of the A1 specifications to define how cells are configured to support e.g.  slices and tracking areas, nor how Near-RT RIC is configured for restrictions or which cells it handles.
+NOTE 2:	In addition to the Near-RT RIC configuration, the available A1 policy enforcement capabilities could be impacted by other aspects related to the internal realization of the Near-RT RIC. E.g., in case the A1 policy enforcement would be distributed among activities that enforce a share of the A1 policy, the operational status of those activities could impact the A1 policy enforcement capabilities that are available, and Near-RT RIC in such a case could use the policy status message to indicate the change in the enforceability of the policy.
+A Near-RT RIC would use its configured A1 policy enforcement capabilities to determine applicability of requested A1 policies (and use the available subset of the configured A1 policy enforcement capabilities to determine enforceability of existing A1 policies).
+The term applicability expresses if enforcement of an A1 policy can be based on the configured A1 policy enforcement capabilities:
+if the scope of an A1 policy is completely covered by the configured A1 policy enforcement capabilities, it is referred to as an "applicable scope"; and
+if the scope of an A1 policy is not completely covered by the configured A1 policy enforcement capabilities, it is referred to as a "not applicable scope".
+An A1 policy creation/update request could potentially be rejected if the requested A1 policy is not applicable, e.g. in cases such as:
+cellId in scope is not handled by the Near-RT RIC;
+sliceId in scope is not handled by the Near-RT RIC (i.e. the slice is not configured for any cell handled by the Near-RT RIC); and
+cellId in scope is not configured for the provided sliceId;
+taI in scope is not broadcasted by any of the cells handled by the Near-RT RIC.
+cellId in resources is not configured for the sliceId provided in the scope.
+NOTE 3:	The current A1 specifications do not define any detailed meaning of applicability, and do not require/forbid the Near-RT RIC to be able to reject A1 policy creation/update requests based on non-applicability.
+5.3.3.2	A1 policy enforcement capabilities and scope coverage
+Figure 5.3.3.2-1 illustrates that the available A1 policy enforcement capabilities of a Near-RT RIC are (equal to or are) a subset of the configured A1 policy enforcement capabilities, and how they cover different scopes.
+Figure 5.3.3.2-1: Relation between configured and available A1 policy enforcement capabilities, and the scopes they cover
+Figure 5.3.3.2-1 illustrates that
+the requested scope (i.e. the scope of an A1 policy in an A1 policy creation/update request) can be bigger than what can be handled based on the configured A1 policy enforcement capabilities;
+the applicable scope is the part of the requested scope that can be handled based on the configured A1 policy enforcement capabilities  (i.e. the applicable part of the "requested scope");
+the enforceable scope is the part of the applicable scope that can be handled based on the available A1 policy enforcement capabilities  (i.e. the enforceable part of the "applicable scope").
+NOTE:		 If a cellIdList in the scope includes cells handled by other Near-RT RIC(s), obviously the requested scope is bigger than, or outside of, the applicable scope. But when there is a ueId in a requested scope, and the Near-RT RIC is configured to allow ueId based scope, then the requested scope can be an applicable scope.
+The current A1 specifications do not make any assumptions on when Near-RT RIC evaluates the applicable scope and/or the enforceable scope against the configured and/or available A1 policy enforcement capabilities.
+5.3.4	Objectives applicability
+If the enforcement status of an A1 policy changes to NOT_ENFORCED, the changeReason STATEMENT_NOT_APPLICABLE could be used to indicate that the reason is related to that objectives can no longer be applied. It can also be used in the case that an A1 policy update request was accepted although objectives are no longer realistic or within the constraints.
+An A1 policy creation/update request could potentially be rejected due to inapplicability in case the objectives are: "unrealistic" or "beyond constraints".
+The objectives statement of an A1 policy could be considered as applicable in case the policy creation/update request can be accepted and the enforcement status of the A1 policy can be ENFORCED.
+NOTE:		An A1 policy creation/update request can be rejected due to conflict in case the existence of other policies implies the objectives are "unachievable". This is, though, not related to objective applicability since not related to the configured A1 policy enforcement capabilities.
+It would be up to a Near-RT RIC if, and how, it can determine if the objectives statement of an A1 policy is unrealistic to an extent that leads to rejection of an A1 policy creation/update request or if the A1 policy is accepted even if the objectives statement may not be (always and fully) applicable.
+Even for a less unrealistic objective, the Near-RT RIC may have constraints related to which objective attribute values it can consider as applicable.
+In addition to constraints regrading objective attribute values, a Near-RT RIC may for each A1 policy type also be restricted to use only a subset of the attributes defined for the objectives statement, and/or a subset of combinations of them (in cases where the A1 policy types allow for more than one objective attribute). Such constraints are considered as covered by the configured A1 policy enforcement capabilities.
+NOTE1 :	If Non-RT RIC was aware of the ranges for attribute values that Near-RT RIC considers unrealistic, or beyond constraints, it would (hopefully) not create an A1 policy with an objective that is not applicable.
+NOTE 2:	It needs, however, to be further studied if it makes sense to reject an A1 policy creation/update request based on the dynamic situation or if that is better expressed as a status of the enforcement.
+To a Near-RT RIC, the objectives statement in an A1 policy would be "applicable" in case it can use the objective attributes for enforcement of the A1 policy and the values of the objective attributes are reasonable (i.e. within the constraints of what can be strived for during enforcement). In case an objectives statement contains multiple attributes, the objectives need to be concurrently achievable (i.e. also the combination of attributes, and their values, can be used) if the A1 policy is to be considered as "applicable".
+5.3.5	Resources applicability
+If the enforcement status of an A1 policy changes to NOT_ENFORCED, the changeReason STATEMENT_NOT_APPLICABLE could be used to indicate that the reason is related to that the resources statement can no longer be applied.
+An A1 policy creation/update request could potentially be rejected due to inapplicability in case the provided resource statement is not applicable.
+The applicability of the resource statement would be related to the configured A1 policy enforcement capabilities or neighbourhood relations. For a cell identifier attribute provided in the resource statement to be applicable, it has to be covered by the configured A1 policy enforcement capabilities or neighbourhood relations for the resource statement to be applicable.
+The entities in resource statements are cellIdList and taiList. Even if a valid A1 policy need not have any items in the arrays, a resources statement would not be applicable in case it does not cover at least one applicable cell.
+5.4	Enforceability (from Near-RT RIC perspective)
+5.4.1	Background
+Enforcement refers to the activity and actions that strive to achieve the objectives of an existing A1 policy. The status of the enforcement activity is expressed in the enforceStatus attribute. To say an A1 policy is enforced corresponds to that the enforceStatus attribute value is ENFORCED, and to say an A1 policy is not enforced corresponds to that the enforceStatus attribute value is NOT_ENFORCED. An enforceable A1 policy has an enforceable scope (see clause 5.3.3.2) and can be enforced.
+A UE identified by the scope of an enforced A1 policy may, or may not, be connected to a cell handled by the Near-RT RIC. And PDU sessions related to QoS flows identified by the scope of an enforced A1 policy may, or may not, be established with a UE connected to a cell handled by the Near-RT RIC. To say an A1 policy is enforceable, or that enforceStatus is ENFORCED, does not reflect whether enforcement is in effect or not. Policy enforcement would not be in effect if the targeted UEs are not connected, or if no PDU session is established with a QoS flow for the targeted qosId. Only when policy enforcement is in effect, for A1 policies with ueId and/or qosId in the scope, can there be an observable outcome.
+5.4.2	Effect of policy enforcement
+Policy enforcement relies on that the identified required resources are available, allocated, and used for enforcing the policy towards achievement of the policy objectives.
+NOTE 1:	The scope of WG2 and the A1 specifications do not include how A1 policy enforcement is done by Near-RT RIC, that is in scope for the Near-RT RIC Architecture [i.7] and other WG3 specifications. The present clause only elaborates on aspects related to usage of the A1 interface from the Non-RT RIC perspective such as e.g. observable effects of A1 policies created in a Near-RT RIC.
+The enforcement of an A1 policy may have direct impact on UEs identified through the scope of the policy and indirect impact on other UEs. For an A1 policy to have direct impact on a UE it needs to be connected to a cell where the policy is being enforced.
+EXAMPLE 1:	A load balancing or traffic steering policy has direct impact on UEs steered to other cells, and their presence in the new cells may have impact on UEs already present there.
+The enforcement of an A1 policy may or may not have effect on a UE, or result in an observable outcome, due to reasons such as UE is not being connected or the UE mobility (where connections do not last long enough to show observable impact). The effect of policy enforcement may also be impacted by dynamic aspects such as e.g. resource load and traffic situation. It may not be feasible for the Near-RT RIC to determine and signal that the enforcement of an A1 policy has no effect.
+If the policy objectives of a set of policies are not concurrently achievable, only a subset of the policies may have effect though all policies are enforced.
+EXAMPLE 2:	E.g. power saving on a cell may not be applied in case it is actively handling traffic.
+An enforceable A1 policy targeting cells can be enforced only if the cells are available (i.e. operational), it would not be enforceable otherwise. An energy saving policy is not considered as making a cell unavailable since it is for the Near-RT RIC to balance the effect of concurrent policies towards the E2 nodes and the cells, and make the trade-off between power saving and traffic handling.
+NOTE 2:	For the observable effects of A1 policies, Non-RT RIC relies on existing mechanisms such as O1 based counters, trace etc to gather this information. It is not studied in the present document if it is feasible for the Near-RT RIC to be aware of the connected state of all UEs targeted by an enforced A1 policy, especially in cases when they move between cells and E2 nodes. Neither is it studied if there would be any reason to notify such changes to Non-RT RIC.
+5.4.3	Relation between enforceability and applicability
+5.4.3.1	General
+The terms applicability and enforceability are strongly related, could apply both during A1 policy creation/update transactions and A1 policy enforcement, and could be defined based on A1 policy enforcement capabilities. They relate to the capabilities needed for enforcement of an A1 policy of a specific A1 policy type, and enables expressing the result of an evaluation of if the A1 policy can be enforced or not if created, as well as the enforcement status of an existing A1 policy.
+5.4.3.2	Acceptable
+An accepted A1 policy is an A1 policy that Near-RT RIC accepted for creation/update based on a requested A1 policy received in an A1 policy creation/update message while a rejected A1 policy is a requested A1 policy that was not accepted for creation due to reasons such as e.g. not valid or conflicting with existing A1 policies.
+The current A1 specifications do not contain any additional requirements (beyond validity and not being identical to an existing A1 policy) on when Near-RT RIC should consider a requested A1 policy as acceptable when receiving an A1 policy creation/update request.
+NOTE 1:	If a requested A1 policy does not validate against the policy schema of the A1 policy type, the rejection is indicated as a bad request. If a requested A1 policy is identical to an existing A1 policy, the rejection is indicated as a conflict.
+NOTE 2:	It could be for further study if applicability and/or enforceability should be considered as further reject reasons.
+5.4.3.3	Applicable and enforceable
+An A1 policy would be "applicable" in case it has an applicable scope (see clause 5.3.3), and the objectives and resources statements are applicable (see clauses 5.3.4 and 5.3.5). Otherwise, the A1 policy would be "not applicable".
+A requested A1 policy could be "applicable" in case it has an applicable scope, and the objectives and resources statements are applicable. If the configured A1 policy enforcement capabilities change during enforcement so that the scope is no longer completely covered by the configured A1 policy enforcement capabilities, the policy would be "not_applicable".
+An A1 policy would be "enforceable" in case it has an enforceable scope (see clause 5.3.3), the objectives statement is applicable (see clauses 5.3.4), and at least one cell indicated in the resource statement is available. Otherwise, the A1 policy would be "not enforceable".
+A requested A1 policy could be "enforceable" in case it has an enforceable scope, the objectives statement is applicable, and at least one cell indicated in the resource statement is available. If the available A1 policy enforcement capabilities change during enforcement so that the scope is no longer completely covered by the available A1 policy enforcement capabilities, the policy would be "not_enforceable".
+Since the available A1 policy enforcement capabilities are a subset of the configured A1 policy enforcement capabilities, an applicable A1 policy may or may not be enforceable, while an A1 policy that is not applicable also is not enforceable.
+Figure 5.4.3.3-1 illustrates the applicability and enforceability aspects related to the A1 policy enforcement capabilities.
+Figure 5.4.3.3-1: Relation between scope applicability and enforceability, and the A1 policy enforcement capabilities
+5.4.3.4	Reasons
+In case of a change in enforcement status (from ENFORCED to NOT_ENFORCED), the enforceReason SCOPE_NOT_APPLICABLE would be used to reflect a change in the configured A1 policy enforcement capabilities required for the enforcement.
+The current A1 specifications does not contain any dedicated attribute value to express a status change to NOT_ENFORCED related to that policy has become not_enforceable (i.e. due to a change in the available A1 policy enforcement capabilities required for the enforcement).
+NOTE:	It is not clear if the enforceReason STATEMENT_NOT_APPLICABLE could be used or not for expressing the consequences of a change in the available A1 policy enforcement capabilities.
+Even if the A1 policy at creation/update was considered as applicable based on the configured A1 policy enforcement capabilities, it may not be enforced due the available A1 policy enforcement capabilities. The considerations in the present clause are general and limited to binary states (able or not_able). The introduction of more granular "degrees of ability" is made in further clauses.
+5.5	A1 policy creation
+5.5.1	General
+The current A1 specification (see A1AP [i.3], clause 5.2.4.3) defines policy creation, and update, based on the PUT+201 pattern as illustrated in figure 5.5.1-1.
+Figure 5.5.1-1: Current definition of the Create single policy operation using a PUT+201 pattern
+As per A1GAP [i.1], clause 5.1.3,
+"A Create/Update policy request is accepted after the policy has been validated and considered as being possible to enforce"
+and
+"When a create A1 policy request is accepted, the Non-RT RIC can assume that the policy is enforced until policy status is queried or a change in enforcement status is notified".
+NOTE 1:	To say an A1 "policy is enforced" corresponds to that the enforceStatus attribute value is ENFORCED (see clause 5.4.1) when enforcement actions are taken for the A1 policy. It could be considered if the text in A1GAP [i.1] means to imply Non-RT RIC can assume policy enforcement has started (and enforcement status is reflected in the enforceStatus attribute) following the confirmation that the requested A1 policy was considered as possible to enforce.
+NOTE 2:	Based on the definitions and reasoning in clauses 5.4.3.3 and 5.4.3.4, it could be considered to say that a policy is "possible to enforce" if it is applicable (and enforceable) as the changeReason values provided in status change notifications refer to scope and statement inapplicability.
+At reception of a 201 Created response message, Non-RT RIC is aware that the requested A1 policy has been validated and considered as possible to enforce. It does, however, not yet know the value of the enforceStatus attribute or the status of the enforcement activity that results from the accepted policy creation/update request. Hence, until it knows, Non-RT RIC can reasonably assume the policy is enforced (since it is considered possible to enforce) and it may also assume that the value of the enforceStatus attribute would be ENFORCED.
+NOTE 3:	The current A1 specification does not describe what value the Near-RT RIC assigns to the enforceStatus attribute after the 201-message and before it reflects the status of the policy enforcement activity.
+To become of aware the enforcement status, Non-RT RIC can query the policy status and subscribe to notifications for policy status changes. Query of policy status, and notification of policy status change, as defined in A1AP [i.3], clauses 5.2.4.7 and 5.2.4.8 are illustrated in figure 5.5.1-2.
+NOTE 4:	Even if Non-RT RIC has received the enforceStatus, it does not imply the enforcement activity has started (see Note 3).
+Figure 5.5.1-2: Current definition of the Query policy status and Notify policy status operations
+The current definition of Create single policy reflects a synchronous design pattern as described in 3GPP TR 32.866 [i.9], clause 7.5.6. A different alternative for defining a Create policy transaction would have been to use an asynchronous design pattern as described in 3GPP TR 32.866 [i.9], clause 7.5.12. The PUT+202+Notify pattern would ensure Non-RT RIC receives consistent information regarding status of evaluations and the resulting policy enforcement status in case policy creation was accepted.
+Using a design pattern with asynchronous properties implies the enforcement status can be explicitly provided and may, or may not, allow for a NOT_ENFORCED outcome. The different alternatives based on these patterns are discussed further in clauses 5.5.2 and 5.5.3 based on the principles that "an A1 policy is accepted for creation if it is possible to enforce" and "there will be an enforcement activity with known status for an existing A1 policy", and with considerations how to avoid assumptions.
+The usage of different status codes related to the different evaluations (if policy is possible to enforce or not) are discussed in clause 5.5.4.
+5.5.2	Detailed analysis for PUT+201 pattern
+5.5.2.1	General
+To say an A1 policy is enforced corresponds to that the enforceStatus attribute value is ENFORCED (see clause 5.4.1) and seems to imply that the policy enforcement (activity) has started. However, the statement that the "request is accepted after the policy has been validated and considered as being possible to enforce" seems to imply that 201 Created can be sent after evaluation of applicability and/or enforceability (see clauses 5.3 and 5.4) but before the policy enforcement (activity) has started. Given that the enforceStatus is queryable after the 201 Created message, the attribute value may either reflect the status of the ongoing enforcement activity or have a value assigned by Near-RT RIC that may, or may not, reflect the status of the enforcement activity after it has been started.
+The scenario where policy creation is accepted after the start of policy enforcement, and enforceStatus is known to be ENFORCED at the reception of 201 Created, is described in clause 5.5.2.2 while the scenarios where policy creation is accepted before the start of policy enforcement, and enforceStatus is assumed to be ENFORCED at the reception of 201 Created until queried, or a status change is notified, are described in clause 5.5.2.3.
+5.5.2.2	Creating an ENFORCED policy
+Figure 5.5.2.2-1 illustrates policy creation where the 201-messsage is sent after the enforcement activity has started and enforcement status is ENFORCED. If Non-RT RIC was aware that Near-RT RIC had this behaviour it would not need not assume, since it would know, that enforcement status is ENFORCED.
+Figure 5.5.2.2-1: Create policy transaction based on the PUT+201 pattern where enforcement status is ENFORCED when policy is created
+This transaction for "creating an enforced policy" follows a synchronous design pattern as described in 3GPP TR 32.866 [i.9], clause 7.5.6, even if the 201-message may not be immediate.
+NOTE:	It is not in the scope of the A1 specifications to define any details on what the starting of a policy enforcement activity covers, if it performed in steps, or how long it may take before it completes. Even if the PUT+201 based transaction is considered as synchronous, Non-RT RIC cannot assume to be aware of the actual enforceStatus within any specific time.
+5.5.2.3	Creating policy before enforcement status is known
+Figure 5.5.2.3-1 and figure 5.5.2.3-2 illustrate policy creation where the 201-messsage is sent before the enforcement activity has started. In these scenarios, the policy is created even if the enforcement status may not be ENFORCED when enforcement has started. Even if Non-RT RIC can assume the policy is enforced, it could, but may not, receive a status change notification immediately after the 201-message.
+These transactions formally separate the acceptance for creating the requested A1 policy from the status of the associated enforcement activity. Thereby it allows for an outcome where the enforcement status is NOT_ENFORCED. Given that policy creation is accepted only if the requested A1 policy is both applicable and enforceable, it would be reasonable to assume that the enforcement status will be ENFORCED (corresponding to the assumption related to the current Create single policy operation). It can, though, not be assumed that Near-RT RIC sets the initial value of enforceStatus to any specific value before enforcement has started.
+Figure 5.5.2.3-1: Create policy transaction based on the PUT+201 pattern where policy is created before enforcement status is actually known
+The transaction in figure 5.5.2.3-1 for "creating an enforceable policy with assumed but unknown status" shows both synchronous and asynchronous properties illustrated in figure 5.5.2.2-1 and 5.5.2.3-2.
+Non-RT RIC can query the status to become aware, but it would still not know when the enforceStatus attribute value reflects the status of the started enforcement activity.
+Non-RT RIC may prefer more consistency regarding the information about the enforcement status before starting to monitor any O1 observables specific for the impact of an A1 policy after receiving 201 Created. One way to enable that could be to define an attribute value UNDETERMINED in the case where policy creation is accepted before the enforcement activity is started as that enables Non-RT RIC to be notified when enforcement has started, and status is ENFORCED (or NOT_ENFORCED), as illustrated in figure 5.5.2.3-2.
+Figure 5.5.2.3-2: Create policy transaction based on the PUT+201 pattern where enforcement status is UNDETERMINED when policy is created
+The transaction in figure 5.5.2.3-2 for "creating an enforceable policy with known status" resembles an asynchronous design pattern described in Option 1 in 3GPP TR 32.866 [i.9], clause 7.5.12, using PUT instead of GET and using the notificationDestination as the asynchronous callback URI.
+5.5.3	Alternatives based on PUT+202+Notify pattern
+5.5.3.1	General
+An alternative to using the PUT+201 pattern would be to use the PUT+202+Notify pattern. The meaning of the 202-response message would be that "the creation request is accepted for evaluation, and the policy will be created if it is possible to enforce".
+The following Create policy transactions are based on Option 3 in 3GPP TR 32.866 [i.9], clause 7.5.12.
+The scenario where policy is created when enforceStatus is known to be ENFORCED is described in clause 5.5.3.2 while the scenario where policy is created irrespective of enforceStatus is described in clause 5.5.3.3.
+The 202 Accepted message would contain a URI that enables to query the status of the ongoing evaluation activity. This status would indicate if the "evaluation of the creation request, policy creation, and start of enforcement" activity is ongoing and when completed the status would indicate if the result was that policy is created or not, and what the enforcement status is. The status notification would also include the PolicyObject (just like the 201-response) and the PolicyStatusObject (reflecting the known enforcement status).
+5.5.3.2	Creating an ENFORCED policy
+Figure 5.5.3.2-1 illustrates policy creation after the enforcement activity has started and enforcement status is ENFORCED.
+Figure 5.5.3.2-1: Create policy transaction based on the PUT+202+Notify pattern where enforcement status is ENFORCED when policy is created
+This transaction allows for an outcome where policy is not created in case the enforcement status is not ENFORCED. The 202 Accepted message can, however, not be assumed to indicate that policy was considered applicable and/or enforceable.
+NOTE 1:	Even if the transaction per definition is asynchronous, it need not imply the notification cannot be sent immediately after 202-message.
+NOTE 2:	The status notification indicating policy was not created should include relevant information regarding the reason why policy was not created, e.g. if it was considered as not applicable/enforceable or if the enforcement activity did not result in enforceStatus being ENFORCED. It would be for further consideration what the appropriate content would be for these cases.
+5.5.3.3	Creating policy with known enforcement status
+Figure 5.5.3.3-1 illustrates policy creation and enforcement activity irrespective of enforcement status.
+This transaction formally separates the acceptance for creating the requested A1 policy from the status of the associated enforcement activity. Thereby it allows for an outcome where the enforcement status is NOT_ENFORCED even if the policy is created only if the requested A1 policy is both applicable and enforceable.
+Figure 5.5.3.3-1: Create policy transaction based on the PUT+202+Notify pattern where enforcement status is ENFORCED or NOT_ENFORCED when policy is created
+The 202 Accepted message cannot be assumed to indicate that the A1 policy was considered applicable and/or enforceable. This transaction implies the A1 policy is created even if the enforcement status may not be ENFORCED.
+NOTE:	This approach, and the approach illustrated in figure 5.5.2.3-2, enables the same Non-RT RIC awareness of that an evaluation activity is ongoing until Non-RT RIC is informed about the outcome of policy being created or not, and what the status of the started enforcement activity is. The approach in figure 5.5.3.3.-1 enables more information can be queried during evaluation and provided in the result of the evaluation activity.
+5.5.3.4	Comparison with PUT+201 pattern alternatives
+The alternatives illustrated in figures 5.5.2.2-1 and 5.5.3.2-1 shows the A1 policy exists (and is queryable over A1) after the enforcement activity has started and the status is known to be ENFORCED. If Non-RT RIC was aware of that Near-RT RIC behaves like this it would not need to make any assumption on the enforcement status at the creation of the A1 policy. The 202-alternative is a typical pattern while the 201-alternative is covered by current service operation although it cannot be expected that Near-RT RIC has this behaviour. A successful policy creation transaction always results in an A1 policy where the enforcement status is ENFORCED.
+The alternatives illustrated in figures 5.5.2.3-2 and 5.5.3.3-1 implies there is no need for Non-RT RIC to make any assumption on the enforcement status at the creation of the A1 policy since it will be notified when the enforcement activity has started. The 202-alternative is a typical pattern while the 201-alternative is a simpler solution based on the current service operation modified for asynchronous properties. A successful policy creation transaction results in an A1 policy with known status, but a consequence is that Non-RT RIC cannot expect an outcome where the enforcement status is ENFORCED when enforcement activity has started (unless further means are taken to address the expectations on the outcome).
+The alternative illustrated in figures 5.5.2.3-1 shows why Non-RT RIC should not make any assumptions on the enforcement status at the creation of the A1 policy since it cannot have any expectation of what value Near-RT RIC will assign to the enforceStatus attribute before the enforcement activity has started, and hence it cannot expect to be notified in case of a specific status change from an assumed status. A successful policy creation transaction results in an A1 policy with unknown status but if Non-RT RIC queries the status of the policy after creation it will become aware of the enforcement status even if the enforcement activity has not yet started (in case it subscribes to policy status notifications). It will, however, not know when the enforceStatus value reflects the status of the started enforcement activity.
+5.5.4	Validations (by Near-RT RIC) and error codes
+5.5.4.1	General
+The transactions illustrated in clauses 5.5.2 and 5.5.3 start with a validation of the requested policy that also validates if "policy is possible to enforce" in the 201 cases. In the cases when policy enforcement is started before policy creation is accepted, the creation request can be rejected also in cases when the policy is possible to enforce. The usage of error codes is summarized in figure 5.5.4.1-1.
+The current A1 specification (see A1AP [i.3], clause 6.2.7.3) only defines HTTP status codes for cases where the policy creation is rejected based on formal validation of the request syntax, the payload not validating against the policy schema, or due to obvious conflict with an existing A1 policy. There is currently no explicit error code to use when rejecting a policy creation request with reasons such "not applicable" or "not enforceable if created".
+NOTE 1:	"not applicable" and "not enforceable" are defined in clause 5.4.3.3.
+Figure 5.5.4.1-1: Validations and error codes
+NOTE 2:	It is out of scope of the A1 specifications and the present document to speculate on, or specify how, Near-RT RIC does internal evaluations of A1 policies and policy enforcement, or in which order such evaluations are performed. This clause only intends to provide reasoning around appropriate HTTP status codes that could be relevant in relation to the considerations and definitions of the present document.
+5.5.4.2	Error codes for policy validation
+For the syntactic validations,
+400 Bad Request is used to indicate a bad request, e.g. invalid URI path or content that do not validate against the required JSON schema;
+404 Not Found is used to indicate that the policy type does not exist (i.e. there is no resource corresponding to the {policyTypeId} in the path), and
+in addition to the syntactic validation of the policy creation request message, additional aspects could be evaluated to address:
+the applicability of the requested A1 policy, i.e. whether the enforcement of the requested A1 policy can be based on the configured A1 policy enforcement capabilities;
+the enforceability of the requested A1 policy (i.e. whether the enforcement of the requested A1 policy can be based on the available A1 policy enforcement capabilities) and the resulting enforcement status of the A1 policy in the case policy creation was accepted; and
+conflicts with existing A1 policies can be indicated with 409 Conflict.
+For the applicability and/or enforceability validations, there is no error code defined in the current A1 specification. While the validation of the request message syntax may lead to rejection with HTTP client errors (4xx), e.g. the applicability and/or enforceability evaluation status may lead to rejection with HTTP server errors (5xx). It is for further study which 5xx errors could be appropriate, e.g.
+501 Not Implemented could be used to indicate "not applicable"; and
+503 Service Unavailable could be used to indicate "not enforceable".
+NOTE:	It could be considered to include some rejectDetails with the error codes that provides detailed information e.g. regarding the related configured and/or available capabilities. This content type could be similar/same as the one indicating changeReason in notifications of policy status change related to change in applicability and/or enforceability.
+5.5.4.3	Error codes for policy enforcement
+Even if an A1 policy is validated as "enforceable", it may not result in an enforcement activity where enforceStatus is ENFORCED. Reasons for this could be related to required resources being consumed by other activities or objectives conflicting with other enforced policies. When rejecting the policy creation at this stage, the same HTTP server errors can be used as for the policy validation but also the 409 Conflict could be used in case Near-RT RIC detects a conflict regarding concurrent achievability of policy objects with existing A1 policies.
+NOTE:	If e.g. the 503 code is used even if the requested A1 policy was considered as "enforceable", it should be considered how that could be reflected in the rejectDetails
+5.5.5	Potential clarifications
+Based on the above considerations for the A1 policy creation scenarios, a major update could be made to incorporate fully asynchronous operations, or the following clarifications and minor enhancements could be made to the current A1 specification:
+"Policy is possible to enforce" could be defined as "policy is applicable", and Near-RT RIC could reject requested A1 policies that are not applicable with e.g. a 501 Not Implemented. An enforceReason for SCOPE_APPLICABLE and STATEMENT_APPLICABLE could be added to cover status changes in both directions.
+"Policy is enforced" in the current A1 specification should be understood as "enforcement activity has started, actions are taken, and enforceStatus is ENFORCED". To instead interpret "policy is enforced" merely as "enforcement activity has started, actions are taken" implies further concepts and definitions need to be considered, and this is covered by the partiality considerations in clause 6.
+Formulations like "Non-RT RIC can assume" would not be needed (in relation to a 201 Creation message) if it is clearly recommended that Non-RT RIC query policy status after policy creation and Near-RT RIC only sets enforceStatus to ENFORCED if policy is created, or if an attribute value like UNDTERMINED is added for enforceStatus (and a corresponding state from which a transition will generate a policy status notification).
+5.6	ACID properties of A1 policy transactions and enforcement
+5.6.1	General
+5.6.1.1	Background
+According to Wikipedia [i.8]:
+"In computer science, ACID (atomicity, consistency, isolation, durability) is a set of properties of database transactions intended to guarantee data validity despite errors, power failures, and other mishaps. In the context of databases, a sequence of database operations that satisfies the ACID properties ... is called a transaction."
+and in short, it is described (in the context of database systems) that:
+Atomicity guarantees that each transaction is treated as a single unit which either succeeds completely or fails completely;
+Consistency ensures that a transaction can only bring the system from one consistent system state to another;
+Isolation ensures that concurrent execution of transactions leave the system in the same state that would have been obtained if the transactions were executed sequentially, and
+Durability guarantees that a committed transaction will remain committed even in the case of a system failure.
+This clause (i.e. clause 5.6.1) introduces general (i.e. not database-related) wordings that enable discussion of ACID properties of operations on a system that manage resources where a specific activity is performed related to each resource. These wordings are then applied in clauses 5.6.2 and 5.6.3 for discussing the properties of A1 transactions and the A1 policy enforcement activities related to A1 policies.
+5.6.1.2	Transactions and activities
+The general system considered here provides an interface for lifecycle management (i.e. create, update, and delete) of the resources and their related activities, and for query and notification of activity status related. The transaction initiator can use the interface to operate on the resource (and thereby implicitly on the related activity) while it cannot explicitly operate on the activity. The transaction initiator can create/update/delete a resource while the system handles the related activity and indicates the activity status (i.e. if it is being performed or not). A successful create transaction results in a resource with a related activity that is being performed, and a successful update transaction results in that the activity related to the updated resources is being performed.
+In the following,
+the context is a system that handles resources based on create/update/delete transactions for which related activities are performed when the resources exist;
+the "effect of the transaction" is the created/update/deleted resource and the related activity being performed if the resource exists;
+the "state of the system" represents the existing resources and activities being performed, and is expressed based on the state of the resources and the status of the activities;
+the "state of the resource" represents the existence of a resource that have a resource URI that can be used to lifecycle manage the resource and query the activity status; and
+the "status of the activity" represents the activity being performed, or not, when the resource exists.
+The ACID properties of transactions and activities are described in clause 5.6.1.4 based on the general ACID properties described in clause 5.6.1.3.
+5.6.1.3	The ACID properties
+5.6.1.3.1	Atomicity
+Atomicity would imply
+a transaction is treated as a single unit which either succeeds or fails completely; and
+an activity is either being performed or not performed at all.
+NOTE:	A successful create transaction results in a resource with a related activity that is being performed, and a successful update transactions results in that the activity related to the updated resources is being performed. In case of a failed transaction, the resource state (existing or not) and the activity status (performed or not if resource exists) is the same as before the transaction was initiated.
+5.6.1.3.2	Consistency
+Consistency would imply
+the created/updated/deleted resource can be uniquely identified during its creation and existence, and the initiator of the transaction is informed about the resulting state of the resource, and the state of the resource does not change unless managed by the initiator; and
+the activity is related to assigned responsibility, and the initiator of the transaction is informed about the status of the activity, and the status of the activity does not change without the initiator being informed.
+NOTE:	It could be considered if information about the immediate activity status is to be part of the transaction or not. For some transactions, where the status of the activity has some explicit relation to the outcome of the transaction, it may be reasonable to consider information about the status of the activity to be part of the transaction.
+5.6.1.3.3	Isolation
+Isolation would imply
+the effect of transactions is independent of the order they are executed, and a transaction has no impact on the effect of other transactions; and
+an activity related to one resource can be performed irrespective of activities related to other resources.
+NOTE:	This would imply a transaction cannot have impact on the activities created by previous transactions and an ongoing activity cannot have impact on the handling of new transactions.
+5.6.1.3.4	Durability
+Durability would imply
+a transaction has effect even in case of restart or recovery after system failure; and
+an activity is maintained after a restart or recovery of a system failure.
+NOTE:	This would imply that the resource state and the activity status can be persistently stored separately, or that the transactions can be persistently stored, and their effect replicated.
+5.6.1.4	ACID properties of transactions and activities
+The transactions defined in clause 5.6.1.2 show
+atomicity property since a resource either exist, or do not exist after a transaction;
+consistency property since the resource is being identified, and if information about the resource state, and changes to it, is provided to the initiator of the transaction;
+isolation property when related to different resources (while a delete transaction and an update transaction on the same resource would not appear to be isolated); and
+durability property if resources have the same state after restart or recovery as they had before.
+The activities defined in clause 5.6.1.2 show
+atomicity property since an activity related to an existing resource is either performed or not performed;
+consistency property since an activity can be identified by the resource identifier, and if information about the activity status, and changes to it, is provided to the initiator of the transaction;
+isolation property for different activities (given they are related to different and unique resources and can be performed independently); and
+durability property if activity status is maintained after restart or recovery.
+5.6.2	A1 policy transactions
+5.6.2.1	General
+Referring to clause 5.6.1.2, the A1 policy is the resource being operated on using the A1 policy transactions and the activity is the A1 policy enforcement activity related to an existing A1 policy.
+An A1 Create/Update/Delete policy transaction consists of one request message and one response message, and additional messages needed to convey the effect of the transaction (i.e. the resource state and the activity status) in case that is not covered by the response message.
+For the Create policy and Update policy transactions, an additional query or notification message may be needed to inform the transaction initiator about the resource state (A1 policy exists or not) and/or the activity status (A1 policy is enforced or not).
+For the Delete policy transaction no additional message is needed since a successful deletion implies the A1 policy no longer exist and, thus, no enforcement activity is no longer performed related to the A1 policy (that no longer exist).
+While a Create policy transaction is being handled (i.e. after a Create policy transaction is initiated but before it is completed), the A1 policy may not exist and the transaction itself would have the status of being "under evaluation". If the Create policy transaction is handled stepwise so that the A1 policy is created before the enforcement status is determined, the enforcement status would have the value "under evaluation" until the transaction is completed.
+NOTE:	These descriptions of A1 policy transactions go beyond what is covered in the current A1 specification. This to enable considerations both of what the current A1 specification covers as well as of future potential enhancements.
+The ACID properties of A1 policy transactions are described in the following based on the general considerations in clause 5.6.1.4.
+5.6.2.2	ACID properties of A1 policy transactions
+5.6.2.2.1	Atomicity
+The A1 policy transactions, as defined in the current A1 specification, are atomic in the sense that:
+a Create policy transaction results in a specified policy being created, or a rejection of the policy creation request without the policy being created;
+an Update policy transaction results in a policy remains existing after being updated, or not being updated; and
+a Delete policy transaction results in an existing policy ceasing to exist, or remains existing in case deletion was not accepted/successful.
+The current A1 specification does not allow for any partly created/updated/deleted A1 policies or any ambiguity regarding if an A1 policy exists or not after a transaction.
+5.6.2.2.2	Consistency
+The A1 policy transactions, as defined in the current A1 specification, are consistent in the sense that they refer to a unique resource identifier (the policyId), and the state of the resource (i.e. the existence of the A1 policy) does not change between transactions since the lifecycle management responsibility is clear (i.e. creation, update, and deletion of A1 policies can only be initiated by the Non-RT RIC).
+They are also consistent considering that the information about the enforcement activity status is provided by
+a successful Create policy transaction assumingly results in a created policy where the enforcement status is ENFORCED;
+a successful Update policy transaction results in an updated policy where the enforcement status is ENFORCED; and
+status change notifications can be subscribed to.
+5.6.2.2.3	Isolation
+The A1 policy transactions, as defined in the current A1 specification, are isolated in the sense that transactions on different A1 policies can be initiated in any order.
+NOTE:	By definition, isolation cannot apply to transactions on the same A1 policy since Delete policy and Update policy transactions cannot be executed in any order.
+When considering the effect of the transactions (i.e. including the A1 policy enforcement activities related to existing A1 policies):
+an A1 policy transaction cannot interfere with the enforcement activity related to another existing A1 policy; while
+the enforcement activity related to existing A1 policy may imply that a Create/Update policy transaction on another A1 policy gets rejected,
+the order may be significant and the A1 policy transactions cannot be considered as fully isolated.
+5.6.2.2.4	Durability
+The A1 policy transactions, as defined in the current A1 specification, cannot be considered as durable since the transactions are not required to be persistently stored and brought back in effect after a system recovery or restart.
+NOTE:	A1 policies may not survive a re-start of the Near-RT RIC (see A1GAP [i.1], clause 4.1.3.1). A Near-RT RIC implementation may, but is not required to, show durability properties regarding A1 policy transactions.
+5.6.3	A1 policy enforcement
+5.6.3.1	General
+Only an existing A1 policy can be enforced. The enforcement status is either ENFORCED or NOT_ENFORCED.
+The enforcement status can be checked using the Query policy status procedure. When there is a change in enforcement status, this can be notified using the Notify policy status procedure.
+NOTE:		These procedures are not considered here from a transactional perspective since they cannot change any resource state or activity status. As described in A1GAP [i.1], clause 5.1.3 and figure 5.1.3-1, the Non-RT RIC view of the activity status of the Near-RT RIC may be different if relying only on the Query policy status procedure than if subscribing to status change notifications.
+The ACID properties of A1 policy enforcement activities are described in the following based on the general considerations in clause 5.6.1.4.
+5.6.3.2	ACID properties of A1 policy enforcement
+5.6.3.2.1	Atomicity
+The A1 policy enforcement activities, as defined in the current A1 specification, are atomic in the sense that the enforcement status of an existing policy
+either is ENFORCED or NOT_ENFORCED; and
+cannot be "undefined" or "partly enforced".
+5.6.3.2.2	Consistency
+The A1 policy enforcement activities, as defined in the current A1 specification, are consistent in the sense that
+they are identified by a unique resource identifier (the policyId); and
+the enforcement status is determined by Near-RT RIC and Non-RT RIC is (implicitly) informed about status in the transaction response messages and can be notified about status changes.
+5.6.3.2.3	Isolation
+The A1 policy enforcement activities, as defined in the current A1 specification, could be considered as isolated in the sense that
+each A1 policy is independently considered as enforceable, or not, based on the A1 policy enforcement capabilities of the Near-RT RIC, but
+should in general not be considered as isolated due to that
+all A1 policy enforcement activities rely on the required resources being available, but the total resource utilization and A1 policy conflicts may imply that not all the existing A1 policies are concurrently considered as enforceable.
+5.6.3.2.4	Durability
+The A1 policy enforcement activities, as defined in the current A1 specification, cannot be considered as durable since the A1 policies may no longer exist (and hence the related enforcement activities cannot be performed) after a system restart (see A1GAP [i.1], clause 4.1.3.1).
+NOTE:	A Near-RT RIC implementation may, but is not required to, show durability properties regarding A1 policy enforcement activities.
+5.6.4	Summary
+The analysis in clauses 5.6.2 and 5.6.3 is summarized in table 5.6.4-1.
+Table 5.6.4-1: ACID properties of A1 policy transactions and enforcement activities
+Even if this implies that A1 policy transactions currently cannot be defined as "a sequence of operations that satisfies ACID properties", it may still be relevant to use the terminology of A1 policy transactions when describing operations and message sequences related to A1 policy lifecycle management and enforcement status. Referring to the ACID properties could still be relevant when addressing impact of enhanced descriptions and introduction of partiality aspects.
+To define, in the context of A1 policy management, A1 policy transactions and enforcement activities that satisfies the ACID properties, the following could be considered:
+persistent storage; and
+solutions that enable avoiding policy conflicts and enable concurrent resource utilization (to ensure that an existing A1 policy enforcement activity does not impact the handling of transactions related to other A1 policies).
+NOTE 1:	These considerations may not cover all aspects needed to satisfy the ACID properties defined in this clause.
+NOTE 2:	It is not studied in the present document if an introduction of partiality-related definitions and features would have any impact on how ACID properties are defined and analysed for A1 transactions and A1 policy enforcement.
+6	Partial enforcement of A1 policies
+6.1	Introduction
+An A1 policy may lead to impact on multiple UEs that may be connected to different cells, or on multiple cells. A single UE may be
+connected to several cells and those cells may be under control of different E2 nodes and even by different Near-RT RICs; and
+impacted by several A1 policies possibly sent to several Near-RT RICs.
+A1 policies can be created by rApps running in the Non-RT RIC (see further the Non-RT RIC Architecture [i.5]) but this has no implications for the considerations in the present document.
+Figure 6.1-1	: Reference illustration of functions and resources for A1 policies
+Figure 6.1-1 illustrates the entities involved when describing how an A1 policy is handled and has impact on cells and UEs. It is based on the common understanding (see O-RAN Architecture Description [i.6]) that
+a Near-RT RIC has an A1 interface to only one Non-RT RIC;
+an E2 node is handled by only one Near-RT RIC;
+a cell is handled by only one E2 node; and
+a UE may be connected to multiple cells.
+In addition
+a UE can have multiple sessions established for different QoS identifiers; and
+a UE can belong to, and cells may be configured for, multiple slices.
+The cells and slices represent examples of the A1 policy enforcement capabilities of a Near-RT RIC as described in clause 5.3.3.1. In clause 5.3.3, applicability is described in relation to the configured A1 policy enforcement capabilities and enforceability is in clause 5.3.4 described in relation to the available A1 policy enforcement capabilities.
+The term partial applicability can be used to describe the situation when the scope of an A1 policy is not completely covered by the configured A1 policy enforcement capabilities (e.g. when enforcement of a requested A1 policy requires usage of more cells than the Near-RT RIC is configured for handling), and partial enforceability can be used to describe the situation when the scope of an A1 policy is not completely covered by the available A1 policy enforcement capabilities (e.g. when all the cells required for enforcement of an A1 policy are not operational).
+NOTE:	As described in clause 6.2, the complete definition of applicability and enforceability also includes considerations of the objectives and resources statements in addition to the scope.
+For an A1 policy to be fully enforced, the required A1 policy enforcement capabilities must be available and hence covered by the configured A1 policy enforcement capabilities. If the required A1 policy enforcement capabilities are a superset of the configured A1 policy enforcement capabilities, the A1 policy cannot be fully enforced but it can be partly enforced if some of the required A1 policy enforcement capabilities are available. The term partial enforcement would refer to the activity and actions that strive to achieve the objectives of an existing A1 policy using a subset of the required A1 policy enforcement capabilities (i.e. enforcement of an A1 policy that is fully, or partly, applicable but only partly enforceable).
+Figure 6.1-2 illustrates the partial enforcement of an applicable but partly enforceable policy while figure 6.1-3 illustrates the partial enforcement of a partly applicable and partly enforceable policy.
+Figure 6.1-2	: Partial enforcement of an applicable A1 policy where not all required A1 policy enforcement capabilities are available
+Figure 6.1-3	: Partial enforcement of a partly applicable A1 policy where not all configured A1 policy enforcement capabilities are available
+6.2	Partial applicability and enforceability of A1 policies
+6.2.1	Introduction
+Applicability (as introduced in clause 5.3) relates the scope of an A1 policy to the configured A1 policy enforcement capabilities while enforceability (as introduced in clause 5.4) relates the scope to the available A1 policy enforcement capabilities. To introduce partiality, the applicability and enforceability terms used in clause 5.3 and 5.4 could be reformulated.
+An A1 policy would be
+"fully applicable" in case it has a fully applicable scope, the objectives statement is fully applicable, and the resources statement is fully applicable;
+"not applicable" in case it has a not applicable scope, or the objectives statement is not applicable, or no part of the resources statement is applicable; and
+"partly applicable" otherwise,
+and
+"fully enforceable " in case it has a fully enforceable scope, the objectives statement is fully applicable, and the cells in the resources statement are available;
+"not enforceable" in case it has a not enforceable scope, or the objectives statement is not applicable, or no cell in the resources statement is available; and
+"partly enforceable" otherwise
+where the objectives statement would be
+"fully applicable" in case all objectives, the combinations of them, are supported and all attribute values are reasonable;
+"not applicable" in case none of the objectives can be used or none of the attribute values are reasonable; and
+"partly applicable" otherwise.
+6.2.2	Scope applicability and enforceability
+An A1 policy would have a
+"fully applicable scope" in case it contains a scope that is completely covered by the configured A1 policy enforcement capabilities;
+"partly applicable scope" in case it contains a scope that is partly covered by the configured A1 policy enforcement capabilities; and
+"not applicable scope" in case it contains a scope where no part is covered by the configured A1 policy enforcement capabilities,
+and
+"fully enforceable scope" in case it contains a scope that is completely covered by the available A1 policy enforcement capabilities;
+"partly enforceable scope" in case it contains a scope that is partly covered by the available A1 policy enforcement capabilities; and
+"not enforceable scope" in case it contains a scope where no part is covered by the available A1 policy enforcement capabilities.
+NOTE:	Comparing to the terms used in clause 5.4, "fully applicable/enforceable" corresponds to the previous applicable/enforceable while the previous "not applicable/enforceable" is redefined and complemented with "partly applicable/enforceable".
+Figure 6.2.2-1 illustrates the corresponding reformulations of those used in figure 5.4.3.3-1.
+Figure 6.2.2-1: Relation between scope applicability and enforceability, and the A1 policy enforcement capabilities, when including partiality aspects
+In clause 5.3.1, the enforceReason attribute value SCOPE_NOT_APPLICABLE was mentioned as currently defined for the status change from ENFORCED to NOT_ENFORCED for a reason that corresponds to that the scope is no longer completely covered by the configured A1 policy enforcement capabilities. The current A1 specifications do not cover how to indicate any difference between not applicable and partly applicable.
+When introducing partiality aspect, it seems natural to consider the following aspects:
+Would there be a need for additional enforceReason attribute values to distinguish partly applicable from not applicable?
+Would there be a need for additional enforceReason attribute values to indicate status changes related to fully enforceable, partly enforceable, and not enforceable? If so, do they replace the need for attributes values related to applicability?
+Would there be a need for reject reason attribute values to indicate if an A1 policy creation/update request is rejected due to non or partial applicability/enforceability?
+Would there be a need for additional information to be provided when partly applicable/enforceable is used as a reason for reject or change?
+Would there be a need for additional enforceStatus attribute values to indicate "PARTIALLY_ENFORCED"?
+NOTE:		This clause does not cover "partial achievement of policy objectives", i.e. the potential impact of partiality on the ability to achieve the policy objectives when a requested policy is considered as applicable/enforceable.
+6.2.3	Options for defining and interpreting enforceStatus
+When introducing partiality aspects for enforceStatus, four cases are possible when considering extending the current enforceStatus attribute values, and their relation to enforceability, see clauses 4.4.2, and 6.2.1:
+Case 0:	"ENFORCED  fully enforceable" & "NOT_ENFORCED  not fully enforceable";
+Case 1:	"ENFORCED  fully enforceable" & "NOT_ENFORCED  partly enforceable or not enforceable";
+Case 2:	"ENFORCED  fully enforceable or partly enforceable" & "NOT_ENFORCED  not enforceable"; and
+Case 3:	"ENFORCED  fully enforceable" & "PARTIALLY_ENFORCED  partly enforceable" & "NOT_ENFORCED  not enforceable".
+Case 0 is the current case without any partiality considerations, Case 1 and 2 are two alternatives for considering partiality with the current attribute values, while Case 3 introduces a third attribute value to explicitly handle partiality.
+Referring to terms introduced in clause 6.2.1, and depending on the Case, the relation between enforceability and the enforcement status can be expressed:
+An enforced A1 policy (i.e. an A1 policy for which enforceStatus is ENFORCED) is an existing A1 policy that is fully (or partly) enforceable, and enforcement actions are taken for all (or some) parts of the A1 policy;
+A partially enforced A1 policy (i.e. an A1 policy for which enforceStatus is PARTIALLY_ENFORCED) is an existing A1 policy that is partly enforceable, and enforcement actions are taken for some parts of the A1 policy;
+A not enforced A1 policy (i.e. an A1 policy for which enforceStatus is NOT_ENFORCED) is an existing A1 policy that is not enforceable (or partly enforceable) or is not being enforced for other reasons.
+6.2.4	Options for defining and interpreting enforceReason
+6.2.4.1	General
+The current enforceReason attribute is used to indicate the reason for a change from ENFORCED to NOT_ENFORCED. There is no corresponding attribute to indicate the reason for a change from NOT_ENFORCED to ENFORCED.
+The current enforceReason attribute value NOT_APPLICABLE indicates there has been a change in capabilities implying the A1 policy can no longer be (fully) enforced.
+NOTE: 	NOT_APPLICABLE here covers both the current attributes values SCOPE_ NOT_APPLICABLE and STATEMENT_NOT_APPLICABLE. In addition, there could be further attribute values or other reasons.
+When introducing partiality aspects for the enforceReason attribute, the change reasons should reflect transitions between the states indicated by the enforceStatus attributes values, i.e. the considerations depend on which case defined in clause 6.2.3 that they relate to.
+6.2.4.2	Reasons for change in enforceability of scope
+To indicate status change reasons related to changes in available A1 policy enforcement capabilities, i.e. changes in enforceability, new attributes values could be considered: SCOPE_NOT_ENFORCEABLE, SCOPE_PARTLY_ENFORCEBLE, and SCOPE_ENFORCEABLE.
+NOTE:	In addition to the value of the changeReason attribute, it could be considered to include information in the status change notification regarding which A1 policy enforcement capabilities has been changed.
+The appliance of these new change reason attribute values for the cases defined in clause 6.2.2 are illustrated in figure 6.2.4.2-1.
+Figure 6.2.4.2-1: Status change reasons related to scope enforceability
+SCOPE_NOT_ENFORCEABLE indicates the available A1 policy enforcement capabilities no longer cover any part of the scope and hence the A1 policy is not enforced.
+SCOPE_ ENFORCEABLE indicates the available A1 policy enforcement capabilities now cover all parts of the scope and hence the A1 policy is enforced.
+SCOPE_ PARTLY_ENFORCEABLE indicates the available A1 policy enforcement capabilities now cover a part of the scope. The A1 policy is enforced, partly enforced, or not enforced (depending on the considered case).
+6.2.4.3	Reasons for change in applicability of scope
+When considering the different A1 policy enforcement capabilities introduced in clause 5.3, and the difference between enforceability and applicability, the SCOPE_NOT_APPLICABLE attribute value would relate to changes in the configured A1 policy enforcement capabilities. The current definition of the changeReason attribute value SCOPE_NOT_APPLICABLE covers cases 0 and 1 where the A1 policy becomes NOT_ENFORCED since the configured A1 policy enforcement capabilities no longer cover all parts of the policy scope and the A1 policy is not enforced. It can also cover the transitions (from ENFORCED to PARTIALLY_ENFORCED, and from PARTIALLY_ENFORCED -> NOT_ENFORCED) for case 3 while it cannot cover the transition (to NOT_ENFORCED) for case 2 as transition implies “no part is covered” rather than “not all parts are covered”.
+A new attribute value SCOPE_APPLICABLE could be introduced for case 0, 1, and 3 to cover when the A1 policy becomes ENFORCED due to that the configured A1 policy enforcement capabilities now cover all parts of the policy scope and hence the A1 policy is enforced.
+The appliance of these change reason attribute values related to scope applicability for the cases defined in clause 6.2.3 are illustrated in figure 6.2.4.3-1.
+Figure 6.2.4.3-1: Status change reasons related to scope applicability
+SCOPE_NOT_ APPLICABLE indicates the configured A1 policy enforcement capabilities no longer covers all parts of the scope and hence the A1 policy is not enforced.
+SCOPE_ APPLICABLE indicates the configured A1 policy enforcement capabilities now cover all parts of the scope and hence the A1 policy is enforced.
+NOTE:	It is not studied in the present document if there is any need for extending the definitions of change reasons related to applicability, e.g. adding PARTLY_APPLICABLE, or if the relevant status changes are sufficiently covered by the change reasons related to enforceability.
+6.2.5	Changes in A1 policy enforcement capabilities
+Two scenarios can be distinguished related to how often A1 policy enforcement capabilities could change and what consequences such changes may have on monitoring and lifecycle management of A1 policies:
+In the first scenario, the normality is that the A1 policy enforcement capabilities available when an A1 policy was created remains available for most A1 policy creations and during enforcement of the A1 policies, and
+in the second scenario, the normality is that the available A1 policy enforcement capabilities change between A1 policy creations and during enforcement of an A1 policy.
+For the first scenario, the enforceability can be full or partial while the achievability of the objectives could depend on which of the A1 policy enforcement capabilities that are available.
+For the second scenario, the achievability of the objectives may change, and the achievement may need to be evaluated, due the changes in availability of the A1 policy enforcement capabilities.
+In both scenarios,
+detailed information regarding partial enforceability may be beneficial for monitoring and evaluation of the achievement of the objectives of an enforced A1 policy; and
+the enforceStatus and enforceReason attribute values give basic guidance for lifecycle management of A1 policies but they may not be sufficient to guide the Non-RT RIC in all cases impacted by partiality. Detailed change information including the partiality aspects could be valuable. This could be provided in the PolicyStatusObject that could be based on a policy type specific status schema.
+NOTE 1:	For scenario 1, the detailed information regarding partial enforceability could be queried (since changes do not occur often) while for scenario 2 it could also be provided in change notifications (since changes normally occur).
+NOTE 2:	It is not studied in the present document if the detailed partiality information in a change notification would cover all the available A1 policy enforcement capabilities, or just the change of the available A1 policy enforcement capabilities. If only the change (e.g. cell 135 not operational) is notified, the information of the currently available A1 policy enforcement capabilities may need to be queryable.
+The enforceStatus and enforceReason attribute values, and the monitoring of the achievability of the objectives, enable the Non-RT RIC to lifecycle manage its A1 policies.  The extended attributes values discussed in clause 6.2.3 and 6.2.4, and detailed change information in PolicyStatusObject, could be beneficial in the presence of partiality. In either scenario, the policy status notification could be sent whenever there is a change in partiality (assuming the notification content can be more granular than the attribute value changes) and it would be clear for Non-RT RIC when policy status and A1 policy enforcement capabilities may need to be queried, or policy status notifications could be expected.
+6.3	Partiality scenarios
+6.3.1	Introduction
+This clause illustrates various scenarios that could occur depending on rules and conditions that have not yet been defined or agreed. The scenarios are based on definitions and concepts illustrated in previous clauses in the present document. Specifically, the definitions of A1 policy enforcement capabilities (see clause 5.3.2), acceptability (see clause 5.4.3.2), applicability and enforceability (see clauses 5.4.3.3 and 6.2),  the enhanced descriptions of A1 transactions (see clause 5.5), and the definitions of partial applicability and enforceability (see clause 6.2) are used for these partiality scenarios.
+Partiality has effect on policy creation transactions and on policy enforcement activities. Aspects of partiality can result in acceptance or rejection of a policy creation request, and impact the status of the policy enforcement activity for an existing A1 policy.
+Partiality can be related to changes in the A1 policy enforcement capabilities where the configured A1 policy enforcement capabilities may not change as often as the available A1 policy enforcement capabilities may do. Changes in the available A1 policy enforcement capabilities may impact an A1 policy enforcement activity and could be indicated in a policy status change notification.
+NOTE:	A change in the configured A1 policy enforcement capabilities may imply a change to the available A1 policy enforcement capabilities. It may be relevant to indicate in a policy status change notification if the change reason is related also to the configured, or only to the available, A1 policy enforcement capabilities (see clause 6.2.4.3).
+Information related to the configured, and available, A1 policy enforcement capabilities could be beneficial for the Non-RT RIC to be aware of before initiating a policy creation transaction as they represent Near-RT RIC constraints for A1 policy enforcement. Such constraints would indicate what expectations Non-RT RIC can have on the outcome of a policy creation request and on the enforcement activity for an A1 policy, and awareness of such constraints would enable formulation of a requested A1 policy that may be possible to enforce.
+6.3.2	Policy type related constraints and status
+6.3.2.1	General
+As discussed in clause 5.3.3.1, the A1 policy enforcement capabilities are specific for a supported A1 policy type and could be described based on the scope identifier attributes. The A1 policy enforcement capabilities represent the constraints for requested A1 policies the Near-RT RIC would consider as applicable and/or enforceable.
+NOTE:	If Near-RT RIC rejects policy creation requests based on such constraints, the constraints would provide an indication of what Near-RT RIC considers as an acceptable/enforceable A1 policy. An accepted A1 policy would then be "possible to enforce" is the sense that is applicable and/or enforceable.
+The scope identifier can contain any values of the attributes (as defined by the common schema defined in A1TD [i.4], clause 7.1.2.1) and the constraints would express which values the Near-RT RIC can handle.
+Constraints expressed by Near-RT RIC could also be related to supported attributes and attribute values ranges related to objectives statements.
+In case the constraints change, e.g. the available A1 policy enforcement capabilities are no longer the same as the configured A1 policy enforcement capabilities, or none of the configured A1 policy enforcement capabilities are currently available, the Non-RT RIC could benefit from being notified.
+6.3.2.2	Policy type constraints related to scope
+The configured A1 policy enforcement capabilities represent what Near-RT RIC is configured for. The nodes and cells Near-RT RIC can be handle would be part of the topology, and hence that information could be assumed to be available to Non-RT RIC. As a complement, the configured A1 policy enforcement capabilities could be made available over the A1 interface.
+Other aspects of the Near-RT RIC configuration not related to topology, and the information of the available A1 policy enforcement capabilities, may not be covered by the topology but could be made available over the A1 interface as constraints.
+Policy type constraints could be made available over the A1 interface as part of a Query policy type constraints operation as illustrated in figure 6.3.2.2-1.
+Figure 6.3.2.2-1: Non-RT RIC queries Near-RT RIC for its constraints
+It is assumed in figure 6.3.2.2-1 that the constraints are policy type specific. In such case they could alternatively be included in the PolicyTypeObject in the normal Query policy type operation.
+Scope identifier related constraints could be expressed using a generic constraints schema related to the common schema defined in A1TD [i.4], clause 7.1.2.1.
+6.3.2.3	Policy type constraints related to objectives
+The A1 policy types defined in A1TD [i.4], clause 7.2, enables several combinations of attributes to be included in the objectives statement of an A1 policy. If a Near-RT RIC does not support all attributes, or all combinations of supported attributes, that can be expressed as constraints. Also, if Near-RT RIC considers certain attribute values as unreasonable or not applicable, the supported attribute value ranges can be expressed as constraints.
+Policy objectives related constraints could be expressed based on a constraints schema related to the policy schema of the A1 policy type.
+NOTE:	In the same way as EI job related constraints, see A1TD [i.4], clause 8.4.5.
+6.3.2.4	Policy type constraints related to allowed combinations
+In A1TD [i.4], clause 7.2, each policy type definition includes a table of the allowed combinations of scope identifier attributes and objective statements. Just like a Near-RT RIC may not support all the specified objectives attributes, and not all combinations of supported objective attributes, it may not support all the specified scope identifier attributes and thereby not all the allowed combinations.
+Constraints related to scope identifier attributes and allowed combinations could also be expressed as part of policy type constraints.
+6.3.2.5	Policy type status
+In the same way as the status of an A1 policy enforcement activity is expressed as "policy status" using the enforceStatus attribute, the status of the functionality related to enforcement of A1 policies of a certain A1 policy type can expressed as "policy type status" using an attribute like e.g. opStatus.
+Policy type status can be queried, and policy type status changes could be notified, over the A1 interface as illustrated in figure 6.3.2.5-1.
+NOTE:	The use cases for policy type status are specified in A1UCR [i.2], clause 6.2.
+Figure 6.3.2.5-1: Query policy type status and Notify policy type status operations
+The opStatus attribute could have the following values:
+OPERABLE if all the configured A1 enforcement capabilities are available;
+INOPERABLE if none of the configured A1 enforcement capabilities are available; and
+PART_OPERABLE if some, but not all, of the configured A1 enforcement capabilities are available.
+The opStatus attribute values have some general relations with the enforceStatus attribute values for individual A1 policies such that:
+when policy type status is INOPERABLE, no A1 policy can be fully or partly enforced, and hence enforceStatus is NOT_ENFORCED for all existing A1 policies;
+when policy type status is OPERABLE, all existing A1 policies can be fully enforced, and hence enforceStatus can be ENFORCED, but a specific A1 policy may be NOT_ENFORCED for other reasons; and
+when policy type status is PART_OPERABLE, there is no general relation with enforceStatus of individual A1 policies as they can be either fully, partly, or not enforced depending on the extent to which their scope is covered by the available A1 policy enforcement capabilities, but a specific A1 policy may be NOT_ENFORCED for other reasons.
+The relation between policy type status changes and policy status changes for individual A1 policies would be depending the general relations, as well as on which Case (see clause 6.2.3) is used for defining the meaning of the enforceStatus attribute values, and this is further elaborated in clause 6.3.6.3.
+6.3.3	Partiality and applicability
+6.3.3.1	General
+The partiality information related to applicability and enforceability could be expressed using the same attributes both when considering constraints and change notifications. In both cases, content transferred over the A1 interface need to indicate if the attributes apply to configured or to available A1 policy enforcement capabilities.
+NOTE 1:	When expressing constraints, the partiality information would contain the set of complete A1 policy enforcement capabilities while for change notifications it is for further consideration if partiality information would be expressed as the "complete capabilities" or only indicate the "capability change".
+NOTE 2:	It should be further considered if it is useful and reasonable to send a change notification for every change in the available A1 policy enforcement capabilities during partial enforcement, or if it may cause extensive signalling while providing minor value.
+In case a policy creation request would be rejected due to partiality as discussed in clause 5.5.4.2, partiality information could be provided in the response message that indicates the constraints-related reason for the reject. Alternatively, the error code of the response message indicates that details can be retrieved by a query for constraints.
+NOTE 3:	When expressing a reject reason, it is for further consideration if partiality information would be expressed as the "current capabilities" or as the "missing capabilities".
+6.3.3.2	Applicability
+When receiving a policy creation request, the Near-RT RIC validates if it "possible to enforce" the requested A1 policy. Assumingly this means Near-RT RIC would not accept the policy creation request if it does not have any of the required A1 policy enforcement capabilities, e.g. when the A1 policy is considered as "not applicable" or "not enforceable" at time of evaluating the requested A1 policy (see clause 5.5).
+Partial applicability covers a situation when the scope of an A1 policy is not completely covered by the configured A1 policy enforcement capabilities. If a requested A1 policy considered as "partly applicable" was accepted, it would result in ambiguities during policy enforcement since enforceability is only expressed related the applicable part of the scope of the accepted A1 policy, i.e. the A1 policy could be considered as "fully enforceable" although the requested scope is not covered.
+The current A1 specification does not exclude policy creation when the requested A1 policy has a "partly applicable scope" if it has a "fully enforceable scope" (referring to the applicable part of the requested scope). For the present considerations on partiality scenarios, "possible to enforce" implies the requested A1 policy is "applicable" and the policy creation request is rejected (e.g. with the 501 code) in case the requested A1 policy is considered as "not applicable" or "partly applicable".
+NOTE:	To be acceptable, the requested A1 policy must be a valid and (fully) applicable A1 policy. Near-RT RIC may, though, reject a policy creation request for other reasons.
+Non-RT RIC could use topology information or queried policy type constraints to formulate applicable A1 policies to avoid, or as consequence of, rejection of policy creation requests with reject reason related to applicability.
+6.3.4	Policy creation transactions
+6.3.4.1	Enforceability
+A successful A1 policy creation transaction results in creation of an A1 policy that is "possible to enforce" and for every existing A1 policy there is an enforcement activity with known enforcement status.
+NOTE1:	Referring to the considerations in clause 5.5 and 6.3.3.2, the detailed principles for policy creation transactions could be formulated "For a requested A1 policy to be created it has to be applicable" and "For an existing A1 policy, the enforceStatus has a value and there will be an enforcement activity, and after the enforcement activity has started the enforceStatus attribute value reflects the status of the enforcement activity".
+Partiality enables scenarios where the enforceability can be partial and may change during enforcement. In addition, partiality needs to be considered during the evaluation of a policy creation request. Handling partiality during enforcement implies a requested A1 policy could be accepted based on the applicability and enforceability validation without further conditions on what the status of the enforcement activity is, or will be, after the creation of the A1 policy.
+NOTE 2:	Compared to the description in clause 5.5.2.2, this clause does not consider rejection of policy creation requests in cases where the A1 policy would not be (fully) enforced after accepting the creation request. To be acceptable, the requested A1 policy must be valid and (fully) applicable. It remains to be considered if acceptability also could/should be related to if the requested A1 policy is considered as fully enforceable, or as fully or partly enforceable.
+NOTE 3:	An approach where policy creation is accepted only if enforcement activity has started, and enforcement status is "fully enforced", is covered by the transactions illustrated in figures 5.5.2.2-1 and 5.5.3.2-1 and is not further considered in the present clause.
+Different approaches exist for further interpreting "possible to enforce" in terms of enforceability when accepting a policy creation request, e.g.:
+Approach A: Policy creation is accepted only if the requested A1 policy is "fully enforceable". The value of the enforceStatus attribute can then be ENFORCED when policy enforcement activity is started, or
+Approach B: Policy creation is accepted if the requested A1 policy is "fully enforceable" or "partly enforceable". The value of the enforceStatus attribute when starting policy enforcement would depend on which case (as defined in clause 6.2.3) is applied.
+Approach A implies it can be reasonable for Non-RT RIC to assumed that the A1 policy will be fully enforced after creation. Given that it is possible for the A1 policy to be fully enforced after creation, it seems relevant to apply usage of the attribute value ENFORCED as defined for Case 1 or 3. If enforceStatus after creation, and start of enforcement activity, is not ENFORCED then it is a very specific (and rather unexpected) outcome of the start of enforcement of a fully enforceable policy.
+Approach B implies an assumption on what the enforcement status will be after creation of the A1 policy has to be based on detailed information such as the available A1 policy enforcement capabilities. Given that it is reasonable that the A1 policy is fully or partially enforced after creation, it seems relevant to apply usage of the attribute value NOT_ENFORCED as defined for Case 2 or 3. If enforceStatus after creation, and start of enforcement activity is NOT_ENFORCED then it is a very specific (and rather unexpected) outcome of the start of enforcement of a fully/partly enforceable policy.
+6.3.4.2	Expectations (from Non-RT RIC perspective)
+Assuming there is only one transaction specified for A1 policy creation (like the current PUT-based create policy operation), the Non-RT RIC would not know what outcome to expect unless it is aware of if Near-RT RIC evaluates the requested A1 policy according to Approach A or Approach B (as defined in clause 6.3.4.1), or if it accepts policy creation if policy is fully enforced. One option for making Non-RT RIC aware is to include information of implemented approach in the constraints, another option is to specify one approach in the A1 specification with updated details for the service operation.
+Alternatively, several approaches and/or service operations could be specified and implemented if Non-RT RIC is enabled to select one when requesting policy creation and thereby knows what outcome to expect and how it is indicated. One option for enabling Non-RT RIC to select is to define different transactions and another option is to enable Non-RT RIC to express the approach as part of the policy creation request.
+EXAMPLE: 	If Approach A was specified using the PUT+201 pattern while Approach B was specified using the PUT+202+Notify pattern, Non-RT RIC could indicate which approach to use through the HTTP Expect header (see Option 3 in 3GPP TR 32.866 [i.9], clause 7.5.12).
+The two approaches A and B are illustrated in figure 6.3.4.1-1 based on assumption that the same PUT request is used while the responses depend on different design patterns.
+NOTE: 	All possible combinations of the approaches defined in clause 6.3.4.1 and the transactions illustrated in clauses 5.5.3.2 and 5.5.3.3 are not included. Figure 6.3.4.1-1 only illustrates one example of how Non-RT RIC can be ensured about what can be expected.
+Figure 6.3.4.1-1: Example of two approaches for accepting policy creation requests based on enforceability
+A further alternative to address the expectations of Non-RT RIC is to enable it to rely on information about the policy type constraints of the Near-RT RIC, or at least on the policy type status. If the policy type status and constraints indicate that partial enforcement could be expected, then Non-RT RIC could either accept that or formulate a requested A1 policy based on the constraints (e.g. the available A1 policy enforcement capabilities) that would be considered as fully enforceable.
+6.3.4.3	Partial success
+Given that Non-RT RIC can assume that an A1 policy is enforced after creation, then it would (without applying partiality definitions) consider that
+a successful policy creation/update transaction results in an (existing) A1 policy for which an enforcement activity has started and the enforcement status is enforced, and correspondingly
+an unsuccessful policy creation transaction does not result in an existing A1 policy, and
+an unsuccessful policy update transaction results in an (existing) A1 policy that has not been modified and enforcement status has not changed.
+NOTE 1:	The current A1 specification does not provide any guidance on if an outcome where the A1 policy is not enforced after creation is to be consider as successful or unsuccessful.
+With the partiality definitions introduced in clause 6.1, and used in clause 6.2.4, "complete success" would mean the A1 policy is fully enforced while "partial success" would mean the A1 policy is partially enforced when describing the outcome of a policy creation transaction. Hence, a successful policy creation transaction results in enforcement of an (existing) A1 policy and partial success refers to a successful policy creation transaction that resulted in partial enforcement.
+NOTE 2:	Depending on the Case (see clause 6.2.3), an outcome where the A1 policy is created but enforceStatus is NOT_ENFORCED may be considered as partial success. E.g. figures 5.5.2.3-2 and 5.5.3.3-1 would for Case 1 cover complete success, partial success, as well as unsuccess.
+NOTE 3:	A more general definition would consider a transactions as successful if the enforcement status is known (irrespective of value) after creation of the A1 policy. In this case it would not be meaningful to consider a difference between complete and partial success.
+The 201-response to a policy creation request would not indicate the difference between complete and partial success, instead Non-RT RIC could receive the corresponding information as part of a policy status operation. The 202-response illustrated in figure 5.5.3.3-1 implicitly indicates the degree of success as it includes the policy status.
+NOTE 4:	It was not considered in the present document if partial success could have been defined as using a 206 Partial Content response to indicate the part of the requested A1 policy that was accepted for creation and enforcement. Instead, it is suggested to reject a requested A1 policy if it is not applicable (see clause 6.3.3.2) and to keep having Non-RT RIC as owner of the A1 policy formulation.
+6.3.5	Enforcement status changes
+6.3.5.1	General
+During policy enforcement, the degree of (partial) enforceability may change due to change in the available A1 policy enforcement capabilities.
+The enforceability may also change for other reasons such as e.g. lack of, or competition about, resources. In case those are feasible to detect and handle, the impact could be indicated as a change in the partiality details of the enforcement.
+EXAMPLE:	When detecting a potential policy conflict, the resources can be re-allocated or made non-operational in such a way that it implies a change in A1 policy enforcement capabilities available for the enforcement of the existing policies and this may not result in any change in the achievability of the objectives.
+Another aspect of partiality could be the degree of achievement of the policy objectives and resource usage. E.g. in case of a policy conflict it may not be feasible to concurrently achieve the objectives or satisfy the conditions for resource usage.
+NOTE:	The partiality details related to conditions for resource usage can assumingly be indicated in a similar way to how A1 policy enforcement capabilities are notified. It is not studied in the present document if, and how, partial achievability of objectives can be indicated, and if it is meaningful.
+6.3.5.2	Case-dependent definitions of enforcement status
+Clause 6.2.3 defines cases that relates the enforceStatus to enforceability, and brings partiality into definitions of "enforced A1 policy". Based on these, and considering that an A1 policy may not be enforced for other reasons than implied by its enforceability, the meaning of the enforceStatus attribute for the different cases can be defined as:
+Case 1: If an A1 policy is fully enforceable, its enforcement status can be ENFORCED; and if it is partly enforceable or not enforceable, its enforcement status is NOT_ENFORCED. The meaning of the enforceStatus attribute values can then be expressed:
+An A1 policy for which enforceStatus is ENFORCED is an existing A1 policy that is fully enforceable, and enforcement actions are taken for all parts of the A1 policy;
+An A1 policy for which enforceStatus is NOT_ENFORCED is an existing A1 policy that is not enforceable, or partly enforceable, or is not being enforced for other reasons.
+Case 2: If an A1 policy is fully enforceable or partly enforceable, its enforcement status can be ENFORCED; and if it is not enforceable, its enforcement status is NOT_ENFORCED. The meaning of the enforceStatus attribute values can then be expressed:
+An A1 policy for which enforceStatus is ENFORCED is an existing A1 policy that is fully or partly enforceable, and enforcement actions are taken for all or some parts of the A1 policy;
+An A1 policy for which enforceStatus is NOT_ENFORCED is an existing A1 policy that is not enforceable or is not being enforced for other reasons,
+Case 3: If an A1 policy is fully enforceable, its enforcement status can be ENFORCED; if it is partly enforceable, its enforcement status can be PARTIALLY_ENFORCED; and if it is not enforceable, its enforcement status is NOT_ENFORCED. The meaning of the enforceStatus attribute values can then be expressed:
+An A1 policy for which enforceStatus is ENFORCED is an existing A1 policy that is fully enforceable, and enforcement actions are taken for all parts of the A1 policy;
+An A1 policy for which enforceStatus is PARTIALLY_ENFORCED is an existing A1 policy that is partly enforceable, and enforcement actions are taken for some parts of the A1 policy;
+An A1 policy for which enforceStatus is NOT_ENFORCED is an existing A1 policy that is not enforceable or is not being enforced for other reasons.
+6.3.5.3	Notify partial enforcement status
+6.3.5.3.1	Change in enforcement status related to scope enforceability
+For the cases 1 to 3 defined in clause 6.2.3, and the status change reasons defined in clause 6.2.4, figures 6.3.5.3.1-1 to 3 illustrate the enforcement status changes and the content of the Notify policy status messages.
+NOTE:	Case 0 is covered by the current A1AP [i.3].
+For Case 1 illustrated in figure 6.3.5.3.1-1, the detailed partiality information is included in messages sent to indicate that enforceStatus is NOT_ENFORCED unless enforceReason is SCOPE_NOT APPLICABLE, while no enforceReason is provided in case the notification only indicates a change in the partiality details (without a change in enforcement status).
+Figure: 6.3.5.3.1-1: Policy status changes for Case 1
+For Case 2 illustrated in figure 6.3.5.3.1-2, the detailed partiality information is included in messages sent to indicate that enforceStatus is ENFORCED unless enforceReason is SCOPE_APPLICABLE, while no enforceReason is provided in case the notification only indicates a change in the partiality details (without a change in enforcement status).
+Figure 6.3.5.3.1-2: Policy status changes for Case 2
+For Case 3 illustrated in figure 6.3.5.3.1-3, the detailed partiality information is included in messages sent to indicate that enforceStatus is PARTIALLY_ENFORCED, while no enforceReason is provided in case the notification only indicates a change in the partiality details (without a change in enforcement status).
+Figure 6.3.5.3.1-3: Policy status changes for Case 3
+6.3.5.4	Query partial enforcement status
+6.3.5.4.1	Enforcement status related to scope enforceability
+For the cases 1 to 3 defined in clause 6.2.3, the detailed partiality information could be provided with the enforcement status in a query response. Depending on the case, the partiality details are only needed when the enforceStatus indicates that enforcement is, or may be, partial.
+NOTE:	In current A1AP [i.3] it is optional to include enforceReason in the query response message, if present it would reflect a situation when the A1 policy is fully enforceable or not enforceable since enforceReason would not be included in notifications with only partiality details.
+For Case 1 illustrated in figure 6.3.5.4.1-1, the detailed partiality information would not be needed if the enforceReason indicates SCOPE_NOT_ENFORCEABLE.
+Figure 6.3.5.4.1-1: Query policy status with partiality details for Case 1
+For Case 2 illustrated in figure 6.3.5.4.1-2, the detailed partiality information would not be needed if the enforceReason indicates SCOPE_ENFORCEABLE.
+Figure 6.3.5.4.1-2: Query policy status with partiality details for Case 2
+For Case 3 illustrated in figure 6.3.5.4.1-3, the detailed partiality information would not be needed if the enforceReason indicates SCOPE_ENFORCEABLE or SCOPE_NOT_ENFORCEABLE.
+Figure 6.3.5.4.1-3: Query policy status with partiality details for Case 3
+6.3.6	Policy type status changes
+6.3.6.1	General
+The ability to enforce A1 policies may change, e.g. due to change in the A1 policy enforcement capabilities, and this can be indicated as a change in policy type status (see clauses 6.3.2.5 and 6.3.4.2) as reflected in the opStatus attribute value.
+6.3.6.2	Query policy type status
+The opStatus attribute would be included in the PolicyTypeStatusObject that may also contain an opReason attribute that reflects the reason for the latest status change.
+NOTE:	Cfr. the inclusion of the enforceStatus and enforceReason attributes in the PolicyStatusObject.
+6.3.6.3	Policy type status changes
+6.3.6.3.1	General
+A change in status of the functionality related to enforcement of A1 policies of a certain type, caused by a change in the available A1 policy enforcement capabilities, is reflected as a change in the policy type status (see clause 6.3.2.5). A policy type status change can, but need not, imply a corresponding change in policy status of existing A1 policies of that type while a change in policy status can occur (for other reasons) without any related change to the associated policy type status.
+A policy type status change from:
+OPERABLE to INOPERABLE causes a change in policy status for individual A1 policies (of that type) for which enforceStatus = ENFORCED (see note 1):
+OPERABLE to PART_OPERABLE can, but need not, cause a change in policy status for individual A1 policies (see notes 1 and 2); and
+PART_OPERABLE to INOPERABLE can, but need not, cause a change in enforceStatus for individual A1 policies (see notes 1 and 3).
+and a policy type status change from:
+INOPERABLE to PART_INOPERABLE can, but need not, cause a change in enforceStatus for individual A1 policies (see notes 1 and 2).
+INOPERABLE to OPERABLE can, but need not, cause a change in enforceStatus for individual A1 policies (see note 1).
+PART_OPERABLE to OPERABLE can, but need not, cause a change in enforceStatus for individual A1 policies (see notes 1 and 4).
+NOTE 1:	If the policy status was NOT_ENFORCED due to other reasons, it would not change when the policy type status changes.
+NOTE 2:	If policy status was ENFORCED, it may remain ENFORCED, or if policy status was NOT_ENFORCED, it may become ENFORCED, if the scope is fully covered by the A1 policy enforcement capabilities available after the policy type status change.
+NOTE 3:	If the policy status was NOT_ENFORCED due that its scope was not fully/partly covered by available A1 policy enforcement capabilities, it would not change when the policy type status becomes INOPERABLE.
+NOTE 4:	If the policy status was ENFORCED due that its scope was fully covered by available A1 policy enforcement capabilities, it would not change when the policy type status becomes OPERABLE.
+6.3.6.3.2	Case specific considerations
+Policy status and policy type status provide fundamental information for how Non-RT RIC could lifecycle manage an A1 policy by updating it, deleting it, or just waiting for some improvement in the availability of the A1 enforcement capabilities (or resolution of other issues) under assumption that it will improve the achievability of the objectives.
+The definition of policy type status is based on A1 policy enforcement capabilities and does not depend on how the enforceStatus attributes values are defined and interpreted (see clause 6.3.5.2). The interpretation of enforceStatus, and policy status changes, depend on the case used for defining the meaning of enforceStatus. The policy status changes may, or may not, be correlated with a change in policy type status.
+For Case 1, the policy type status complements the policy status for a specific A1 policy by indicating when the NOT_ENFORCED status could indicate that enforcement actions may be taken for some parts of the A1 policy.
+EXAMPLE 1:	Policy status is NOT_ENFORCED if the A1 policy is not enforceable. The policy status could be NOT_ENFORCED if policy is partly enforceable, and if the policy type status is PART_OPERABLE, it could be so that enforcement actions are taken (if a part of the scope is covered by the available A1 policy enforcement capabilities) unless the policy is not being enforced for other reasons.
+For Case 2, the policy type status complements the policy status for a specific A1 policy by indicating when the ENFORCED status could indicate that enforcement actions are taken for some, rather than all, parts of the A1 policy.
+EXAMPLE 2:	Policy status is ENFORCED if the A1 policy is fully enforceable unless the policy is not being enforced for other reasons. The policy status could be ENFORCED if policy is partly enforceable, and if the policy type status is PART_OPERABLE, it could be so that enforcement actions are taken for all parts of policy or for those parts of the scope that are covered by the available A1 policy enforcement capabilities.
+For Case 3, the policy type status complements the policy status for a specific A1 policy by indicating when the policy status may be impacted by the extent to which the policy scope is covered by the available A1 policy enforcement capabilities.
+EXAMPLE 3:	Unless the A1 policy is not being enforced for other reasons, policy type status OPERABLE implies policy status is ENFORCED, and policy type status INOPERABLE implies policy status is NOT_ENFORCED, while PART_OPERABLE indicates that policy status may be either ENFORCED, PARTIALLY_ENFORCED, or NOT_ENFORCED depending on how much of the scope that is covered by the available A1 policy enforcement capabilities).
+NOTE:	It is for further consideration what the relevant attribute values for opReason would be, and how they would relate to the enforceReason attribute values.
+6.3.6.3.3	Relations between policy type status, policy status, and status changes
+Based on definitions and reasoning in clauses 5.5, 6.3.2.5, and 6.3.6.3, figure 6.3.6.3.3-1 illustrates the relation between policy type status and policy status, as well as policy type status changes and policy status changes.
+Policy status of an individual A1 policy is based on the enforceability implied by the policy type status but could be impacted by other (dynamic) aspects such as e.g. resource or policy conflicts. Creation of a requested A1 policy is assumed to be based on the (full) applicability and the (full or partial) enforceability of the requested A1 policy, hence policy type status is assumed to be strictly defined based on the availability of configured A1 policy enforcement capabilities. If policy type status is OPERABLE, the requested A1 policy could be accepted (since fully enforceable) or could be rejected (for other reasons); and if policy type status is PART_OPERABLE, the requested A1 policy could be accepted (if fully or partially enforceable) or could be rejected (if not enforceable or for other reasons).
+Figure 6.3.6.3.3-1: Policy type status and policy status, and status changes
+NOTE 1:	A policy status change (for an A1 policy of a certain type) may be related to a change of the policy type status but may also occur for other reasons (when there is no change in policy type status).
+NOTE 2:	A policy type status change may, or may not, lead to a policy status change for an individual A1 policy.
+NOTE 3: Figure 6.3.6.3.3-1 illustrates Cases 1 and 2 in clause 6.2.3.
+6.4	Life cycle management and state transitions
+6.4.1	General
+The state diagram in figure 6.4.1-1 reflects the state transitions after the transactions illustrated in figure 5.5.2.2-1 and 5.5.3.2-1 where policy creation is accepted after the enforcement status in known to be ENFORCED.
+NOTE:	This corresponds to figure 4.2.2-1 and is replicated here as basis for further elaborations in the following clauses.
+Figure 6.4.1-1: State transition diagram when policy creation is accepted after enforcement status is known to be ENFORCED
+6.4.2	Undetermined state
+The state diagram in figure 6.4.2-1 reflects the state transitions after the transactions illustrated in figure 5.5.2.3-2 where status is initially UNDETERMINED after policy creation until determined and notified.
+NOTE 1: 	The transaction illustrated in figure 5.5.3.3-1 is similar in the sense that policy creation acceptance can lead to either value of the status.
+Figure 6.4.2-1: State transition diagram when policy creation is accepted with status UNDERTMINED until enforcement status is known
+NOTE 2: 	It would be for further considerations if status should be reverted to UNDETERMINED during evaluation of a policy update request.
+6.4.3	Partially enforced state
+The state diagram in figure 6.4.3-1 reflects the state transitions after the transactions illustrated in figure 5.5.2.2-1 and 5.5.3.2-1 in Case 3 (see clause 6.2.3).
+Figure 6.4.3-1: State transition diagram including a PARTIALLY_ENFORCED state
+NOTE: 	An alternative diagram could include also the UNDETERMINED state.
+6.5	Summary
+The usage of the terms elaborated in clauses 5.3 and 5.4, and in the present clause, can be summarized as:
+Requested A1 policy: the policy requested to be created/updated in an A1 policy creation/update request message
+Requested scope: the scope in a requested A1 policy
+NOTE 1:	The requested scope may or may not be applicable
+Valid A1 policy: a requested A1 policy that validates against the policy schema used by the Near-RT RIC
+NOTE 2:	The Non-RT RIC formulates the A1 policy based on the policy schema before requesting the A1 policy to be created/updated, and the Near-RT RIC will validate the A1 policy against the policy schema when receiving the A1 policy creation/update request. To say the A1 policy validates against the policy schema implies a validation would be successful whenever it is performed and hence the A1 policy is considered as valid.
+Accepted A1 policy: a requested A1 policy accepted to be created based on an A1 policy creation/update request message
+NOTE 3:	Term is used instead of saying "created policy" to avoid confusing the outcome of the creation process with the long-term state of the A1 policy representing an enforcement activity
+NOTE 4:	To be acceptable, the requested A1 policy has to be a valid A1 policy and Near-RT RIC may also reject a requested policy that it considers to be in conflict with an existing A1 policy.
+Existing A1 policy: an A1 policy created/updated after accepting an A1 policy creation/update request message that has not yet been deleted
+NOTE 5:	Term is used instead of saying "created policy" to avoid confusing the long-term state representing an enforcement activity with the outcome of the creation process
+Rejected A1 policy: an A1 policy not accepted to be created/updated based on an A1 policy creation/update request message
+NOTE 6:	The reject reason contained in the A1 policy creation/update response message could be used by the A1-P Consumer to reformulate the requested A1 policy and can currently indicate if the requested A1 policy was considered as “invalid” or "conflicting", and could in future cover other reasons such as e.g. "inapplicable", "unachievable" etc
+Applicability: expresses if enforcement of a valid A1 policy can be based on the configured A1 policy enforcement capabilities and the supported objective attributes and their supported value ranges
+An A1 policy would be
+"fully applicable" (or simply " applicable ") in case it has a fully applicable scope, the objectives statement is fully applicable, and the resources statement is fully applicable;
+"not applicable" in case it has a not applicable scope, or the objectives statement is not applicable, or no part of the resources statement is applicable; and
+"partly applicable" otherwise
+and the objectives statement would be
+"fully applicable" in case all objectives, and the combinations of them, are supported and all attribute values are reasonable;
+"not applicable" in case none of the objectives is supported or none of the attribute values are reasonable; and
+"partly applicable" otherwise.
+Applicable scope: the part of the requested scope covered by the configured A1 policy enforcement capabilities
+a "fully applicable scope" is completely covered;
+a "partly applicable scope" is partly covered; and
+a "not applicable scope" has no part covered.
+NOTE 7:	The applicable scope may or may not be enforceable
+Enforceable scope: the part of the applicable scope covered by the available A1 policy enforcement capabilities
+a "fully enforceable scope" is completely covered;
+a "partly enforceable scope" is partly covered; and
+a "not enforceable scope" has no part is covered.
+Enforceability: expresses if an applicable A1 policy can be enforced based on the available A1 policy enforcement capabilities
+An A1 policy would be
+"fully enforceable" (or simply "enforceable") in case it has a fully enforceable scope, the objectives statement is fully applicable, and the cells in the resources statement are available;
+"not enforceable" in case it has a not enforceable scope, or the objectives statement is not applicable, or no cell in the resources statement is available; and
+"partly enforceable" otherwise.
+Enforcement: the activity and actions that strive to achieve the objectives of an existing A1 policy
+NOTE 8:	The A1 interface does not support activation/de-activation of the enforcement of existing A1 policies, an existing A1 policy is always in enforcement
+Partial enforcement: the activity and actions that strive to achieve the objectives of an existing A1 policy using a subset of the required A1 policy enforcement capabilities (i.e. enforcement of an A1 policy that is only partly enforceable).
+Enforcement status: the status of the enforcement activity as expressed by the enforceStatus attribute
+If the enforceStatus is ENFORCED, enforcement actions are taken for all parts of the A1 policy and the A1 policy is referred to as "fully enforced" (or simply "enforced");
+If the enforceStatus is PARTIALLY_ENFORCED, enforcement actions are taken for some parts of the A1 policy and the A1 policy is referred to as "partially enforced"; and
+If the enforceStatus is NOT_ENFORCED, the A1 policy is referred to as "not enforced".
+NOTE 9:	This describes enforcement status with a dedicated attribute value for handling partiality.
+Partial success: the outcome of a create policy transaction where the A1 policy is partially enforced.
+7	Conclusions and recommendations
+7.1	General
+Updating the A1 interface specification for support of partiality aspects would imply update of several clauses in several of the specifications, and an update of the A1 policy management service (A1-P) may imply a non-backward compatible change.
+Clause 7.2 provides a summary of major findings of the study in the present document that could be considered for inclusion in an updated A1 interface specification. Clause 7.3 then provides further details on inclusion of partiality in the definition and interpretation of policy enforcement status.
+Clause 7.4 summarizes identified issues and items that were not further considered in the present study.
+Clause 7.5 provides the high-level recommendations from the study.
+7.2	Common aspects
+7.2.1	Terms
+7.2.1.1	General
+The partiality discussion in the present document relies on fundamental definitions related to A1 policy enforcement capabilities and to how (the scope, objectives, and resources of) an A1 policy is considered as applicable and enforceable. The reasoning of how partiality can be considered during policy creation and enforcement introduced refined terms for referring to an A1 policy and enforcement as an activity.
+The following clause summarizes where the definitions are made.
+7.2.1.2	Capabilities
+The configured A1 policy enforcement capabilities and the available A1 policy enforcement capabilities defined as in clause 5.3.2 and 6.2.2.
+The required A1 policy enforcement capabilities and the available A1 policy enforcement capabilities as discussed in clause 6.1.
+7.2.1.3	Abilities
+Scope applicability as defined in 6.2.2.
+Objectives applicability as defined in 5.3.4 and 6.2.1.
+Resources applicability as defined in clause 5.3.5.
+Policy applicability and enforceability as defined in clauses 5.4.3 and 6.2.
+7.2.1.4	Scopes and policies
+Requested/Valid/Accepted/Rejected/Existing A1 policy, and Requested/Applicable/Enforceable scope, as summarized  in clause 6.5.
+7.2.1.5	Enforcement
+Enforcement as described in clause 5.4.1 and partial enforcement as defined in clause 6.1.
+7.2.2	Constraints and status
+7.2.2.1	General
+The definition of policy type constraints and policy type status in clause 6.3.2 would provide detailed information for Non-RT RIC related to what it could expect if a requested A1 policy was formulated in certain ways and in certain contexts so that
+if Non-RT RIC was aware of the policy type specific constraints containing configured A1 policy enforcement capabilities, it would be able to formulate a requested A1 policy with an applicable scope;
+if Non-RT RIC was aware of the policy type specific supported attributes and value ranges, it would be able to formulate a requested A1 policy with applicable objectives;
+if Non-RT RIC was aware of the policy type specific constraints containing available A1 policy enforcement capabilities, it would be able to formulate a requested A1 policy with enforceable scope; and
+if Non-RT RIC was aware of the policy type status, it would be able to realize when the constraints change and reflect status that provides guidance regarding if partial enforcement could be expected for A1 policies.
+7.2.2.2	Procedures
+Policy type constraints can be provided in the response of a Query policy type constraints operations, or in the response to the Query policy type operation, as discussed in clause 6.3.2.2.
+Policy type status can be provided in the response of a Query policy type status operation, or by a Notify policy type status operation, as discussed in clause 6.3.2.5.
+7.2.2.3	Schema
+Constraints schema and policy type status schema would be part of policy type definitions (together with policy schema and status schema), see clause 6.3.2.
+7.2.3	Creation/update requests
+7.2.3.1	General
+The design patterns for how A1 policies can be created and updated using HTTP PUT operations, and the HTTP status codes related to evaluations of policy creation requests, can be applied to support partiality aspects. In addition, the message content could include detailed information that could correspond to information provided in other operations.
+7.2.3.2	Create/update policy operations
+The Create single policy operations and Update single policy operations are based on HTTP PUT where the requested A1 policy is provided in the message content.
+If the requested A1 policy is not considered as applicable, the PUT request could be rejected with a 501 error, and if the requested A1 policy is not considered as enforceable, the PUT request could be rejected with a 503 error, as discussed in clause 5.5.4.2.
+NOTE:	The usage of the error codes 501 and 503 is already allowed, see A1AP [i.3], clause 6.2.7.3, although their relation to A1 policy enforcement capabilities is not covered by the current A1 specification.
+The reject message could contain any detailed information on the reject reasons but need not if the corresponding information is provided as policy type constraints and/or status.
+7.2.3.3	Design patterns
+Evaluation of policy creation requests can be based on only evaluation of applicability/enforceability but can also be based on the status after start of enforcement (when actions are taken for the parts of the policy) as described in clauses 5.5.2 and 5.5.3. Clause 5.5.5 provides potential clarifications to the current A1 specification related to this while clause 6.3.4 elaborates further on how policy creation transactions could be impacted by partiality (depending on cases as described in clause 7.3).
+7.2.3.4	Assumptions and expectations
+Non-RT RIC can assume that an A1 policy is enforced until policy status is queried or a change in enforcement status is notified while Near-RT RIC can assign any value of enforceStatus when creating the A1 policy before enforcement activity starts and the actual status may be notified. To avoid risk for situations where the assumptions may leave Non-RT RIC unaware of the actual status of the enforcement activity, the proposed clarification (see clause 5.5.5) is that the Non-RT RIC should query the policy status after receiving the 201 Created as that enables understanding of the policy status in both cases when a policy status notification is either received or not.
+7.2.4	Status and notifications
+The change reason attributes values in the policy status notifications can reflect partiality information. In addition, the message content could include detailed status information that could correspond to information provided in other operations.
+Potential updates of enforceReason attributes values are discussed in clause 6.2.4 and detailed policy status information in clause 6.2.5. Clause 5.5.5 provides potential clarifications to the current A1 specification related to this while clause 6.3.5 elaborates further on how policy creation transactions could be impacted by partiality (depending on cases as described in clause 7.3).
+7.3	Defining and interpreting enforceStatus
+7.3.1	General
+The definitions referred to in clause 7.2 can be applied to support partiality irrespective of if/how the enforceStatus attribute values are defined and interpreted as they reflect policy type and enforcement capability related properties rather than properties of any individual A1 policy.
+The enforcement status is specific for an individual A1 policy. The detailed change information of the policy status and the policy type status identified in the present document refers to the same attributes as those related to the A1 policy enforcement capabilities of the A1 policy type.
+7.3.2	Lifecycle management
+The current description of A1 policy lifecycle management in A1GAP [i.1], clause 5.1.3, would be impacted by clarifications/updates related to the policy creation transactions (see clause 7.2.3) and to definitions/interpretations of policy enforcement status.
+NOTE:	The present document does not consider any changes to the principle that Non-RT RIC is the lifecycle management owner of A1 polices while Near-RT RIC determines the status of the A1 policy enforcement activities for existing policies.
+7.3.3	Reinterpreting the current case
+Case 0 introduced in clause 6.2.3 corresponds to the current A1 specification. By introducing supporting information as per clause 7.2, the current definitions of the enforceStatus attributes values can be kept if interpretations (and Non-RT RIC assumptions) are clarified as:
+if requested A1 policy is not applicable (i.e. it is not "fully applicable"), the policy creation request can be rejected using the 501 error code;
+if requested A1 policy is not enforceable (i.e. it is "fully enforceable" or "partly enforceable"), the policy creation request can be rejected using the 503 error code;
+if the requested A1 policy is accepted using the 201 response code, Non-RT RIC can assume Near-RT RIC considers it as enforceable and will start an enforcement activity.
+Non-RT RIC would be expected to query policy status (when needed) to get guidance on if observable impact of the A1 policy can be expected, and if to consider keeping/updating/deleting the A1 policy. The enforceReason attribute values, and any detailed policy status information, would enable Near-RT RIC to express detailed partiality information. Policy status notifications could indicate changes in the detailed policy status information as well as changes in enforceStatus attribute value.
+The policy type constraints and status would provide guidance to Non-RT RIC regarding what can be an expected outcome of a policy creation transaction. The policy type status would indicate if full or partial enforcement could be expected based on configured A1 policy enforcement capabilities being completely or partly available, and the policy type constraints would provide detailed information on available A1 policy enforcement capabilities.
+NOTE:	Even if the same attributes (providing information on availability of A1 policy enforcement capabilities) are used to indicate status of policy types as to indicate status of an individual policy, the policy type status does not reflect status of an individual policy.
+7.3.4	New alternative definitions
+7.3.4.1	Case 1
+Case 1 introduced in clause 6.2.3 implies stricter expectations, compared to case 0 described in clause 7.3.2, regarding Near-RT RIC behaviour and implies Non-RT RIC can assume:
+enforceStatus = ENFORCED means enforcement actions are taken to enforce all parts of the A1 policy; and
+enforceStatus = NOT_ENFORCED means enforcement actions are taken to enforce some parts, or no part, of the A1 policy.
+It also implies stricter relations between the enforceStatus and enforceReason values as described in 6.3.5.3.1.
+7.3.4.2	Case 2
+Case 2 introduced in clause 6.2.3 implies stricter expectations, compared to case 0 described in clause 7.3.2, regarding Near-RT RIC behaviour and implies Non-RT RIC can assume:
+enforceStatus = ENFORCED means enforcement actions are taken to enforce all parts, or some parts, of the A1 policy; and
+enforceStatus = NOT_ENFORCED means enforcement actions are taken to enforce no part, of the A1 policy.
+It also implies stricter relations between the enforceStatus and enforceReason values as described in 6.3.5.3.1.
+7.3.4.3	Case 3
+Case 3 introduced in clause 6.2.3 introduces an additional attribute value specifically for partial enforcement and implies stricter expectations, compared to case 0 described in clause 7.3.2, regarding Near-RT RIC behaviour and implies Non-RT RIC can assume:
+enforceStatus = ENFORCED means enforcement actions are taken to enforce all parts of the A1 policy;
+enforceStatus = PARTIALLY_ENFORCED means enforcement actions are taken to enforce some parts of the A1 policy; and
+enforceStatus = NOT_ENFORCED means enforcement actions are taken to enforce  no part of the A1 policy.
+It also implies stricter relations between the enforceStatus and enforceReason values as described in 6.3.5.3.1 and an update to the lifecycle management state transition diagram.
+7.4	Inconclusive items
+7.4.1	Effect of enforcement
+The present document does not cover aspects related to feasible of being aware of the connected state of all targeted UEs, and if there would be any reason to notify such changes, as discussed in clause 5.4.2.
+7.4.2	ACID properties for partiality
+The present document does not cover any impact on how ACID properties are defined and analysed, after introduction of partiality-related definitions and features, as discussed in clause 5.5.4.
+7.4.3	Partial content
+Usage of the HTTP status code 206 Partial Content was not considered in the present study, as noted in clause 6.3.4.3, since it would imply a significant change to the principles for A1 policy lifecycle management.
+7.5	Recommendations
+7.5.1	General
+If updates to the A1 interface specification for support of partiality aspects are to be done, they should be based on a work item that enables coordination and alignment of CRs that could be approved for the same O-RAN train release and ensure there is only a minimum number of non-backward compatible API changes.
+In such work item, it should be described what approaches and options identified in the present document that should be the basis for the specification update in case the scope is larger than the specific recommendations in clause 7.5.2.
+7.5.2	Specific
+7.5.2.1	Capabilities and abilities
+The A1 specification should define terms related to applicability, enforceability, and A1 policy enforcement capabilities to enable inclusion of partiality aspects.
+See further clauses 7.2.1.2 and 7.2.1.3.
+7.5.2.2	Rejection of not applicable policy
+The A1 specification should define usage of the 501 Not Implemented error code for the case when a policy creation request is rejected due to that the requested A1 policy is not considered as "fully applicable".
+See further clauses 7.2.3.2 and 7.3.3.
+7.5.2.3	Rejection of not enforceable policy
+The A1 specification should define usage of the 503 Service Unavailable error code for the case when a policy creation request is rejected due to that the requested A1 policy is considered as "not enforceable".
+See further clauses 7.2.3.2 and 7.3.3.
+7.5.2.4	enforceReason attribute values
+The A1 specification should be updated with enforceReason attribute values SCOPE_NOT_ENFORCEABLE and SCOPE_PARTLY_ENFORCEABLE, and the current values for SCOPE_NOT_APPLICABLE should be clarified to enable status change notification related to loss of A1 policy enforcement capabilities.
+The A1 specification should be updated with enforceReason attribute values SCOPE_APPLICABLE and SCOPE_ENFORCEABLE to enable status change notification related to recovery of A1 policy enforcement capabilities.
+See further clause 7.2.4.
+7.5.2.5	Query policy status
+The A1 specification should recommend Non-RT RIC to query policy status when receiving a 201 Created after making a policy creation request to avoid taking actions on assumptions related to Near-RT RIC behaviour.
+See further clause 7.2.3.4.
+7.5.2.6	Policy type status
+The A1 specification should be updated with definitions of policy type status with attribute values that enable indication of that the policy enforcement functionality is OPERABLE (i.e. all the configured A1 enforcement capabilities are available), PART_OPERABLE (i.e. some of the configured A1 enforcement capabilities are available), or INOPERABLE (i.e. none of the configured A1 enforcement capabilities are available).
+See further clauses 7.2.2.1, 7.2.2.2, and 7.3.3.
+7.5.2.7	Policy type constraints
+The A1 specification should be updated with definitions for policy type constraints that enable indication of which configured A1 enforcement capabilities that are available.
+See further clauses 7.2.2.1, 7.2.2.2, and 7.3.3.
+Annex: 
+Change history

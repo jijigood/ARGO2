@@ -121,6 +121,55 @@ class Retriever:
             f"threshold={similarity_threshold:.3f}, p_s={p_s_value:.2f}"
         )
     
+    def _retrieve_internal(
+        self,
+        query: str,
+        k: int = 3,
+        return_scores: bool = False,
+        where_filter: Optional[Dict] = None,
+    ) -> Tuple[List[str], bool, Optional[List[float]]]:
+        try:
+            results = self.collection.query(
+                query_texts=[query],
+                n_results=k,
+                where=where_filter or None,
+                include=['documents', 'distances', 'metadatas']
+            )
+
+            documents = results['documents'][0] if results['documents'] else []
+            distances = results['distances'][0] if results['distances'] else []
+            metadatas = results['metadatas'][0] if results['metadatas'] else []
+
+            similarities = [1.0 / (1.0 + d) for d in distances]
+            success = self._check_success(similarities)
+
+            if not success:
+                logger.info(
+                    "Retrieval failed for query: '%s...' (max similarity: %.3f)",
+                    query[:50],
+                    max(similarities) if similarities else 0.0,
+                )
+                return ([], False, [] if return_scores else None)
+
+            formatted_docs = []
+            for doc, meta in zip(documents, metadatas):
+                meta = meta or {}
+                source = meta.get('source') or meta.get('doc_id') or 'unknown'
+                formatted_doc = f"[Source: {source}] {doc}"
+                formatted_docs.append(formatted_doc)
+
+            logger.info(
+                "Retrieved %s documents for query: '%s...'",
+                len(formatted_docs),
+                query[:50],
+            )
+
+            return formatted_docs, True, similarities if return_scores else None
+
+        except Exception as e:
+            logger.error(f"Retrieval error: {e}")
+            return ([], False, [] if return_scores else None)
+
     def retrieve(
         self,
         query: str,
@@ -141,55 +190,31 @@ class Retriever:
                 - success: 是否成功检索
                 - scores: 相似度分数列表（仅当return_scores=True）
         """
-        try:
-            # 使用Chroma内置的查询
-            results = self.collection.query(
-                query_texts=[query],
-                n_results=k,
-                include=['documents', 'distances', 'metadatas']
+        return self._retrieve_internal(query, k, return_scores)
+
+    def retrieve_with_filter(
+        self,
+        query: str,
+        k: int = 3,
+        section_filter: Optional[str] = None,
+        work_group_filter: Optional[str] = None,
+        return_scores: bool = False,
+    ) -> Tuple[List[str], bool, Optional[List[float]]]:
+        """检索时应用section/work group元数据过滤"""
+
+        where_filter: Dict[str, str] = {}
+        if section_filter:
+            where_filter["section_id"] = section_filter
+        if work_group_filter:
+            where_filter["work_group"] = work_group_filter
+
+        if where_filter:
+            logger.debug(
+                "Applying metadata filter: %s",
+                {k: v for k, v in where_filter.items()},
             )
-            
-            # 提取结果
-            documents = results['documents'][0] if results['documents'] else []
-            distances = results['distances'][0] if results['distances'] else []
-            metadatas = results['metadatas'][0] if results['metadatas'] else []
-            
-            # 转换距离为相似度（Chroma使用L2距离，需要转换）
-            # 相似度 = 1 / (1 + distance)
-            similarities = [1.0 / (1.0 + d) for d in distances]
-            
-            # 判断是否成功
-            success = self._check_success(similarities)
-            
-            if not success:
-                logger.info(f"Retrieval failed for query: '{query[:50]}...' "
-                           f"(max similarity: {max(similarities) if similarities else 0:.3f})")
-                if return_scores:
-                    return [], False, []
-                else:
-                    return [], False, None
-            
-            # 格式化文档
-            formatted_docs = []
-            for i, (doc, meta) in enumerate(zip(documents, metadatas)):
-                # 添加元数据（如文档ID、来源等）
-                source = meta.get('source', 'unknown')
-                formatted_doc = f"[Source: {source}] {doc}"
-                formatted_docs.append(formatted_doc)
-            
-            logger.info(f"Retrieved {len(formatted_docs)} documents for query: '{query[:50]}...'")
-            
-            if return_scores:
-                return formatted_docs, True, similarities
-            else:
-                return formatted_docs, True, None
-            
-        except Exception as e:
-            logger.error(f"Retrieval error: {e}")
-            if return_scores:
-                return [], False, []
-            else:
-                return [], False, None
+
+        return self._retrieve_internal(query, k, return_scores, where_filter or None)
     
     def _check_success(self, similarities: List[float]) -> bool:
         """

@@ -1,0 +1,2786 @@
+Technical Specification  
+  
+O-RAN Work Group 10 (OAM for O-RAN) 
+  
+Topology Exposure & Inventory Common Information Models 
+and Interface Specification - Stage 2 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Copyright © 2025 by the O-RAN ALLIANCE e.V. 
+The copying or incorporation into any other work of part or all of the material available in this specification in any form 
+without the prior written permission of O-RAN ALLIANCE e.V.  is prohibited, save that you may print or download extracts 
+of the material of this specification for your personal use, or copy the material of this specification for the purpose of se nding 
+to individual third parties for their information provided that you acknowledge O-RAN ALLIANCE as the source of the 
+material and that you inform the third party that these conditions apply to them and that they must comply with them.  
+O-RAN ALLIANCE e.V., Buschkauler Weg 27, 53347 Alfter, Germany 
+Register of Associations, Bonn VR 11238, VAT ID DE321720189 
+ 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 2 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Contents 
+Foreword ............................................................................................................................................................. 3 
+Modal verbs terminology .................................................................................................................................... 3 
+Executive summary ............................................................................................................................................ 3 
+Introduction ........................................................................................................................................................ 3 
+1 Scope ........................................................................................................................................................ 4 
+2 References ................................................................................................................................................ 4 
+2.1 Normative references ......................................................................................................................................... 4 
+2.2 Informative references ........................................................................................................................................ 5 
+3 Definition of terms, symbols and abbreviations ....................................................................................... 5 
+3.1 Terms .................................................................................................................................................................. 5 
+3.2 Symbols .............................................................................................................................................................. 5 
+3.3 Abbreviations ..................................................................................................................................................... 6 
+4 TE&IV Information Models ..................................................................................................................... 6 
+4.1 Introduction ........................................................................................................................................................ 6 
+4.2 TE&IV Information Modeling Guidelines ......................................................................................................... 6 
+4.2.1 Modeling approach, Unified Modeling Language (UML) ............................................................................ 6 
+4.2.2 Modeling guidelines ................................................................................................................................... 12 
+4.3 TE&IV Information Model Definitions ........................................................................................................... 12 
+4.3.1 Namespace ORAN.SMO.TEIV.RAN ......................................................................................................... 12 
+4.3.2 Namespace ORAN.SMO.TEIV.Cloud ....................................................................................................... 18 
+4.3.3 Namespace ORAN.SMO.TEIV.REL-Cloud-RAN ..................................................................................... 22 
+4.3.4 Namespace ORAN.SMO.TEIV .................................................................................................................. 32 
+4.3.5 Namespace ORAN.SMO.TEIV.Physical .................................................................................................... 34 
+4.3.6 Namespace ORAN.SMO.TEIV.REL-Physical-RAN ................................................................................. 40 
+4.4 TE&IV Service Operations .............................................................................................................................. 50 
+4.4.1 Introduction................................................................................................................................................. 50 
+4.4.2 Operations and Notification ........................................................................................................................ 51 
+4.5 TE&IV User Defined Data ............................................................................................................................... 57 
+4.5.1 Introduction................................................................................................................................................. 57 
+4.5.2 Classifiers ................................................................................................................................................... 57 
+4.5.3 Decorators ................................................................................................................................................... 58 
+4.5.4 Attribute properties ..................................................................................................................................... 59 
+4.5.5 Service Operations for User Defined Data ................................................................................................. 59 
+Annex A (Informative): Model views .............................................................................................................. 63 
+A.1 Model View: O-RAN TE&IV Network Function Deployment View (informative) ........................................ 63 
+Annex (informative): Change history ............................................................................................................... 66 
+ 
+  
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 3 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Foreword 
+This Technical Specification (TS) has been produced by WG10 of the O-RAN ALLIANCE. 
+The content of the present document is subject to continuing work within O-RAN and may change following formal O-RAN 
+approval. Should the O-RAN ALLIANCE modify the contents of the present document, it will be re-released by O-RAN with 
+an identifying change of version date and an increase in version number as follows: 
+version xx.yy.zz 
+where: 
+xx: the first digit-group is incremented for all changes of substance, i.e. technical enhancements, corrections, updates, etc. 
+(the initial approved document will have xx=01).  Always 2 digits with leading zero if needed. 
+yy: the second digit-group is incremented when editorial only changes have been incorporated in the document.  Always 2 
+digits with leading zero if needed. 
+zz: the third digit-group included only in working versions of the document indicating incremental changes during the 
+editing process. External versions never include the third digit-group.  Always 2 digits with leading zero if needed. 
+Modal verbs terminology 
+In the present document "shall", "shall not", "should", "should not", "may", "need not", "will", "will not", "can" and 
+"cannot" are to be interpreted as described in clause 3.2 of the O-RAN Drafting Rules (Verbal forms for the expression of 
+provisions). 
+"must" and "must not" are NOT allowed in O-RAN deliverables except when used in direct citation. 
+Executive summary 
+The present document specifies the TE&IV Information Models suited to realize the use cases of TE&IV Service Consumer as 
+specified in [1]. 
+Introduction 
+The O-RAN TE&IV Information Models provide the logical representation of O-RAN specific TE&IV resources. This includes: 
+• Topology Entities intended to convey classes that realizes TE&IV resources.  
+• Topology Relationships intended to realize relationship between Topology Entities.  
+• Enumerations which provide a predefined list of choices. 
+• Data Types which provide structure to the elements of TE&IV resources.  
+• Notifications which is the information conveyed in a message from TE&IV Service Producer to TE&IV Service 
+Consumer.  
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 4 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+1 Scope 
+This document specifies the Information Model used to support TE&IV services within the SMO. The TE&IV Information 
+Models described in this document are structured using the concept of Namespaces. In addition, relevant sections in this 
+document include information imported from existing standards and industry work that serve as a basis for O -RAN TE&IV. 
+The Annex section of this document describes multiple views of the TE&IV Information Models that supports TE&IV Service 
+Consumer use cases [1] within the SMO. 
+The TE&IV Information Models specified in this present document is part of a “modeling continuum” that aims to establish 
+and evolve an O-RAN TE&IV Information Model from which O-RAN TE&IV Data Models may be generated manually or 
+with a set of tools. However, the O-RAN TE&IV Data Models is out of scope of this present document and will be specified in 
+a different specification. 
+2 References 
+2.1 Normative references 
+References are either specific (identified by date of publication and/or edition number or version number) or non -specific. For 
+specific references, only the cited version applies. For non-specific references, the latest version of the referenced document 
+(including any amendments) applies. In the case of a reference to a 3GPP document, a non-specific reference implicitly refers 
+to the latest version of that document in Release 18. 
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O -RAN cannot guarantee their 
+long-term validity. 
+The following referenced documents are necessary for the application of the present document.  
+[1] O-RAN.WG10.TE&IV-UCR.0: "Topology Exposure and Inventory Management Services Use Cases and 
+Requirement Specification"  
+[2] 3GPP TS 32.156: Telecommunication management; Fixed Mobile Convergence (FMC) Model repertoire, 
+version 17.5.0, December 2023 
+[3] OMG formal/2017-12-05: OMG® Unified Modeling Language® (OMG UML®), version 2.5.1 
+[4] 3GPP TS 32.160: Management and orchestration; Management service template, version 17.9.0, September 
+2023 
+[5] 3GPP TS 28.541: 3rd Generation Partnership Project; Technical Specification Group Services and System 
+Aspects; Management and orchestration; 5G Network Resource Model (NRM), version 17.13.0, December 
+2023 
+[6] O-RAN.WG1.TS.OAD: " O-RAN Architecture Description" ("OAD")  
+[7]  O-RAN.WG6.TS.O2-GA&P: "O-RAN O2 Interface General Aspects and Principles"  
+[8]  O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE: "O2dms Interface Specification: Profile 
+based on ETSI NFV Protocol and Data Models" 
+[9]  O-RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE: "O2dms Interface Specification: Kubernetes 
+Native API Profile for Containerized NFs"  
+[10] O-RAN.WG6.ORCH-USE-CASES: "Cloudification and Orchestration Use Cases and Requirements for 
+O-RAN Virtualized RAN" 
+[11] O-RAN.WG10.TS.OAM-Architecture: "O-RAN Operations and Maintenance Architecture" 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 5 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+[12] O-RAN.WG3.TS.E2AP: "E2 Application Protocol” (“E2AP”) 
+[13] 3GPP TS 28.658: 3rd Generation Partnership Project; Technical Specification Group Services and 
+System Aspects; Telecommunication management; Evolved Universal Terrestrial Radio Access Network 
+(E-UTRAN) Network Resource Model (NRM) Integration Reference Point (IRP); Inform ation Service 
+(IS) 
+[14] IETF RFC 8141: "Uniform Resource Names (URNs)" 
+[15] O-RAN.WG4.TS.MP.0: "O-RAN Management Plane Specification" 
+[16] 3GPP TS 28.622: Generic Network Resource Model (NRM) Integration Reference Point (IRP); 
+Information Service (IS) 
+[17] O-RAN.WG10.TS.TE&IV-API.0: "Topology Exposure & Inventory Application Protocols Specification 
+- Stage 3" (“TE&IV API”) 
+2.2 Informative references 
+References are either specific (identified by date of publication and/or edition number or version number) or non -specific. For 
+specific references, only the cited version applies. For non-specific references, the latest version of the referenced document 
+(including any amendments) applies. In the case of a reference to a 3GPP document, a non-specific reference implicitly refers 
+to the latest version of that document in Release 18, or the latest 3GPP release prior to Release 18 that includes that docum ent. 
+NOTE: While any hyperlinks included in this clause were valid at the time of publication, O -RAN cannot guarantee their 
+long-term validity. 
+The following referenced documents are not necessary for the application of the present document, but they assist the user with 
+regard to a particular subject area. 
+[i.1] 3GPP TR 21.905: "3rd Generation Partnership Project; Technical Specification Group Services and 
+System Aspects; Vocabulary for 3GPP Specifications" 
+3 Definition of terms, symbols and abbreviations 
+3.1 Terms 
+For the purposes of the present document, the terms given in [i.1] and the following apply:  
+Information Model:  a representation of concepts and the relationships, constraints, rules, and operations to specify data 
+semantics for a chosen domain of discourse, it specifies relations between objects, can provide sharable, stable, and organiz ed 
+structure of information requirements or knowledge for the domain context. 
+Namespace: a logical grouping of named elements specified, to prevent name collisions across named elements imported and 
+associated from other specifications to support the independent lifecycle of its representation in the TE&IV Information 
+Model. 
+Topology Entity: is a modelling construct that represents TE&IV resources useful to a Topology and Inventory use case [1].  
+Topology Relationship: is a modelling construct that represents the relationship between Topology Entities useful to a 
+Topology and Inventory use case [1]. 
+Domain: a logical grouping of Topology Entities and/or Topology Relationships. 
+3.2 Symbols 
+Void 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 6 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+3.3 Abbreviations 
+For the purposes of the present document, the following abbreviations apply: 
+TEC Topology Entity Class 
+TRC Topology Relationship Class 
+4 TE&IV Information Models 
+4.1 Introduction 
+The TE&IV Information Models described in this specification exposes the Topology Entities and Topology Relationships of 
+the TE&IV resources as defined in [1]. 
+4.2 TE&IV Information Modeling Guidelines 
+4.2.1 Modeling approach, Unified Modeling Language (UML) 
+The TE&IV Information Models shall use the Unified Modeling Language ™ (UML®) version 2.5.1 [3] from the Object 
+Management Group (OMG). 
+UML provides a rich set of concepts, graphical notations, and model elements to model distributive systems. 3GPP TS 32.156 
+[2] provides the necessary and sufficient set of UML notations and model elements, including the ones built by the UML 
+extension mechanism <<stereotype>> to model network management systems and their managed nodes. These conventions are 
+applied to the TE&IV Information Model. 
+The TE&IV Information Model also defines UML notation, model elements and <<stereotypes>> which shall be used to 
+model behaviours of the Topology Entity and Topology Relationship. 
+The TE&IV Information Model uses embedded PlantUML for diagraming and the relationships are modeled using UML Class 
+diagram conventions. 
+O-RAN TE&IV Information Models shall also follow methodology documented in 3GPP  TS 32.160 [4] Clause 5.2. 
+4.2.1.1 Model elements and notation 
+4.2.1.1.1 General 
+The UML graphical notation in this document is only used to represent the Topology Entity and Topology Relationship model 
+elements. 
+UML properties as defined in [3] clause 9.5 are referred in this document and shall be used only for TE&IV Information 
+Model. 
+4.2.1.1.2 Basic model elements  
+UML [3] has defined a number of basic model elements. This subclause lists the subset selected for use in TE&IV Information 
+Model. 
+The characteristics defined in UML [3] clause 11.4 is applicable to TE&IV Information Model. However, in this specification, 
+classes may or may not have attributes and the graphical notation of a class may show a suppressed attribute (middle) 
+compartment even if the class has attributes, as shown in figure below.  The operation (bottom) compartment is also 
+suppressed. 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 7 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.2.1.1.2-1: Basic model elements 
+4.2.1.1.3 Attribute 
+4.2.1.1.3.1 Description 
+In UML [3], an attribute is a typed element of a class that is represented by a property. The properties listed in this secti on 
+represents the attributes of a Topology Entity and Topology Relationship class.  
+Table 4.2.1.1.3.1-1 below lists the adaptations of the attribute properties and its values applicable for TE&IV Information 
+Model when re-using the attribute properties specified in 3GPP TS 32.156 [2] clause 5.2.1. 
+Table 4.2.1.1.3.1-1: TE&IV Information Model valid attribute values 
+Property name TE&IV Adaptations  
+type This property and its description, legal values 
+shall be supported 
+allowedValues This property and its description, legal values 
+shall be supported 
+defaultValue This property and its description, legal values 
+shall be supported 
+multiplicity This property and its description, legal values 
+shall be supported 
+isOrdered This property and its description, legal values 
+shall be supported 
+isUnique This property and its description, legal values 
+shall be supported 
+isNullable Not required to be supported 
+passedById This property and its description, legal values 
+shall be supported 
+lifecycleStatus Not required to be supported 
+isInvariant This property and its description, legal values 
+shall be supported 
+isWritable This property and its description, legal values 
+shall be supported. However, A "isWritable: 
+True" property might be restricted by access 
+control. 
+isReadable This property and its description, legal values 
+shall be supported 
+isNotifyable This property and its description, legal values 
+shall be supported 
+supportQualifier This property and its description, legal values 
+shall be supported 
+4.2.1.1.3.2 Example 
+This example shows three attributes, i.e., x, y,and z, listed in the attribute (the second) compartment of the class. However, as 
+mentioned in 4.2.1.1.2, the attribute compartment (middle) can be suppressed.  
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 8 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+  
+Figure 4.2.1.1.3.2-1: Attribute notation 
+4.2.1.1.3.3 Name style  
+As defined in clause 5.2.1.3 of 3GPP TS 32.156 [2]. 
+4.2.1.1.4 Association Relationship 
+4.2.1.1.4.1 Description 
+An association relationship class is a modelling construct that represents p otentially complex series of associations that may 
+cross domain boundaries. These classes are identifiable, searchable, have attributes and a record of the entities (and potent ially 
+configuration/associations) that make up their source. 
+Association relationship classes are appropriate for use to show a relationship between different Topology Entities [see clau se 
+4.2.1.1.2] through the Topology Relationship class [see clause 4.2.1.1.3]. Each association relationship class has aSide and 
+bSide relationships, multiplicity, and navigability as shown in the example clause 4.2.1.1.4.2.  
+For a Topology Relationship, the following rules apply:  
+1. The Topology Relationship class name shall have the form “<X>_{REL}_<Y>”, where <X> represents the TEC at 
+the aSide of the relationship, <Y> represents the TEC at the bSide of the relationship, and {REL} is a transient verb 
+representing the relationship between <X> and <Y>. e.g., NFDeployment_serves_ODUFunction.  
+2. The aSide is considered the originating side of the relationship. The bSide is considered the terminating side of the 
+relationship. The order of aSide and bSide is of importance and shall not be changed once defined.  
+3. The Topology Relationship is a bi-directional relationship which indicates the navigability from either the aSide or 
+bSide of the associated Topology Entity. 
+4.2.1.1.4.2 Example 
+For TE&IV Information model, the example (Figure 4.2.1.1.4.2-1) shows a bi-directional association. In this example, both 
+Topology Entity classes (AbcFunction and XyzFunction) are related through a separate relationship class named 
+Abc_REL_Xyz. By default, the aSide of the relationship is considered originating when relating its associated Topology Entity  
+classes. 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 9 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+ 
+Figure 4.2.1.1.4.2-1: Association Relationship notation 
+However, the figure 4.2.1.1.4.2-1 can also be represented in a simpler form with only the relationship class name without 
+mentioning association names, as shown in the below figure 4.2.1.1.4.2 -2. 
+ 
+Figure 4.2.1.1.4.2-2: Simple Association Relationship notation 
+4.2.1.1.4.3 Name style 
+The name shall use the same style as used in << TopologyRelationshipClass >> clause 4.2.1.2.3.3. 
+4.2.1.1.5 Abstract class 
+4.2.1.1.5.1 Description 
+An abstract class is a generalized representation of Topology Entity and Topology Relationship classes. An abstract class 
+cannot be instantiated. 
+This modelled element has the same properties as class. See 4.2.1.1.2. 
+4.2.1.1.5.2 Example 
+This example (Figure 4.2.1.1.5-1) shows that AbcFunction_ of stereotype TopologyEntityClass is an abstract class. It is a 
+generalization of both AbcFunction1 and AbcFunction2. 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 10 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.2.1.1.5-1: Abstract class notation for Topology Entity 
+This example (Figure 4.2.1.1.5-2) shows that XyzFunction_ of stereotype TopologyRelationshipClass is an abstract class. 
+It is a generalization of both XyzFunction1 and XyzFunction2. 
+ 
+Figure 4.2.1.1.5-2: Abstract class notation for Topology Relationship 
+4.2.1.1.5.3 Name style 
+The name shall use the same style as used in TopologyEntityClass and TopologyRelationshipClass as specified in clauses 
+4.2.1.2.2.3 and 4.2.1.2.3.3. The name shall be in italics and its last character shall be an underscore . 
+4.2.1.2 Stereotype 
+4.2.1.2.1 Description 
+Subclause 4.2.1 listed the UML defined basic model elements. UML defined a stereotype concept allowing the specification of 
+simple or complex user-defined model elements. 
+This subclause lists all allowable stereotypes for TE&IV Information Model.   
+The names of stereotypes shall be chosen such that they do not clash with any stereotype defined in O -RAN. 
+The characteristics defined in subclause 5.3.0 of 3GPP TS 32.156 [2] is applicable to TE&IV Information Model elements i.e, 
+as per the clause 5.3.0 of 3GPP TS 32.156 [2] “For each stereotype model element listed, there are three parts. The first par t 
+contains its description. The second part contains its graphical notation examples, and the third part contains the rule, if any, 
+recommended for labelling or naming it”.  
+4.2.1.2.2 <<TopologyEntityClass>> 
+4.2.1.2.2.1 Description 
+The << TopologyEntityClass >> is identical to UML class [3] clause 11.4.3.1 which specifies a Topology Entity Resource 
+including properties, attributes and allows inheritance but it does not include/define methods or operations.  
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 11 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.2.1.2.2.2 Example 
+This example (figure 4.2.1.2.2.2-1) shows a class AbcFunction << TopologyEntityClass >>. 
+ 
+Figure 4.2.1.2.2.2-1: << TopologyEntityClass >> notation 
+This example (figure 4.2.1.2.2.2-2) shows an abstract class AbcFunction_ << TopologyEntityClass >>. 
+ 
+Figure 4.2.1.2.2.2-2: Abstract class << TopologyEntityClass >> notation 
+4.2.1.2.2.3 Name style 
+For << TopologyEntityClass >> name, use the same style as defined in clause 5.3.2.3 of 3GPP TS 32.156 [2].  
+4.2.1.2.3  <<TopologyRelationshipClass>> 
+4.2.1.2.3.1 Description 
+The <<TopologyRelationshipClass>> is identical to UML class [3] clause 11.4.3.1 which specifies a Topology Relationship 
+between different Topology Entities including properties, attributes and allows multiple inheritance but it does not 
+include/define methods or operations. 
+4.2.1.2.3.2 Example 
+This example shows a class AbcXyzRelation <<TopologyRelationshipClass>>. 
+ 
+Figure 4.2.1.2.3.2-1: <<TopologyRelationshipClass>> notation 
+This example shows an abstract class AbcXyzRelation_ <<TopologyRelationshipClass>>. 
+ 
+Figure 4.2.1.2.3.2-2: Abstract class <<TopologyRelationshipClass>> notation 
+4.2.1.2.3.3 Name style 
+For <<TopologyRelationshipClass>> name, use the same style as defined in clause 5.3.2.3 of 3GPP TS 32.156 [2].  
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 12 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.2.2 Modeling guidelines 
+The TE&IV Information Models references concepts from each of the other O -RAN Information Model Namespaces by 
+adding and removing attributes, entities, and relationships to serve the needs of the SMO use cases and services.  TE&IV 
+Information Models use multiple separate Namespaces to support independent lifecycle of loosely coupled topology and 
+inventory concepts. 
+The definitions and mapping involved with the TE&IV resources created within O-RAN TE&IV shall follow the below 
+mentioned guidelines: 
+• shall be defined in a TE&IV namespace 
+• shall follow the 3GPP style when defining its identity and attributes [5] 
+• shall maintain a standard mapping to existing O-RAN definitions within O-RAN namespaces  
+• if it is a 1:1 mapping with other namespace resource, not limited to O-RAN, 
+o the resource name shall be reused exactly 
+o the identities used in the TE&IV resources shall encapsulate the type of the instance identifier and the instance 
+identifier of the resource defined in other source namespaces 
+ 
+• if it is a 1:N mapping with other namespace resource, not limited to O -RAN, 
+o the resource name shall begin with O-RAN prefix “ORT-” 
+o the identities used in the TE&IV resources shall be generated within TE&IV and represented using a TE&IV 
+specified type of the instance identifier and the generated instance identifier of the resource  
+o the generated identities to map the TE&IV instance identifier to the source shall be preserved along with the 
+identity of the source. 
+4.3 TE&IV Information Model Definitions 
+4.3.1 Namespace ORAN.SMO.TEIV.RAN 
+4.3.1.1 Namespace overview 
+This namespace contains the Topology Entities and Topology Relationship in the RAN Logical domain, which represents the 
+functional capability of the deployed RAN that are relevant to realise use cases of TE&IV Service Consumer as specified in 
+[1]. 
+4.3.1.2 Imported associated information 
+4.3.1.2.1 Imported information entities and local labels 
+Imported information entities and local labels is not defined in the present version of the document. 
+4.3.1.2.2 Associated information entities and local labels 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 13 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Label reference Local label  
+TS 28.541 [5], IOC, GNBDUFunction GNBDUFunction 
+TS 28.541 [5], IOC, GNBCUCPFunction GNBCUCPFunction 
+TS 28.541 [5], IOC, GNBCUUPFunction GNBCUUPFunction 
+4.3.1.3 Class diagram 
+4.3.1.3.1 Relationships 
+Relationships are not defined in the present version of the document. 
+4.3.1.3.2 Inheritance 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV { 
+ 
+abstract class TopologyEntity_ 
+} 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+ 
+abstract class ORANNetworkFunction_ 
+class ORUFunction  
+class ODUFunction  
+class OCUCPFunction  
+class OCUUPFunction  
+class NearRTRICFunction 
+ 
+TopologyEntity_ <|-d- ORANNetworkFunction_ 
+ 
+ORANNetworkFunction_ <|-- ORUFunction 
+ORANNetworkFunction_ <|-- ODUFunction 
+ORANNetworkFunction_ <|-- OCUCPFunction 
+ORANNetworkFunction_ <|-- OCUUPFunction 
+ORANNetworkFunction_ <|-- NearRTRICFunction 
+} 
+@enduml 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 14 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.1.3.2-1: ORAN SMO TE&IV RAN inheritance view 
+4.3.1.4 Class definitions 
+4.3.1.4.1 ORUFunction 
+4.3.1.4.1.1 Definitions 
+This class provides the TE&IV resource representation of O-RU O-RAN Network Function using the equivalent concept as 
+defined in clause 5 of O-RAN.WG1.OAD [6]. 
+4.3.1.4.1.2 Attributes 
+The ORUFunction TEC includes the attributes inherited from ORANNetworkFunction_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+oruId M T F F T 
+4.3.1.4.1.3 Attribute constraints 
+ None. 
+4.3.1.4.1.4 Notifications 
+There is no notification defined. 
+4.3.1.4.1.5 State diagram 
+None. 
+4.3.1.4.2 NearRTRICFunction 
+4.3.1.4.2.1 Definitions 
+This class provides the TE&IV resource representation of Near-RT RIC O-RAN Network Function using the equivalent 
+concept as defined in clause 5 of O-RAN.WG1.OAD [6].  
+4.3.1.4.2.2 Attributes 
+The NearRTRICFunction TEC includes the topology attributes inherited from ORANNetworkFunction_ and have the following 
+attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+pLMNId  M T F F T 
+nearRtRicId M T F F T 
+ 
+4.3.1.4.2.3 Attribute constraints  
+None. 
+4.3.1.4.2.4 Notifications 
+There is no notification defined. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 15 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.1.4.2.5 State diagram 
+None. 
+4.3.1.4.3 OCUCPFunction 
+4.3.1.4.3.1 Definitions 
+This class provides the TE&IV resource representation of O-CU-CP Network Function using the equivalent concept as defined 
+in clause 5 of O-RAN TS OAD [6].  
+NOTE: The management characteristics of the O-CU-CP O-RAN NF is represented by the IOC GNBCUCPFunction as 
+specified in 3GPP NR NRM model, as per 3GPP TS 28.541 [5].  
+4.3.1.4.3.2 Attributes 
+The OCUCPFunction TEC includes the attributes inherited from ORANNetworkFunction_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+gNBCUName O T F F T 
+gNBId M T F F T 
+gNBIdLength M T F F T 
+pLMNId M T F F T 
+4.3.1.4.3.3 Attribute constraints  
+None. 
+4.3.1.4.3.4 Notifications 
+There is no notification defined. 
+4.3.1.4.3.5 State diagram 
+None. 
+4.3.1.4.4 OCUUPFunction 
+4.3.1.4.4.1 Definitions 
+This class provides the TE&IV resource representation of O-CU-UP Network Function using the equivalent concept as defined 
+in clause 5 of O-RAN.WG1.OAD [6].  
+NOTE: The management characteristics of the O-CU-UP O-RAN NF is represented by the IOC GNBCUUPFunction as 
+specified in 3GPP NR NRM model, as per 3GPP TS 28.541 [5].  
+4.3.1.4.4.2 Attributes 
+The OCUUPFunction TEC includes the attributes inherited from ORANNetworkFunction_ and have the following 
+attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+gNBId M T F F T 
+gNBIdLength M T F F T 
+pLMNIdList M T F F T 
+4.3.1.4.4.3 Attribute constraints  
+None. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 16 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.1.4.4.4 Notifications 
+There is no notification defined. 
+4.3.1.4.4.5 State diagram 
+None. 
+4.3.1.4.5 ODUFunction 
+4.3.1.4.5.1 Definitions 
+This class provides the TE&IV resource representation of O-DU Network Function using the equivalent concept as defined in 
+clause 5 of O-RAN.WG1.OAD [6].  
+NOTE: The management characteristics of the O-DU O-RAN NF is represented by the IOC GNBDUFunction as specified in 
+3GPP NR NRM model, as per 3GPP TS 28.541 [5]. 
+4.3.1.4.5.2 Attributes 
+The ODUFunction TEC includes the attributes inherited from ORANNetworkFunction_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+gNBDUId M T F F T 
+gNBId M T F F T 
+gNBIdLength M T F F T 
+4.3.1.4.5.3 Attribute constraints  
+None. 
+4.3.1.4.5.4 Notifications 
+There is no notification defined. 
+4.3.1.4.5.5 State diagram 
+None. 
+4.3.1.4.6 ORANNetworkFunction_ 
+4.3.1.4.6.1 Definitions 
+This abstract class is provided for sub-classing only and is used to generalize the entity classes in this namespace. 
+4.3.1.4.6.2 Attributes 
+The ORANNetworkFunction_ includes the attributes inherited from TopologyEntity_ in the ORAN.SMO.TEIV namespace. 
+4.3.1.4.6.3 Attribute constraints  
+None. 
+4.3.1.4.6.4 Notifications 
+There is no notification defined. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 17 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.1.4.6.5 State diagram 
+None. 
+4.3.1.5 Attribute definitions 
+4.3.1.5.1 Attribute properties 
+The following table defines the properties of attributes specified in the present document.  
+Table 4.3.1.5.1-1: Attribute properties 
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+gNBCUName Name of gNB-CU, see subclause 4.4.1 of 3GPP TS 28.541 [5]. 
+ 
+allowedValues: Not applicable 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+gNBDUId Unique identifier for the gNB-DU at least within a gNB-CU, see 
+subclause 4.4.1 of 3GPP TS 28.541 [5]. 
+ 
+allowedValues: Not applicable 
+type: Integer 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+gNBId Identity of gNB within a PLMN , see subclause 4.4.1 of 3GPP TS 
+28.541 [5].  
+ 
+allowedValues: 0..4294967295 
+type: Integer 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+gNBIdLength Length of gNBId bit string representation , see subclause 4.4.1 of 
+3GPP TS 28.541 [5]. 
+ 
+allowedValues: 22 .. 32 
+type: Integer 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+nearRTRICID The identifier of Near-RT RIC as defined in O -RAN.WG3.E2AP [12], 
+clause 9.2.4 
+type: Integer 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+pLMNId Identity of the PLMN, see subclause 4.4.1 of 3GPP TS 28.541 [5]. 
+ 
+type: PLMNId 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 
+oruId Identity of the O-RU as discovered from the source domain based on 
+M-Plane architecture model as defined in O-RAN TS [15] 
+ 
+Note: The oruId is assumed to be available in TE&IV. 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+O1 (Hierarchical) 
+O1, Open FH M-
+Plane (Hybrid) 
+pLMNIdList List of unique identities for PLMN , see subclause 4.4.1 of 3GPP TS 
+28.658 [13]. 
+type: PLMNId 
+multiplicity: 1..12 
+isOrdered: False 
+isUnique: True 
+isWritable: False 
+defaultValue: None 
+O1 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 18 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.2 Namespace ORAN.SMO.TEIV.Cloud 
+4.3.2.1 Namespace overview 
+This namespace contains the Topology Entities and Topology Relationship in the O-CLOUD domain, which comprises cloud 
+infrastructure and cloud deployment aspects. 
+4.3.2.2 Imported associated information 
+4.3.2.2.1 Imported information entities and local labels 
+Imported information entities and local labels is not defined in the present version of the document.  
+4.3.2.2.2 Associated information entities and local labels 
+Associated information entities and local labels is not defined in the present version of the document.  
+4.3.2.3 Class diagram 
+4.3.2.3.1 Relationships 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+namespace ORAN.SMO.TEIV.Cloud { 
+ 
+class CloudifiedNF  
+class NFDeployment  
+class OCloudNamespace  
+class NodeCluster 
+class OCloudSite 
+ 
+note as locationnote 
+  Has location info. 
+end note 
+ 
+locationnote .. OCloudSite 
+ 
+ 
+CloudifiedNF "1" --> "1..*" NFDeployment: comprizes 
+NFDeployment " 1..* "--> "1..*" OCloudNamespace : deployedOn 
+OCloudNamespace " 1..* "--> "1" NodeCluster : deployedOn 
+NodeCluster "1..*" --> "1..*" OCloudSite : locatedAt 
+} 
+@enduml 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 19 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.2.3.1-1: ORAN SMO TE&IV O-Cloud relationship view 
+4.3.2.3.2 Inheritance 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+namespace ORAN.SMO.TEIV.Cloud { 
+ 
+class Resource  
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 20 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+class CloudifiedNF  
+class NFDeployment  
+class OCloudNamespace  
+class NodeCluster  
+class OCloudSite  
+ 
+Resource <|-- CloudifiedNF 
+Resource <|-- NFDeployment 
+Resource <|-- OCloudNamespace 
+Resource <|-- NodeCluster 
+Resource <|-- OCloudSite 
+} 
+@enduml 
+ 
+Figure 4.3.2.3.2-1: ORAN SMO TE&IV O-Cloud inheritance view 
+4.3.2.4 Class definitions 
+4.3.2.4.1 CloudifiedNF 
+4.3.2.4.1.1 Definitions 
+This class provides the TE&IV resource representation of Cloudified NF using the equivalent concept as defined in O-
+RAN.WG6.O2-GA&P [7].  
+4.3.2.4.1.2 Attributes 
+Not specified in the present version of the document. 
+4.3.2.4.1.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.2.4.1.4 Notifications 
+Not specified in the present version of the document. 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 21 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.2.4.1.5 State diagram 
+Not specified in the present version of the document. 
+4.3.2.4.2 NFDeployment 
+4.3.2.4.2.1 Definitions 
+This class provides the TE&IV resource representation of NF Deployment using the equivalent concept as defined in O-
+RAN.WG6.O2-GA&P [7].  
+4.3.2.4.2.2 Attributes 
+Not specified in the present version of the document. 
+4.3.2.4.2.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.2.4.2.4 Notifications 
+Not specified in the present version of the document. 
+4.3.2.4.2.5 State diagram 
+Not specified in the present version of the document. 
+4.3.2.4.3 OCloudNamespace 
+4.3.2.4.3.1 Definitions 
+This class provides the TE&IV resource representation of OCloud Namespace using the equivalent concept as 
+“containerNamespace” defined in O-RAN.WG6.O2DMS-INTERFACE-ETSI-NFV-PROFILE [8] and as “namespace” in O-
+RAN.WG6.O2DMS-INTERFACE-K8S-PROFILE [9]. 
+4.3.2.4.3.2 Attributes 
+Not specified in the present version of the document. 
+4.3.2.4.3.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.2.4.3.4 Notifications 
+Not specified in the present version of the document. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 22 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.2.4.3.5 State diagram 
+Not specified in the present version of the document. 
+ 4.3.2.4.4 NodeCluster 
+4.3.2.4.4.1 Definitions 
+This class provides the TE&IV resource representation of O-Cloud Node Cluster using the equivalent concept as defined in O-
+RAN.WG6.O2-GA&P [7].  
+4.3.2.4.4.2 Attributes 
+Not specified in the present version of the document. 
+4.3.2.4.4.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.2.4.4.4 Notifications 
+Not specified in the present version of the document. 
+4.3.2.4.4.5 State diagram 
+Not specified in the present version of the document. 
+4.3.2.4.5 OCloudSite 
+4.3.2.4.5.1 Definitions 
+This class provides the TE&IV resource representation of O-Cloud Site using the equivalent concept as defined in O-
+RAN.WG6.O2-GA&P [7].  
+4.3.2.4.5.2 Attributes 
+Not specified in the present version of the document. 
+4.3.2.4.5.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.2.4.5.4 Notifications 
+Not specified in the present version of the document. 
+4.3.2.4.5.5 State diagram 
+Not specified in the present version of the document. 
+4.3.3 Namespace ORAN.SMO.TEIV.REL-Cloud-RAN 
+4.3.3.1 Namespace overview 
+This namespace contains the relationship between ORAN.SMO.TEIV.RAN to ORAN.SMO.TEIV.Cloud namespaces. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 23 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+The ORANNetworkFunction_ abstract class depicted in the figure 4.3.3.3.1-1 is a generalization of the various O-RAN 
+Network Functions and shall be associated from the ORAN.SMO.TEIV.RAN namespace. 
+The NFDeployment_REL_NF_ abstract class depicted in the figure 4.3.3.3.1-1 is a generalization of the various relationships 
+between the O-RAN Network Functions and its associated NF Deployments. 
+The NFDeployment class depicted in the figure 4.3.3.3.1-1 shall be associated from the ORAN.SMO.TEIV.Cloud namespace. 
+4.3.3.2 Imported associated information 
+4.3.3.2.1 Imported information entities and local labels 
+Imported information entities and local labels is not defined in the present version of the document.  
+4.3.3.2.2 Associated information entities and local labels 
+Associated information entities and local labels is not defined in the present version of the document.  
+4.3.3.3 Class diagram 
+4.3.3.3.1 Relationships 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+abstract class ORANNetworkFunction_ 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+abstract class NFDeployment_REL_NF_ 
+ 
+} 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment 
+ 
+} 
+ 
+NFDeployment  "1..n" <-> "1..n" ORANNetworkFunction_ 
+NFDeployment_REL_NF_ "1" -[hidden]d- NFDeployment 
+NFDeployment_REL_NF_ -[hidden]d- ORANNetworkFunction_ 
+NFDeployment_REL_NF_ . (NFDeployment, ORANNetworkFunction_) 
+@enduml 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 24 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.3.3.1-1: SMO TE&IV Cloud-RAN relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+abstract class ORANNetworkFunction_ 
+ 
+} 
+ 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment 
+ 
+} 
+NFDeployment <-right-> ORANNetworkFunction_:\t<b><i> NFDeployment_REL_NF_\t\t 
+@enduml 
+ 
+Figure 4.3.3.3.1-2: Simplified SMO TE&IV Cloud-RAN relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class ODUFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+class NFDeployment_serves_ODUFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment{ 
+    } 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 25 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+} 
+ 
+NFDeployment  " \n1..n\nserved-oduFunction" <---> "serving-nfDeployment\n1..n\n\n   " 
+ODUFunction: > serves 
+NFDeployment_serves_ODUFunction . (NFDeployment, ODUFunction) 
+@enduml 
+ 
+ 
+ 
+Figure 4.3.3.3.1-3: NFDeployment and ODUFunction relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class OCUCPFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 26 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+class NFDeployment_serves_OCUCPFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment{ 
+    } 
+} 
+ 
+NFDeployment  " \n1..n\nserved-ocucpFunction" <---> "serving-nfDeployment\n1..n\n\n   " 
+OCUCPFunction: > serves 
+NFDeployment_serves_OCUCPFunction . (NFDeployment, OCUCPFunction) 
+@enduml 
+ 
+Figure 4.3.3.3.1-4: NFDeployment and OCUCPFunction relationship model   
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class OCUUPFunction{ 
+    } 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 27 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+class NFDeployment_serves_OCUUPFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment{ 
+    } 
+} 
+ 
+NFDeployment  " \n1..n\nserved-ocuupFunction" <---> "serving-nfDeployment\n1..n\n\n   " 
+OCUUPFunction: > serves 
+NFDeployment_serves_OCUUPFunction . (NFDeployment, OCUUPFunction) 
+@enduml 
+ 
+ 
+Figure 4.3.3.3.1-5: NFDeployment and OCUUPFunction relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class NearRTRICFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+class NFDeployment_serves_NearRTRICFunction{ 
+    } 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 28 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+} 
+namespace ORAN.SMO.TEIV.Cloud { 
+class NFDeployment{ 
+    } 
+} 
+ 
+NFDeployment  " \n1..n\nserved-nearRTRICFunction" <---> "serving-nfDeployment\n1..n\n\n   " 
+NearRTRICFunction: > serves 
+NFDeployment_serves_NearRTRICFunction . (NFDeployment, NearRTRICFunction) 
+@enduml 
+ 
+Figure 4.3.3.3.1-6: NFDeployment and NearRTRICFunction relationship model  
+4.3.3.3.2 Inheritance 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+namespace ORAN.SMO.TEIV { 
+    abstract class Topology_REL_ {} 
+} 
+namespace ORAN.SMO.TEIV.REL-Cloud-RAN { 
+ 
+abstract class NFDeployment_REL_NF_ {} 
+ 
+Topology_REL_ <|-- NFDeployment_REL_NF_  
+NFDeployment_REL_NF_ <|-- NFDeployment_serves_ODUFunction 
+NFDeployment_REL_NF_ <|-- NFDeployment_serves_OCUCPFunction 
+NFDeployment_REL_NF_ <|-- NFDeployment_serves_OCUUPFunction 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 29 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+NFDeployment_REL_NF_ <|-- NFDeployment_serves_NeartRTRICFunction 
+} 
+ 
+@enduml 
+ 
+ 
+Figure 4.3.3.3.2-1: TE&IV Cloud-RAN Serves Relationship Generalization 
+4.3.3.4 Class definitions 
+4.3.3.4.1 NFDeployment_serves_ODUFunction 
+4.3.3.4.1.1 Definitions 
+This class provides the Topology Relationship between the NFDeployment and the ODUFunction Topology Entities as shown 
+in figure 4.3.3.3.1-3. This class represents the relationship type of the NF Deployment serving the functionality of the ODU 
+Function. 
+4.3.3.4.1.2  Attributes 
+The NFDeployment_serves_ODUFunction TRC includes the attributes inherited from TopologyRel_ and has the following 
+attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-oduFunction  M T F F T 
+serving-nfDeployment M T F F T 
+ 
+4.3.3.4.1.3 Attribute constraints  
+None. 
+4.3.3.4.1.4 Notifications 
+None. 
+4.3.3.4.1.5 State diagram 
+None. 
+4.3.3.4.2 NFDeployment_serves_OCUCPFunction 
+4.3.3.4.2.1 Definitions 
+This class provides the Topology Relationship between the NFDeployment and the OCUCPFunction Topology Entities as 
+shown in figure 4.3.3.3.1-4. This class represents the relationship type of the NF Deployment serving the functionality of the 
+OCUCP Function.  
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 30 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.3.4.2.2 Attributes 
+The NFDeployment_serves_OCUCPFunction TRC includes the attributes inherited from TopologyRel_ and has the following 
+attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-ocucpFunction M T F F T 
+serving-nfDeployment M T F F T 
+ 
+4.3.3.4.2.3 Attribute constraints  
+None. 
+4.3.3.4.2.4 Notifications 
+None. 
+4.3.3.4.2.5 State diagram 
+None. 
+4.3.3.4.3 NFDeployment_serves_OCUUPFunction 
+4.3.3.4.3.1 Definitions 
+This class provides the Topology Relationship between the NFDeployment and the OCUUPFunction Topology Entities as 
+shown in figure 4.3.3.3.1-5. This class represents the relationship type of the NF Deployment serving the functionality of the 
+OCUUP Function. 
+4.3.3.4.3.2 Attributes 
+ The NFDeployment_serves_OCUUPFunction TRC includes the attributes inherited from  TopologyRel_ and has the following 
+attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-ocuupFunction M T F F T 
+serving-nfDeployment M T F F T 
+ 
+4.3.3.4.3.3 Attribute constraints  
+None. 
+4.3.3.4.3.4 Notifications 
+None. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 31 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.3.4.3.5 State diagram 
+None. 
+4.3.3.4.4 NFDeployment_serves_NearRTRICFunction 
+4.3.3.4.4.1 Definitions 
+This class provides the Topology Relationship between the NFDeployment and the NearRTRICFunction Topology Entities as 
+shown in figure 4.3.3.3.1-6. This class represents the relationship type of the NF Deployment serving the functionality of the 
+Near-RT RIC Function.  
+4.3.3.4.4.2 Attributes 
+The NFDeployment_serves_  NearRTRICFunction TRC includes the attributes inherited from TopologyRel_ and has the 
+following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-nearRTRICFunction M T F F T 
+serving-nfDeployment M T F F T 
+4.3.3.4.4.3 Attribute constraints  
+None. 
+4.3.3.4.4.4 Notifications 
+None. 
+4.3.3.4.4.5 State diagram 
+None. 
+4.3.3.4.4 NFDeployment_REL_NF_ 
+4.3.3.4.4.1 Definitions 
+This abstract class is provided for sub-classing only and is used to generalize the relationship classes in this namespace.    
+4.3.3.4.4.2 Attributes 
+None. 
+4.3.3.4.4.3 Attribute constraints  
+None. 
+4.3.3.4.4.4 Notifications 
+None. 
+4.3.3.4.4.5 State diagram 
+None. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 32 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.3.5 Attribute definitions 
+4.3.3.5.1 Attribute properties 
+The following table defines the properties of attributes specified in the present document.  
+Table 4.3.3.5.1-1: Attribute properties 
+4.3.4 Namespace ORAN.SMO.TEIV  
+4.3.4.1 Overview 
+This section contains the commonly used O-RAN TE&IV basic types and abstractions for Topology Entities and Topology 
+Relationships. 
+4.3.4.2 Imported associated information 
+4.3.4.2.1 Imported information entities and local labels 
+Imported information entities and local labels is not defined in the present version of the document.  
+4.3.4.2.2 Associated information entities and local labels 
+Associated information entities and local labels is not defined in the present version of the document.  
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+serving-
+nfDeployment 
+This represents the Topology Entity Id(s) of the NF Deployment 
+instance(s) serving an O-RAN Network Function. 
+type:  URN  
+multiplicity: 1..n  
+isOrdered: False  
+isUnique: True 
+defaultValue: None  
+ 
+TE&IV 
+served-
+oduFunction 
+This represents the Topology Entity Id(s) of the ODU Function 
+instance(s) served by an NF Deployment. 
+ 
+type:  URN  
+multiplicity: 1..n  
+isOrdered: False  
+isUnique: True 
+defaultValue: None  
+ 
+TE&IV 
+served-
+ocucpFunction 
+This represents the Topology Entity Id(s) of the OCUCP function 
+instance(s) served by an NF Deployment. 
+ 
+type:  URN  
+multiplicity: 1..n 
+isOrdered: False  
+isUnique: True  
+defaultValue: None  
+ 
+TE&IV 
+served-
+ocuupFunction 
+This represents the Topology Entity Id(s) of the OCUUP function 
+instance(s) served by an NF Deployment. 
+ 
+type:  URN  
+multiplicity: 1..n 
+isOrdered: False  
+isUnique: True  
+defaultValue: None  
+ 
+TE&IV 
+served-
+nearRTRICFunctio
+n 
+This represents the Topology Entity Id(s) of the Near-RT RIC 
+function instance(s) served by an NF deployment. 
+ 
+type:  URN  
+multiplicity: 1..n  
+isOrdered: False  
+isUnique: True  
+defaultValue: None  
+ 
+TE&IV 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 33 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.4.3 Class diagram 
+4.3.4.3.1 Relationships 
+Not specified in the present version of the document. 
+4.3.4.3.2 Inheritance 
+Not specified in the present version of the document. 
+4.3.4.4 Class definitions 
+4.3.4.4.1 TopologyEntity_ 
+4.3.4.4.1.1 Definitions 
+This abstract class represents the Topology Entities in the O-RAN TE&IV Information Models. All other 
+<<TopologyEntityClass>> specified in this document must inherit from TopologyEntity_ directly or indirectly. 
+4.3.4.4.1.2 Attributes 
+This class shall have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+topologyEntityId M T F T F 
+sourceIds M T F F T 
+4.3.4.4.1.3 Attribute constraints  
+Not specified in the present version of the document. 
+4.3.4.4.1.4 Notifications 
+Not specified in the present version of the document. 
+4.3.4.4.1.5 State diagram 
+Not specified in the present version of the document. 
+4.3.4.4.2 TopologyRel_ 
+4.3.4.4.2.1 Definitions 
+This abstract class represents the Topology Relationships between Topology Entities in the O -RAN TE&IV Information 
+Models. All other <<TopologyRelationshipClass>> specified in this document must inherit from TopologyRel_ directly or 
+indirectly. 
+4.3.4.4.2.2 Attributes 
+This class shall have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+topologyRelationshipId M T F T F 
+sourceIds M T F F T 
+4.3.4.4.2.3 Attribute constraints  
+Not specified in the present version of the document. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 34 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.4.4.2.4 Notifications 
+Not specified in the present version of the document. 
+4.3.4.4.2.5 State diagram 
+Not specified in the present version of the document. 
+4.3.4.5 Attribute definitions 
+4.3.4.5.1 Attribute properties 
+The following table defines the properties of attributes specified in the present document.  
+Table 4.3.4.5.1-1: Attribute properties 
+4.3.5 Namespace ORAN.SMO.TEIV.Physical 
+4.3.5.1 Namespace overview 
+This namespace contains the Topology Entities and Topology Relationship in the Physical domain, which comprises of the 
+deployment aspects of O-RAN Physical Network Functions. 
+4.3.5.2 Imported associated information 
+4.3.5.2.1 Imported information entities and local labels 
+Table 4.3.5.2.1-1: Imported information entities and local labels 
+Label reference Local label  
+TEC, TopologyEntity_ TopologyEntity_ 
+TRC, TopologyRel_ TopologyRel_ 
+3GPP TS 28.622[16], dataType, GeoCoordinate GeoCoordinate 
+4.3.5.2.2  Associated information entities and local labels 
+Associated information entities and local labels is not defined in the present version of the document.  
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+topologyEntityId Unique identifier of the Topology Entity. 
+ 
+This identity is represented using a URN notation format [14]. 
+type: URN 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: True 
+defaultValue: None 
+SMO/TE&IV 
+topologyRelationshipId Unique identifier of the Topology Relationship. 
+ 
+This identity is represented using a URN notation format [14]. 
+type: URN 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: True 
+defaultValue: None 
+SMO/TE&IV 
+sourceIds Identities of the underlying topology resources represented by 
+the Topology Entity or underlying topology resources 
+participating in the Topology Relationship. 
+ 
+The sourceIds are represented using a URN notation format [14]. 
+ 
+A TE&IV consumer can use the identifiers to navigate to the 
+source domain objects. 
+type: URN 
+multiplicity: 1..N 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+e.g., O1 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 35 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.5.3 Class diagram 
+4.3.5.3.1 Relationships 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+skinparam linetype ortho 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance_installedAt_Site 
+class PhysicalAppliance 
+class Site 
+ 
+PhysicalAppliance  "1..n\ninstalling-site\n\n" <--->  "installed-physicalAppliance    \n1" 
+Site : > installedAt   
+PhysicalAppliance_installedAt_Site . (PhysicalAppliance, Site) 
+} 
+@enduml 
+ 
+Figure 4.3.5.3.1-1: SMO TE&IV Physical Deployment relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 36 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+namespace ORAN.SMO.TEIV.Physical { 
+ 
+class PhysicalAppliance { 
+} 
+ 
+class Site { 
+} 
+ 
+class Site 
+PhysicalAppliance -> Site : PhysicalAppliance_installedAt_Site 
+} 
+@enduml 
+ 
+Figure 4.3.5.3.1-2: Simplified SMO TE&IV Physical Deployment relationship model 
+4.3.5.3.2 Inheritance 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV{ 
+abstract class TopologyEntity_ {} 
+} 
+ 
+namespace ORAN.SMO.TEIV.Physical { 
+class Site 
+class PhysicalAppliance 
+} 
+ 
+TopologyEntity_ <|-- PhysicalAppliance 
+TopologyEntity_ <|-- Site 
+ 
+@enduml 
+ 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV{ 
+abstract class TopologyRel_ {} 
+} 
+ 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance_installedAt_Site 
+} 
+ 
+TopologyRel_ <|-- PhysicalAppliance_installedAt_Site 
+ 
+@enduml 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 37 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+  
+Figure 4.3.5.3.2-1: ORAN SMO TE&IV Physical Toplogy Entity inheritance view 
+ 
+Figure 4.3.5.3.2-2: ORAN SMO TE&IV PhysicalAppliance_installedAt_Site inheritance view 
+4.3.5.4 Class definitions 
+4.3.5.4.1 PhysicalAppliance 
+4.3.5.4.1.1 Definitions 
+This class provides the TE&IV resource representation of PhysicalAppliance using the equivalent concept as defined in O-
+RAN.WG1.OAD [6] clause 5. 
+NOTE: The current version of this specification recommends that ORU be represented as a PhysicalAppliance with the 
+applianceType as "ORU". 
+4.3.5.4.1.2 Attributes 
+The PhysicalAppliance TEC includes the topology attributes inherited from TopologyEntity_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+vendorName M T F F T 
+modelName M T F F T 
+serialNumber M T F T T 
+applianceType M T F F T 
+ 
+4.3.5.4.1.3 Attribute constraints  
+Not specified in the present version of the document. 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 38 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.5.4.1.4 Notifications 
+Not specified in the present version of the document. 
+4.3.5.4.1.5 State diagram 
+Not specified in the present version of the document. 
+4.3.5.4.2 Site 
+4.3.5.4.2.1 Definitions 
+This class provides the TE&IV resource representation of physical Site using the similar concept as O-Cloud Site defined in O-
+RAN.WG6.O2-GA&P [7].  
+4.3.5.4.2.2 Attributes 
+The Site TEC includes the attributes inherited from TopologyEntity_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+siteLocation M T F F T 
+siteName O T F F T 
+4.3.5.4.2.3 Attribute constraints 
+ None. 
+4.3.5.4.2.4 Notifications 
+There is no notification defined. 
+4.3.5.4.2.5 State diagram 
+None.  
+4.3.5.4.3  GeoInformation <<dataType>> 
+4.3.5.4.3.1 Definitions 
+This data type provides the TE&IV resource representation of physical site location.  
+4.3.5.4.3.2 Attributes 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+address O T F F T 
+coordinate M T F F T 
+4.3.5.4.3.3 Attribute constraints 
+ None. 
+4.3.5.4.4.4 Notifications 
+There is no notification defined. 
+4.3.5.4.4.5 State diagram 
+None. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 39 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.5.4.4 PhysicalAppliance_installedAt_Site 
+4.3.5.4.4.1 Definitions 
+This class provides the Topology Relationship between the PhysicalAppliance and the Site Topology Entities as shown in figure 
+4.3.5.3.2-2. This class represents the relationship type of the Site installing the Physical Appliance. 
+4.3.5.4.4.2 Attributes 
+The Site TRC includes the attributes inherited from TopologyRel_ and have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+installing-site M T F F T 
+installed-physicalAppliance M T F F T 
+4.3.5.4.4.3 Attribute constraints 
+ None. 
+4.3.5.4.4.4 Notifications 
+There is no notification defined. 
+4.3.5.4.4.5 State diagram 
+None.  
+ 
+4.3.5.5 Attribute definitions 
+4.3.5.5.1  Attribute properties 
+The following table defines the properties of attributes specified in the present document.  
+Table 4.3.5.5.1-1: Attribute properties 
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+vendorName Name of the physical appliance vendor. 
+ 
+allowedValues: Not applicable 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+modelName Name of the physical appliance model. 
+allowedValues: Not applicable 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+siteLocation It indicates the location of the physical site. It describes Postal 
+address and coordinate. 
+allowedValues: Not applicable 
+type: 
+GeoInformation 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+siteName Human readable name of the physical site as identified by the 
+mobile network operator. 
+allowedValues: Not applicable 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 40 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.6 Namespace ORAN.SMO.TEIV.REL-Physical-RAN 
+4.3.6.1 Namespace overview 
+This namespace contains the relationship between specific Topology Entities of the ORAN.SMO.TEIV.RAN to 
+ORAN.SMO.TEIV.Physical namespaces and which represents the physical deployment aspects of ORAN Network Functions.  
+4.3.6.2 Imported associated information 
+4.3.6.2.1 Imported information entities and local labels 
+Imported information entities and local labels is not defined in the present version of the document.  
+4.3.6.2.2  Associated information entities and local labels 
+Associated information entities and local labels is not defined in the present version of the document.  
+4.3.6.3 Class diagram 
+4.3.6.3.1  Relationships 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+address Postal address of the location. 
+ 
+allowedValues: Not applicable 
+type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+coordinate The latitude, longitude and altitude of the GeoCoordinate, defined in 
+clause 4.3.53 of 3GPP TS 28.622 [16]. 
+allowedValues: Not applicable 
+type: 
+GeoCoordinate 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+installing-site This represents the Topology Entity Id of the Site installing the 
+PhysicalAppliance instance(s). 
+type:  URN 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+TE&IV 
+installed-
+physicalAppliance 
+This represents the Topology Entity Id(s) of the PhysicalAppliance 
+instance(s) installed at the Site. 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+TE&IV 
+serialNumber Serial number of the appliance  type: String 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+SMO 
+applianceType Indicates the type of PhysicalAppliance. type: String 
+multiplicity: 0..1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue:None 
+SMO 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 41 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+abstract class ORANNetworkFunction_ 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+abstract class PhysicalAppliance_REL_NF_ 
+ 
+} 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance 
+ 
+} 
+ 
+PhysicalAppliance  "1..n" <-> "1..n" ORANNetworkFunction_ 
+PhysicalAppliance_REL_NF_ "1" -[hidden]d- PhysicalAppliance 
+PhysicalAppliance_REL_NF_ -[hidden]d- ORANNetworkFunction_ 
+PhysicalAppliance_REL_NF_ . (PhysicalAppliance, ORANNetworkFunction_) 
+@enduml 
+ 
+Figure 4.3.6.3.1-1: SMO TE&IV Physical-RAN relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+skinparam nodesep 120 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance 
+} 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+abstract ORANNetworkFunction_ 
+} 
+ 
+ 
+ 
+PhysicalAppliance <-right->  ORANNetworkFunction_: \t<b><i>PhysicalAppliance_REL_NF_ 
+ 
+ 
+@enduml 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 42 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.6.3.1-2: Simplified SMO TE&IV Physical-RAN relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class ODUFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+class PhysicalAppliance_serves_ODUFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance{ 
+    } 
+} 
+ 
+PhysicalAppliance  " \n1..n\nserved-oduFunction" <---> "serving-
+physicalAppliance\n1..n\n\n   " ODUFunction: > serves 
+PhysicalAppliance_serves_ODUFunction . (PhysicalAppliance, ODUFunction) 
+@enduml 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 43 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+  
+Figure 4.3.6.3.1-3: PhysicalAppliance and ODUFunction relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class OCUUPFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+class PhysicalAppliance_serves_OCUUPFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance{ 
+    } 
+} 
+ 
+PhysicalAppliance  " \n1..n\nserved-ocuupFunction" <---> "serving-
+physicalAppliance\n1..n\n\n   " OCUUPFunction: > serves 
+PhysicalAppliance_serves_OCUUPFunction . (PhysicalAppliance, OCUUPFunction) 
+@enduml 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 44 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+  
+Figure 4.3.6.3.1-4: PhysicalAppliance and OCUUPFunction relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class OCUCPFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+class PhysicalAppliance_serves_OCUCPFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance{ 
+    } 
+} 
+ 
+PhysicalAppliance  " \n1..n\nserved-ocucpFunction" <---> "serving-
+physicalAppliance\n1..n\n\n   " OCUCPFunction: > serves 
+PhysicalAppliance_serves_OCUCPFunction . (PhysicalAppliance, OCUCPFunction) 
+@enduml 
+ 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 45 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.6.3.1-5: PhysicalAppliance and OCUCPFunction relationship model 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV.RAN { 
+class NearRTRICFunction{ 
+    } 
+ 
+} 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+class PhysicalAppliance_serves_NearRTRICFunction{ 
+    } 
+} 
+namespace ORAN.SMO.TEIV.Physical { 
+class PhysicalAppliance{ 
+    } 
+} 
+ 
+PhysicalAppliance  " \n1..n\nserved-nearRTRICFunction" <---> "serving-
+physicalAppliance\n1..n\n\n   " NearRTRICFunction: > serves 
+PhysicalAppliance_serves_NearRTRICFunction . (PhysicalAppliance, NearRTRICFunction) 
+@enduml 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 46 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.6.3.1-6: PhysicalAppliance and NearRTRICFunction relationship model  
+4.3.6.3.2  Inheritance 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+ 
+namespace ORAN.SMO.TEIV{ 
+abstract class TopologyRel_ {} 
+} 
+ 
+namespace ORAN.SMO.TEIV.REL-Physical-RAN { 
+abstract class PhysicalAppliance_REL_NF_ {} 
+ 
+TopologyRel_ <|-- PhysicalAppliance_REL_NF_  
+PhysicalAppliance_REL_NF_ <|-- PhysicalAppliance_serves_ODUFunction 
+PhysicalAppliance_REL_NF_ <|-- PhysicalAppliance_serves_OCUCPFunction 
+PhysicalAppliance_REL_NF_ <|-- PhysicalAppliance_serves_OCUUPFunction 
+PhysicalAppliance_REL_NF_ <|-- PhysicalAppliance_serves_NeartRTRICFunction 
+} 
+@enduml 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 47 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.3.6.3.2-1: ORAN SMO TE&IV RAN Physical inheritance view 
+4.3.6.4 Class definitions 
+4.3.6.4.1  PhysicalAppliance_serves_ODUFunction 
+4.3.6.4.1.1 Definitions 
+This class provides the Topology Relationship between the PhysicalAppliance and the ODUFunction Topology Entities as 
+shown in figure 4.3.6.3.1-3. This class represents the relationship type of the PhysicalAppliance serving the functionality of the 
+ODU function. 
+4.3.6.4.1.2 Attributes 
+The PhysicalAppliance_serves_ODUFunction TRC includes the attributes inherited from TopologyRel_ and have the 
+following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-oduFunction M T F F T 
+serving-physicalAppliance M T F F T 
+ 
+4.3.6.4.1.3 Attribute constraints  
+None. 
+4.3.6.4.1.4 Notifications 
+None. 
+4.3.6.4.1.5 State diagram 
+None. 
+4.3.6.4.2  PhysicalAppliance_serves_OCUUPFunction 
+4.3.6.4.2.1 Definitions 
+This class provides the Topology Relationship between the PhysicalAppliance and the OCUUPFunction Topology Entities as 
+shown in figure 4.3.6.3.1-4. This class represents the relationship type of the PhysicalAppliance serving the functionality of the 
+OCUUP function.  
+4.3.6.4.2.2 Attributes 
+The PhysicalAppliance_serves_OCUUPFunction TRC includes the attributes inherited from TopologyRel_ and have the 
+following attributes: 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 48 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-ocuupFunction M T F F T 
+serving-physicalAppliance M T F F T 
+ 
+4.3.6.4.2.3 Attribute constraints  
+None. 
+4.3.6.4.2.4 Notifications 
+None. 
+4.3.6.4.2.5 State diagram 
+None. 
+4.3.6.4.3  PhysicalAppliance_serves_OCUCPFunction 
+4.3.6.4.3.1 Definitions 
+This class provides the Topology Relationship between the PhysicalAppliance and the OCUCPFunction Topology Entities as 
+shown in figure 4.3.6.3.1-5. This class represents the relationship type of the PhysicalAppliance serving the functionality of the 
+OCUCP function.  
+4.3.6.4.3.2 Attributes 
+The PhysicalAppliance_serves_OCUCPFunction TRC includes the attributes inherited from TopologyRel_ and have the 
+following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-ocucpFunction M T F F T 
+serving-physicalAppliance M T F F T 
+ 
+4.3.6.4.3.3 Attribute constraints  
+None. 
+4.3.6.4.3.4 Notifications 
+None. 
+4.3.6.4.3.5 State diagram 
+None. 
+4.3.6.4.4  PhysicalAppliance_serves_NearRTRICFunction 
+4.3.6.4.4.1 Definitions 
+This class provides the Topology Relationship between the PhysicalAppliance and the NearRTRICFunction Topology Entities 
+as shown in figure 4.3.6.3.1-6. This class represents the relationship type of the PhysicalAppliance serving the functionality of 
+the Near-RTRIC function.  
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 49 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.3.6.4.4.2 Attributes 
+The PhysicalAppliance_serves_NearRTRICFunction TRC includes the attributes inherited from TopologyRel_ and have the 
+following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+served-nearRTRICFunction M T F F T 
+serving-physicalAppliance M T F F T 
+ 
+4.3.6.4.4.3 Attribute constraints  
+None 
+4.3.6.4.4.4 Notifications 
+None. 
+4.3.6.4.4.5 State diagram 
+None. 
+4.3.6.4.5  PhysicalAppliance_REL_NF_ 
+4.3.6.4.5.1 Definitions 
+This abstract class is provided for sub-classing only and is used to generalize the relationship classes in this namespace.    
+4.3.6.4.5.2 Attributes 
+None. 
+4.3.6.4.5.3 Attribute constraints  
+None. 
+4.3.6.4.5.4 Notifications 
+None. 
+4.3.6.4.5.5 State diagram 
+None. 
+4.3.6.4 Attribute definitions 
+4.3.6.4.1  Attribute properties 
+The following table defines the properties of attributes specified in the present document.  
+Table 4.3.6.4.1-1: Attribute properties 
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+serving-
+physicalAppliance 
+This represents the Topology Entity Id(s) of the NF  
+PhysicalAppliance instance(s) serving O-RAN Network Function(s). 
+ 
+ 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+TE&IV 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 50 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4 TE&IV Service Operations 
+4.4.1 Introduction 
+This clause provides the stage 2 definitions of TE&IV Service Operations for exposing Topology Entities, Topology 
+Relationships and their attributes.  
+The information model in Figure 4.4.1 -1 depicts the model view of the entities used in the TE&IV Service Operations initiated 
+by TE&IV Service Consumers to retrieve the Domains in Topology, Topology Entities and Topology Relationships.  
+ 
+Figure 4.4.1-1: ORAN SMO TE&IV Topology Domain, Topology Entity and Topology Relationship Model 
+View 
+The Figure 4.4.1-2 shows the allowed inter-domain relationships. It depicts subclasses of the Domain concept comprising two 
+distinct categories: Relationship and Entity. An Entity Domain may contain both Entities and Relationships, however both 
+aSide and bSide of such relationships shall exist in that domain. A Relationship Domain encapsulates Relationships to Entities 
+in one or more Entity Domains. The Relationship Domain should not have any Entities.  
+Attribute Name Documentation and Allowed Values Properties Source Domain 
+ defaultValue: None 
+served-
+oduFunction 
+This represents the Topology Entity Id(s) of the ODU function 
+instance(s) served by the PhysicalAppliance. 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+TE&IV 
+served-
+ocuupFunction 
+This represents the Topology Entity Id(s) of the OCUUP function 
+instance(s) served by the PhysicalAppliance. 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+TE&IV 
+served-
+ocucpFunction 
+This represents the Topology Entity Id(s) of the OCUCP function 
+instance(s) served by the PhysicalAppliance. 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+TE&IV 
+served-
+nearRTRICFunctio
+n 
+This represents the Topology Entity Id(s) of the Near-RTRIC function 
+instance(s) served by the PhysicalAppliance. 
+type:  URN 
+multiplicity: 1..n 
+isOrdered: False 
+isUnique: True 
+defaultValue: None 
+TE&IV 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 51 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure 4.4.1-2: ORAN SMO TE&IV Domain Dependency Model View 
+4.4.2 Operations and Notification 
+4.4.2.1 getAllDomains operation 
+4.4.2.1.1  Description 
+This operation is invoked by the TE&IV Service Consumer to retrieve all the available Topology Domains. 
+4.4.2.1.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+ 
+4.4.2.1.3  Output parameters 
+Parameter name S Description 
+Domains M A list of Topology Domains and the links to its 
+EntityTypes and RelationshipTypes. 
+ 
+4.4.2.1.4  Results 
+In case of success, all the available Topology Domains are returned. In case of failure, an appropriate error response may be 
+provided. 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 52 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.2 getTopologyEntityTypes operation 
+4.4.2.2.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get all the available Topology Entity types within a domain. 
+4.4.2.2.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+ 
+4.4.2.2.3 Output parameters 
+Parameter name S Description 
+EntityTypes M A list of links to the Topology Entities within the 
+Topology Domain. 
+ 
+4.4.2.2.4 Results 
+In case of success, all the available Topology Entity types in domain name are returned.  In case of failure, an appropriate error 
+response may be provided. 
+4.4.2.3 getTopologyByEntityTypeName operation 
+4.4.2.3.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get all Topology Entity instances of a specific Topology Entity 
+type. 
+4.4.2.3.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+entityTypeName M This path parameter specifies the name of a Topology Entity in a 
+Topology Domain. 
+targetFilter O This query parameter specifies the entity type and attributes to 
+be returned in the REST response. 
+scopeFilter O This query parameter specifies the attributes to match on for 
+specific Topology Entities for which the data is to be produced. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 53 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.3.3 Output parameters 
+Parameter name S Description 
+Entities M A list of links to the data model for schema definition of 
+Topology Entities. 
+ 
+4.4.2.3.4 Results 
+In case of success, all the available instances of a specific topology entity type are returned. In case of failure, an appropriate 
+error response may be provided. 
+4.4.2.4 getTopologyById operation 
+4.4.2.4.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get a specific Topology Entity instance of a Topology Entity 
+type. 
+4.4.2.4.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+entityTypeName M This path parameter specifies the name of a Topology Entity in a 
+Topology Domain. 
+entityId M The path parameter specifies the Identifier of a Topology Entity 
+instance. 
+ 
+4.4.2.4.3 Output parameters 
+Parameter name S Description 
+EntityInstance M Encapsulated object reference to the data model for 
+schema definition of Topology Entities. 
+ 
+4.4.2.4.4 Results 
+In case of success, an object referencing to the data model schema definition of Topology Entity instance of a specific 
+Topology Entity type name is returned. In case of failure, an appropriate error response may be provided. 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 54 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.5 getAllRelationshipsForEntityId operation 
+4.4.2.5.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get all relationships for a specific Topology Entity instance of a 
+Topology Entity type.  
+4.4.2.5.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable.  
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+entityTypeName M This path parameter specifies the name of a Topology Entity in a 
+Topology Domain. 
+entityId M The path parameter specifies the Identifier of a Topology Entity 
+instance. 
+targetFilter O This query parameter specifies the entity type and relationship to 
+be returned in the REST response. 
+scopeFilter O This query parameter specifies the attributes to match on for 
+specific Topology Entity relationship for which the data is to be 
+produced. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+ 
+4.4.2.5.3 Output parameters 
+Parameter name S Description 
+Relationships M Encapsulated object reference to the data model for 
+schema definition of Topology Relationships. 
+ 
+4.4.2.5.4 Results 
+In case of success, an object referencing to the data model schema definition of Topology Relationships of a specific Topology 
+Entity type name is returned. In case of failure, an appropriate error response may be provided. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 55 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.6 getTopologyRelationshipTypes operation 
+4.4.2.6.1  Description 
+This operation is invoked by the TE&IV Service Consumer to retrieve all the available Topology Relationship types. 
+4.4.2.6.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+4.4.2.6.3  Output parameters 
+Parameter name S Description 
+RelationshipTypes M A list of links to the Topology Relationships. 
+4.4.2.6.4  Results 
+In case of success, all the available Topology Relationship types are returned. In case of failure, an appropriate error response 
+may be provided. 
+4.4.2.7 getRelationshipsByType operation 
+4.4.2.7.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get all the available Topology Relationships of a specific 
+relationship type name. 
+4.4.2.7.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+relationshipTypeName M This path parameter specifies the name of a Topology 
+Relationship in a Topology Domain. 
+targetFilter O This query parameter specifies the entity type and attributes to 
+be returned in the REST response. 
+scopeFilter O This query parameter specifies the attributes to match on for 
+specific Topology Entities for which the data is to be produced. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 56 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.7.3 Output parameters 
+Parameter name S Description 
+Relationships M Encapsulated object reference to the data model for 
+schema definition of Topology Relationships. 
+4.4.2.7.4 Results 
+In case of success, all the available Topology Relationships of a specific relationship type name are returned.  In case of 
+failure, an appropriate error response may be provided. 
+4.4.2.8 getRelationshipById operation 
+4.4.2.8.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get a specific Topology Relationship instance of a Topology 
+Relationship type. 
+4.4.2.8.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+domainName M This path parameter specifies the name of the Topology 
+Domain. 
+relationshipTypeName M This path parameter specifies the name of a Topology 
+Relationship in a Topology Domain. 
+relationshipId M This path parameter specifies the identifier of a Topology 
+Relationship instance. 
+4.4.2.8.3 Output parameters 
+Parameter name S Description 
+Relationship M Encapsulated object reference to the data model for 
+schema definition of Topology Relationship. 
+4.4.2.8.4 Results 
+In case of success, a specific Topology Relationship instance of a Topology Relationship type is returned. In case of failure, an 
+appropriate error response may be provided. 
+4.4.2.9 getSchemas operation 
+4.4.2.9.1  Description 
+This operation is invoked by the TE&IV Service Consumer to retrieve all the available Topology Model Schemas. 
+4.4.2.9.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+domain O This query parameter allows you to specify the desired domain 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 57 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.4.2.9.3  Output parameters 
+Parameter name S Description 
+Schemas M A list of Topology Model Schemas 
+4.4.2.9.4  Results 
+In case of success, all the available Topology Model Schemas are returned. In case of failure, an appropriate error response 
+may be provided. 
+4.4.2.10 getSchemaByName operation 
+4.4.2.10.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get the schema by name. 
+4.4.2.10.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+schemaName M This path parameter specifies the name of the Topology Model 
+Schema. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination. 
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+4.4.2.10.3  Output parameters 
+Parameter name S Description 
+string M Content of the Topology Model Schema 
+4.4.2.10.4  Results 
+In case of success, schema content is returned.  In case of failure, an appropriate error response may be provided. 
+4.5 TE&IV User Defined Data  
+4.5.1 Introduction 
+TE&IV user defined data is used for enriching Topology Entities and Topology Relationships. Such data can be added to existing 
+Topology Entities and Relationships which enables flexibility for TE&IV Service Consumers in its usage of the service 
+operations defined in clause 4.4. The  user defined data are declared in separate schema s and are added through a REST API  
+which shall be defined in the TE&IV API [17] .  The following clauses provide the definitions for the types of TE&IV user 
+defined data. 
+4.5.2 Classifiers  
+Classifiers permit the association of a well defined user specified string with a  Topology Entity and/or Topology Relationship. 
+Classifiers are declared in a schema added through a REST API [17]. When the schema is successfully created and validated, 
+the user can assign the classifiers to the selected entities and/or relationships.  
+4.5.2.1 Definitions 
+This class provides the representation of Classifiers. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 58 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.5.2.2 Attributes 
+Classifiers have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+operation M T F F T 
+classifierNames M T F F T 
+topologyEntityIds M T F F T 
+topologyRelationshipIds M T F F T 
+4.5.2.3 Attribute constraints 
+ None. 
+4.5.2.4 Notifications 
+There is no notification defined. 
+4.5.2.5 State diagram 
+None. 
+4.5.3 Decorators 
+Decorators are key-value pairs that can be associated with Topology Entities and/or Topology Relationships. The type of the 
+value is defined by the user in the schema which declares the decorator.  Decorators are declared in a schema added through a 
+REST API [17]. When the schema is successfully created and validated, the user can assign the decorator to the selected 
+entities and/or relationships.  
+4.5.3.1 Definitions 
+This class provides the representation of Decorators. 
+4.5.3.2 Attributes 
+Decorators have the following attributes: 
+Attribute Name S isReadable isWritable isInvariant isNotifyable 
+operation M T F F T 
+decoratorTags M T F F T 
+topologyEntityIds M T F F T 
+topologyRelationshipIds M T F F T 
+4.5.2.3 Attribute constraints 
+ None. 
+4.5.2.4 Notifications 
+There is no notification defined. 
+4.5.2.5 State diagram 
+None. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 59 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.5.4 Attribute properties 
+Table 4.5.4.-1: Attribute properties 
+ 
+4.5.5 Service Operations for User Defined Data 
+This clause provides the stage 2 definitions of TE&IV Service Operations for exposing Topology Entities, Topology 
+Relationships using User Defined Data.  
+Attribute Name Documentation and Allowed Values Properties Source 
+Domain 
+operation Specifies whether a classifier or decorator is being added or 
+removed. 
+ 
+Allowed values: merge, delete 
+ 
+Merge: Defined classifiers or decorators can be assigned to 
+specified Topology Entities and Topology Relationships in a single 
+request. 
+ 
+Delete: Defined classifiers or decorators can be removed from 
+specified Topology Entities and Topology Relationships in a single 
+request. 
+type:  ENUM 
+multiplicity: 1 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+ 
+classifierNames List of tags to be assigned to Topology Entities and/or Topology 
+Relationships 
+type: String 
+multiplicity: 1..N 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+ 
+decoratorTags Key-value pairs to be assigned to Topology Entities and/or Topology 
+Relationships.  
+ 
+The content of this attribute is a list of attributeName-attributeValue 
+pairs.  
+ 
+Allowed values: Value must be a simple data type (string, integer, or 
+Boolean) 
+type: AttributeValuePair 
+multiplicity: 1..N 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+ 
+topologyEntityIds List of topologyEntityId. 
+ 
+topologyEntityId is defined in clause 4.3.4.5.1. 
+type: URN 
+multiplicity: 1..N 
+isOrdered: N/A 
+isUnique: N/A 
+defaultValue: None 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 60 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.5.5.1 updateClassifier operation 
+4.5.5.1.1 Description 
+This operation is invoked by the TE&IV Service Consumer to merge or delete the classifiers for the available Topology 
+Entities and Relationships. 
+4.5.5.1.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+Content-Type  M This parameter specifies the media types of the resource. 
+4.5.5.1.3 Output parameters 
+None 
+4.5.4.1.4 Results 
+In case of success, the classifier is assigned to or removed from all indicated entities and relationships. In case of failure, an 
+appropriate error response may be provided. 
+4.5.5.2 updateDecorator operation 
+4.5.5.2.1 Description 
+This operation is invoked by the TE&IV Service Consumer to merge or delete the decorators for the available Topology 
+Entities and Relationships. 
+4.5.5.2.2 Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+Content-Type M This parameter specifies the media types of the resource. 
+4.5.5.2.3 Output parameters 
+None. 
+4.5.5.2.4 Results 
+In case of success, all indicated entities and relationships are updated with the decorator.  In case of failure, an appropriate 
+error response may be provided. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 61 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.5.5.3 getUserDefinedSchema operation 
+4.5.5.3.1  Description 
+This operation is invoked by the TE&IV Service Consumer to discover the available user defined schema. 
+4.5.5.3.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+offsetParam O This query parameter allows you to omit a specified number of 
+entries before the beginning of the result set for pagination.  
+limitParam O The query parameter provides to limit the number of entries 
+returned for a request for pagination. 
+4.5.5.3.3  Output parameters 
+Parameter Name S Description 
+UserDefinedSchemas M A list of user defined schemas. 
+4.5.5.3.4  Results 
+In case of success, all the available user defined schemas are returned. In case of failure, an appropriate error response may be 
+provided. 
+4.5.5.4 createUserDefinedSchema operation 
+4.5.5.4.1   Description 
+This operation is invoked by the TE&IV Service Consumer to create new user defined schemas. 
+4.5.5.4.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+Content-Type M This parameter specifies the media types of the resource. 
+MultipartFile M Multipart file containing the user defined schema to be 
+created. 
+4.5.5.4.3  Output parameters 
+Parameter Name S Description 
+UserDefinedSchema M User defined schema with link to its content. 
+ 
+4.5.5.4.4  Results 
+In case of success, the new user defined schema is created. In case of failure, an appropriate error response may be provided. 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 62 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+4.5.5.5 deleteUserDefinedSchema operation 
+4.5.5.5.1  Description 
+This operation is invoked by the TE&IV Service Consumer to delete a user defined schema. 
+4.5.5.5.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+schemaName M This path parameter specifies the name of the user defined 
+schema. 
+4.5.5.5.3  Output parameters 
+None. 
+4.5.5.5.4  Results 
+In case of success, the specified user defined schema is deleted. In case of failure, an appropriate error response may be 
+provided. 
+4.5.5.6 getUserDefinedSchemaByName operation 
+4.5.5.6.1 Description 
+This operation is invoked by the TE&IV Service Consumer to get a specific user defined schema by name. 
+4.5.5.6.2  Input parameters 
+Parameter Name S Description 
+Accept M This parameter specifies the response media types that are 
+acceptable. 
+Content-Type M This parameter specifies the media types of the resource. 
+schemaName M This path parameter specifies the name of the user defined 
+schema. 
+ 
+4.5.5.6.3  Output parameters 
+Parameter Name S Description 
+string M User defined schema content. 
+4.5.5.6.4  Results 
+In case of success, the content of the user defined schema is returned.  In case of failure, an appropriate error response may be 
+provided. 
+ 
+ 
+ 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 63 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Annex A (Informative): Model views 
+A.1  Model View: O-RAN TE&IV Network Function Deployment View 
+(informative) 
+The TE&IV Network Function Deployment model view provides the basic constructs of the Topology Entities and Topology 
+Relationship to represent the topology information related to the physical and cloud deployment aspects of the O-RAN 
+Network Functions. The physical network function deployment view is shown in Figure A.1-1 and the cloud network function 
+deployment view is shown in Figure A.1-2. 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+package "TE&IV Physical Network Function Deployment View" { 
+ 
+class PhysicalAppliance  
+ 
+abstract class ORANNetworkFunction_ 
+class Site 
+ 
+note "has location info." as N1 
+note "Represents a Physical hardware which is used to realise Network Functions" as P1 
+} 
+ 
+PhysicalAppliance .r. P1 
+ 
+Site .r. N1 
+ 
+ORANNetworkFunction_ "*" <-- "0..n" PhysicalAppliance : serves 
+PhysicalAppliance "1..*" --> "0..1" Site : installedAt 
+ 
+@enduml 
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 64 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure A.1-1: ORAN TE&IV Physical NF Deployment View 
+@startuml 
+skin rose 
+skinparam ClassStereotypeFontStyle normal 
+skinparam style strictuml 
+hide empty members 
+set namespaceSeparator none 
+package "TE&IV Cloud Network Function Deployment View" { 
+ 
+class CloudifiedNF 
+class NFDeployment 
+ 
+abstract class ORANNetworkFunction_ 
+ 
+class OCloudNamespace 
+class NodeCluster 
+class OCloudSite 
+ 
+note "has location info." as N1 
+} 
+ 
+ORANNetworkFunction_ "1..n" <-- "0..n" NFDeployment : serves 
+ 
+CloudifiedNF"1" --> "1..*" NFDeployment: comprizes 
+NFDeployment "1..* " --> "1..*" OCloudNamespace : deployedOn 
+OCloudNamespace "1..* " --> "1" NodeCluster : deployedOn 
+NodeCluster "1..* " --> "1..*" OCloudSite : locatedAt 
+ 
+OCloudSite .r. N1 
+@enduml 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 65 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+ 
+Figure A.1-2: ORAN TE&IV Cloud NF Deployment View 
+ 
+
+
+ 
+ 
+ 
+© 2025 by the O-RAN ALLIANCE e.V. Your use is subject to the copyright statement on the cover page of this specification. 66 
+ 
+O-RAN.WG10.TS.TE&IV-CIMI.0-R004.v05.00 
+Annex (informative): 
+Change history 
+Date Revision Description 
+08/06/2023 00.00.01 Initial proposed skeleton for the TE&IV Common Topology Information Models and 
+Interface Specification 
+14/06/2023 00.00.02 Updated skeleton for the TE&IV Common Information Models and Interface 
+Specification as per comments 
+09/11/2023 00.00.03 Updated title for this specification and removed Stage-2 wording 
+11/01/2024 00.00.04 Updated the title, numbering, introduced structure for namespaces 
+06/03/2024 00.00.05
+  
+Merged the TE&IV Stage-2 IM CRs for March'24 train 
+SYM.AO-2023.10.05-WG10-CR-001-TEIV NF deployment model-v07, ERI-
+2024.02.08-WG10-CR-0064-Adding introduction scope in TEIV IM specification-v04, 
+ERI-2023.12.21-WG10-CR-0056-Update to TE&IV-IM specification-v01 
+13/03/2024 00.00.06 Editorial changes to update reference names, version as per O-RAN guidelines. 
+Removed redundant versioning text in foreward and updated the O-RAN release 
+versioning format in scope 
+13/03/2024 01.00.00 Editorial Comments, First Publication for the March 2024 Train 
+11/07/2024 02.00.00 Implemented the following CRs for the July'24 train: ERI.AO-2024.03.11-WG10-CR-
+0067-RAN-Logical-To-Cloud-Relationship-Namespace-v06, ERI-2024.04.18-WG10-
+CR-0071-Update to O-RAN TE&IV Network Function Deployment -v06, ERI-
+2024.06.10-WG10-CR-0075-Addition of UML notation and model element -v02, ERI-
+2024.06.10-WG10-CR-0084-adding attributes to RAN logical namespace-05, 
+Editorial corrections. 
+15/07/2024 02.00.00 Addressed WG10 review comments. Used Atlassian versioning to track revisions on 
+the captured comments. 
+06/11/2024 03.00 Implemented the following CRs for the November 2024 train: ERI-2024.09.18-
+WG10-CR-0113-TE&IV_IS_Definitions_of_ServiceOperations-v02, ERI-2024.09.18-
+WG10-CR-0114-TE&IV_IS_Definitions_of_ServiceOperations_for_Relationships-
+v01, ERI-2024.10.04-WG10-CR-0124-REL-RAN-Cloud Namespace 
+07/02/2025 04.00 Implemented the following CRs for the March 2025 train: ERI.AO-2025.01.15-
+WG10-CR-0144-TE&IV-AbstractClasses v02, ERI.AO-2025.01.28-WG10-CR-0145-
+RAN Abstractions-v01, ERI.AO-2025.01.27-WG10-CR-0146-REL-Cloud-RAN 
+Abstractions-v01, ERI.AO-2025.01.27-WG10-CR-0147-TE&IV-Modelling-Guidelines 
+v01, KDDI.AO-2025.02.19-WG10-CR-0003-TEIV-Physical v03, KDDI.AO-
+2025.02.19-WG10-CR-0004-TE&IV-Physical_NF_REL v02, ERI-2025.02.17-WG10-
+CR-0150- stage 2 to add query parameter to topology entity relationship resource -
+v01 
+01/07/2025 05.00 Implemented the following CRs for the July 2025 train: ERI.AO-2025.04.02-WG10-
+CR-0168- ORU-as-a-type-of-PhysicalAppliance-v02, ERI-2025.03.24-WG10-CR-
+0161- Classifiers-and-Decorators-v02, ERI-2025.05.20-WG10-CR-0174-Classifier-
+and-Decorator-Attributes-and-Service-Operations-v03, ERI-2025.06.23-WG10-CR-
+0184-Update OAM Arch title in TE&IV CIMI-v01, ERI-2025.06.25-WG10-CR-0187-
+Stage 2 Schema Operations-v02, Updated the specification for formatting 
+corrections and editorial updates based on ODR and TS template v04 
+ 
+ 
