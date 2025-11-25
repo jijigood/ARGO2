@@ -70,7 +70,7 @@ def example_batch_evaluation():
     print("="*80)
     
     # 加载数据集
-    dataset_path = "ORAN-Bench-13K/Benchmark/fin_H_clean.json"
+    dataset_path = "data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json"
     
     if not os.path.exists(dataset_path):
         print(f"⚠️  数据集未找到: {dataset_path}")

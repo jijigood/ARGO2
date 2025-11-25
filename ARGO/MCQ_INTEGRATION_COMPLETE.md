@@ -80,7 +80,7 @@ print(f"步数: {metadata['total_steps']}")
 import json
 
 # 加载数据集
-with open('ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
+with open('data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
     dataset = json.load(f)
 
 # 批量处理
@@ -253,7 +253,7 @@ import json
 from src.argo_system import ARGOSystem
 
 # 加载fin_H_clean.json (3224题)
-with open('ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
+with open('data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
     dataset = json.load(f)
 
 # 初始化ARGO

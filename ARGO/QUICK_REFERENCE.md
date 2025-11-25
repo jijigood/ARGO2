@@ -64,7 +64,7 @@ answer, choice, history, metadata = argo.answer_question(
 ```python
 import json
 
-with open('ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
+with open('data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
     dataset = json.load(f)
 
 for item in dataset:
@@ -291,7 +291,7 @@ from src.argo_system import ARGOSystem
 from sklearn.metrics import accuracy_score
 
 # 1. 加载数据
-with open('ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
+with open('data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
     dataset = json.load(f)
 
 # 2. 初始化系统

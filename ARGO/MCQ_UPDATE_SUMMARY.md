@@ -196,7 +196,7 @@ print(f"解释: {answer}")
 import json
 
 # 加载数据集
-with open('ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
+with open('data/benchmark/ORAN-Bench-13K/Benchmark/fin_H_clean.json', 'r') as f:
     dataset = json.load(f)
 
 # 批量处理
