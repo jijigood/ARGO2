@@ -15,7 +15,7 @@ def count_lines(filepath):
         return 0
 
 def main():
-    project_root = "/home/data2/huangxiaolin2/ARGO_MDP"
+    project_root = "/data/user/huangxiaolin/ARGO2/ARGO_MDP"
     
     print("=" * 80)
     print("ARGO MDP PROJECT OVERVIEW")

@@ -3,7 +3,7 @@
 # Quick commands for running different experiments
 
 PYTHON_PATH="/root/miniconda/envs/ARGO/bin/python"
-PROJECT_DIR="/home/data2/huangxiaolin2/ARGO_MDP"
+PROJECT_DIR="/data/user/huangxiaolin/ARGO2/ARGO_MDP"
 
 echo "======================================"
 echo "ARGO MDP Experiment Runner"

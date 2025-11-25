@@ -41,7 +41,7 @@ conda activate ARGO
 ### 2. Install Dependencies
 
 ```bash
-cd /home/data2/huangxiaolin2/ARGO_MDP
+cd /data/user/huangxiaolin/ARGO2/ARGO_MDP
 pip install -r requirements.txt
 ```
 

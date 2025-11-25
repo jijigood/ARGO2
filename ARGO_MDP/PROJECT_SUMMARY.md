@@ -247,7 +247,7 @@ mdp:
 
 ## 📞 Contact & Support
 
-- Project location: `/home/data2/huangxiaolin2/ARGO_MDP/`
+- Project location: `/data/user/huangxiaolin/ARGO2/ARGO_MDP/`
 - Python environment: `/root/miniconda/envs/ARGO/bin/python`
 - Test suite: `scripts/test_basic.py`
 

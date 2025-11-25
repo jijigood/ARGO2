@@ -4,7 +4,7 @@
 
 ### Using Shell Script (Recommended)
 ```bash
-cd /home/data2/huangxiaolin2/ARGO_MDP
+cd /data/user/huangxiaolin/ARGO2/ARGO_MDP
 
 # Run tests
 bash run_experiments.sh test
@@ -224,10 +224,10 @@ mu: 0.2
 ```
 **Expected**: Higher quality acceptance threshold
 
-## 📚 File Locations
+## 📂 File Locations
 
-- **Project Root**: `/home/data2/huangxiaolin2/ARGO_MDP/`
-- **Python Env**: `/root/miniconda/envs/ARGO/bin/python`
+- **Project Root**: `/data/user/huangxiaolin/ARGO2/ARGO_MDP/`
+- **Python Environment**: `/root/miniconda/envs/ARGO/bin/python`
 - **Results**: `./results/`
 - **Figures**: `./figs/`
 - **Logs**: Terminal output (redirect with `> log.txt`)

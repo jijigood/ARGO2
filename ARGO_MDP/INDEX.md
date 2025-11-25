@@ -1,7 +1,7 @@
 # ARGO MDP - Complete Project Index
 
 ## 📍 Project Location
-**Path**: `/home/data2/huangxiaolin2/ARGO_MDP/`  
+**Path**: `/data/user/huangxiaolin/ARGO2/ARGO_MDP/`  
 **Environment**: `/root/miniconda/envs/ARGO/`  
 **Python**: `/root/miniconda/envs/ARGO/bin/python`
 
@@ -103,7 +103,7 @@ ARGO_MDP/
 
 ### Pattern 1: Quick Test
 ```bash
-cd /home/data2/huangxiaolin2/ARGO_MDP
+cd /data/user/huangxiaolin/ARGO2/ARGO_MDP
 bash run_experiments.sh test
 ```
 
@@ -287,7 +287,7 @@ All PNG format, 300 DPI, publication quality:
 ## 📞 Contact Information
 
 **Project**: ARGO MDP Simulation  
-**Location**: `/home/data2/huangxiaolin2/ARGO_MDP/`  
+**Location**: `/data/user/huangxiaolin/ARGO2/ARGO_MDP/`  
 **Environment**: `conda activate ARGO`  
 **Status**: ✅ Complete and Operational  
 **Version**: 1.0.0  
