@@ -35,6 +35,7 @@ class ProgressTracker:
     def __init__(
         self,
         question: str,
+        question_umax: float = 1.0,
         base_retrieval_gain: float = 0.25,
         base_reason_gain: float = 0.1,
         coverage_weight: float = 0.5,
@@ -48,13 +49,16 @@ class ProgressTracker:
         if not self.question_tokens:
             self.question_tokens = self._extract_tokens(question + " context")
 
-        self.base_retrieval_gain = max(0.01, base_retrieval_gain) * gain_multiplier
-        self.base_reason_gain = max(0.01, base_reason_gain) * gain_multiplier
+        self.question_umax = max(0.3, min(0.95, question_umax))
+        umax_scaling = (1.0 / max(0.3, self.question_umax)) ** 0.6
+
+        self.base_retrieval_gain = max(0.01, base_retrieval_gain) * gain_multiplier * umax_scaling
+        self.base_reason_gain = max(0.01, base_reason_gain) * gain_multiplier * umax_scaling
         self.coverage_weight = max(0.0, coverage_weight)
         self.novelty_weight = max(0.0, novelty_weight)
         self.confidence_weight = max(0.0, min(confidence_weight, 1.0))
         self.min_gain = max(0.0, min_gain)
-        self.max_gain = max(self.min_gain, max_gain)
+        self.max_gain = max(self.min_gain, max_gain) * umax_scaling
 
         self.current_progress = 0.0
         self.covered_question_tokens = set()
@@ -110,7 +114,16 @@ class ProgressTracker:
         delta += self.novelty_weight * max(0.0, novelty_gain)
         delta = max(self.min_gain, min(delta, self.max_gain))
 
-        self.current_progress = min(1.0, self.current_progress + delta)
+        coverage_ratio = 0.0
+        if self.question_tokens:
+            coverage_ratio = len(self.covered_question_tokens) / len(self.question_tokens)
+
+        if self.question_umax < 0.6 and confidence > 0.75 and coverage_ratio > 0.65:
+            delta *= 1.6
+        elif self.question_umax < 0.5 and confidence > 0.80 and coverage_ratio > 0.70:
+            delta *= 2.0
+
+        self.current_progress = min(self.question_umax, self.current_progress + delta)
         return self.current_progress
 
     @classmethod

@@ -78,26 +78,30 @@ class ARGO_System:
         return base
 
     def _build_policy_config(self, overrides: Optional[Dict], default_max_steps: int) -> Dict:
+        simple_steps = max(3, int(round(default_max_steps * 0.5)))
+        medium_steps = max(5, int(round(default_max_steps * 0.8)))
+        complex_steps = max(medium_steps + 2, int(round(default_max_steps * 1.2)))
+
         config: Dict = {
             'theta_star': None,
             'theta_cont': None,
             'theta_star_by_complexity': {
-                'simple': 0.68,
-                'medium': 0.75,
-                'complex': 0.82
+                'simple': 0.75,
+                'medium': 0.80,
+                'complex': 0.85
             },
             'theta_cont_by_complexity': {
-                'simple': 0.30,
-                'medium': 0.40,
-                'complex': 0.45
+                'simple': 0.35,
+                'medium': 0.45,
+                'complex': 0.50
             },
             'max_steps': max(5, default_max_steps),
             'max_steps_by_complexity': {
-                'simple': max(4, default_max_steps - 4),
-                'medium': max(5, default_max_steps),
-                'complex': default_max_steps + 2
+                'simple': simple_steps,
+                'medium': medium_steps,
+                'complex': complex_steps
             },
-            'hard_cap_steps': default_max_steps + 4,
+            'hard_cap_steps': default_max_steps + 5,
             'progress': {
                 'enabled': True,
                 'base_retrieval_gain': None,
@@ -168,7 +172,12 @@ class ARGO_System:
         hard_cap = int(max(base_steps, self.policy_config.get('hard_cap_steps', base_steps)))
         return max(1, min(base_steps, hard_cap))
 
-    def _build_progress_tracker(self, question: str, complexity: str) -> Optional[ProgressTracker]:
+    def _build_progress_tracker(
+        self,
+        question: str,
+        complexity: str,
+        question_umax: float = 1.0
+    ) -> Optional[ProgressTracker]:
         if not self.progress_enabled:
             return None
 
@@ -179,6 +188,7 @@ class ARGO_System:
 
         return ProgressTracker(
             question=question,
+            question_umax=question_umax,
             base_retrieval_gain=base_retrieval_gain,
             base_reason_gain=base_reason_gain,
             coverage_weight=cfg.get('coverage_weight', 0.5),
@@ -391,19 +401,36 @@ class ARGO_System:
             print(f"Strategy: {'MDP-Guided' if self.use_mdp else 'Fixed'}")
             print(f"{'='*80}\n")
         
-        # 初始化状态
+        # ============ Question-Adaptive Setup ============
+        complexity_label = self.complexity_classifier.classify(question)
+        question_umax = self.complexity_classifier.estimate_umax(question)
+        adaptive_cap = self.complexity_classifier.get_adaptive_max_steps(
+            question,
+            base_max_steps=self.base_max_steps
+        )
+        policy_cap = self._resolve_max_steps(complexity_label)
+        per_question_max_steps = min(policy_cap, adaptive_cap)
+
+        base_theta_cont, base_theta_star = self._resolve_thresholds(complexity_label)
+        theta_cont = base_theta_cont * question_umax
+        theta_star = base_theta_star * question_umax
+
+        progress_tracker = self._build_progress_tracker(
+            question,
+            complexity_label,
+            question_umax=question_umax
+        )
+
         history: List[Dict] = []
         t = 0
-        complexity_label = self.complexity_classifier.classify(question)
-        theta_cont, theta_star = self._resolve_thresholds(complexity_label)
-        per_question_max_steps = self._resolve_max_steps(complexity_label)
-        progress_tracker = self._build_progress_tracker(question, complexity_label)
         U_t = progress_tracker.current_progress if progress_tracker else 0.0
         
         if self.verbose:
             print(f"Complexity: {complexity_label}")
-            print(f"θ_cont={theta_cont:.2f}, θ*={theta_star:.2f}")
-            print(f"Max Steps (cap): {per_question_max_steps}")
+            print(f"Estimated U_max(x): {question_umax:.3f}")
+            print(f"Base thresholds: θ_cont={base_theta_cont:.3f}, θ*={base_theta_star:.3f}")
+            print(f"Scaled thresholds: θ_cont={theta_cont:.3f}, θ*={theta_star:.3f}")
+            print(f"Max Steps (adaptive): {per_question_max_steps}")
         
         # 主循环
         while U_t < theta_star and t < per_question_max_steps:
@@ -411,7 +438,7 @@ class ARGO_System:
             
             if self.verbose:
                 print(f"\n--- Step {t} ---")
-                print(f"Current U_t: {U_t:.3f}")
+                print(f"Current U_t: {U_t:.3f} / {question_umax:.3f} (target: {theta_star:.3f})")
             
             # 决定动作
             if self.use_mdp:
@@ -450,7 +477,7 @@ class ARGO_System:
                     U_t += self.delta_r
                 elif action == 'reason':
                     U_t += self.delta_p
-            U_t = min(U_t, 1.0)
+            U_t = min(U_t, question_umax)
             step_data['progress_after'] = U_t
             step_data['progress'] = U_t
             history.append(step_data)
@@ -460,7 +487,7 @@ class ARGO_System:
             
             if U_t >= theta_star:
                 if self.verbose:
-                    print(f"✓ Early termination triggered at step {t}")
+                    print(f"✓ Termination threshold reached")
                 break
         
         # 合成最终答案
@@ -469,10 +496,12 @@ class ARGO_System:
             print(f"\n{'='*80}")
             print(f"Synthesizing Final Answer")
             print(f"{'='*80}")
-            print(f"Final U_t: {U_t:.3f}")
+            print(f"Final U_t: {U_t:.3f} / {question_umax:.3f}")
             print(f"Total Steps: {t}")
-            if not terminated_early and t >= per_question_max_steps:
-                print("Reached step cap before hitting θ*")
+            if terminated_early:
+                print("Terminated early (reached threshold)")
+            elif t >= per_question_max_steps:
+                print("Reached max_steps cap")
         
         final_answer, choice, sources = self.synthesizer.synthesize(
             question, 
@@ -488,7 +517,9 @@ class ARGO_System:
         
         metadata = {
             'total_steps': t,
+            'final_progress': U_t,
             'final_uncertainty': U_t,
+            'question_umax': question_umax,
             'retrieve_count': sum(1 for s in history if s['action'] == 'retrieve'),
             'reason_count': sum(1 for s in history if s['action'] == 'reason'),
             'successful_retrievals': sum(1 for s in history 
@@ -496,12 +527,15 @@ class ARGO_System:
             'elapsed_time': elapsed_time,
             'sources': sources,
             'theta_star': theta_star,
+            'theta_star_base': base_theta_star,
             'theta_cont': theta_cont,
+            'theta_cont_base': base_theta_cont,
             'max_steps_cap': per_question_max_steps,
             'complexity': complexity_label,
             'terminated_early': terminated_early,
             'step_cap_hit': (not terminated_early and t >= per_question_max_steps),
-            'progress_mode': 'dynamic' if progress_tracker else 'static'
+            'progress_mode': 'dynamic' if progress_tracker else 'static',
+            'progress_efficiency': U_t / max(1, t)
         }
         
         if self.verbose:

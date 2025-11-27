@@ -1,26 +1,82 @@
-# configs/adaptive_policy.yaml
-# Adaptive termination and progress tracking configuration
+---
+# Question-Adaptive Policy Configuration for ARGO
+# Enables early termination for simple questions while allowing complex questions full steps
 
-policy:
-  simple:
-    theta_star: 0.60   # Terminate early for simple questions
-    theta_cont: 0.30
-    max_steps: 5       # Limit simple questions
-  
-  medium:
-    theta_star: 0.70   # Standard threshold
-    theta_cont: 0.40
-    max_steps: 8       # Standard cap
-  
-  complex:
-    theta_star: 0.80   # Higher bar for complex questions
-    theta_cont: 0.45
-    max_steps: 12      # Allow more for complex
+# ============================================================================
+# Complexity-Based Thresholds (Base Values)
+# ============================================================================
+# These get scaled by question_umax(x) at runtime
+# Actual threshold = base_threshold × question_umax(x)
 
+theta_star_by_complexity:
+  simple: 0.75    # For simple questions (U_max ≈ 0.4), actual θ* ≈ 0.30
+  medium: 0.80    # For medium questions (U_max ≈ 0.7), actual θ* ≈ 0.56
+  complex: 0.85   # For complex questions (U_max ≈ 0.9), actual θ* ≈ 0.76
+
+theta_cont_by_complexity:
+  simple: 0.35    # Retrieve vs Reason threshold
+  medium: 0.45
+  complex: 0.50
+
+# ============================================================================
+# Adaptive Max Steps
+# ============================================================================
+# Different complexity levels get different step budgets
+
+max_steps: 10  # Base maximum steps
+hard_cap_steps: 15  # Absolute maximum (safety limit)
+
+max_steps_by_complexity:
+  simple: 5      # Simple questions: 50% of base (5 steps max)
+  medium: 8      # Medium questions: 80% of base (8 steps max)
+  complex: 12    # Complex questions: 120% of base (12 steps max)
+
+# ============================================================================
+# Progress Tracking Configuration
+# ============================================================================
 progress:
-  enabled: true
-  base_retrieval_gain: 0.30
-  base_reason_gain: 0.10
-  coverage_weight: 0.5
-  novelty_weight: 0.3
-  confidence_weight: 0.4
+  enabled: true  # Enable dynamic progress tracking
+  
+  # Base gains (will be scaled by question complexity)
+  base_retrieval_gain: 0.25
+  base_reason_gain: 0.08
+  
+  # Weights for different progress components
+  coverage_weight: 0.5    # Weight for query token coverage
+  novelty_weight: 0.3     # Weight for novel information
+  confidence_weight: 0.4  # Weight for confidence scores
+  
+  # Gain bounds
+  min_gain: 0.015   # Minimum progress per step
+  max_gain: 0.35    # Maximum progress per step
+  
+  # Complexity-based gain multipliers
+  # Simple questions grow faster, complex questions grow slower
+  gain_multipliers:
+    simple: 1.20    # 20% faster progress for simple questions
+    medium: 1.00    # Normal progress for medium questions
+    complex: 0.85   # 15% slower progress for complex questions
+
+# ============================================================================
+# Complexity Classification
+# ============================================================================
+complexity:
+  # Token count thresholds
+  simple_length: 10     # Questions <= 10 tokens considered for simple
+  medium_length: 20     # Questions <= 20 tokens considered for medium
+  
+  # Scoring thresholds
+  simple_score_max: 0   # Score <= 0 → simple
+  medium_score_max: 3   # Score <= 3 → medium, else complex
+  
+  # Use difficulty hints from dataset metadata
+  use_difficulty_hint: true
+  
+  # Map dataset difficulty labels to complexity
+  difficulty_mapping:
+    easy: simple
+    e: simple
+    medium: medium
+    m: medium
+    hard: complex
+    h: complex

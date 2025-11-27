@@ -239,7 +239,7 @@ def run_experiment(
         
         # 运行系统
         try:
-            answer, history, metadata = system.answer_question(
+            answer, choice, history, metadata = system.answer_question(
                 formatted_question,
                 return_history=True
             )
@@ -258,11 +258,25 @@ def run_experiment(
                 'question': item['question'][:100],  # 截断以节省空间
                 'ground_truth': item['answer'],
                 'predicted': predicted,
+                'choice': choice,
                 'is_correct': is_correct,
                 'total_steps': metadata['total_steps'],
                 'retrieve_count': metadata['retrieve_count'],
                 'reason_count': metadata['reason_count'],
-                'final_uncertainty': metadata['final_uncertainty'],
+                'final_uncertainty': metadata.get('final_uncertainty', metadata.get('final_progress', 0.0)),
+                'final_progress': metadata.get('final_progress', metadata.get('final_uncertainty', 0.0)),
+                'question_umax': metadata.get('question_umax', 1.0),
+                'complexity': metadata.get('complexity'),
+                'progress_efficiency': metadata.get('progress_efficiency'),
+                'theta_star_scaled': metadata.get('theta_star'),
+                'theta_star_base': metadata.get('theta_star_base'),
+                'theta_cont_scaled': metadata.get('theta_cont'),
+                'theta_cont_base': metadata.get('theta_cont_base'),
+                'max_steps_adaptive': metadata.get('max_steps_cap'),
+                'terminated_early': metadata.get('terminated_early'),
+                'step_cap_hit': metadata.get('step_cap_hit'),
+                'elapsed_time': metadata.get('elapsed_time'),
+                'progress_mode': metadata.get('progress_mode'),
                 'answer_length': len(answer)
             }
             
@@ -287,11 +301,25 @@ def run_experiment(
                 'question': item['question'][:100],
                 'ground_truth': item['answer'],
                 'predicted': 'ERROR',
+                'choice': None,
                 'is_correct': False,
                 'total_steps': 0,
                 'retrieve_count': 0,
                 'reason_count': 0,
                 'final_uncertainty': 1.0,
+                'final_progress': 0.0,
+                'question_umax': None,
+                'complexity': None,
+                'progress_efficiency': 0.0,
+                'theta_star_scaled': None,
+                'theta_star_base': None,
+                'theta_cont_scaled': None,
+                'theta_cont_base': None,
+                'max_steps_adaptive': None,
+                'terminated_early': False,
+                'step_cap_hit': True,
+                'elapsed_time': 0.0,
+                'progress_mode': None,
                 'answer_length': 0
             }
             results.append(result)
@@ -306,13 +334,34 @@ def run_experiment(
     avg_steps = df['total_steps'].mean()
     avg_retrieves = df['retrieve_count'].mean()
     avg_reasons = df['reason_count'].mean()
+    avg_time = df['elapsed_time'].mean()
+    avg_umax = df['question_umax'].dropna().mean() if 'question_umax' in df else float('nan')
     
     print(f"\n{strategy_name} Results:")
     print(f"  Accuracy: {accuracy*100:.2f}%")
     print(f"  Avg Steps: {avg_steps:.2f}")
     print(f"  Avg Retrieves: {avg_retrieves:.2f}")
     print(f"  Avg Reasons: {avg_reasons:.2f}")
+    if not np.isnan(avg_umax):
+        print(f"  Avg U_max: {avg_umax:.3f}")
+    print(f"  Avg Time: {avg_time:.2f}s")
     print(f"  Total Time: {total_time:.1f}s ({total_time/len(questions):.1f}s/query)")
+
+    if 'complexity' in df.columns:
+        for complexity in ['simple', 'medium', 'complex']:
+            subset = df[df['complexity'] == complexity]
+            if len(subset) == 0:
+                continue
+            print(f"\n{complexity.upper()} Questions:")
+            print(f"  Count: {len(subset)}")
+            if 'question_umax' in subset and subset['question_umax'].notna().any():
+                print(f"  Avg U_max: {subset['question_umax'].dropna().mean():.3f}")
+            print(f"  Avg Steps: {subset['total_steps'].mean():.2f}")
+            if 'elapsed_time' in subset and subset['elapsed_time'].notna().any():
+                print(f"  Avg Time: {subset['elapsed_time'].mean():.2f}s")
+            print(f"  Accuracy: {subset['is_correct'].mean():.3f}")
+            if 'terminated_early' in subset and subset['terminated_early'].notna().any():
+                print(f"  Early Term Rate: {subset['terminated_early'].mean():.3f}")
     
     # 保存最终结果
     df.to_csv(os.path.join(output_dir, f'{strategy_name}_results.csv'), index=False)

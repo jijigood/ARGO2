@@ -101,6 +101,59 @@ class QuestionComplexityClassifier:
 
         return label
 
+    def estimate_umax(self, question: str, metadata: Optional[Dict] = None) -> float:
+        """Estimate question-specific information requirement U_max(x)."""
+
+        complexity = self.classify(question, metadata)
+        base_umax = {
+            'simple': 0.40,
+            'medium': 0.70,
+            'complex': 0.85,
+        }[complexity]
+
+        lower = (question or '').lower()
+        adjustments = 0.0
+
+        if any(pattern in lower for pattern in ['what is', 'define', 'who is', 'when was', 'where is']):
+            adjustments -= 0.12
+
+        if any(pattern in lower for pattern in ['is it', 'does it', 'can it', 'will it', 'should it']):
+            adjustments -= 0.08
+
+        if any(pattern in lower for pattern in ['compare', 'difference between', 'versus', 'vs']):
+            adjustments += 0.12
+
+        if any(pattern in lower for pattern in ['analyze', 'explain why', 'how does', 'what causes']):
+            adjustments += 0.08
+
+        if any(pattern in lower for pattern in ['list all', 'enumerate', 'what are the']):
+            adjustments += 0.10
+
+        question_marks = (question or '').count('?')
+        if question_marks > 1:
+            adjustments += 0.05 * (question_marks - 1)
+
+        conjunction_count = sum(1 for word in ['and', 'also', 'furthermore'] if word in lower)
+        if conjunction_count > 1:
+            adjustments += 0.04 * (conjunction_count - 1)
+
+        final_umax = base_umax + adjustments
+        final_umax = max(0.30, min(0.95, final_umax))
+        return final_umax
+
+    def get_adaptive_max_steps(self, question: str, base_max_steps: int = 10) -> int:
+        """Estimate appropriate max_steps based on question complexity."""
+
+        complexity = self.classify(question)
+        scaling_factor = {
+            'simple': 0.5,
+            'medium': 0.8,
+            'complex': 1.2,
+        }[complexity]
+
+        adjusted = int(base_max_steps * scaling_factor)
+        return max(3, min(adjusted, base_max_steps + 5))
+
     @staticmethod
     def _blend_labels(primary: str, hint: str) -> str:
         order = {'simple': 0, 'medium': 1, 'complex': 2}
