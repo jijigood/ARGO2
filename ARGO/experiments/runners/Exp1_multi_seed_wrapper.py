@@ -25,6 +25,7 @@ from pathlib import Path
 from datetime import datetime
 import argparse
 import json
+from typing import Optional
 
 
 def run_multi_seed_experiment(
@@ -35,7 +36,10 @@ def run_multi_seed_experiment(
     gpus: str = '0,1,2,3,4,5,6,7',
     model_path: str = None,
     config_path: str = 'configs/multi_gpu_data_calibrated.yaml',
-    policy_config_path: str = 'configs/adaptive_policy.yaml'
+    policy_config_path: str = 'configs/adaptive_policy.yaml',
+    c_r_values: Optional[str] = None,
+    c_r_multipliers: Optional[str] = None,
+    base_c_r: Optional[float] = None
 ):
     """运行多种子实验 (Question-Adaptive版本)"""
     
@@ -50,6 +54,11 @@ def run_multi_seed_experiment(
         model_name = Path(model_path).name
         print(f"LLM模型: {model_name}")
     print(f"策略配置: {policy_config_path}")
+    if c_r_values:
+        print(f"检索成本列表: {c_r_values}")
+    elif c_r_multipliers:
+        base_desc = base_c_r if base_c_r is not None else 'auto (c_p)'
+        print(f"检索成本倍数: {c_r_multipliers} (base={base_desc})")
     print(f"总运行次数: {n_seeds * len(difficulties)}")
     print("="*80)
     print("\n特性:")
@@ -102,6 +111,14 @@ def run_multi_seed_experiment(
             # 添加策略配置文件路径
             if policy_config_path:
                 cmd.extend(['--policy-config-path', policy_config_path])
+
+            # 检索成本扫描设置
+            if c_r_values:
+                cmd.extend(['--c-r-values', c_r_values])
+            elif c_r_multipliers:
+                cmd.extend(['--c-r-multipliers', c_r_multipliers])
+            if base_c_r is not None:
+                cmd.extend(['--base-c-r', str(base_c_r)])
             
             # 添加question-adaptive观察的verbose标志
             cmd.append('--verbose')
@@ -284,6 +301,12 @@ def main():
                        help='MDP配置文件路径 (默认使用data_calibrated版本，c_p=0.02)')
     parser.add_argument('--policy-config-path', type=str, default='configs/adaptive_policy.yaml',
                        help='自适应策略配置文件路径 (启用question-adaptive features)')
+    parser.add_argument('--c-r-values', type=str, default=None,
+                        help='显式指定的检索成本列表 (逗号分隔)')
+    parser.add_argument('--c-r-multipliers', type=str, default=None,
+                        help='相对于base_c_r的检索成本倍数 (逗号分隔)')
+    parser.add_argument('--base-c-r', type=float, default=None,
+                        help='指定检索成本倍数的基准 (默认自动使用c_p)')
     
     args = parser.parse_args()
     
@@ -315,7 +338,10 @@ def main():
         gpus=args.gpus,
         model_path=args.model_path,
         config_path=args.config_path,
-        policy_config_path=args.policy_config_path
+        policy_config_path=args.policy_config_path,
+        c_r_values=args.c_r_values,
+        c_r_multipliers=args.c_r_multipliers,
+        base_c_r=args.base_c_r
     )
     
     # 返回退出码

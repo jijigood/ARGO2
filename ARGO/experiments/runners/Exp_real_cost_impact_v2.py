@@ -33,12 +33,14 @@ import argparse
 import yaml
 import json
 import random
+import math
 import numpy as np
 import pandas as pd
 import torch
 from datetime import datetime
 from tqdm import tqdm
 from typing import Dict, List, Optional, Tuple
+from copy import deepcopy
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -244,10 +246,51 @@ def load_configs(
     return mdp_config, policy_config
 
 
+def _parse_float_list(raw_value: Optional[str]) -> Optional[List[float]]:
+    """Parse comma separated floats, returning None when empty"""
+    if not raw_value:
+        return None
+    values: List[float] = []
+    for chunk in raw_value.split(','):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        try:
+            values.append(float(chunk))
+        except ValueError:
+            raise ValueError(f"Invalid float value in list: '{chunk}'") from None
+    return values or None
+
+
+def _build_cost_schedule(
+    mdp_config: Dict,
+    explicit_values: Optional[List[float]],
+    multipliers: Optional[List[float]],
+    base_cost_override: Optional[float]
+) -> List[float]:
+    """Determine which c_r values to evaluate"""
+    if explicit_values:
+        return [float(v) for v in explicit_values]
+
+    base_cost = base_cost_override
+    if base_cost is None:
+        base_cost = mdp_config['mdp'].get('c_p')
+    if base_cost is None:
+        base_cost = mdp_config['mdp'].get('c_r')
+    if base_cost is None:
+        base_cost = 0.02  # final fallback
+
+    if multipliers:
+        return [base_cost * float(m) for m in multipliers]
+
+    return [mdp_config['mdp'].get('c_r', base_cost)]
+
+
 def run_experiment(
     argo_system: ARGO_System,
     dataset: pd.DataFrame,
-    verbose: bool = False
+    verbose: bool = False,
+    cost_params: Optional[Dict[str, float]] = None
 ) -> List[Dict]:
     """Run ARGO on all questions and collect results"""
     print(f"\n{'='*80}")
@@ -280,6 +323,15 @@ def run_experiment(
             else:
                 correct = None
 
+            retrieve_count = metadata.get('retrieve_count')
+            reason_count = metadata.get('reason_count')
+            estimated_cost = None
+            if cost_params and retrieve_count is not None and reason_count is not None:
+                c_r_value = cost_params.get('c_r')
+                c_p_value = cost_params.get('c_p')
+                if c_r_value is not None and c_p_value is not None:
+                    estimated_cost = retrieve_count * c_r_value + reason_count * c_p_value
+
             result = {
                 'question_id': idx,
                 'question': question,
@@ -289,8 +341,8 @@ def run_experiment(
                 'predicted_answer': answer,
                 'correct': correct,
                 'total_steps': metadata.get('total_steps'),
-                'retrieve_count': metadata.get('retrieve_count'),
-                'reason_count': metadata.get('reason_count'),
+                'retrieve_count': retrieve_count,
+                'reason_count': reason_count,
                 'successful_retrievals': metadata.get('successful_retrievals'),
                 'elapsed_time': metadata.get('elapsed_time'),
                 'final_progress': metadata.get('final_progress', metadata.get('final_uncertainty')),
@@ -305,6 +357,13 @@ def run_experiment(
                 'theta_cont_scaled': metadata.get('theta_cont'),
                 'max_steps_cap': metadata.get('max_steps_cap'),
                 'num_sources': len(metadata.get('sources', [])) if metadata.get('sources') else 0,
+                'c_r': cost_params.get('c_r') if cost_params else None,
+                'c_r_multiplier': (
+                    cost_params.get('c_r') / cost_params.get('c_p')
+                    if cost_params and cost_params.get('c_p')
+                    else None
+                ),
+                'estimated_cost': estimated_cost
             }
             results.append(result)
 
@@ -338,16 +397,18 @@ def save_results(
     output_dir: Path,
     difficulty: str = "all",
     seed: int = 42,
-    adaptive: bool = True
+    adaptive: bool = True,
+    c_r: Optional[float] = None
 ) -> Path:
     """Save results to CSV file"""
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     difficulty_str = difficulty if difficulty != 'all' else 'mixed'
     adaptive_tag = '_adaptive' if adaptive else '_baseline'
+    cost_suffix = f"_cr{c_r:.3f}" if c_r is not None else ""
     n_questions = len(results)
     filename = (
-        f"exp1_results_{difficulty_str}_seed{seed}_n{n_questions}{adaptive_tag}_{timestamp}.csv"
+        f"exp1_results_{difficulty_str}_seed{seed}_n{n_questions}{cost_suffix}{adaptive_tag}_{timestamp}.csv"
     )
     output_file = output_dir / filename
     df = pd.DataFrame(results)
@@ -356,9 +417,103 @@ def save_results(
     return output_file
 
 
+def save_summary_json(
+    summary_records: List[Dict],
+    args: argparse.Namespace,
+    output_dir: Path,
+    timestamp: Optional[str] = None
+) -> Optional[Path]:
+    """Persist aggregated summaries for downstream analysis"""
+    if not summary_records:
+        return None
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ts = timestamp or datetime.now().strftime("%Y%m%d_%H%M%S")
+    payload = {
+        'metadata': {
+            'test_mode': args.mode,
+            'n_questions': args.n_questions,
+            'difficulty': args.difficulty,
+            'seed': args.seed,
+            'n_cost_steps': len(summary_records),
+            'timestamp': ts
+        },
+        'results': []
+    }
+
+    def _clean(value):
+        if isinstance(value, float):
+            if math.isnan(value) or math.isinf(value):
+                return None
+        return value
+
+    for record in summary_records:
+        entry = {
+            'c_r': record.get('c_r'),
+            'c_r_multiplier': record.get('c_r_multiplier'),
+            'theta_cont': record.get('theta_cont'),
+            'theta_star': record.get('theta_star'),
+            'ARGO_retrievals': record.get('ARGO_retrievals'),
+            'ARGO_reasons': record.get('ARGO_reasons'),
+            'ARGO_steps': record.get('ARGO_steps'),
+            'ARGO_time': record.get('ARGO_time'),
+            'ARGO_quality': record.get('ARGO_quality'),
+            'ARGO_accuracy': record.get('ARGO_accuracy'),
+            'ARGO_cost': record.get('ARGO_cost')
+        }
+        entry = {key: _clean(value) for key, value in entry.items()}
+        payload['results'].append(entry)
+
+    summary_path = output_dir / f"exp1_real_cost_impact_custom_{ts}.json"
+    with open(summary_path, 'w', encoding='utf-8') as fh:
+        json.dump(payload, fh, indent=2)
+    print(f"✓ Cost summary saved to: {summary_path}")
+    return summary_path
+
+
 def _safe_mean(series: pd.Series) -> float:
     clean = series.dropna()
     return float(clean.mean()) if not clean.empty else float('nan')
+
+
+def summarize_run(
+    results: List[Dict],
+    c_r: Optional[float],
+    c_p: Optional[float]
+) -> Dict:
+    """Compute aggregate metrics for a single cost point"""
+    if not results:
+        return {
+            'c_r': c_r,
+            'c_p': c_p,
+            'n_questions': 0
+        }
+
+    df = pd.DataFrame(results)
+
+    def _maybe_mean(column: str) -> float:
+        if column not in df:
+            return float('nan')
+        return _safe_mean(df[column])
+
+    accuracy = float('nan')
+    if 'correct' in df and df['correct'].notna().any():
+        accuracy = float(df['correct'].dropna().mean())
+
+    summary = {
+        'c_r': c_r,
+        'c_p': c_p,
+        'c_r_multiplier': (c_r / c_p) if (c_r is not None and c_p) else None,
+        'n_questions': len(df),
+        'ARGO_retrievals': _maybe_mean('retrieve_count'),
+        'ARGO_reasons': _maybe_mean('reason_count'),
+        'ARGO_steps': _maybe_mean('total_steps'),
+        'ARGO_time': _maybe_mean('elapsed_time'),
+        'ARGO_quality': _maybe_mean('final_progress'),
+        'ARGO_accuracy': accuracy,
+        'ARGO_cost': _maybe_mean('estimated_cost') if 'estimated_cost' in df else float('nan')
+    }
+    return summary
 
 
 def print_summary(results: List[Dict], policy_config: Optional[Dict] = None):
@@ -505,6 +660,15 @@ Examples:
     parser.add_argument('--policy-config-path', type=str,
                         default='configs/adaptive_policy.yaml',
                         help='Path to policy configuration (enables question-adaptive features)')
+    parser.add_argument('--c-r-values', type=str,
+                        default=None,
+                        help='Comma-separated retrieval cost values to evaluate (overrides config c_r)')
+    parser.add_argument('--c-r-multipliers', type=str,
+                        default=None,
+                        help='Comma-separated multipliers applied to base retrieval cost (defaults to c_p)')
+    parser.add_argument('--base-c-r', type=float,
+                        default=None,
+                        help='Base retrieval cost used when applying multipliers (defaults to c_p, then c_r)')
 
     parser.add_argument('--chroma-dir', type=str,
                         default='Environments/chroma_store',
@@ -526,6 +690,11 @@ Examples:
     parser.add_argument('--output-dir', type=str,
                         default='draw_figs/data',
                         help='Output directory for results')
+    parser.add_argument('--summary-dir', type=str,
+                        default='analysis/figures/draw_figs/data',
+                        help='Directory for aggregated cost summaries (JSON)')
+    parser.add_argument('--skip-summary', action='store_true',
+                        help='Do not persist aggregated per-cost summaries')
     parser.add_argument('--verbose', action='store_true',
                         help='Enable verbose output to see question-adaptive behavior')
     return parser.parse_args()
@@ -570,9 +739,6 @@ def main() -> int:
         seed=args.seed
     )
 
-    print(f"\n{'='*80}")
-    print("Initializing ARGO System")
-    print(f"{'='*80}")
     chroma_dir = Path(args.chroma_dir)
     if not chroma_dir.is_absolute():
         chroma_dir = (PROJECT_ROOT / chroma_dir).resolve()
@@ -581,49 +747,134 @@ def main() -> int:
         print(f"⚠ Chroma directory not found: {chroma_dir}. Falling back to mock retriever.")
         retriever_mode = "mock"
 
-    argo_system = ARGO_System(
-        model=model,
-        tokenizer=tokenizer,
-        use_mdp=True,
+    cost_values = _build_cost_schedule(
         mdp_config=mdp_config,
-        policy_config=policy_config,
-        retriever_mode=retriever_mode,
-        chroma_dir=str(chroma_dir),
-        collection_name=args.collection_name,
-        max_steps=10,
-        verbose=args.verbose
+        explicit_values=_parse_float_list(args.c_r_values),
+        multipliers=_parse_float_list(args.c_r_multipliers),
+        base_cost_override=args.base_c_r
     )
+    c_p_value = mdp_config['mdp'].get('c_p')
 
-    if policy_config:
-        print("✓ Question-adaptive features enabled")
+    if len(cost_values) == 1:
+        print(f"\n✓ Evaluating single retrieval cost: c_r = {cost_values[0]:.4f}")
     else:
-        print("⚠ Using baseline settings (no question-adaptive features)")
-    print(f"{'='*80}\n")
-
-    results = run_experiment(
-        argo_system=argo_system,
-        dataset=dataset,
-        verbose=args.verbose
-    )
+        print(f"\n✓ Evaluating {len(cost_values)} retrieval cost points")
 
     output_dir = Path(args.output_dir)
     if not output_dir.is_absolute():
         output_dir = (PROJECT_ROOT / output_dir).resolve()
-    results_file = save_results(
-        results=results,
-        output_dir=output_dir,
-        difficulty=args.difficulty,
-        seed=args.seed,
-        adaptive=policy_config is not None
-    )
+    summary_dir = Path(args.summary_dir)
+    if not summary_dir.is_absolute():
+        summary_dir = (PROJECT_ROOT / summary_dir).resolve()
 
-    print_summary(results, policy_config)
+    summary_records: List[Dict] = []
+    csv_files: List[Path] = []
+
+    for idx, cost_value in enumerate(cost_values, start=1):
+        cost_value = float(cost_value)
+        multiplier = None
+        if c_p_value:
+            multiplier = cost_value / c_p_value
+        print("\n" + "-"*80)
+        if multiplier:
+            print(f"Cost point {idx}/{len(cost_values)}: c_r = {cost_value:.4f} ({multiplier:.2f}× c_p)")
+        else:
+            print(f"Cost point {idx}/{len(cost_values)}: c_r = {cost_value:.4f}")
+        print("-"*80)
+
+        run_mdp_config = deepcopy(mdp_config)
+        run_mdp_config.setdefault('mdp', {})['c_r'] = cost_value
+
+        argo_system = ARGO_System(
+            model=model,
+            tokenizer=tokenizer,
+            use_mdp=True,
+            mdp_config=run_mdp_config,
+            policy_config=policy_config,
+            retriever_mode=retriever_mode,
+            chroma_dir=str(chroma_dir),
+            collection_name=args.collection_name,
+            max_steps=10,
+            verbose=args.verbose
+        )
+
+        theta_cont = getattr(argo_system.mdp_solver, 'theta_cont', None) if argo_system.mdp_solver else None
+        theta_star = getattr(argo_system.mdp_solver, 'theta_star', None) if argo_system.mdp_solver else None
+        if theta_cont is not None and theta_star is not None:
+            print(f"  θ_cont = {theta_cont:.4f}")
+            print(f"  θ*      = {theta_star:.4f}")
+
+        if policy_config:
+            print("  ✓ Question-adaptive features enabled")
+        else:
+            print("  ⚠ Using baseline settings (no question-adaptive features)")
+
+        cost_context = {'c_r': cost_value, 'c_p': run_mdp_config['mdp'].get('c_p')}
+        results = run_experiment(
+            argo_system=argo_system,
+            dataset=dataset,
+            verbose=args.verbose,
+            cost_params=cost_context
+        )
+
+        results_file = save_results(
+            results=results,
+            output_dir=output_dir,
+            difficulty=args.difficulty,
+            seed=args.seed,
+            adaptive=policy_config is not None,
+            c_r=cost_value
+        )
+        csv_files.append(results_file)
+
+        summary = summarize_run(results, cost_value, cost_context.get('c_p'))
+        summary['theta_cont'] = theta_cont
+        summary['theta_star'] = theta_star
+        summary['results_file'] = str(results_file)
+        summary_records.append(summary)
+
+        print(f"  Avg retrievals/question: {summary.get('ARGO_retrievals', float('nan')):.2f}")
+        print(f"  Avg reasons/question:    {summary.get('ARGO_reasons', float('nan')):.2f}")
+        if not np.isnan(summary.get('ARGO_accuracy', float('nan'))):
+            print(f"  Accuracy:                {summary['ARGO_accuracy']:.2%}")
+        avg_cost = summary.get('ARGO_cost')
+        if avg_cost == avg_cost:
+            print(f"  Avg cost/question:       {avg_cost:.3f}")
+
+        print(f"\n>>> Detailed metrics for c_r = {cost_value:.4f}")
+        print_summary(results, policy_config)
+
+        del argo_system
+
+    if not args.skip_summary:
+        save_summary_json(summary_records, args, summary_dir)
+
+    if len(summary_records) > 1:
+        print("\nRetrieval cost sweep summary:")
+        for record in summary_records:
+            c_r_value = record.get('c_r')
+            if c_r_value is None:
+                continue
+            multiplier = record.get('c_r_multiplier')
+            multiplier_text = f" ({multiplier:.2f}× c_p)" if multiplier else ""
+            accuracy_value = record.get('ARGO_accuracy', float('nan'))
+            if accuracy_value == accuracy_value:
+                accuracy_text = f"{accuracy_value:.2%}"
+            else:
+                accuracy_text = "N/A"
+            retrieval_value = record.get('ARGO_retrievals', float('nan'))
+            print(
+                f"  c_r={c_r_value:.4f}{multiplier_text} -> "
+                f"retrievals={retrieval_value:.2f}, accuracy={accuracy_text}"
+            )
 
     print("\n" + "="*80)
     print("EXPERIMENT COMPLETED")
     print("="*80)
     print(f"End time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Results file: {results_file}")
+    print("Result files:")
+    for path in csv_files:
+        print(f"  - {path}")
     print("="*80)
     return 0
 
