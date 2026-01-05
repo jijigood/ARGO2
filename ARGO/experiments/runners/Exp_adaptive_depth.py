@@ -22,7 +22,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from oran_benchmark_loader import ORANBenchmark
 from src import ARGO_System
-from src.complexity import QuestionComplexityClassifier
+from src.complexity_v2 import ORANComplexityClassifier, ComplexityProfile
+# Legacy import for backward compatibility
+# from src.complexity import QuestionComplexityClassifier
 
 
 def set_seed(seed: int) -> None:
@@ -65,7 +67,7 @@ def extract_choice(text: str) -> str:
 
 def stratified_questions(
     benchmark: ORANBenchmark,
-    classifier: QuestionComplexityClassifier,
+    classifier: ORANComplexityClassifier,
     counts: Dict[str, int],
     seed: int
 ) -> Tuple[List[Dict], Dict[str, List[Dict]]]:
@@ -76,8 +78,10 @@ def stratified_questions(
         for item in entries:
             enriched = item.copy()
             enriched['difficulty'] = diff
-            label = classifier.classify(enriched['question'], metadata={'difficulty': diff})
+            profile = classifier.classify(enriched['question'], metadata={'difficulty': diff})
+            label = profile.label if hasattr(profile, 'label') else profile
             enriched['argo_complexity'] = label
+            enriched['argo_umax'] = profile.umax if hasattr(profile, 'umax') else None
             grouped[label].append(enriched)
 
     selected: List[Dict] = []
@@ -91,29 +95,61 @@ def stratified_questions(
     return selected, grouped
 
 
-def build_policy_config(max_steps: int) -> Dict:
-    return {
-        'theta_star': 0.70,
-        'theta_cont': 0.40,
+def build_policy_config(max_steps: int, theory_aligned: bool = True) -> Dict:
+    """
+    Build policy configuration.
+    
+    Args:
+        max_steps: Base maximum steps
+        theory_aligned: If True, use theory-aligned settings (Problem 1, 2, 3 fixes)
+    """
+    config = {
+        'theta_star': 0.75,  # Fallback (ThresholdTable preferred)
+        'theta_cont': 0.40,  # Fallback (ThresholdTable preferred)
         'max_steps': max_steps,
         'hard_cap_steps': max_steps + 2,
         'theta_star_by_complexity': {
-            'simple': 0.68,
-            'medium': 0.74,
-            'complex': 0.82
+            'simple': 0.75,
+            'medium': 0.80,
+            'complex': 0.85
         },
         'theta_cont_by_complexity': {
-            'simple': 0.30,
-            'medium': 0.38,
-            'complex': 0.45
+            'simple': 0.35,
+            'medium': 0.45,
+            'complex': 0.50
         },
         'max_steps_by_complexity': {
             'simple': max(3, max_steps - 4),
             'medium': max_steps,
             'complex': max_steps + 2
         },
-        'progress': {
+        # Use V2 classifier (ORANComplexityClassifier)
+        'classifier_version': 'v2',
+        # U_max buckets for ThresholdTable alignment
+        'umax_buckets': [0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95],
+    }
+    
+    if theory_aligned:
+        # Theory-aligned progress tracking (Problem 2 fix)
+        config['progress'] = {
             'enabled': True,
+            'mode': 'fixed',  # Use FixedProgressTracker (Eq.2 exact)
+            'delta_r': 0.25,  # Fixed retrieval gain
+            'delta_p': 0.08,  # Fixed reasoning gain
+            # Legacy fields (ignored in 'fixed' mode)
+            'base_retrieval_gain': 0.25,
+            'base_reason_gain': 0.08,
+            'coverage_weight': 0.0,   # Disabled - violates Assumption 1
+            'novelty_weight': 0.0,    # Disabled - violates Assumption 1
+            'confidence_weight': 0.0, # Disabled - violates Assumption 1
+            'min_gain': 0.08,
+            'max_gain': 0.25,
+        }
+    else:
+        # Legacy dynamic progress (may violate Assumption 1)
+        config['progress'] = {
+            'enabled': True,
+            'mode': 'dynamic',
             'base_retrieval_gain': 0.30,
             'base_reason_gain': 0.10,
             'coverage_weight': 0.55,
@@ -127,7 +163,8 @@ def build_policy_config(max_steps: int) -> Dict:
                 'complex': 0.85
             }
         }
-    }
+    
+    return config
 
 
 def analyze_results(df: pd.DataFrame) -> Dict[str, Dict[str, float]]:
@@ -177,7 +214,7 @@ def run_experiment(args: argparse.Namespace) -> None:
     set_seed(args.seed)
 
     benchmark = ORANBenchmark(benchmark_dir=args.benchmark_dir, use_cleaned=not args.use_raw_benchmark)
-    classifier = QuestionComplexityClassifier()
+    classifier = ORANComplexityClassifier()
     counts = {
         'simple': args.num_simple,
         'medium': args.num_medium,
@@ -199,7 +236,7 @@ def run_experiment(args: argparse.Namespace) -> None:
         model.to(args.device)
     model.eval()
 
-    policy_config = build_policy_config(args.max_steps)
+    policy_config = build_policy_config(args.max_steps, theory_aligned=not args.legacy_progress)
 
     argo = ARGO_System(
         model=model,
@@ -332,6 +369,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--output-dir', default='results/complexity_adaptive')
     parser.add_argument('--plot-file', default='steps_by_complexity.png')
     parser.add_argument('--use-raw-benchmark', action='store_true', help='Use raw fin_H.json instead of cleaned set')
+    parser.add_argument('--legacy-progress', action='store_true', 
+                       help='Use legacy dynamic progress (may violate Assumption 1)')
     return parser.parse_args()
 
 

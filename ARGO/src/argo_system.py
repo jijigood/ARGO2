@@ -37,8 +37,11 @@ from typing import Dict, List, Tuple, Optional
 import logging
 import time
 from .prompts import ARGOPrompts, PromptConfig
-from .progress import ProgressTracker
+from .progress import ProgressTracker, StationaryProgressTracker, HybridProgressTracker
+from .fixed_progress import FixedProgressTracker, BoundedConfidenceTracker
 from .complexity import QuestionComplexityClassifier
+from .complexity_v2 import ORANComplexityClassifier, ComplexityProfile
+from .threshold_table import ThresholdTable
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +144,36 @@ class ARGO_System:
 
         return config
 
+    def _resolve_thresholds_for_umax(self, question_umax: float) -> Tuple[float, float, float]:
+        """
+        Resolve thresholds using pre-computed lookup table.
+        
+        This fixes Problem 1: Threshold Scaling Breaks Optimality
+        Instead of linear scaling, we use thresholds computed via 
+        full value iteration for each U_max bucket.
+        
+        Args:
+            question_umax: Estimated U_max for the question
+            
+        Returns:
+            (theta_cont, theta_star, actual_umax): Optimal thresholds and bucket used
+        """
+        if self.threshold_table is not None:
+            # Use pre-computed optimal thresholds (O(1) lookup)
+            theta_cont, theta_star, actual_umax = self.threshold_table.lookup(
+                question_umax, 
+                strategy='ceiling'  # Conservative: use higher bucket
+            )
+            return theta_cont, theta_star, actual_umax
+        
+        # Fallback: use MDP solver's base thresholds (legacy behavior)
+        base_theta_star = self.mdp_solver.theta_star if self.use_mdp else 0.75
+        base_theta_cont = self.mdp_solver.theta_cont if self.use_mdp else 0.35
+        
+        return base_theta_cont, base_theta_star, 1.0
+    
     def _resolve_thresholds(self, complexity: str) -> Tuple[float, float]:
+        """Legacy method for backward compatibility."""
         base_theta_star = self.mdp_solver.theta_star if self.use_mdp else 0.75
         base_theta_cont = self.mdp_solver.theta_cont if self.use_mdp else 0.35
 
@@ -177,27 +209,79 @@ class ARGO_System:
         question: str,
         complexity: str,
         question_umax: float = 1.0
-    ) -> Optional[ProgressTracker]:
+    ):
+        """
+        Build progress tracker based on configuration.
+        
+        Supports four modes:
+        - 'fixed': Pure fixed gains, exactly implements Eq(2) (RECOMMENDED)
+        - 'bounded': Fixed gains + bounded confidence scaling (practical)
+        - 'stationary': Fixed gains (alias for 'fixed')
+        - 'dynamic': Content-based gains (legacy, violates Assumption 1)
+        
+        Args:
+            question: The question being processed
+            complexity: Question complexity label
+            question_umax: Estimated maximum progress for this question
+            
+        Returns:
+            ProgressTracker instance or None if disabled
+        """
         if not self.progress_enabled:
             return None
 
         cfg = self.progress_config
-        gain_multiplier = cfg.get('gain_multipliers', {}).get(complexity, 1.0)
-        base_retrieval_gain = cfg.get('base_retrieval_gain', self.delta_r)
-        base_reason_gain = cfg.get('base_reason_gain', self.delta_p)
+        tracker_mode = cfg.get('mode', 'fixed')  # Default to theory-aligned
+        
+        if tracker_mode in ('fixed', 'stationary'):
+            # MDP-compliant: fixed gains (Solves Problem 2)
+            # Implements Equation (2) exactly
+            return FixedProgressTracker(
+                delta_r=self.delta_r,
+                delta_p=self.delta_p,
+                u_max=question_umax,
+                initial_progress=0.0
+            )
+        
+        elif tracker_mode == 'bounded':
+            # Fixed gains + bounded confidence scaling (practical compromise)
+            confidence_scale = cfg.get('confidence_scale', 0.3)
+            return BoundedConfidenceTracker(
+                delta_r=self.delta_r,
+                delta_p=self.delta_p,
+                u_max=question_umax,
+                confidence_scale=confidence_scale,
+                initial_progress=0.0
+            )
+        
+        elif tracker_mode == 'hybrid':
+            # Legacy hybrid mode (uses old HybridProgressTracker)
+            return HybridProgressTracker(
+                question=question,
+                delta_r=self.delta_r,
+                delta_p=self.delta_p,
+                U_max=question_umax,
+                track_confidence=cfg.get('track_confidence', True)
+            )
+        
+        else:  # 'dynamic' - legacy mode
+            # WARNING: This violates Assumption 1
+            gain_multiplier = cfg.get('gain_multipliers', {}).get(complexity, 1.0)
+            base_retrieval_gain = cfg.get('base_retrieval_gain', self.delta_r)
+            base_reason_gain = cfg.get('base_reason_gain', self.delta_p)
 
-        return ProgressTracker(
-            question=question,
-            question_umax=question_umax,
-            base_retrieval_gain=base_retrieval_gain,
-            base_reason_gain=base_reason_gain,
-            coverage_weight=cfg.get('coverage_weight', 0.5),
-            novelty_weight=cfg.get('novelty_weight', 0.3),
-            confidence_weight=cfg.get('confidence_weight', 0.4),
-            min_gain=cfg.get('min_gain', 0.015),
-            max_gain=cfg.get('max_gain', 0.35),
-            gain_multiplier=gain_multiplier
-        )
+            return ProgressTracker(
+                question=question,
+                question_umax=question_umax,
+                base_retrieval_gain=base_retrieval_gain,
+                base_reason_gain=base_reason_gain,
+                coverage_weight=cfg.get('coverage_weight', 0.5),
+                novelty_weight=cfg.get('novelty_weight', 0.3),
+                confidence_weight=cfg.get('confidence_weight', 0.4),
+                min_gain=cfg.get('min_gain', 0.015),
+                max_gain=cfg.get('max_gain', 0.35),
+                gain_multiplier=gain_multiplier
+            )
     
     def __init__(
         self,
@@ -235,9 +319,21 @@ class ARGO_System:
         self.verbose = verbose
         self.progress_config = self.policy_config.get('progress', {})
         self.progress_enabled = self.progress_config.get('enabled', True)
-        self.complexity_classifier = QuestionComplexityClassifier(
-            self.policy_config.get('complexity')
-        )
+        # 选择分类器版本: 'v2' 使用 O-RAN 领域感知分类器
+        classifier_version = self.policy_config.get('classifier_version', 'v2')
+        if classifier_version == 'v2':
+            # V2: 领域感知 + 与 ThresholdTable buckets 对齐
+            self.complexity_classifier = ORANComplexityClassifier(
+                umax_buckets=self.policy_config.get('umax_buckets'),
+                config=self.policy_config.get('complexity')
+            )
+            logger.info("Using ORANComplexityClassifier (V2, domain-aware)")
+        else:
+            # V1: 原始通用分类器
+            self.complexity_classifier = QuestionComplexityClassifier(
+                self.policy_config.get('complexity')
+            )
+            logger.info("Using QuestionComplexityClassifier (V1, generic)")
         
         # 设备
         self.device = next(model.parameters()).device
@@ -368,6 +464,54 @@ class ARGO_System:
             progress_cfg = self.policy_config.get('progress', {})
             self.delta_r = progress_cfg.get('base_retrieval_gain') or 0.25
             self.delta_p = progress_cfg.get('base_reason_gain') or 0.08
+        
+        # 5. Initialize Threshold Lookup Table (Fixes Problem 1)
+        # Pre-computes optimal thresholds for each U_max bucket
+        self.threshold_table = None
+        if self.use_mdp:
+            try:
+                # Get base config from MDP solver
+                table_config = {
+                    'mdp': {
+                        'U_max': 1.0,  # Will be overridden per bucket
+                        'delta_r': self.delta_r,
+                        'delta_p': self.delta_p,
+                        'c_r': getattr(self.mdp_solver, 'c_r', 0.05),
+                        'c_p': getattr(self.mdp_solver, 'c_p', 0.02),
+                        'p_s': getattr(self.mdp_solver, 'p_s', 0.8),
+                        'mu': getattr(self.mdp_solver, 'mu', 0.0),
+                        'gamma': getattr(self.mdp_solver, 'gamma', 0.98),
+                        'U_grid_size': 100  # Smaller for faster computation
+                    },
+                    'quality': {
+                        'mode': getattr(self.mdp_solver, 'quality_mode', 'linear'),
+                        'k': getattr(self.mdp_solver, 'quality_k', 1.0)
+                    },
+                    'reward_shaping': {'enabled': False, 'k': 0.0},
+                    'solver': {
+                        'max_iterations': 1000,
+                        'convergence_threshold': 1e-6,
+                        'verbose': False
+                    }
+                }
+                
+                # Cache path for threshold table
+                cache_dir = os.path.join(os.path.dirname(__file__), '../configs')
+                cache_path = os.path.join(cache_dir, 'threshold_cache.json')
+                
+                self.threshold_table = ThresholdTable(
+                    mdp_base_config=table_config,
+                    cache_path=cache_path
+                )
+                logger.info("✅ ThresholdTable initialized (pre-computed optimal thresholds)")
+                
+                if self.verbose:
+                    self.threshold_table.print_table()
+                    
+            except Exception as e:
+                logger.warning(f"Failed to initialize ThresholdTable: {e}")
+                logger.warning("Falling back to legacy threshold scaling")
+                self.threshold_table = None
     
     def answer_question(
         self,
@@ -402,7 +546,8 @@ class ARGO_System:
             print(f"{'='*80}\n")
         
         # ============ Question-Adaptive Setup ============
-        complexity_label = self.complexity_classifier.classify(question)
+        complexity_profile = self.complexity_classifier.classify(question)
+        complexity_label = complexity_profile.label if isinstance(complexity_profile, ComplexityProfile) else complexity_profile
         question_umax = self.complexity_classifier.estimate_umax(question)
         adaptive_cap = self.complexity_classifier.get_adaptive_max_steps(
             question,
@@ -411,9 +556,10 @@ class ARGO_System:
         policy_cap = self._resolve_max_steps(complexity_label)
         per_question_max_steps = min(policy_cap, adaptive_cap)
 
-        base_theta_cont, base_theta_star = self._resolve_thresholds(complexity_label)
-        theta_cont = base_theta_cont * question_umax
-        theta_star = base_theta_star * question_umax
+        # Use pre-computed thresholds from lookup table (Fixes Problem 1)
+        theta_cont, theta_star, actual_umax = self._resolve_thresholds_for_umax(question_umax)
+        # Note: thresholds are already correctly computed for this U_max bucket
+        # No linear scaling needed - that would break optimality!
 
         progress_tracker = self._build_progress_tracker(
             question,
@@ -427,10 +573,10 @@ class ARGO_System:
         
         if self.verbose:
             print(f"Complexity: {complexity_label}")
-            print(f"Estimated U_max(x): {question_umax:.3f}")
-            print(f"Base thresholds: θ_cont={base_theta_cont:.3f}, θ*={base_theta_star:.3f}")
-            print(f"Scaled thresholds: θ_cont={theta_cont:.3f}, θ*={theta_star:.3f}")
+            print(f"Estimated U_max(x): {question_umax:.3f} (bucket: {actual_umax:.3f})")
+            print(f"Optimal thresholds: θ_cont={theta_cont:.3f}, θ*={theta_star:.3f}")
             print(f"Max Steps (adaptive): {per_question_max_steps}")
+            print(f"Progress tracker: {type(progress_tracker).__name__ if progress_tracker else 'None'}")
         
         # 主循环
         while U_t < theta_star and t < per_question_max_steps:
@@ -527,9 +673,9 @@ class ARGO_System:
             'elapsed_time': elapsed_time,
             'sources': sources,
             'theta_star': theta_star,
-            'theta_star_base': base_theta_star,
+            'theta_star_base': self.mdp_solver.theta_star if self.mdp_solver else theta_star,
             'theta_cont': theta_cont,
-            'theta_cont_base': base_theta_cont,
+            'theta_cont_base': self.mdp_solver.theta_cont if self.mdp_solver else theta_cont,
             'max_steps_cap': per_question_max_steps,
             'complexity': complexity_label,
             'terminated_early': terminated_early,

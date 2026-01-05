@@ -272,13 +272,28 @@ class MDPSolver:
                 break
         
         # Find continuation threshold: θ_cont where Q(U,0) = Q(U,1) for U < θ*
-        theta_cont = 0.0
-        theta_star_idx = self.get_state_index(theta_star)
+        # 
+        # θ_cont 语义修正:
+        #   - 当 U < θ_cont 时，选择 RETRIEVE
+        #   - 当 θ_cont <= U < θ* 时，选择 REASON  
+        #   - 当 U >= θ* 时，TERMINATE
+        #
+        # 边界情况:
+        #   - 若 RETRIEVE 始终优于 REASON (c_r 极低)，则 θ_cont = θ*（一直检索到终止）
+        #   - 若 REASON 从 U=0 就优于 RETRIEVE (c_r 极高)，则 θ_cont = 0（一开始就推理）
         
-        for i in range(theta_star_idx):
-            if self.Q[i, 0] < self.Q[i, 1]:
-                theta_cont = self.U_grid[i]
-                break
+        theta_star_idx = self.get_state_index(theta_star)
+        theta_cont = theta_star  # 默认：一直 RETRIEVE 直到终止
+        
+        # 检查 U=0 时是否 REASON 已经优于 RETRIEVE
+        if self.Q[0, 1] > self.Q[0, 0]:
+            theta_cont = 0.0  # 从一开始就用 REASON
+        else:
+            # 从 U=0 往上找第一个 REASON 优于 RETRIEVE 的点
+            for i in range(theta_star_idx):
+                if self.Q[i, 0] < self.Q[i, 1]:
+                    theta_cont = self.U_grid[i]
+                    break
         
         self.theta_cont = theta_cont
         self.theta_star = theta_star
