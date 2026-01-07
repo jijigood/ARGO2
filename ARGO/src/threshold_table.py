@@ -250,10 +250,38 @@ class ThresholdTable:
         return entry['theta_cont'], entry['theta_star'], entry['actual_umax']
     
     def _validate_cache(self) -> bool:
-        """Check if cached table matches current bucket configuration."""
+        """Check if cached table matches current configuration including c_r.
+        
+        CRITICAL: Must validate both buckets AND config hash to prevent
+        using stale thresholds when c_r changes during cost sweep experiments.
+        """
+        if not self.table:
+            return False
+        
+        # Check bucket match
         cached_buckets = set(self.table.keys())
         expected_buckets = set(self.umax_buckets)
-        return cached_buckets == expected_buckets
+        if cached_buckets != expected_buckets:
+            return False
+        
+        # Check config hash (includes c_r, c_p, delta_r, delta_p, etc.)
+        if not self.cache_path or not self.cache_path.exists():
+            return False
+            
+        try:
+            with open(self.cache_path, 'r') as f:
+                data = json.load(f)
+            cached_hash = data.get('base_config_hash')
+            if cached_hash is None:
+                return False  # Old cache format without hash
+            current_hash = hash(json.dumps(self.base_config, sort_keys=True, default=str))
+            if cached_hash != current_hash:
+                logger.info(f"Cache config hash mismatch (c_r or other param changed)")
+                return False
+            return True
+        except Exception as e:
+            logger.warning(f"Cache validation error: {e}")
+            return False
     
     def _load_cache(self) -> None:
         """Load threshold table from JSON cache."""
@@ -301,6 +329,32 @@ class ThresholdTable:
             'cost_cache_size': len(self._cost_cache)
         }
     
+
+    def clear_cost_cache(self) -> None:
+        """Clear the cost-aware cache. Call this when c_r changes in experiments."""
+        old_size = len(self._cost_cache)
+        self._cost_cache.clear()
+        if old_size > 0:
+            logger.info(f"Cleared cost cache ({old_size} entries)")
+    
+    def invalidate_for_new_cost(self, new_c_r: float) -> None:
+        """Invalidate cached thresholds and recompute for new c_r value.
+        
+        IMPORTANT: Call this at the start of each cost sweep iteration
+        to ensure thresholds are computed with the correct c_r.
+        """
+        # Update base config with new c_r
+        self.base_config['mdp']['c_r'] = new_c_r
+        
+        # Clear all caches
+        self._cost_cache.clear()
+        self.table.clear()
+        
+        # Recompute thresholds with new c_r
+        self._compute_all_thresholds()
+        
+        logger.info(f"Recomputed thresholds for c_r={new_c_r:.4f}")
+
     def print_table(self) -> None:
         """Pretty-print the threshold table."""
         print("\n" + "="*60)
