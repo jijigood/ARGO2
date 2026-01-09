@@ -160,11 +160,22 @@ class ARGO_System:
         """
         if self.threshold_table is not None:
             # Use pre-computed optimal thresholds (O(1) lookup)
-            theta_cont, theta_star, actual_umax = self.threshold_table.lookup(
+            theta_cont, theta_star, bucket_umax = self.threshold_table.lookup(
                 question_umax, 
                 strategy='ceiling'  # Conservative: use higher bucket
             )
-            return theta_cont, theta_star, actual_umax
+            
+            # FIX: Scale thresholds to match question_umax
+            # Problem: bucket_umax > question_umax (due to ceiling)
+            #          but U_t is capped at question_umax
+            #          So if theta_star > question_umax, termination is impossible!
+            # Solution: Scale thresholds proportionally
+            if bucket_umax > 0 and bucket_umax > question_umax:
+                scale = question_umax / bucket_umax
+                theta_cont = theta_cont * scale
+                theta_star = theta_star * scale
+            
+            return theta_cont, theta_star, question_umax  # Return actual question_umax, not bucket
         
         # Fallback: use MDP solver's base thresholds (legacy behavior)
         base_theta_star = self.mdp_solver.theta_star if self.use_mdp else 0.75

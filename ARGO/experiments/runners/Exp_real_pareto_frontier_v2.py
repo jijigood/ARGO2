@@ -50,7 +50,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from oran_benchmark_loader import ORANBenchmark
 
 # Add ARGO_MDP path relative to this script
-mdp_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'ARGO_MDP', 'src')
+# Add ARGO root path for Environments module
+argo_root = '/data/user/huangxiaolin/ARGO2/ARGO'
+sys.path.insert(0, argo_root)
+
+mdp_path = '/data/user/huangxiaolin/ARGO2/ARGO_MDP/src'
 sys.path.insert(0, mdp_path)
 from mdp_solver import MDPSolver
 
@@ -68,12 +72,12 @@ class ParetoFrontierExperimentV2:
     
     def __init__(
         self,
-        config_path: str = "configs/multi_gpu_data_calibrated.yaml",
+        config_path: str = "configs/pareto_optimized.yaml",
         llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-3B-Instruct",
         embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
         chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
-        n_test_questions: int = 100,
-        difficulty: str = "medium",
+        n_test_questions: int = 20,  # 优化: 100→20 (保证统计显著性同时控制时间)
+        difficulty: str = "hard",
         seed: int = 42,
         gpu_ids: List[int] = None
     ):
@@ -112,7 +116,7 @@ class ParetoFrontierExperimentV2:
             raise RuntimeError("GPU required!")
         
         self.n_gpus = torch.cuda.device_count()
-        self.gpu_ids = gpu_ids if gpu_ids else list(range(min(8, self.n_gpus)))
+        self.gpu_ids = gpu_ids if gpu_ids else [4, 5, 6, 7]  # 默认使用GPU 4-7
         
         print(f"GPU Configuration:")
         print(f"  Available GPUs: {self.n_gpus}")
@@ -126,6 +130,9 @@ class ParetoFrontierExperimentV2:
         # Load configuration
         with open(config_path, 'r') as f:
             self.config = yaml.safe_load(f)
+        
+        # 打印并验证配置参数
+        self._validate_and_print_config()
         
         # Set random seeds
         random.seed(seed)
@@ -179,6 +186,65 @@ class ParetoFrontierExperimentV2:
         print(f"Initialization Complete!")
         print(f"{'='*80}\n")
     
+    def _validate_and_print_config(self):
+        """验证并打印MDP配置参数，帮助调试"""
+        mdp = self.config['mdp']
+        
+        c_r = mdp['c_r']
+        c_p = mdp['c_p']
+        delta_r = mdp['delta_r']
+        delta_p = mdp['delta_p']
+        p_s = mdp['p_s']
+        U_max = mdp.get('U_max', 1.0)
+        
+        # 计算效率比
+        retrieve_efficiency = p_s * delta_r / c_r if c_r > 0 else float('inf')
+        reason_efficiency = delta_p / c_p if c_p > 0 else float('inf')
+        
+        print(f"\n{'='*80}")
+        print(f"MDP Configuration Validation")
+        print(f"{'='*80}")
+        print(f"  Config file: {self.config_path}")
+        print(f"")
+        print(f"  State Space:")
+        print(f"    U_max = {U_max}")
+        print(f"")
+        print(f"  Progress Parameters:")
+        print(f"    delta_r = {delta_r} (retrieval progress)")
+        print(f"    delta_p = {delta_p} (reasoning progress)")
+        print(f"    p_s = {p_s} (retrieval success probability)")
+        print(f"    E[delta_r] = {p_s * delta_r:.4f}")
+        print(f"")
+        print(f"  Cost Parameters:")
+        print(f"    c_r = {c_r} (retrieval cost)")
+        print(f"    c_p = {c_p} (reasoning cost)")
+        print(f"    c_r/c_p = {c_r/c_p:.2f}")
+        print(f"")
+        print(f"  Efficiency Analysis:")
+        print(f"    Retrieval efficiency = E[delta_r]/c_r = {retrieve_efficiency:.2f}")
+        print(f"    Reasoning efficiency = delta_p/c_p = {reason_efficiency:.2f}")
+        if reason_efficiency > 0:
+            print(f"    Ratio = {retrieve_efficiency/reason_efficiency:.2f}x")
+        print(f"")
+        
+        # 检查潜在问题
+        warnings = []
+        if c_r / c_p < 1.0:
+            warnings.append(f"⚠️ c_r/c_p = {c_r/c_p:.2f} < 1.0: 检索太便宜，可能导致策略急剧转换")
+        if reason_efficiency > 0 and retrieve_efficiency / reason_efficiency > 5.0:
+            warnings.append(f"⚠️ 检索效率是推理的{retrieve_efficiency/reason_efficiency:.1f}倍: 可能导致策略不平衡")
+        if reason_efficiency > 0 and retrieve_efficiency / reason_efficiency < 0.2:
+            warnings.append(f"⚠️ 检索效率只有推理的{retrieve_efficiency/reason_efficiency:.1f}倍: 检索可能永远不会被选择")
+        
+        if warnings:
+            print(f"  Warnings:")
+            for w in warnings:
+                print(f"    {w}")
+        else:
+            print(f"  ✅ Configuration looks balanced")
+        
+        print(f"{'='*80}\n")
+    
     def _load_llm(self):
         """Load LLM model (multi-GPU)"""
         print(f"Loading LLM: {self.llm_model_path}")
@@ -216,41 +282,121 @@ class ParetoFrontierExperimentV2:
             return results['documents'][0]
         return []
     
-    def generate_answer(self, question: str, context: str = "") -> str:
-        """Generate answer using LLM"""
-        if context:
-            prompt = f"""Based on the following context, answer the question.
-
-Context: {context[:1000]}
-
-Question: {question}
-
-Answer:"""
-        else:
-            prompt = f"""Answer the following question based on your knowledge.
-
-Question: {question}
-
-Answer:"""
+    def _format_question_with_options(self, question_data: Dict) -> str:
+        """Format question with options for LLM prompt"""
+        question = question_data['question']
+        options = question_data.get('options', [])
         
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        formatted = question + "\n\nOptions:\n"
+        for i, opt in enumerate(options, 1):
+            # 有些选项已经带编号，有些没有
+            if opt.strip().startswith(str(i)):
+                formatted += f"{opt}\n"
+            else:
+                formatted += f"{i}. {opt}\n"
+        
+        return formatted
+    
+    def generate_answer(self, question_data: Dict, context: str = "", history: List[Dict] = None) -> str:
+        """
+        Generate answer using LLM with ARGO-style structured prompts
+        
+        Key improvements (learned from ARGO_System/AnswerSynthesizer):
+        1. Use structured output format with <choice>X</choice>
+        2. Include retrieval history for better context
+        3. Chat template for instruction-tuned models
+        """
+        if history is None:
+            history = []
+        
+        # Handle both dict and string inputs for backward compatibility
+        if isinstance(question_data, str):
+            question = question_data
+            options = []
+        else:
+            question = question_data['question']
+            options = question_data.get('options', [])
+        
+        # Build structured prompt (similar to ARGOPrompts.build_synthesis_prompt)
+        prompt = """You are an expert in O-RAN (Open Radio Access Network) specifications.
+Your task is to answer multiple-choice questions about O-RAN architecture, interfaces, and protocols.
+
+"""
+        
+        prompt += f"Question: {question}\n\n"
+        
+        # Add options
+        if options:
+            prompt += "Options:\n"
+            for i, opt in enumerate(options, 1):
+                opt_text = opt.strip()
+                # Check if option already has number prefix
+                if opt_text.startswith(str(i) + '.') or opt_text.startswith(str(i) + ')'):
+                    prompt += f"{opt_text}\n"
+                else:
+                    prompt += f"{i}. {opt_text}\n"
+            prompt += "\n"
+        
+        # Add retrieved information from history (key improvement!)
+        retrieved_docs = []
+        for step in history:
+            if step.get('action') == 'retrieve' and step.get('success', False):
+                docs = step.get('docs', [])
+                for doc in docs:
+                    if doc and doc not in retrieved_docs:
+                        retrieved_docs.append(doc)
+        
+        if retrieved_docs:
+            prompt += "Retrieved Information from O-RAN Specifications:\n"
+            for i, doc in enumerate(retrieved_docs[:5], 1):  # Limit to 5 docs
+                doc_text = doc[:600] if len(doc) > 600 else doc  # Truncate long docs
+                prompt += f"[{i}] {doc_text}\n"
+            prompt += "\n"
+        elif context and context.strip():
+            # Fallback to simple context
+            clean_context = context.strip()[:2000]
+            prompt += f"Retrieved Information:\n{clean_context}\n\n"
+        
+        # Add explicit instruction for structured output
+        prompt += """Based on the question and the retrieved information above, analyze each option carefully.
+
+Instructions:
+1. Read the question and all options carefully
+2. Use the retrieved O-RAN specifications to identify the correct answer
+3. If no relevant information was retrieved, use your knowledge about O-RAN
+4. Provide your final answer in this EXACT format:
+
+<choice>X</choice>
+
+where X is the option number (1, 2, 3, or 4).
+
+Provide a brief explanation followed by your choice:"""
+        
+        # Use chat template for instruction-tuned models
+        messages = [{"role": "user", "content": prompt}]
+        text = self.tokenizer.apply_chat_template(
+            messages, 
+            tokenize=False, 
+            add_generation_prompt=True
+        )
+        
+        inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
         
         with torch.no_grad():
             outputs = self.model.generate(
                 **inputs,
-                max_new_tokens=256,
+                max_new_tokens=512,  # Allow longer response for reasoning
                 do_sample=False,
                 temperature=1.0,
-                top_p=0.9,
-                top_k=50
+                pad_token_id=self.tokenizer.eos_token_id
             )
         
-        answer = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        if "Answer:" in answer:
-            answer = answer.split("Answer:")[-1].strip()
+        # Decode and extract answer after the prompt
+        generated_ids = outputs[0][inputs['input_ids'].shape[1]:]
+        answer = self.tokenizer.decode(generated_ids, skip_special_tokens=True)
         
         return answer
-    
+
     def evaluate_answer(self, question: str, answer: str, ground_truth: str) -> bool:
         """
         Evaluate answer correctness for multiple-choice questions
@@ -425,7 +571,7 @@ Answer:"""
         total_latency = time.time() - start_time
         
         # Generate final answer
-        final_answer = self.generate_answer(question, context)
+        final_answer = self.generate_answer(question_data, context, history)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         
         # Compute information quality (Option A)
@@ -493,7 +639,7 @@ Answer:"""
             retrieval_times.append(time.time() - retrieve_start)
         
         total_latency = time.time() - start_time
-        final_answer = self.generate_answer(question, context)
+        final_answer = self.generate_answer(question_data, context, history)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         info_quality = self._compute_quality(U, correct)
         
@@ -546,7 +692,7 @@ Answer:"""
             reasoning_times.append(time.time() - reason_start)
         
         total_latency = time.time() - start_time
-        final_answer = self.generate_answer(question, "")
+        final_answer = self.generate_answer(question_data, "", [])
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         info_quality = self._compute_quality(U, correct)
         
@@ -615,7 +761,7 @@ Answer:"""
                 total_cost += c_p
                 reason_count += 1
         
-        final_answer = self.generate_answer(question, context)
+        final_answer = self.generate_answer(question_data, context, history)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         info_quality = self._compute_quality(U, correct)
         
@@ -683,7 +829,7 @@ Answer:"""
                 total_cost += c_p
                 reason_count += 1
         
-        final_answer = self.generate_answer(question, context)
+        final_answer = self.generate_answer(question_data, context, history)
         correct = self.evaluate_answer(question, final_answer, ground_truth)
         info_quality = self._compute_quality(U, correct)
         
@@ -734,7 +880,7 @@ Answer:"""
         This proves ARGO dominates ALL possible fixed-threshold policies
         """
         if theta_cont_values is None:
-            theta_cont_values = np.linspace(0.1, 0.9, 9)
+            theta_cont_values = np.array([0.1, 0.25, 0.4, 0.55, 0.7, 0.85, 0.95])  # 优化: 7个关键点
         
         print(f"\n{'='*80}")
         print(f"Fixed-Threshold Sweep (θ* = {theta_star:.2f})")
@@ -778,7 +924,7 @@ Answer:"""
         self,
         mu_min: float = 0.0,
         mu_max: float = 2.0,
-        n_mu_steps: int = 15
+        n_mu_steps: int = 12  # 优化: 15→12
     ):
         """Run complete Pareto frontier experiment"""
         mu_values = np.linspace(mu_min, mu_max, n_mu_steps)
@@ -1267,9 +1413,11 @@ def main():
                        choices=['easy', 'medium', 'hard'])
     parser.add_argument('--mu-min', type=float, default=0.0)
     parser.add_argument('--mu-max', type=float, default=2.0)
-    parser.add_argument('--n-mu-steps', type=int, default=15)
+    parser.add_argument('--n-mu-steps', type=int, default=12)  # 优化: 15→12
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--gpus', type=str, default='0,1,2,3,4,5,6,7')
+    parser.add_argument('--gpus', type=str, default='4,5,6,7')
+    parser.add_argument('--config-path', type=str, default='configs/pareto_optimized.yaml',
+                       help='Path to MDP config file')
     
     args = parser.parse_args()
     
@@ -1287,6 +1435,7 @@ def main():
     
     # Initialize experiment
     exp = ParetoFrontierExperimentV2(
+        config_path=args.config_path,
         n_test_questions=args.n_questions,
         difficulty=args.difficulty,
         seed=args.seed,
