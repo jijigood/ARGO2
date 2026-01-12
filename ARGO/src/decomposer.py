@@ -81,7 +81,8 @@ class QueryDecomposer:
         self,
         original_question: str,
         history: List[Dict],
-        uncertainty: float
+        uncertainty: float,
+        options: Optional[List[str]] = None
     ) -> str:
         """
         构建查询分解的提示词（使用ARGO V2.0标准模板）
@@ -90,6 +91,7 @@ class QueryDecomposer:
             original_question: 原始问题
             history: 之前的推理历史
             uncertainty: 当前不确定度 (1-U_t)，值越大说明缺口越大
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
         
         Returns:
             完整的提示词字符串
@@ -101,7 +103,8 @@ class QueryDecomposer:
         prompt = ARGOPrompts.build_decomposition_prompt(
             original_question=original_question,
             history=history,
-            progress=progress
+            progress=progress,
+            options=options
         )
         
         return prompt
@@ -110,7 +113,8 @@ class QueryDecomposer:
         self,
         original_question: str,
         history: List[Dict],
-        uncertainty: float
+        uncertainty: float,
+        options: Optional[List[str]] = None
     ) -> str:
         """
         生成子查询（主入口）
@@ -119,6 +123,7 @@ class QueryDecomposer:
             original_question: 原始问题
             history: 推理历史（每个元素包含 'action', 'progress' 等字段）
             uncertainty: 不确定度 (1 - U_t)
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
         
         Returns:
             生成的子查询字符串
@@ -136,7 +141,8 @@ class QueryDecomposer:
         prompt = self._build_decomposition_prompt(
             original_question,
             history_with_progress,
-            uncertainty
+            uncertainty,
+            options=options
         )
         
         # Tokenize
@@ -180,6 +186,7 @@ class QueryDecomposer:
         2. 截断到第一个换行或句号
         3. 确保以问号结尾（如果是疑问句）
         4. 长度限制
+        5. 验证包含O-RAN技术术语（如果可能）
         
         Args:
             subquery: 原始生成的子查询
@@ -189,6 +196,10 @@ class QueryDecomposer:
         """
         # 去除前后空白
         subquery = subquery.strip()
+        
+        # 移除可能的格式标记
+        subquery = subquery.replace('[Progress:', '').replace(']', '').strip()
+        subquery = subquery.replace('Follow up:', '').strip()
         
         # 截断到第一个换行
         if '\n' in subquery:
@@ -204,11 +215,17 @@ class QueryDecomposer:
             if not subquery.endswith('?'):
                 subquery += '?'
         
+        # 清理多余的空白
+        subquery = ' '.join(subquery.split())
+        
         # 长度限制（字符级别）
         max_chars = 256
         if len(subquery) > max_chars:
             # 截断到最后一个完整单词
-            subquery = subquery[:max_chars].rsplit(' ', 1)[0] + '...'
+            subquery = subquery[:max_chars].rsplit(' ', 1)[0]
+            # 如果截断后还有空间，添加省略号
+            if len(subquery) < max_chars - 3:
+                subquery += '...'
         
         return subquery
     

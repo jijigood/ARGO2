@@ -247,19 +247,38 @@ class ARGO_System:
         if tracker_mode in ('fixed', 'stationary'):
             # MDP-compliant: fixed gains (Solves Problem 2)
             # Implements Equation (2) exactly
+            # Apply complexity-based gain multipliers for simple questions
+            # This allows simple questions to reach termination faster (1-2 steps)
+            gain_multiplier = cfg.get('gain_multipliers', {}).get(complexity, 1.0)
+            adjusted_delta_r = self.delta_r * gain_multiplier
+            adjusted_delta_p = self.delta_p * gain_multiplier
+            
+            if self.verbose and gain_multiplier != 1.0:
+                print(f"  Applying gain multiplier for {complexity}: {gain_multiplier:.2f}x")
+                print(f"    delta_r: {self.delta_r:.3f} → {adjusted_delta_r:.3f}")
+                print(f"    delta_p: {self.delta_p:.3f} → {adjusted_delta_p:.3f}")
+            
             return FixedProgressTracker(
-                delta_r=self.delta_r,
-                delta_p=self.delta_p,
+                delta_r=adjusted_delta_r,
+                delta_p=adjusted_delta_p,
                 u_max=question_umax,
                 initial_progress=0.0
             )
         
         elif tracker_mode == 'bounded':
             # Fixed gains + bounded confidence scaling (practical compromise)
+            # Also apply complexity-based gain multipliers
+            gain_multiplier = cfg.get('gain_multipliers', {}).get(complexity, 1.0)
+            adjusted_delta_r = self.delta_r * gain_multiplier
+            adjusted_delta_p = self.delta_p * gain_multiplier
             confidence_scale = cfg.get('confidence_scale', 0.3)
+            
+            if self.verbose and gain_multiplier != 1.0:
+                print(f"  Applying gain multiplier for {complexity}: {gain_multiplier:.2f}x")
+            
             return BoundedConfidenceTracker(
-                delta_r=self.delta_r,
-                delta_p=self.delta_p,
+                delta_r=adjusted_delta_r,
+                delta_p=adjusted_delta_p,
                 u_max=question_umax,
                 confidence_scale=confidence_scale,
                 initial_progress=0.0
@@ -397,14 +416,26 @@ class ARGO_System:
         elif retriever_mode == "chroma":
             if chroma_dir is None:
                 raise ValueError("chroma_dir must be provided for chroma mode")
+            # 从MDP配置读取p_s值（Retriever在MDP Solver之前初始化，所以从mdp_config读取）
+            p_s_value = 0.8  # 默认值
+            if self.use_mdp and mdp_config and 'mdp' in mdp_config:
+                p_s_value = mdp_config['mdp'].get('p_s', 0.8)
+                logger.info(f"✅ Using p_s={p_s_value:.3f} from MDP config")
+            else:
+                logger.info(f"⚠️  Using default p_s={p_s_value:.3f} (MDP config not available)")
+            
             self.retriever = Retriever(
                 chroma_dir=chroma_dir,
                 collection_name=collection_name,
-                similarity_threshold=0.3,
+                similarity_threshold=0.5,  # 提高阈值：从0.3到0.5，只接受高质量检索
                 p_s_mode="threshold",
-                p_s_value=0.8
+                p_s_value=p_s_value,  # 从MDP配置读取，而不是硬编码
+                use_reranker=True,  # 启用Reranking改进检索质量
+                # 使用本地已下载的bge-reranker-base模型（278M参数，1.1GB）
+                reranker_model_path="/data/user/huangxiaolin/.cache/huggingface/hub/models--BAAI--bge-reranker-base",
+                reranker_device=None  # None=自动选择（优先GPU，失败时回退到CPU）；'cuda'=强制GPU；'cpu'=强制CPU
             )
-            logger.info(f"✅ Retriever initialized (Chroma: {chroma_dir})")
+            logger.info(f"✅ Retriever initialized (Chroma: {chroma_dir}, p_s={p_s_value:.3f})")
         else:
             raise ValueError(f"Unknown retriever_mode: {retriever_mode}")
         
@@ -449,6 +480,13 @@ class ARGO_System:
             
             self.mdp_solver = MDPSolver(default_mdp_config)
             logger.info("✅ MDPSolver initialized")
+            
+            # Issue 3 Fix: 记录关键 MDP 参数，确保 mu 值正确传递
+            logger.info(f"MDP关键参数: c_r={self.mdp_solver.c_r:.4f}, c_p={self.mdp_solver.c_p:.4f}, "
+                        f"μ={self.mdp_solver.mu:.4f}, δ_r={self.mdp_solver.delta_r:.4f}, "
+                        f"δ_p={self.mdp_solver.delta_p:.4f}, p_s={self.mdp_solver.p_s:.3f}")
+            if self.mdp_solver.mu == 0.0:
+                logger.warning("⚠️ μ=0 检测到! MDP 将无法感知成本差异，成本扫描可能无效。请检查配置文件中 mdp.mu 的值。")
             
             # 预计算策略（使用solve方法完成value iteration和阈值计算）
             result = self.mdp_solver.solve()
@@ -507,8 +545,13 @@ class ARGO_System:
                 }
                 
                 # Cache path for threshold table
+                # Issue 1 Fix: 在缓存文件名中包含 c_r 和 μ 值，防止成本扫描和μ扫描时使用过期缓存
                 cache_dir = os.path.join(os.path.dirname(__file__), '../configs')
-                cache_path = os.path.join(cache_dir, 'threshold_cache.json')
+                c_r_value = table_config['mdp']['c_r']
+                mu_value = table_config['mdp']['mu']
+                cache_filename = f'threshold_cache_cr{c_r_value:.4f}_mu{mu_value:.4f}.json'
+                cache_path = os.path.join(cache_dir, cache_filename)
+                logger.info(f"ThresholdTable 缓存路径: {cache_path}")
                 
                 self.threshold_table = ThresholdTable(
                     mdp_base_config=table_config,
@@ -528,7 +571,8 @@ class ARGO_System:
         self,
         question: str,
         return_history: bool = True,
-        options: Optional[List[str]] = None
+        options: Optional[List[str]] = None,
+        question_metadata: Optional[Dict] = None
     ) -> Tuple[str, Optional[str], Optional[List[Dict]], Optional[Dict]]:
         """
         回答问题（主入口）
@@ -537,6 +581,8 @@ class ARGO_System:
             question: 输入问题
             return_history: 是否返回推理历史
             options: 选择题的选项列表（可选，格式为 ["选项1文本", "选项2文本", ...]）
+            question_metadata: 问题元数据（可选），包含 'difficulty' 字段用于复杂度分类
+            question_metadata: 问题元数据（可选），包含 'difficulty' 字段用于复杂度分类
         
         Returns:
             (answer, choice, history, metadata):
@@ -557,9 +603,9 @@ class ARGO_System:
             print(f"{'='*80}\n")
         
         # ============ Question-Adaptive Setup ============
-        complexity_profile = self.complexity_classifier.classify(question)
+        complexity_profile = self.complexity_classifier.classify(question, question_metadata)
         complexity_label = complexity_profile.label if isinstance(complexity_profile, ComplexityProfile) else complexity_profile
-        question_umax = self.complexity_classifier.estimate_umax(question)
+        question_umax = self.complexity_classifier.estimate_umax(question, question_metadata)
         adaptive_cap = self.complexity_classifier.get_adaptive_max_steps(
             question,
             base_max_steps=self.base_max_steps
@@ -571,6 +617,42 @@ class ARGO_System:
         theta_cont, theta_star, actual_umax = self._resolve_thresholds_for_umax(question_umax)
         # Note: thresholds are already correctly computed for this U_max bucket
         # No linear scaling needed - that would break optimality!
+        
+        # Apply complexity-based threshold scaling if configured
+        # This allows reducing thresholds for medium/complex questions to reduce steps
+        if self.policy_config and 'theta_star_by_complexity' in self.policy_config:
+            complexity_threshold_base = self.policy_config['theta_star_by_complexity'].get(
+                complexity_label,
+                None
+            )
+            if complexity_threshold_base is not None:
+                # Apply configured threshold: theta_star = base × question_umax
+                target_theta_star = complexity_threshold_base * question_umax
+                # Only apply if it's different from threshold_table value
+                if abs(target_theta_star - theta_star) > 0.01:  # Allow small floating point differences
+                    if self.verbose:
+                        print(f"  Applying complexity-based threshold override:")
+                        print(f"    θ* from threshold_table: {theta_star:.3f}")
+                        print(f"    θ* from config ({complexity_label}, base={complexity_threshold_base:.2f}): {target_theta_star:.3f}")
+                    theta_star = target_theta_star
+                    
+                    # Also adjust theta_cont proportionally to maintain the ratio
+                    if theta_star > 0 and theta_cont > 0:
+                        original_ratio = theta_cont / theta_star
+                        theta_cont = target_theta_star * original_ratio
+                        
+                        # Apply theta_cont_by_complexity if configured
+                        if 'theta_cont_by_complexity' in self.policy_config:
+                            cont_base = self.policy_config['theta_cont_by_complexity'].get(
+                                complexity_label,
+                                None
+                            )
+                            if cont_base is not None:
+                                target_theta_cont = cont_base * question_umax
+                                if abs(target_theta_cont - theta_cont) > 0.01:
+                                    if self.verbose:
+                                        print(f"    θ_cont from config ({complexity_label}, base={cont_base:.2f}): {target_theta_cont:.3f}")
+                                    theta_cont = target_theta_cont
 
         progress_tracker = self._build_progress_tracker(
             question,
@@ -609,7 +691,7 @@ class ARGO_System:
             
             # 执行动作
             if action == 'retrieve':
-                step_data = self._execute_retrieve(question, history, U_t)
+                step_data = self._execute_retrieve(question, history, U_t, options=options)
                 
                 if self.verbose and step_data['retrieval_success']:
                     print("✓ Retrieval successful")
@@ -621,7 +703,7 @@ class ARGO_System:
                     self.stats['successful_retrievals'] += 1
             
             else:  # reason
-                step_data = self._execute_reason(question, history, U_t)
+                step_data = self._execute_reason(question, history, U_t, options=options)
                 
                 self.stats['reason_actions'] += 1
             
@@ -717,9 +799,18 @@ class ARGO_System:
         self,
         original_question: str,
         history: List[Dict],
-        U_t: float
+        U_t: float,
+        options: Optional[List[str]] = None
     ) -> Dict:
-        """执行检索动作（使用增强的答案生成）"""
+        """
+        执行检索动作（使用增强的答案生成）
+        
+        Args:
+            original_question: 原始问题
+            history: 推理历史
+            U_t: 当前进度
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
+        """
         
         # 1. 生成子查询
         uncertainty = 1.0 - U_t
@@ -735,7 +826,7 @@ class ARGO_System:
         # 2. 检索
         docs, success, scores = self.retriever.retrieve(
             subquery,
-            k=3,
+            k=5,  # 增加检索数量：从3到5，提高找到相关文档的概率
             return_scores=True
         )
         
@@ -749,8 +840,12 @@ class ARGO_System:
         intermediate_answer = ""
         confidence = 0.0
         
+        # Track if LLM found useful information
+        effective_retrieval = success  # Start with technical success
+        
         if success and docs:
             # 使用检索器的答案生成方法（基于ARGO V2.0 prompts）
+            # 数据集全部是选择题，直接传递原始题目和选项（即使为None也传递）
             intermediate_answer = self.retriever.generate_answer_from_docs(
                 question=subquery,
                 docs=docs,
@@ -758,23 +853,44 @@ class ARGO_System:
                 tokenizer=self.tokenizer,
                 max_length=PromptConfig.REASONER_MAX_LENGTH,
                 temperature=PromptConfig.REASONER_TEMPERATURE,
-                top_p=PromptConfig.REASONER_TOP_P
+                top_p=PromptConfig.REASONER_TOP_P,
+                original_question=original_question,
+                options=options  # 直接传递，prompt内部会判断是否使用
             )
+            
+            # Check if LLM found useful information
+            # Improved logic: check if answer contains useful information, not just exact "No information found" string
+            if not intermediate_answer or intermediate_answer.strip() == "":
+                effective_retrieval = False
+                if self.verbose:
+                    print("⚠ Retrieval returned empty answer (LLM found no useful information)")
+            else:
+                # Check if answer is effective (contains useful information)
+                effective_retrieval = self._is_answer_effective(intermediate_answer)
+                if not effective_retrieval:
+                    if self.verbose:
+                        print("⚠ LLM indicated no information found (retrieval ineffective)")
             
             # 估算置信度（基于检索分数和答案质量）
             if intermediate_answer:
                 avg_score = np.mean(scores) if scores else 0.5
                 confidence = min(0.95, avg_score * 0.8 + 0.2)
+            else:
+                confidence = 0.0  # No confidence if no answer
             
             if self.verbose and intermediate_answer:
                 print(f"Intermediate Answer: {intermediate_answer[:150]}...")
                 print(f"Confidence: {confidence:.2f}")
+            elif self.verbose and not intermediate_answer:
+                print("⚠ No intermediate answer generated (retrieval ineffective)")
         
         # 4. 构造步骤数据
+        # Use effective_retrieval for progress tracking: only count as successful if we got useful content
         step_data = {
             'action': 'retrieve',
             'subquery': subquery,
-            'retrieval_success': success,
+            'retrieval_success': effective_retrieval,  # Use effective_retrieval instead of technical success
+            'technical_retrieval_success': success,  # Keep track of technical success separately
             'retrieved_docs': docs,
             'retrieval_scores': scores,
             'intermediate_answer': intermediate_answer,
@@ -785,18 +901,81 @@ class ARGO_System:
         
         return step_data
     
+    def _is_answer_effective(self, answer: str) -> bool:
+        """
+        判断答案是否有效（包含有用信息）
+        
+        改进的判断逻辑：
+        - 如果答案主要是"No information found"但没有其他有用信息，认为无效
+        - 如果答案包含选项编号、数值、技术术语等，认为有效
+        - 如果答案较长（>100字符），可能包含解释，认为有效
+        """
+        if not answer or answer.strip() == "":
+            return False
+        
+        # 检查是否主要是"No information found"
+        no_info_patterns = [
+            "[No information found in O-RAN specs]",
+            "No information found in O-RAN specs",
+            "no information found in O-RAN specs",
+            "```no information found in O-RAN specs```",
+            "[No information found",
+            "No information found"
+        ]
+        
+        answer_lower = answer.lower()
+        has_no_info = any(pattern.lower() in answer_lower for pattern in no_info_patterns)
+        
+        if has_no_info:
+            # 检查是否包含有用信息（选项编号、数值、技术术语等）
+            import re
+            useful_indicators = [
+                r'\d+\.',      # 选项编号（如"1.", "2."）
+                r'\d+°C',     # 温度
+                r'\d+%',      # 百分比
+                r'\d+[A-Z]',  # 技术规格（如"5G", "FR1"）
+                r'[A-Z]{2,}', # 缩写（如"O-RAN", "SSH"）
+            ]
+            
+            # 检查是否有数字（但排除纯"No information found"的情况）
+            has_numbers = bool(re.search(r'\d+', answer))
+            # 如果答案很短且只有"No information found"，认为无效
+            if len(answer.strip()) < 50 and not has_numbers:
+                return False
+            
+            has_useful_info = any(re.search(pattern, answer) for pattern in useful_indicators)
+            
+            # 如果答案较长（>100字符），可能包含解释，认为有效
+            # 或者包含有用信息，认为有效
+            if len(answer.strip()) > 100 or has_useful_info or has_numbers:
+                return True  # 有有用信息，认为检索有效
+            else:
+                return False  # 主要是"No information found"，认为无效
+        
+        return True  # 没有"No information found"，认为有效
+    
     def _execute_reason(
         self,
         original_question: str,
         history: List[Dict],
-        U_t: float
+        U_t: float,
+        options: Optional[List[str]] = None
     ) -> Dict:
-        """执行推理动作（使用增强的推理prompt）"""
+        """
+        执行推理动作（使用增强的推理prompt）
         
-        # 构建推理提示词（使用ARGO V2.0标准模板）
+        Args:
+            original_question: 原始问题
+            history: 推理历史
+            U_t: 当前进度
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
+        """
+        
+        # 构建推理提示词（使用ARGO V2.0标准模板，传递原始题目和选项）
         prompt = ARGOPrompts.build_reasoning_prompt(
             original_question=original_question,
-            history=history
+            history=history,
+            options=options
         )
         
         # 生成中间答案

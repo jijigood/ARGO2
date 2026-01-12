@@ -156,14 +156,28 @@ class QuestionComplexityClassifier:
 
     @staticmethod
     def _blend_labels(primary: str, hint: str) -> str:
+        """
+        Blend primary (estimated) complexity with hint (from dataset).
+        
+        When dataset provides difficulty hint (easy/medium/hard), 
+        we TRUST the hint and use it directly since it comes from
+        expert annotation.
+        
+        Args:
+            primary: Estimated complexity from question analysis
+            hint: Difficulty hint from dataset metadata
+            
+        Returns:
+            Final complexity label
+        """
         order = {'simple': 0, 'medium': 1, 'complex': 2}
-        if primary not in order or hint not in order:
+        if primary not in order:
             return primary
-        blended = max(order[primary], order[hint])
-        for label, idx in order.items():
-            if idx == blended:
-                return label
-        return primary
+        if hint not in order:
+            return primary
+        # When hint is available, trust it over estimation
+        # This ensures easy questions get classified as simple
+        return hint
 
     @staticmethod
     def _tokenize(text: str) -> list:

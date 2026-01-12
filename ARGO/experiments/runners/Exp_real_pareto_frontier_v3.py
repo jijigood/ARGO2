@@ -58,7 +58,8 @@ class ParetoFrontierExperimentV3:
         config_path: str,
         llm_model_path: str = "/data/user/huangxiaolin/ARGO/RAG_Models/models/Qwen2.5-3B-Instruct",
         embedding_model_path: str = "/data/user/huangxiaolin/ARGO/models/all-MiniLM-L6-v2",
-        chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/ARGO/Environments/chroma_store",
+        chroma_db_path: str = "/data/user/huangxiaolin/ARGO2/Environments/chroma_store_v2",
+        collection_name: str = "oran_specs_semantic",
         n_test_questions: int = 20,
         difficulty: str = "hard",
         seed: int = 42,
@@ -69,6 +70,7 @@ class ParetoFrontierExperimentV3:
         self.llm_model_path = llm_model_path
         self.embedding_model_path = embedding_model_path
         self.chroma_db_path = chroma_db_path
+        self.collection_name = collection_name
         self.n_test_questions = n_test_questions
         self.difficulty = difficulty
         self.seed = seed
@@ -149,6 +151,7 @@ class ParetoFrontierExperimentV3:
             mdp_config=mdp_config,
             retriever_mode='chroma',
             chroma_dir=self.chroma_db_path,
+            collection_name=self.collection_name,
             max_steps=10,
             verbose=self.verbose
         )
@@ -428,6 +431,12 @@ def main():
     parser = argparse.ArgumentParser(description='Pareto Frontier Experiment V3')
     parser.add_argument('--config-path', type=str, 
                        default='/data/user/huangxiaolin/ARGO2/ARGO/configs/pareto_optimized.yaml')
+    parser.add_argument('--chroma-db-path', type=str,
+                       default='/data/user/huangxiaolin/ARGO2/Environments/chroma_store_v2',
+                       help='Path to Chroma vector database')
+    parser.add_argument('--collection-name', type=str,
+                       default='oran_specs_semantic',
+                       help='Chroma collection name')
     parser.add_argument('--n-questions', type=int, default=20)
     parser.add_argument('--difficulty', type=str, default='hard',
                        choices=['easy', 'medium', 'hard'])
@@ -447,6 +456,8 @@ def main():
     print("Pareto Frontier Experiment V3")
     print("=" * 80)
     print(f"Config: {args.config_path}")
+    print(f"Chroma DB: {args.chroma_db_path}")
+    print(f"Collection: {args.collection_name}")
     print(f"Questions: {args.n_questions} ({args.difficulty})")
     print(f"μ range: [{args.mu_min}, {args.mu_max}] ({args.n_mu_steps} steps)")
     print(f"GPUs: {gpu_ids}")
@@ -454,6 +465,8 @@ def main():
     
     exp = ParetoFrontierExperimentV3(
         config_path=args.config_path,
+        chroma_db_path=args.chroma_db_path,
+        collection_name=args.collection_name,
         n_test_questions=args.n_questions,
         difficulty=args.difficulty,
         seed=args.seed,

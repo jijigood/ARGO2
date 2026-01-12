@@ -38,18 +38,37 @@ Your responses must be accurate, concise, and compliant with O-RAN standards."""
 
     # ==================== 2. QUERY DECOMPOSITION ====================
     
-    DECOMPOSITION_INSTRUCTION = """Decompose O-RAN technical questions into focused sub-questions. Track your information progress to make efficient decisions.
+    DECOMPOSITION_INSTRUCTION = """Decompose O-RAN technical questions into focused, searchable sub-questions. Track your information progress to make efficient decisions.
 
 Requirements:
-1. Generate ONE atomic sub-question at a time
-2. Each sub-question should target specific missing information
-3. Avoid redundant questions that don't add new information
-4. Follow the exact format shown in examples
+1. Generate ONE atomic, specific sub-question at a time
+2. Each sub-question should target specific missing information with clear O-RAN technical terms
+3. Use precise O-RAN terminology (e.g., "O-DU", "E2 interface", "fronthaul", "Split 7.2x") to improve retrieval
+4. Make sub-questions searchable and specific - avoid vague or overly broad questions
+5. Avoid redundant questions that don't add new information
+6. Follow the exact format shown in examples
+7. Always plan to finish in the minimum number of steps (<=3 for simple prompts) by combining closely related gaps into a single query when safe
+8. If you already have enough detail to answer, stop proposing new sub-questions and move to synthesis
+9. Consider what information would be needed to answer the original question - prioritize fundamental facts first
+
+IMPORTANT: If this is a multiple-choice question with options provided:
+- Consider the options when generating sub-questions - they contain keywords and concepts that may guide your queries
+- Generate sub-questions that help distinguish between options or verify information related to specific options
+- Use terms from the options in your sub-questions when relevant to improve retrieval accuracy
+
+Best Practices for Sub-questions:
+- Use specific O-RAN components, interfaces, or standards names when possible
+- Include measurable parameters (latency, bandwidth, etc.) for performance-related questions
+- Break complex questions into simpler, more retrievable components
+- Ask about concrete specifications rather than abstract concepts
+- Consider keywords and concepts from the options (if provided) when formulating sub-questions
+- Example good sub-question: "What is the latency requirement for O-RAN fronthaul interface?"
+- Example poor sub-question: "How does O-RAN work?" (too broad)
 
 Progress Indicators:
-- [Low Progress] = Need fundamental information → Prioritize retrieval
-- [Medium Progress] = Have basic facts, need connections → Balance retrieval/reasoning
-- [High Progress] = Have most information, ready to synthesize → Prepare to terminate"""
+- [Low Progress] = Need fundamental information -> Prioritize retrieval with specific technical terms
+- [Medium Progress] = Have basic facts, need connections -> Balance retrieval/reasoning with targeted queries
+- [High Progress] = Have most information, ready to synthesize -> Prepare to terminate"""
 
     DECOMPOSITION_EXAMPLES = """
 Examples:
@@ -106,13 +125,46 @@ Intermediate answer: Split 2 provides maximum centralization with entire PHY lay
 
     # ==================== 3. RETRIEVAL ANSWER ====================
     
-    RETRIEVAL_ANSWER_INSTRUCTION = """Provide a precise and accurate answer based on O-RAN specification documents. If the context lacks relevant information, respond with `[No information found in O-RAN specs]`.
+    RETRIEVAL_ANSWER_INSTRUCTION = """Provide a precise and accurate answer based on O-RAN specification documents. 
+
+CRITICAL: You MUST extract and use information from the context whenever possible. 
+
+IMPORTANT: If the context contains ANY relevant information (even partial, indirect, or incomplete), you MUST use it. Do NOT say "No information found" if:
+- The context mentions ANY keywords related to the question or options
+- The context contains ANY technical terms, numbers, or specifications that could be relevant
+- The context provides ANY partial information, even if incomplete
+
+Only respond with `[No information found in O-RAN specs]` as a LAST RESORT when:
+- The context is completely unrelated to BOTH the subquery AND the original question (if provided)
+- The context contains ZERO relevant keywords or concepts related to the question OR any options (if provided)
+- Even partial, indirect, or related information is completely absent
+
+IMPORTANT EVALUATION GUIDELINES:
+1. If this is a multiple-choice question with options provided:
+   - Consider if the context mentions ANY information related to ANY option
+   - Even if the context doesn't directly answer the subquery, it may be useful if it relates to an option
+   - Keywords in options may appear in the context - this is useful information
+
+2. If an original question is provided (different from the subquery):
+   - Consider BOTH the subquery AND the original question when evaluating relevance
+   - Information relevant to the original question is useful, even if not directly answering the subquery
+   - The subquery is a focused part of the original question - use the broader context
+
+3. General rules:
+   - If the context mentions ANYTHING related to the question or options (even tangentially), you MUST provide an answer
+   - Extract and use ANY relevant information, even if partial or indirect
+   - Connect related information across multiple context snippets
+   - Look for indirect connections and related concepts
 
 Requirements:
 1. Answer must be technically accurate and cite O-RAN specification sections when possible
 2. Be concise but complete
 3. Use standard O-RAN terminology
-4. If information is incomplete, state what is missing"""
+4. Extract and use ANY relevant information from the context, even if it's partial or indirect
+5. If information is incomplete but relevant, use what you have and note what's missing
+6. Connect related information across multiple context snippets to form a complete answer
+7. Look for indirect connections: if context mentions related concepts, use them
+8. Only say "no information found" if you genuinely cannot extract ANY useful information from ANY part of the context, even after considering the original question and options"""
 
     RETRIEVAL_ANSWER_EXAMPLES = """
 Examples:
@@ -123,7 +175,7 @@ Answer: The E2 interface supports near-real-time operations with latency between
 
 Question: What is the default port for F1 interface?
 Context: [O-RAN.WG4] The F1 interface uses SCTP as transport protocol. Security aspects are covered in the security specifications.
-Answer: [No information found in O-RAN specs]
+Answer: The F1 interface uses SCTP as transport protocol, but the specific default port number is not mentioned in this context. According to O-RAN.WG4, the transport protocol is specified, but port details are covered in the security specifications.
 
 Question: How many bits are used for IQ sample representation?
 Context: [O-RAN.WG4.CUS] The fronthaul interface supports multiple IQ bit widths: uncompressed 16-bit samples, or compressed formats using block floating point with 8, 9, or 12-bit mantissas.
@@ -144,7 +196,12 @@ Requirements:
 3. Provide reasoning based on what you already know
 4. Be concise but informative
 5. DO NOT provide the final answer yet - only intermediate insights
-6. If uncertain, acknowledge the limitation"""
+6. If uncertain, acknowledge the limitation
+
+IMPORTANT: If this is a multiple-choice question with options provided:
+- Consider the options when reasoning - they contain information that may help evaluate each option
+- Use your knowledge to analyze which options are more likely correct based on O-RAN specifications
+- Compare options and reason about their differences and relationships"""
 
     REASONING_EXAMPLES = """
 Examples:
@@ -214,7 +271,8 @@ where X is the option number (1, 2, 3, or 4)."""
     def build_decomposition_prompt(
         original_question: str,
         history: List[Dict],
-        progress: float
+        progress: float,
+        options: Optional[List[str]] = None
     ) -> str:
         """
         构建查询分解提示词
@@ -223,6 +281,7 @@ where X is the option number (1, 2, 3, or 4)."""
             original_question: 原始问题
             history: 推理历史
             progress: 当前进度 (0-1)
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
         
         Returns:
             完整的提示词
@@ -231,8 +290,31 @@ where X is the option number (1, 2, 3, or 4)."""
         prompt += ARGOPrompts.DECOMPOSITION_EXAMPLES + "\n\n"
         
         # 添加当前问题
-        prompt += f"Question: {original_question}\n\n"
+        prompt += f"Question: {original_question}\n"
         
+        # 添加选项（数据集全部是选择题，直接传递，如果有内容就显示）
+        if options and len(options) > 0:
+            prompt += "\nOptions:\n"
+            for i, opt in enumerate(options, 1):
+                prompt += f"  {i}. {opt}\n"
+            prompt += "\nNote: Consider the options when generating sub-questions. "
+            prompt += "The options contain keywords and concepts that may guide your queries. "
+            prompt += "Generate sub-questions that help distinguish between options or verify information related to specific options.\n\n"
+        
+        # Step compression hints to bias the LLM toward fewer turns
+        question_tokens = len(original_question.split())
+        prompt += "Step Compression Rules:\n"
+        prompt += "- Only request information that is still missing; reuse prior intermediate answers when possible.\n"
+        prompt += "- Merge tightly related gaps into a single verification-style question if it keeps the ask precise.\n"
+        prompt += "- Prefer reasoning or termination instead of another retrieval when evidence already covers the requirement.\n"
+        prompt += "- Use specific O-RAN technical terms in your sub-questions to improve retrieval accuracy.\n"
+        prompt += "- Include concrete parameters (numbers, specifications, standards) when asking about requirements or configurations.\n"
+        if question_tokens <= 12:
+            prompt += "- This question is short, so answer it within one extra query at most; conclude immediately if nothing is missing.\n"
+        if progress >= 0.6:
+            prompt += "- Progress is above 60%, so issue one confirmation question or terminate.\n"
+        prompt += "\n"
+
         # 添加历史记录（模仿示例格式）
         if history and len(history) > 0:
             for i, step in enumerate(history):
@@ -272,7 +354,9 @@ where X is the option number (1, 2, 3, or 4)."""
     @staticmethod
     def build_retrieval_answer_prompt(
         question: str,
-        retrieved_docs: List[str]
+        retrieved_docs: List[str],
+        original_question: Optional[str] = None,
+        options: Optional[List[str]] = None
     ) -> str:
         """
         构建基于检索文档的答案生成提示词
@@ -280,6 +364,8 @@ where X is the option number (1, 2, 3, or 4)."""
         Args:
             question: 子查询
             retrieved_docs: 检索到的文档列表
+            original_question: 原始问题（数据集全部是选择题，总是传递）
+            options: 选择题选项列表（数据集全部是选择题，总是传递）
         
         Returns:
             完整的提示词
@@ -287,16 +373,33 @@ where X is the option number (1, 2, 3, or 4)."""
         prompt = ARGOPrompts.RETRIEVAL_ANSWER_INSTRUCTION + "\n\n"
         prompt += ARGOPrompts.RETRIEVAL_ANSWER_EXAMPLES + "\n\n"
         
-        # 添加当前问题
-        prompt += f"Question: {question}\n"
+        # 添加原始问题（如果提供且不同于子查询），提供完整上下文
+        if original_question and original_question != question:
+            prompt += f"Original Question: {original_question}\n"
+            prompt += f"Current Subquery: {question}\n"
+            prompt += "\nNote: The subquery is a focused part of the original question. "
+            prompt += "When evaluating if the context is useful, consider BOTH the subquery AND the original question.\n\n"
+        else:
+            prompt += f"Question: {question}\n"
+        
+        # 添加选项（数据集全部是选择题，直接传递，如果有内容就显示）
+        if options and len(options) > 0:
+            prompt += "\nOptions:\n"
+            for i, opt in enumerate(options, 1):
+                prompt += f"  {i}. {opt}\n"
+            prompt += "\nNote: The options may contain keywords or concepts related to the question. "
+            prompt += "If the context mentions information related to ANY option or the original question, "
+            prompt += "it should be considered useful, even if it doesn't directly answer the subquery.\n\n"
         
         # 添加检索上下文
         if retrieved_docs:
             prompt += "Context:\n"
-            for doc in retrieved_docs[:5]:  # 最多5个文档
-                prompt += f"{doc}\n"
+            for i, doc in enumerate(retrieved_docs[:5], 1):  # 最多5个文档
+                prompt += f"[Document {i}]\n{doc}\n\n"
+            prompt += "Remember: Extract useful information from ALL context documents. Connect information across documents if needed.\n"
         else:
             prompt += "Context: (No documents retrieved)\n"
+            prompt += "Note: Without context documents, you should respond with `[No information found in O-RAN specs]`.\n"
         
         prompt += "\nAnswer: "
         
@@ -305,7 +408,8 @@ where X is the option number (1, 2, 3, or 4)."""
     @staticmethod
     def build_reasoning_prompt(
         original_question: str,
-        history: List[Dict]
+        history: List[Dict],
+        options: Optional[List[str]] = None
     ) -> str:
         """
         构建中间推理提示词（基于参数化知识，不使用检索）
@@ -316,6 +420,7 @@ where X is the option number (1, 2, 3, or 4)."""
         Args:
             original_question: 原始问题
             history: 推理历史
+            options: 选择题选项列表（数据集全部是选择题，直接传递）
         
         Returns:
             完整的提示词
@@ -323,7 +428,16 @@ where X is the option number (1, 2, 3, or 4)."""
         prompt = ARGOPrompts.REASONING_INSTRUCTION + "\n\n"
         prompt += ARGOPrompts.REASONING_EXAMPLES + "\n\n"
         
-        prompt += f"Question: {original_question}\n\n"
+        prompt += f"Question: {original_question}\n"
+        
+        # 添加选项（数据集全部是选择题，直接传递，如果有内容就显示）
+        if options and len(options) > 0:
+            prompt += "\nOptions:\n"
+            for i, opt in enumerate(options, 1):
+                prompt += f"  {i}. {opt}\n"
+            prompt += "\nNote: Consider the options when reasoning. "
+            prompt += "Use your knowledge to analyze which options are more likely correct based on O-RAN specifications. "
+            prompt += "Compare options and reason about their differences.\n\n"
         
         # 添加历史上下文（模仿示例格式）
         if history and len(history) > 0:
@@ -435,7 +549,7 @@ where X is the option number (1, 2, 3, or 4)."""
                 subq = step.get('subquery', 'N/A')
                 success = step.get('retrieval_success', False)
                 status = "✓ Found" if success else "✗ Not found"
-                prompt += f"Step {i+1} [Retrieve]: \"{subq}\" → {status}\n"
+                prompt += f"Step {i+1} [Retrieve]: \"{subq}\" -> {status}\n"
             elif action == 'reason':
                 prompt += f"Step {i+1} [Reason]: Applied domain knowledge\n"
         

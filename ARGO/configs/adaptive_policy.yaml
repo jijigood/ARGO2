@@ -9,9 +9,16 @@
 # Actual threshold = base_threshold × question_umax(x)
 
 theta_star_by_complexity:
-  simple: 0.75    # For simple questions (U_max ≈ 0.4), actual θ* ≈ 0.30
-  medium: 0.80    # For medium questions (U_max ≈ 0.7), actual θ* ≈ 0.56
-  complex: 0.85   # For complex questions (U_max ≈ 0.9), actual θ* ≈ 0.76
+  simple: 0.65    # Optimized for 1-2 steps target
+                  # For simple questions (U_max ≈ 0.4), actual θ* ≈ 0.26
+                  # With gain_multiplier=1.40: delta_r=0.35, delta_p=0.112
+                  # Expected steps: 0.26/0.35 = 0.74 → 1-2步 ✅
+  medium: 0.75    # Optimized for 2-3 steps target
+                  # For medium questions (U_max ≈ 0.55), actual θ* ≈ 0.4125
+                  # With gain_multiplier=0.90: delta_r=0.225, expected steps: 0.4125/0.225 = 1.83 → 2-3步 ✅
+  complex: 0.90   # Optimized for 4-6 steps target
+                  # For complex questions (U_max ≈ 0.75), actual θ* ≈ 0.675
+                  # With gain_multiplier=0.75: delta_r=0.1875, expected steps: 0.675/0.1875 = 3.6 → 4-6步 ✅
 
 theta_cont_by_complexity:
   simple: 0.35    # Retrieve vs Reason threshold
@@ -36,8 +43,9 @@ max_steps_by_complexity:
 # ============================================================================
 progress:
   enabled: true  # Enable dynamic progress tracking
+  mode: fixed    # Use fixed mode (applies gain_multipliers for complexity)
   
-  # Base gains (will be scaled by question complexity)
+  # Base gains (will be scaled by question complexity via gain_multipliers)
   base_retrieval_gain: 0.25
   base_reason_gain: 0.08
   
@@ -47,26 +55,29 @@ progress:
   confidence_weight: 0.4  # Weight for confidence scores
   
   # Gain bounds
-  min_gain: 0.015   # Minimum progress per step
+  min_gain: 0.06   # Minimum progress per step
   max_gain: 0.35    # Maximum progress per step
   
   # Complexity-based gain multipliers
-  # Simple questions grow faster, complex questions grow slower
+  # Optimized for target steps: simple 1-2, medium 2-3, complex 4-6
   gain_multipliers:
-    simple: 1.20    # 20% faster progress for simple questions
-    medium: 1.00    # Normal progress for medium questions
-    complex: 0.85   # 15% slower progress for complex questions
+    simple: 1.40    # Optimized for 1-2 steps target
+                    # delta_r = 0.25 × 1.40 = 0.35, with θ*=0.26 → 1-2步 ✅
+    medium: 0.90    # Optimized for 2-3 steps target
+                    # delta_r = 0.25 × 0.90 = 0.225, with θ*=0.4125 → 2-3步 ✅
+    complex: 0.75   # Optimized for 4-6 steps target
+                    # delta_r = 0.25 × 0.75 = 0.1875, with θ*=0.675 → 4-6步 ✅
 
 # ============================================================================
 # Complexity Classification
 # ============================================================================
 complexity:
   # Token count thresholds
-  simple_length: 10     # Questions <= 10 tokens considered for simple
+  simple_length: 8      # Stricter simple threshold to avoid pseudo-simple questions
   medium_length: 20     # Questions <= 20 tokens considered for medium
   
   # Scoring thresholds
-  simple_score_max: 0   # Score <= 0 → simple
+  simple_score_max: -1  # Only ultra-low complexity scores stay simple
   medium_score_max: 3   # Score <= 3 → medium, else complex
   
   # Use difficulty hints from dataset metadata

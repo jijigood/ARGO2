@@ -312,10 +312,14 @@ def run_experiment(
         pbar.set_description(f"Q{idx+1}: {preview}")
 
         try:
+            # Build question metadata with difficulty hint
+            q_metadata = {'difficulty': metadata_difficulty} if metadata_difficulty else None
+            
             answer, choice, history, metadata = argo_system.answer_question(
                 question,
                 return_history=True,
-                options=options
+                options=options,
+                question_metadata=q_metadata
             )
             metadata = metadata or {}
             if choice is not None and ground_truth is not None:
@@ -671,10 +675,10 @@ Examples:
                         help='Base retrieval cost used when applying multipliers (defaults to c_p, then c_r)')
 
     parser.add_argument('--chroma-dir', type=str,
-                        default='Environments/chroma_store',
+                        default='/data/user/huangxiaolin/ARGO2/Environments/chroma_store_v2',
                         help='Path to Chroma vector database')
     parser.add_argument('--collection-name', type=str,
-                        default='oran_specs',
+                        default='oran_specs_semantic',
                         help='Chroma collection name')
 
     parser.add_argument('--gpus', type=str,
