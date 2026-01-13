@@ -1,0 +1,86 @@
+# Pareto实验最终配置 - 基于V3优化
+# ==========================================
+# 分析总结：
+# 
+# V3配置在μ∈[0, 0.5]范围内展示了良好的适应性行为：
+#   - μ=0.0: 只检索 (质量最大化)
+#   - μ=0.1-0.4: 混合策略 (检索后推理)
+#   - μ≥0.5: 早期终止 (成本最小化)
+#
+# 这IS the expected optimal behavior:
+# - 低μ: 质量优先，多检索获取信息
+# - 中μ: 平衡策略，适当检索后用推理节省成本
+# - 高μ: 成本优先，尽早终止
+#
+# 实验策略:
+# 1. 更多μ采样点在有意义的[0, 0.6]范围
+# 2. 多种子运行确保统计显著性
+# ==========================================
+
+gpu:
+  n_gpus: 8
+  max_memory_per_gpu: 10
+  default_gpu_ids: [4, 5, 6, 7]
+  default_mode: "auto"
+
+models:
+  small:
+    models:
+      - "Qwen/Qwen2.5-1.5B-Instruct"
+      - "Qwen/Qwen2.5-3B-Instruct"
+    recommended_mode: "single"
+    n_gpus_needed: 1
+
+mdp:
+  # 状态空间
+  U_max: 1.0
+  
+  # ========================================
+  # 参数设置 (与V3相同)
+  # ========================================
+  delta_r: 0.25       # 检索进度增量
+  p_s: 0.75           # 检索成功概率
+  c_r: 0.15           # 检索成本
+  
+  delta_p: 0.04       # 推理进度增量
+  c_p: 0.06           # 推理成本
+  
+  # ========================================
+  # 效率分析
+  # ========================================
+  # 检索效率 = 0.75 × 0.25 / 0.15 = 1.25
+  # 推理效率 = 0.04 / 0.06 = 0.667
+  # 效率比 = 1.87 (检索更高效)
+  #
+  # 预期行为:
+  # - μ=0.0: θ_cont ≈ θ* (只检索)
+  # - μ=0.1-0.4: θ_cont < θ* (混合策略)
+  # - μ≥0.5: 提前终止
+  # ========================================
+  
+  # MDP求解参数
+  mu: 0.2             # 默认值
+  gamma: 0.98
+  grid_size: 101
+  
+  # 质量函数
+  quality_function: "linear"
+  quality_k: 1.0
+  
+  # Reward Shaping
+  reward_shaping:
+    enabled: false
+    k: 1.0
+
+inference:
+  batch_size: 4
+  generation:
+    max_new_tokens: 10
+    temperature: 0.1
+    do_sample: false
+  dtype: "float16"
+
+output:
+  results_dir: "results/pareto_final"
+  save_full_results: true
+  verbose: true
